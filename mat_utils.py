@@ -5,7 +5,6 @@ import app_config as cfg
 
 class Mat:
     mat_file = None
-
     def __init__(self, file_name):
         self.mat_file = io.loadmat(cfg.path(cfg.av_wide_data, file_name))
         self.image = self.mat_file['I2']
@@ -15,4 +14,3 @@ class Mat:
 
     def get_image(self, image_dict_key='I2'):
         return self.mat_file[image_dict_key]
-

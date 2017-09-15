@@ -76,7 +76,7 @@ def slide_and_construct(nd_array, m=50, n=50, threshold=0.95):
                     nd_array[i - 1, j + 1] = mn
 
 
-def show(image_array):
+def show_image(image_array):
     Image.fromarray(image_array).show()
 
 
