@@ -80,14 +80,9 @@ def show_image(image_array):
     Image.fromarray(image_array).show()
 
 
-def save_image(image, x, y, threshold):
+def save_image(image, x, y):
     new_image = Image.fromarray(image)
-    file_name = str(x) + ' by ' + str(y) + '_T_' + str(threshold) + '.png'
+    file_name = str(x) + ' by ' + str(y) + '_T_' + '.png'
     os.chdir(cfg.output_path)
     image.save(file_name)
     new_image.show()
-
-
-if __name__ == '__main__':
-    arr = np.array([[3, 2, 3, 8], [5, 5, 9, 7], [10, 11, 8, 6], [4, 5, 9, 10]], np.int32)
-    slide_and_construct(arr, 4, 4)
