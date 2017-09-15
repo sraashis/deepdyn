@@ -1,16 +1,21 @@
+import os
+
 import numpy as np
+from PIL import Image
+
+import app_config as cfg
 
 
-# (2d_array, m, n)
-# # 3*3 Sliding window by default
-def sliding_window(nd_array, m=3, n=3):
+# @args(2d_array, m, n)
+# # 50 * 50 Sliding window by default
+def slide_and_construct(nd_array, m=50, n=50, threshold=0.85):
     x = nd_array.shape[0]
     y = nd_array.shape[1]
     x_w = m - 1
     y_w = n - 1
     for i in range(0, x):
         for j in range(0, y):
-            print(str(i)+','+str(j)+'\n')
+            print(str(i) + ',' + str(j) + '\n')
             window_x, window_y = i - 1, j - 1
             if window_x < 0:
                 window_x = 0
@@ -20,58 +25,66 @@ def sliding_window(nd_array, m=3, n=3):
             temp_x, temp_y = temp_arr.shape[0], temp_arr.shape[1]
             avg = np.ndarray.sum(temp_arr) / (temp_x * temp_y)
             mx = np.ndarray.max(temp_arr)
+            mn = np.ndarray.min(temp_arr)
 
             if i - 1 >= 0:
-                if nd_array[i - 1, j] >= avg:
+                if nd_array[i - 1, j] >= avg * threshold:
                     nd_array[i - 1, j] = mx
                 else:
-                    nd_array[i - 1, j] = 0
+                    nd_array[i - 1, j] = mn
 
             if i + 1 <= x - 1:
-                if nd_array[i + 1, j] >= avg:
+                if nd_array[i + 1, j] >= avg * threshold:
                     nd_array[i + 1, j] = mx
                 else:
-                    nd_array[i + 1, j] = 0
+                    nd_array[i + 1, j] = mn
 
             if j - 1 >= 0:
-                if nd_array[i, j - 1] >= avg:
+                if nd_array[i, j - 1] >= avg * threshold:
                     nd_array[i, j - 1] = mx
                 else:
-                    nd_array[i, j - 1] = 0
+                    nd_array[i, j - 1] = mn
 
             if j + 1 <= y - 1:
-                if nd_array[i, j + 1] >= avg:
+                if nd_array[i, j + 1] >= avg * threshold:
                     nd_array[i, j + 1] = mx
                 else:
-                    nd_array[i, j + 1] = 0
+                    nd_array[i, j + 1] = mn
 
             if i + 1 <= x - 1 and j + 1 <= y - 1:
-                if nd_array[i + 1, j + 1] >= avg:
+                if nd_array[i + 1, j + 1] >= avg * threshold:
                     nd_array[i + 1, j + 1] = mx
                 else:
-                    nd_array[i + 1, j + 1] = 0
+                    nd_array[i + 1, j + 1] = mn
 
             if i + 1 <= x - 1 and j - 1 >= 0:
-                if nd_array[i + 1, j - 1] >= avg:
+                if nd_array[i + 1, j - 1] >= avg * threshold:
                     nd_array[i + 1, j - 1] = mx
                 else:
-                    nd_array[i + 1, j - 1] = 0
+                    nd_array[i + 1, j - 1] = mn
 
             if i - 1 >= 0 and j - 1 >= 0:
-                if nd_array[i - 1, j - 1] >= avg:
+                if nd_array[i - 1, j - 1] >= avg * threshold:
                     nd_array[i - 1, j - 1] = mx
                 else:
-                    nd_array[i - 1, j - 1] = 0
+                    nd_array[i - 1, j - 1] = mn
 
             if i - 1 >= 0 and j + 1 <= y - 1:
-                if nd_array[i - 1, j + 1] >= avg:
+                if nd_array[i - 1, j + 1] >= avg * threshold:
                     nd_array[i - 1, j + 1] = mx
                 else:
-                    nd_array[i - 1, j + 1] = 0
-    return nd_array
+                    nd_array[i - 1, j + 1] = mn
+
+
+def save_image(image, x, y, threshold):
+    new_image = Image.fromarray(image)
+    file_name = str(x) + ' by ' + str(y) + '_T_' + str(threshold) + '.png'
+    os.chdir(cfg.output_path)
+    image.save(file_name)
+    new_image.show()
 
 
 if __name__ == '__main__':
     arr = np.array([[3, 2, 3, 8], [5, 5, 9, 7], [10, 11, 8, 6], [4, 5, 9, 10]], np.int32)
-    result = sliding_window(arr,4,4)
+    result = slide_and_construct(arr, 4, 4)
     print(result)
