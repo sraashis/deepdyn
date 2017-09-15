@@ -8,7 +8,7 @@ import app_config as cfg
 
 # @args(2d_array, m, n)
 # # 50 * 50 Sliding window by default
-def slide_and_construct(nd_array, m=50, n=50, threshold=0.85):
+def slide_and_construct(nd_array, m=50, n=50, threshold=0.95):
     x = nd_array.shape[0]
     y = nd_array.shape[1]
     x_w = m - 1
@@ -76,6 +76,10 @@ def slide_and_construct(nd_array, m=50, n=50, threshold=0.85):
                     nd_array[i - 1, j + 1] = mn
 
 
+def show(image_array):
+    Image.fromarray(image_array).show()
+
+
 def save_image(image, x, y, threshold):
     new_image = Image.fromarray(image)
     file_name = str(x) + ' by ' + str(y) + '_T_' + str(threshold) + '.png'
@@ -86,5 +90,4 @@ def save_image(image, x, y, threshold):
 
 if __name__ == '__main__':
     arr = np.array([[3, 2, 3, 8], [5, 5, 9, 7], [10, 11, 8, 6], [4, 5, 9, 10]], np.int32)
-    result = slide_and_construct(arr, 4, 4)
-    print(result)
+    slide_and_construct(arr, 4, 4)
