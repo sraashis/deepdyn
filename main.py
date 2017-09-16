@@ -9,7 +9,7 @@ if __name__ == '__main__':
 
     image = file.get_image('I2')
 
-    img.slide_and_construct(image[:, :, 1])
+    img.slide_and_construct(image[:, :, 1],m=33,n=33,threshold=.89)
     img.show_image(image[:, :, 1])
 
     # auxiliary_graph = file.get_graph('A')
