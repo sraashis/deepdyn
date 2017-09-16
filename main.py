@@ -2,14 +2,15 @@ from preprocess.mat_utils import Mat
 from preprocess import image_utils as img
 from preprocess import graph_utils as gt
 
+
 if __name__ == '__main__':
 
     file = Mat(file_name='wide_image_03.mat')
 
     image = file.get_image('I2')
 
-    img.slide_and_construct(image[:, :, 1], m=40, n=40, threshold=.8)
-    img.show_image(image[:, :, 1])
+    img.slide_and_construct(image[:, :, 1], m=44, n=66, threshold=.94)
+    img.save_image(image[:, :, 1])
 
     auxiliary_graph = file.get_graph('A')
     node_pos = file.get_graph('V')

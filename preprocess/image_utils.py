@@ -81,9 +81,9 @@ def show_image(image_array):
     Image.fromarray(image_array).show()
 
 
-def save_image(image, x, y):
+def save_image(image, x='X', y='Y'):
     new_image = Image.fromarray(image)
     file_name = str(x) + ' by ' + str(y) + '_T_' + '.png'
     os.chdir(cfg.output_path)
-    image.save(file_name)
+    new_image.save(file_name)
     new_image.show()
