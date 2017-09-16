@@ -9,5 +9,5 @@ conf_path = os.path.join(path, 'conf')
 av_wide_data = os.path.join(input_path, 'av_wide_data_set')
                                       
 
-def path(root, add):
+def join(root, add):
     return os.path.join(root, add)

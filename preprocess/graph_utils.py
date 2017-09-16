@@ -2,9 +2,9 @@ import matplotlib.pyplot as plt
 import networkx as nx
 
 
-def show_graph(auxiliary_matrix, node_pos=None, node_color='r'):
+def show_graph(auxiliary_matrix, node_pos=None, node_color='red',edge_color='black'):
     graph = nx.from_scipy_sparse_matrix(auxiliary_matrix)
-    nx.draw_networkx(graph, pos=node_pos, edge_color='black', node_color=node_color, with_labels=False, node_size=4,
+    nx.draw_networkx(graph, pos=node_pos, edge_color=edge_color, node_color=node_color, with_labels=False, node_size=4,
                      width=0.5)
     plt.show()
 

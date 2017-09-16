@@ -1,9 +1,8 @@
 import os
-
 import numpy as np
 from PIL import Image
 
-import app_config as cfg
+import path_config as cfg
 
 
 # @args(2d_array, m, n)
