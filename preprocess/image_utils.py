@@ -8,7 +8,7 @@ import app_config as cfg
 
 # @args(2d_array, m, n)
 # # 50 * 50 Sliding window by default
-def slide_and_construct(nd_array, m=45, n=45, threshold=0.85):
+def slide_and_construct(nd_array, m=44, n=44, threshold=1):
     x = nd_array.shape[0]
     y = nd_array.shape[1]
     x_w = m - 1
