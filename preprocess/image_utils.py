@@ -8,19 +8,21 @@ import app_config as cfg
 
 # @args(2d_array, m, n)
 # # 50 * 50 Sliding window by default
-def slide_and_construct(nd_array, m=50, n=50, threshold=0.90):
+def slide_and_construct(nd_array, m=45, n=45, threshold=0.85):
     x = nd_array.shape[0]
     y = nd_array.shape[1]
     x_w = m - 1
     y_w = n - 1
+
     for i in range(0, x):
         for j in range(0, y):
-            print(str(i) + ',' + str(j) + '\n')
+            print('\r[ {} / {} ]'.format(i,x), end="")
             window_x, window_y = i - 1, j - 1
             if window_x < 0:
                 window_x = 0
             if window_y < 0:
                 window_y = 0
+
             window_arr = nd_array[window_x:i + x_w, window_y:j + y_w]
             temp_x, temp_y = window_arr.shape[0], window_arr.shape[1]
             avg = np.ndarray.sum(window_arr) / (temp_x * temp_y)
