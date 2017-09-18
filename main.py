@@ -3,7 +3,7 @@ from preprocess import image_utils as img
 from preprocess.mat_utils import Mat
 
 if __name__ == '__main__':
-    file = Mat(file_name='wide_image_21.mat')
+    file = Mat(file_name='wide_image_03.mat')
 
     image = file.get_image('I2')
 
