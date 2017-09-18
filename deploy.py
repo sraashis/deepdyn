@@ -1,14 +1,12 @@
 from flask import Flask
 
-import path_config as conf
-
 app = Flask(__name__)
 app.config['DEBUG'] = True
 
 
 @app.route('/')
 def hello_world():
-    return 'Welcome! :). <br />More coming Soon.'
+    return "Coming soon!"
 
 
 if __name__ == '__main__':

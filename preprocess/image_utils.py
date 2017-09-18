@@ -1,4 +1,5 @@
 import os
+
 import numpy as np
 from PIL import Image
 
@@ -6,7 +7,7 @@ import path_config as cfg
 
 
 # @args(2d_array, m, n)
-# # 50 * 50 Sliding window by default
+# # 44 * 44 Sliding window by default
 def slide_and_construct(nd_array, m=44, n=44, threshold=1):
     x = nd_array.shape[0]
     y = nd_array.shape[1]
@@ -15,7 +16,7 @@ def slide_and_construct(nd_array, m=44, n=44, threshold=1):
 
     for i in range(0, x):
         for j in range(0, y):
-            print('\r[ {} / {} ]'.format(i,x), end="")
+            print('\r[ {} / {} ]'.format(i, x), end="")
             window_x, window_y = i - 1, j - 1
             if window_x < 0:
                 window_x = 0

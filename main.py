@@ -1,16 +1,15 @@
-from preprocess.mat_utils import Mat
-from preprocess import image_utils as img
 from preprocess import graph_utils as gt
-
+from preprocess import image_utils as img
+from preprocess.mat_utils import Mat
 
 if __name__ == '__main__':
-
-    file = Mat(file_name='wide_image_03.mat')
+    file = Mat(file_name='wide_image_21.mat')
 
     image = file.get_image('I2')
 
-    img.slide_and_construct(image[:, :, 1], m=44, n=66, threshold=.94)
-    img.save_image(image[:, :, 1])
+    img.slide_and_construct(image[:, :, 1], threshold=0.87)
+
+    img.show_image(image[:, :, 1])
 
     auxiliary_graph = file.get_graph('A')
     node_pos = file.get_graph('V')
@@ -20,4 +19,4 @@ if __name__ == '__main__':
 
     color = (gt.color_av(a, v) for a, v in zip(file.get_graph('art'), file.get_graph('ven')))
 
-    gt.show_graph(auxiliary_matrix=auxiliary_graph,node_pos=node_pos,node_color=''.join(color))
+    gt.show_graph(auxiliary_matrix=auxiliary_graph,node_pos=node_pos,node_color=''.join(arteries_color))
