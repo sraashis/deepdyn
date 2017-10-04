@@ -3,11 +3,11 @@ from preprocess import image_utils as img
 from preprocess.mat_utils import Mat
 
 if __name__ == '__main__':
-    file = Mat(file_name='wide_image_03.mat')
+    file = Mat(file_name='wide_image_09.mat')
 
     image = file.get_image('I2')
 
-    img.slide_and_construct(image[:, :, 1], threshold=0.87)
+    # img.slide_and_construct(image[:, :, 1], m=100, n=100, threshold=.88)
 
     img.show_image(image[:, :, 1])
 
@@ -19,4 +19,4 @@ if __name__ == '__main__':
 
     color = (gt.color_av(a, v) for a, v in zip(file.get_graph('art'), file.get_graph('ven')))
 
-    gt.show_graph(auxiliary_matrix=auxiliary_graph,node_pos=node_pos,node_color=''.join(arteries_color))
+    gt.show_graph(auxiliary_matrix=auxiliary_graph, node_pos=node_pos, node_color=''.join(color))
