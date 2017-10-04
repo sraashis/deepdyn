@@ -2,6 +2,7 @@ import os
 
 import numpy as np
 from PIL import Image
+from PIL import ImageOps
 
 import path_config as cfg
 
