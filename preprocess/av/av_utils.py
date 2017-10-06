@@ -1,15 +1,12 @@
 import numpy as np
 from matplotlib import pyplot as plt
 
-from preprocess import graph_utils as gt
-
 
 def get_onh_radius(av_data_set):
     return np.linalg.norm(av_data_set.get_graph('onh')[0] - av_data_set.get_graph('onh_pos'))
 
 
 def get_av_nodes(av_data_set=None, vessel=""):
-
     node_position = av_data_set.get_graph('V')
 
     if vessel == "Art":
@@ -18,7 +15,6 @@ def get_av_nodes(av_data_set=None, vessel=""):
     if vessel == "Ven":
         node_position = av_data_set.get_graph('ven')
 
-    radius = get_onh_radius(av_data_set)
     av_radius = 3 * get_onh_radius(av_data_set=av_data_set)
     xc, yc = av_data_set.get_graph('onh_pos')[0]
     for node in node_position:
@@ -28,10 +24,9 @@ def get_av_nodes(av_data_set=None, vessel=""):
 
 
 def show_av_graph(av_data_set, image_show=False, onh_show=False, av_show=True):
-
     onh = av_data_set.get_graph('onh')
 
-    av_art = np.array(list(get_av_nodes(av_data_set,vessel="art")))
+    av_art = np.array(list(get_av_nodes(av_data_set, vessel="art")))
     av_ven = np.array(list(get_av_nodes(av_data_set, vessel="ven")))
 
     if av_show:
