@@ -1,19 +1,22 @@
-from preprocess import graph_utils as gt
-from preprocess import image_utils as img
-from preprocess.mat_utils import Mat
-import preprocess.av.av_utils as av
-from matplotlib import pyplot as plt
 import numpy as np
 
+import preprocess.av.av_utils as av
+import preprocess.image_utils as img
+from preprocess.mat_utils import Mat
 
 if __name__ == '__main__':
-    file = Mat(file_name='wide_image_07.mat')
+
+    file = Mat(file_name='wide_image_03.mat')
 
     image = file.get_image('I2')
 
     # img.slide_and_construct(image[:, :, 1], m=100, n=100, threshold=.88)
 
     # img.show_image(image[:, :, 1])
+    # va
+
+    # ig = image[:, :, 1]
+    # print(ig.shape)
 
     # auxiliary_graph = file.get_graph('A')
     # node_pos = file.get_graph('V')
@@ -31,3 +34,4 @@ if __name__ == '__main__':
     # plt.plot(onh[:, 0], onh[:, 1], color='yellow')
     # plt.show()
     av.show_av_graph(file, image_show=True, onh_show=True)
+

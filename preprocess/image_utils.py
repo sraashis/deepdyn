@@ -2,7 +2,7 @@ import os
 
 import numpy as np
 from PIL import Image
-from PIL import ImageOps
+from PIL import ImageEnhance
 
 import path_config as cfg
 
@@ -79,13 +79,25 @@ def slide_and_construct(nd_array, m=44, n=44, threshold=1):
                     nd_array[i - 1, j + 1] = mn
 
 
+def from_array(image_array):
+    return Image.fromarray(image_array)
+
+
 def show_image(image_array):
-    Image.fromarray(image_array).show()
+    from_array(image_array).show()
 
 
 def save_image(image, x='X', y='Y'):
-    new_image = Image.fromarray(image)
+    new_image = from_array(image)
     file_name = str(x) + ' by ' + str(y) + '_T_' + '.png'
     os.chdir(cfg.output_path)
     new_image.save(file_name)
     new_image.show()
+
+
+def enhance(image, color=1, brightness=1, sharpness=1, contrast=1):
+    color = ImageEnhance.Color(image).enhance(color)
+    contrast = ImageEnhance.Contrast(color).enhance(contrast)
+    brightness = ImageEnhance.Brightness(contrast).enhance(brightness)
+    sharpness = ImageEnhance.Sharpness(brightness).enhance(sharpness)
+    return sharpness
