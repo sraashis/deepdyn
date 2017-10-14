@@ -2,7 +2,6 @@ import os
 
 import numpy as np
 from PIL import Image
-from PIL import ImageEnhance
 
 import path_config as cfg
 
@@ -95,9 +94,7 @@ def save_image(image, x='X', y='Y'):
     new_image.show()
 
 
-def enhance(image, color=1, brightness=1, sharpness=1, contrast=1):
-    color = ImageEnhance.Color(image).enhance(color)
-    contrast = ImageEnhance.Contrast(color).enhance(contrast)
-    brightness = ImageEnhance.Brightness(contrast).enhance(brightness)
-    sharpness = ImageEnhance.Sharpness(brightness).enhance(sharpness)
-    return sharpness
+def enhance(image_array, color=1, brightness=1, sharpness=1, contrast=1):
+    image_array[:, :, 0] = 0
+    image_array[:, :, 2] = 0
+    return image_array

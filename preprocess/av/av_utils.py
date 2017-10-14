@@ -1,5 +1,4 @@
 import numpy as np
-from PIL import Image
 from matplotlib import pyplot as plt
 from skimage import morphology
 
@@ -26,7 +25,7 @@ def get_av_nodes(av_data_set=None, vessel=""):
             yield node
 
 
-def show_av_graph(av_data_set, image_show=False, onh_show=False, av_show=True):
+def show_av_graph(av_data_set, image_show=True, onh_show=True, av_show=True):
     onh = av_data_set.get_graph('onh')
     av_art = np.array(list(get_av_nodes(av_data_set, vessel="art")))
     av_ven = np.array(list(get_av_nodes(av_data_set, vessel="ven")))
@@ -41,18 +40,6 @@ def show_av_graph(av_data_set, image_show=False, onh_show=False, av_show=True):
     if image_show:
         image_array = av_data_set.get_image('I2')
         image_array = img.enhance(image_array, color=0, contrast=3, brightness=0.81, sharpness=4)
-        image = Image.fromarray(image_array[:, :, :])
+        image = img.from_array(image_array)
         plt.imshow(image, interpolation='nearest', aspect='auto')
-        plt.grid(True)
         plt.show()
-
-
-def region_growing(av_data_set):
-    image = av_data_set.get_image('I2')
-    av_art = np.array(list(get_av_nodes(av_data_set, vessel="art")))
-    av = np.ceil(av_art)
-    markers = morphology.label(av_art)
-    arr = np.ones((961, 1217, 3))
-    labels_ws = morphology.watershed(image[:, :, :], arr)
-    plt.imshow(labels_ws)
-    plt.show()

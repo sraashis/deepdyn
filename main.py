@@ -34,4 +34,4 @@ if __name__ == '__main__':
     # plt.plot(onh[:, 0], onh[:, 1], color='yellow')
     # plt.show()
     av.show_av_graph(file, image_show=True, onh_show=True)
-
+    # av.region_growing(file)
