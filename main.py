@@ -7,13 +7,9 @@ if __name__ == '__main__':
 
     image = file.get_image('I2')
 
-    kernels = fil.build_filter_bank(k_size=12, lambd=50, sigma=4, psi=0.0, gamma=.8)
-    image[:, :, 0] = 0
-    image[:, :, 2] = 0
-    final_image = fil.process(image, kernels)
-
+    kernels = fil.build_filter_bank(k_size=24, lambd=5.01, sigma=1.79, psi=0.0, gamma=.89)
+    final_image = fil.process(image[:, :, 1], kernels)
     img.show_image(final_image)
-    img.show_image(image)
 
 
 # --------------- USAGE Examples ----------------

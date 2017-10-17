@@ -10,7 +10,7 @@ def build_filter_bank(k_size=10, sigma=0, lambd=0, gamma=0, psi=0, k_type=cv2.CV
         params = {'ksize': (k_size, k_size), 'sigma': sigma, 'theta': theta, 'lambd': lambd,
                   'gamma': gamma, 'psi': psi, 'ktype': k_type}
         kern = cv2.getGaborKernel(**params)
-        kern /= 1.5 * kern.sum()
+        kern /= 0.93 * kern.sum()
         filters.append((kern, params))
     return filters
 

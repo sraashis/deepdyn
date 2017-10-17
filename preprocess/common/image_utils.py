@@ -1,6 +1,9 @@
 import os
-import matplotlib.pyplot as plt
+import time
+
 from PIL import Image
+from PIL import ImageEnhance
+
 import path_config as cfg
 
 
@@ -12,14 +15,17 @@ def show_image(image_array):
     from_array(image_array).show()
 
 
-def save_image(image, x='X', y='Y'):
+def save_image(image, name="image-" + str(int(time.time()))):
     new_image = from_array(image)
-    file_name = str(x) + ' by ' + str(y) + '_T_' + '.png'
+    file_name = image + '.png'
     os.chdir(cfg.output_path)
     new_image.save(file_name)
     new_image.show()
 
 
-def enhance(image_array, color=1, brightness=1, sharpness=1, contrast=1):
-   # todo
-    return image_array
+def enhance(image, color=1, brightness=1, sharpness=1, contrast=1):
+    color = ImageEnhance.Color(image).enhance(color)
+    contrast = ImageEnhance.Contrast(color).enhance(contrast)
+    brightness = ImageEnhance.Brightness(contrast).enhance(brightness)
+    sharpness = ImageEnhance.Sharpness(brightness).enhance(sharpness)
+    return sharpness
