@@ -9,10 +9,7 @@ def from_array(image_array):
 
 
 def show_image(image_array):
-    fig = plt.figure()
-    plt.imshow(from_array(image_array), aspect='auto')
-    fig.tight_layout()
-    plt.show()
+    from_array(image_array).show()
 
 
 def save_image(image, x='X', y='Y'):
