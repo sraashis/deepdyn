@@ -1,23 +1,23 @@
 import cv2
 import numpy as np
 
+import preprocess.common.image_utils as img
 
-# Gabor Kernel based filter
-def build_filters():
+
+def build_filter_bank(k_size=10, sigma=0, lambd=0, gamma=0, psi=0, k_type=cv2.CV_64F):
     filters = []
-    k_size = 31
-    for theta in np.arange(0, np.pi, np.pi / 32):
-        params = {'ksize': (k_size, k_size), 'sigma': 1.0, 'theta': theta, 'lambda': 15.0,
-                  'gamma': 0.02, 'psi': 0, 'ktype': cv2.CV_32F}
+    for theta in np.arange(0, np.pi, np.pi / k_size + 1):
+        params = {'ksize': (k_size, k_size), 'sigma': sigma, 'theta': theta, 'lambd': lambd,
+                  'gamma': gamma, 'psi': psi, 'ktype': k_type}
         kern = cv2.getGaborKernel(**params)
         kern /= 1.5 * kern.sum()
         filters.append((kern, params))
     return filters
 
 
-def process(img, filters):
-    accumulator = np.zeros_like(img)
+def process(image, filters):
+    accumulator = np.zeros_like(image)
     for kern, params in filters:
-        fimg = cv2.filter2D(img, cv2.CV_8UC3, kern)
-        np.maximum(accumulator, fimg, accumulator)
+        final_image = cv2.filter2D(image, cv2.CV_8UC3, kern)
+        np.maximum(accumulator, final_image, accumulator)
     return accumulator

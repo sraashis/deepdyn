@@ -24,6 +24,5 @@ def save_image(image, x='X', y='Y'):
 
 
 def enhance(image_array, color=1, brightness=1, sharpness=1, contrast=1):
-    image_array[:, :, 0] = 0
-    image_array[:, :, 2] = 0
+   # todo
     return image_array
