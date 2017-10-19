@@ -1,7 +1,8 @@
 import numpy as np
 from matplotlib import pyplot as plt
 
-import preprocess.common.image_utils as img
+import preprocess.filter.image_filters as fil
+import preprocess.image.image_utils as img
 
 
 def get_onh_radius(av_data_set):
@@ -24,7 +25,7 @@ def get_av_nodes(av_data_set=None, vessel=""):
             yield node
 
 
-def show_av_graph(av_data_set, image_show=True, onh_show=True, av_show=True):
+def show_av_graph(av_data_set, image_show=True, onh_show=True, av_show=True, gabor_filter=False):
     onh = av_data_set.get_graph('onh')
     av_art = np.array(list(get_av_nodes(av_data_set, vessel="art")))
     av_ven = np.array(list(get_av_nodes(av_data_set, vessel="ven")))
@@ -41,6 +42,8 @@ def show_av_graph(av_data_set, image_show=True, onh_show=True, av_show=True):
 
     if image_show:
         image_array = av_data_set.get_image('I2')
-        image_array = img.enhance(image_array, color=0, contrast=3, brightness=0.81, sharpness=4)
+        if gabor_filter:
+            kernels = fil.build_filter_bank(k_size=24, lambd=5.01, sigma=1.79, psi=0.0, gamma=.89)
+            image_array = fil.process(image_array[:, :, 1], kernels)
         plt.imshow(img.from_array(image_array), aspect='auto')
         plt.show()

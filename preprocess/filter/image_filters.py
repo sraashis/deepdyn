@@ -1,7 +1,7 @@
 import cv2
 import numpy as np
 
-import preprocess.common.image_utils as img
+import preprocess.image.image_utils as img
 
 
 def build_filter_bank(k_size=10, sigma=0, lambd=0, gamma=0, psi=0, k_type=cv2.CV_64F):
