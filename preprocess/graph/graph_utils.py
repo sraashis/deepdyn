@@ -21,11 +21,3 @@ def color_av(a, v):
     if a == 0 and v == 1:
         return 'r'
     return 'g'
-
-
-# Shows the networkx graph for a given data set.
-def show_vessel_graph(file):
-    adj_matrix = file.get_graph('A')
-    node_pos = file.get_graph('V')
-    color = (color_av(a, v) for a, v in zip(file.get_graph('art'), file.get_graph('ven')))
-    show_graph(auxiliary_matrix=adj_matrix, node_pos=node_pos, node_color=''.join(color))

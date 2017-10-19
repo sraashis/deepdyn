@@ -22,7 +22,7 @@ def get_av_nodes_positions(av_data_set=None, vessel="", av_only=True):
             yield node
 
 
-def show_av_graph(av_data_set, image_show=True, onh_show=True, av_only=True):
+def show_av_graph(av_data_set, image_show=True, onh_show=True, av_only=True, gray_scale=None):
 
     onh = av_data_set.get_graph('onh')
     av_art = np.array(list(get_av_nodes_positions(av_data_set, vessel="art", av_only=av_only)))
@@ -39,6 +39,6 @@ def show_av_graph(av_data_set, image_show=True, onh_show=True, av_only=True):
 
     if image_show:
         image_array = av_data_set.get_image('I2')
-        plt.imshow(img.from_array(image_array), aspect='auto')
+        plt.imshow(img.from_array(image_array), aspect='auto', cmap=gray_scale)
     plt.show()
 

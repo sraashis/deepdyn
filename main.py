@@ -13,8 +13,7 @@ if __name__ == '__main__':
     # image[:, :, 0] = 0
     # image[:, :, 2] = 0
     final_image = fil.process(image[:, :, 1], kernels)
-    plt.imshow(img.from_array(final_image))
+    plt.imshow(final_image, cmap='gray')
     img.show_image(final_image)
-    # av.show_av_graph(file, av_only=False,image_show=False)
-    # gt.show_vessel_graph(file)
+    av.show_av_graph(file, av_only=False,image_show=True)
     plt.show()
