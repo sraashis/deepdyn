@@ -4,12 +4,13 @@ import numpy as np
 
 def build_filter_bank(k_size=10, sigma=0, lambd=0, gamma=0, psi=0, k_type=ocv.CV_64F):
     filters = []
-    for theta in np.arange(0, np.pi, np.pi / k_size + 1):
+    for theta in np.arange(0, np.pi, np.pi / 7):
         params = {'ksize': (k_size, k_size), 'sigma': sigma, 'theta': theta, 'lambd': lambd,
                   'gamma': gamma, 'psi': psi, 'ktype': k_type}
         kern = ocv.getGaborKernel(**params)
-        kern /= 0.93 * kern.sum()
-        filters.append((kern, params))
+        scaled_kern = kern - np.min(kern)
+        scaled_kern = scaled_kern / np.max(scaled_kern)
+        filters.append((scaled_kern * 255, params))
     return filters
 
 
