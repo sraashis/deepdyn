@@ -15,9 +15,9 @@ def show_image(image_array):
     from_array(image_array).show()
 
 
-def save_image(image, name="image-" + str(int(time.time()))):
-    new_image = from_array(image)
-    file_name = image + '.png'
+def save_image(image_array, name="image-" + str(int(time.time()))):
+    new_image = from_array(image_array)
+    file_name = image_array + '.png'
     os.chdir(cfg.output_path)
     new_image.save(file_name)
     new_image.show()
