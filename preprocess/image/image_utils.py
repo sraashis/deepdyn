@@ -16,11 +16,10 @@ def show_image(image_array):
 
 
 def save_image(image_array, name="image-" + str(int(time.time()))):
-    new_image = from_array(image_array)
-    file_name = image_array + '.png'
+    image = from_array(image_array)
+    file_name = name + '.png'
     os.chdir(cfg.output_path)
-    new_image.save(file_name)
-    new_image.show()
+    image.save(file_name)
 
 
 def enhance(image, color=1, brightness=1, sharpness=1, contrast=1):
