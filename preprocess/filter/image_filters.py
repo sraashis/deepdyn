@@ -9,13 +9,13 @@ import numpy as np
 import path_config as cfg
 
 
-def build_filter_bank(k_size_start=3, k_size_end=8, k_step=1, sigma=0.25, lambd=0.80, gamma=0.5, psi=0,
+def build_filter_bank(k_size_start=3, k_size_end=16, k_step=1, sigma=0.25, lambd=0.80, gamma=0.5, psi=0,
                       k_type=ocv.CV_32F):
     filters = []
     for k_size in np.arange(k_size_start, k_size_end, k_step):
-        for theta in np.arange(0, np.pi, np.pi / 9):  # Number of orientations
-            sig = k_size * sigma
-            lamb = k_size * lambd
+        for theta in np.arange(0, np.pi, np.pi / 33):  # Number of orientations
+            sig = sigma * k_size
+            lamb = lambd * k_size
             params = {'ksize': (k_size, k_size), 'sigma': sig, 'theta': theta, 'lambd': lamb,
                       'gamma': gamma, 'psi': psi, 'ktype': k_type}
             kern = ocv.getGaborKernel(**params)
