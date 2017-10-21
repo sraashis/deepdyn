@@ -7,7 +7,7 @@ import preprocess.image.image_utils as img
 from preprocess.common.mat_utils import Mat
 
 if __name__ == '__main__':
-    kernels = fil.build_filter_bank(k_size_start=2, k_size_end=6, k_step=1, gamma=0.5, sigma=0.2, lambd=0.8)
+    kernels = fil.build_filter_bank(k_size_start=3, k_size_end=8, k_step=1, gamma=0.5, sigma=0.3, lambd=0.9)
     fil.show_kernels(kernels, save_fig=False)
     files = os.listdir(pth.av_wide_data)
 
