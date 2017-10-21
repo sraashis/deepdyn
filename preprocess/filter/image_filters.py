@@ -13,7 +13,7 @@ def build_filter_bank(k_size_start=3, k_size_end=16, k_step=1, sigma=0.25, lambd
                       k_type=ocv.CV_32F):
     filters = []
     for k_size in np.arange(k_size_start, k_size_end, k_step):
-        for theta in np.arange(0, np.pi, np.pi / 33):  # Number of orientations
+        for theta in np.arange(0, np.pi, np.pi / 51):  # Number of orientations
             sig = sigma * k_size
             lamb = lambd * k_size
             params = {'ksize': (k_size, k_size), 'sigma': sig, 'theta': theta, 'lambd': lamb,
