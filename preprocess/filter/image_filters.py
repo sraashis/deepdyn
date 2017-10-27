@@ -7,21 +7,30 @@ import matplotlib.pyplot as plt
 import numpy as np
 
 import path_config as cfg
+import preprocess.image.image_utils as img
 
 
-def build_filter_bank(k_size_start=3, k_size_end=16, k_step=1, sigma=0.25, lambd=0.80, gamma=0.5, psi=0,
-                      k_type=ocv.CV_32F):
+def build_filter_bank(k_size, sigma=2, lambd=5, gamma=0.5, psi=0,
+                      k_type=ocv.CV_32F, orientations=32):
     filters = []
-    for k_size in np.arange(k_size_start, k_size_end, k_step):
-        for theta in np.arange(0, np.pi, np.pi / 51):  # Number of orientations
-            sig = sigma * k_size
-            lamb = lambd * k_size
-            params = {'ksize': (k_size, k_size), 'sigma': sig, 'theta': theta, 'lambd': lamb,
-                      'gamma': gamma, 'psi': psi, 'ktype': k_type}
-            kern = ocv.getGaborKernel(**params)
-            kern /= 1.5 * kern.sum()
-            filters.append(kern)
-    return filters
+    for theta in np.arange(0, np.pi, np.pi / orientations):  # Number of orientations
+        params = {'ksize': (k_size, k_size), 'sigma': sigma, 'theta': theta, 'lambd': lambd,
+                  'gamma': gamma, 'psi': psi, 'ktype': k_type}
+        kern = ocv.getGaborKernel(**params)
+        kern /= 1.5 * kern.sum()
+        filters.append(kern)
+    return filters  # Rescale 2D array
+
+
+def rescale2d_0_1(arr):
+    m = np.max(arr)
+    n = np.min(arr)
+    return (arr - n) / (m - n)
+
+
+# Rescale 3d arrays
+def rescale3d_0_1(arrays):
+    return list((rescale2d_0_1(arr) for arr in arrays))
 
 
 def process(image, filters):
@@ -32,16 +41,28 @@ def process(image, filters):
     return accumulator
 
 
-def show_kernels(kernels=None, save_fig=False):
+def show_kernels(kernels=None, save_fig=False, file_name=str(int(time.time()))):
     grid_size = mt.ceil(mt.sqrt(len(kernels)))
     for ix, kernel in enumerate(kernels):
-        f_kernel = kernel - np.min(kernel)
-        f_kernel = f_kernel / np.max(f_kernel)
         plt.subplot(grid_size, grid_size, ix + 1)
         plt.xticks([], [])
         plt.yticks([], [])
-        plt.imshow(f_kernel * 255, cmap='gray', aspect='auto')
+
     if save_fig:
         os.chdir(cfg.output_path)
-        plt.savefig(str(int(time.time())) + "-gabor_kernels.png")
-    plt.show()
+        plt.savefig(file_name + "-gabor_kernels.png")
+    else:
+        plt.imshow(kernel, cmap='gray', aspect='auto')
+        plt.show()
+
+
+def try_all(image_arr=None, ii=5, jj=10, k_size=4, gamma=0.5):
+    f_name = ''
+    for i in range(1, ii):
+        for j in range(1, jj):
+            try_kernel = build_filter_bank(k_size=k_size, gamma=gamma, lambd=i, sigma=j)
+            f_name = str('size') + str(k_size) + str('_gamma-') + str(gamma) + ('_lambd-') + str(i) + str('_sigma-') + str(
+                j) + '.png'
+            img_convolved = process(255 - image_arr, try_kernel)
+            print('Saving: ' + f_name)
+            img.save_image(255 - img_convolved, name=f_name)
