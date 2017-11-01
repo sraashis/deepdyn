@@ -11,7 +11,7 @@ import preprocess.image.image_utils as img
 
 
 def build_filter_bank(k_size, sigma=2, lambd=5, gamma=0.5, psi=0,
-                      k_type=ocv.CV_32F, orientations=32):
+                      k_type=ocv.CV_32F, orientations=16):
     filters = []
     for theta in np.arange(0, np.pi, np.pi / orientations):  # Number of orientations
         params = {'ksize': (k_size, k_size), 'sigma': sigma, 'theta': theta, 'lambd': lambd,
@@ -19,7 +19,7 @@ def build_filter_bank(k_size, sigma=2, lambd=5, gamma=0.5, psi=0,
         kern = ocv.getGaborKernel(**params)
         kern /= 1.5 * kern.sum()
         filters.append(kern)
-    return filters  # Rescale 2D array
+    return filters
 
 
 def rescale2d_0_1(arr):
@@ -47,12 +47,11 @@ def show_kernels(kernels=None, save_fig=False, file_name=str(int(time.time()))):
         plt.subplot(grid_size, grid_size, ix + 1)
         plt.xticks([], [])
         plt.yticks([], [])
-
+        plt.imshow(kernel, cmap='gray', aspect='auto')
     if save_fig:
         os.chdir(cfg.output_path)
         plt.savefig(file_name + "-gabor_kernels.png")
     else:
-        plt.imshow(kernel, cmap='gray', aspect='auto')
         plt.show()
 
 
