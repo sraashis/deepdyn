@@ -7,11 +7,10 @@ import matplotlib.pyplot as plt
 import numpy as np
 
 import path_config as cfg
-import preprocess.image.image_utils as img
 
 
 def build_filter_bank(k_size, sigma=2, lambd=5, gamma=0.5, psi=0,
-                      k_type=ocv.CV_32F, orientations=16):
+                      k_type=ocv.CV_32F, orientations=32):
     filters = []
     for theta in np.arange(0, np.pi, np.pi / orientations):  # Number of orientations
         params = {'ksize': (k_size, k_size), 'sigma': sigma, 'theta': theta, 'lambd': lambd,
@@ -53,3 +52,13 @@ def show_kernels(kernels=None, save_fig=False, file_name=str(int(time.time()))):
         plt.savefig(file_name + "-gabor_kernels.png")
     else:
         plt.show()
+
+
+def apply_chosen_gabor_bank(image_arr):
+    kernels0 = build_filter_bank(k_size=16, gamma=0.6, lambd=7, sigma=3)
+    kernels1 = build_filter_bank(k_size=24, gamma=0.6, lambd=6, sigma=3)
+    kernels2 = build_filter_bank(k_size=32, gamma=0.6, lambd=4, sigma=2)
+    kernels3 = build_filter_bank(k_size=32, gamma=0.6, lambd=6, sigma=3)
+    kernels4 = build_filter_bank(k_size=64, gamma=0.7, lambd=13, sigma=6)
+    kernels = kernels0 + kernels1 + kernels2 + kernels3 + kernels4
+    gabor_img = process(255 - image_arr, kernels)
