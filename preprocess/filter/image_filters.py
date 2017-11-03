@@ -53,15 +53,3 @@ def show_kernels(kernels=None, save_fig=False, file_name=str(int(time.time()))):
         plt.savefig(file_name + "-gabor_kernels.png")
     else:
         plt.show()
-
-
-def try_all(image_arr=None, ii=5, jj=10, k_size=4, gamma=0.5):
-    f_name = ''
-    for i in range(1, ii):
-        for j in range(1, jj):
-            try_kernel = build_filter_bank(k_size=k_size, gamma=gamma, lambd=i, sigma=j)
-            f_name = str('size') + str(k_size) + str('_gamma-') + str(gamma) + ('_lambd-') + str(i) + str('_sigma-') + str(
-                j) + '.png'
-            img_convolved = process(255 - image_arr, try_kernel)
-            print('Saving: ' + f_name)
-            img.save_image(255 - img_convolved, name=f_name)
