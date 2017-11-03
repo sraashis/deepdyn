@@ -61,4 +61,4 @@ def apply_chosen_gabor_bank(image_arr):
     kernels3 = build_filter_bank(k_size=32, gamma=0.6, lambd=6, sigma=3)
     kernels4 = build_filter_bank(k_size=64, gamma=0.7, lambd=13, sigma=6)
     kernels = kernels0 + kernels1 + kernels2 + kernels3 + kernels4
-    gabor_img = process(255 - image_arr, kernels)
+    return process(255 - image_arr, kernels)
