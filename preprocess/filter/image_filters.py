@@ -59,10 +59,13 @@ def apply_bilateral(img_arr):
     return 254 - (img_arr - bi_img)
 
 
-def apply_chosen_gabor_bank(image_arr):
+def get_chosen_gabor_bank():
     kernels1 = build_filter_bank(k_size=24, gamma=0.5, lambd=10, sigma=3)
     kernels2 = build_filter_bank(k_size=32, gamma=0.5, lambd=10, sigma=3)
     kernels3 = build_filter_bank(k_size=36, gamma=0.5, lambd=10, sigma=3)
     kernels4 = build_filter_bank(k_size=42, gamma=0.5, lambd=10, sigma=3)
-    kernels = kernels1 + kernels2 + kernels3 + kernels4
-    return process(255 - image_arr, kernels)
+    return kernels1 + kernels2 + kernels3 + kernels4
+
+
+def apply_gabor(image_arr, bank=get_chosen_gabor_bank()):
+    return 255 - process(255 - image_arr, bank)

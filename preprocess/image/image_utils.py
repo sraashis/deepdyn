@@ -1,8 +1,8 @@
 import os
 import time
 
+import matplotlib.pyplot as plt
 from PIL import Image
-from PIL import ImageEnhance
 
 import path_config as cfg
 
@@ -22,9 +22,6 @@ def save_image(image_array, name="image-" + str(int(time.time()))):
     image.save(file_name)
 
 
-def enhance(image, color=1, brightness=1, sharpness=1, contrast=1):
-    color = ImageEnhance.Color(image).enhance(color)
-    contrast = ImageEnhance.Contrast(color).enhance(contrast)
-    brightness = ImageEnhance.Brightness(contrast).enhance(brightness)
-    sharpness = ImageEnhance.Sharpness(brightness).enhance(sharpness)
-    return sharpness
+def histogram(image_arr):
+    plt.hist(image_arr.ravel(), bins=64)
+    plt.show()
