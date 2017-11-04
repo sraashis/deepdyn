@@ -67,5 +67,5 @@ def get_chosen_gabor_bank():
     return kernels1 + kernels2 + kernels3 + kernels4
 
 
-def apply_gabor(image_arr, bank=get_chosen_gabor_bank()):
+def apply_gabor(image_arr, bank=None):
     return 255 - process(255 - image_arr, bank)
