@@ -54,8 +54,8 @@ def show_kernels(kernels=None, save_fig=False, file_name=str(int(time.time()))):
         plt.show()
 
 
-def apply_bilateral(img_arr):
-    bi_img = ocv.bilateralFilter(img_arr, 15, 95, 95)
+def apply_bilateral(img_arr, k_size=9, sig1=75, sig2=75):
+    bi_img = ocv.bilateralFilter(img_arr, k_size, sig1, sig2)
     return 254 - (img_arr - bi_img)
 
 

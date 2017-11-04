@@ -21,11 +21,11 @@ def try_all(image_arr=None, ii=25, jj=5, k_size=4):
 
 
 def p1(image_array):
-    try_all(image_arr=image_array, k_size=4)
+    try_all(image_arr=image_array, k_size=42)
 
 
 def p2(image_array):
-    try_all(image_arr=image_array, k_size=32)
+    try_all(image_arr=image_array, k_size=42)
 
 
 def run_test(image_array):
