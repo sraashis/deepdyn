@@ -31,8 +31,8 @@ class Image(IUtils):
             Image.kernel_bank = fil.get_chosen_gabor_bank()
             jlb.dump(Image.kernel_bank, filename=kern_file_name, compress=True)
 
-    def apply_gabor(self, arr=None, bank=None):
-        self.img_gabor = fil.apply_gabor(arr, bank=bank)
+    def apply_gabor(self, arr=None, filter_bank=None):
+        self.img_gabor = fil.apply_gabor(arr, filter_bank=filter_bank)
 
     @staticmethod
     def show_kernel(kernels, save_fig=False):
