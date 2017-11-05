@@ -21,7 +21,7 @@ def get_av_nodes_positions(av_data_set=None, vessel="", av_only=True):
             yield node
 
 
-def show_av_graph(av_data_set, image_show=True, onh_show=True, av_only=True, gray_scale=None):
+def show_av_graph(av_data_set=None, image_array=None, image_show=True, onh_show=True, av_only=True, gray_scale=None):
 
     onh = av_data_set.get_graph('onh')
     av_art = np.array(list(get_av_nodes_positions(av_data_set, vessel="art", av_only=av_only)))
@@ -30,14 +30,13 @@ def show_av_graph(av_data_set, image_show=True, onh_show=True, av_only=True, gra
     av_art = np.ceil(av_art)
     av_ven = np.ceil(av_ven)
 
-    plt.scatter(av_art[:, 0], av_art[:, 1], color='red', s=1.0)
-    plt.scatter(av_ven[:, 0], av_ven[:, 1], color='blue', s=1.0)
+    plt.scatter(av_art[:, 0], av_art[:, 1], color='red', s=4.0)
+    plt.scatter(av_ven[:, 0], av_ven[:, 1], color='blue', s=4.0)
 
     if onh_show:
         plt.plot(onh[:, 0], onh[:, 1], color='green')
 
     if image_show:
-        image_array = av_data_set.get_image('I2')
         plt.imshow(Image.fromarray(image_array), aspect='auto', cmap=gray_scale)
     plt.show()
 

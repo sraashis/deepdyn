@@ -11,7 +11,6 @@ from commons.MAT import Mat
 
 
 class IUtils(Logger):
-
     def __init__(self, av_file_name, img_key='I2'):
         self.av_file = av_file_name
         self.mat = Mat(file_name=av_file_name)
@@ -37,7 +36,9 @@ class IUtils(Logger):
         plt.hist(image_arr.ravel(), bins=64)
         plt.show()
 
-    def show_av_graph(self, image_show=True, onh_show=True, av_only=True, gray_scale=None):
-        av.show_av_graph(av_data_set=self.mat, image_show=image_show, onh_show=onh_show, av_only=av_only,
+    @staticmethod
+    def show_av_graph(mat_file=None, image_arr=None, image_show=True, onh_show=True, av_only=True,
+                      gray_scale='gray'):
+        av.show_av_graph(av_data_set=mat_file, image_array=image_arr, image_show=image_show, onh_show=onh_show,
+                         av_only=av_only,
                          gray_scale=gray_scale)
-
