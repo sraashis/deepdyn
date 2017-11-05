@@ -20,7 +20,7 @@ class Image(IUtils):
             Image.warn('Bilateral filter already applied.')
         self.img_bilateral = fil.apply_bilateral(arr, k_size=k_size, sig1=sig1, sig2=sig2)
 
-    def load_kernel_bank(self, kern_file_name='kern.pkl'):
+    def load_kernel_bank(self, kern_file_name='kernel_bank.pkl'):
         if Image.kernel_bank is not None:
             self.warn('Kernel already loaded.')
         try:

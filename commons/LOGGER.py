@@ -5,13 +5,13 @@ class Logger:
         print('Logging')
 
     @staticmethod
-    def log(self, msg):
-        print('[Log] msg')
+    def log(msg):
+        print('[Log] ' + msg)
 
     @staticmethod
-    def warn(self, msg):
-        print('[Warn] msg')
+    def warn(msg):
+        print('[Warn] ' + msg)
 
     @staticmethod
-    def err(self, msg):
-        print('[Err] msg')
+    def err(msg):
+        print('[Err] msg ' + msg)
