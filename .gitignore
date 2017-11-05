@@ -1,0 +1,15 @@
+# Created by .ignore support plugin (hsz.mobi)
+__pycache__/
+preprocess/__pycache__/
+preprocess/av/__pycache__/
+preprocess/common/__pycache__/
+preprocess/filter/__pycache__/
+preprocess/graph/__pycache__/
+preprocess/image/__pycache__/
+IMG_0584.JPG
+assests/Filters.txt
+assests/Filters/
+assests/Final/
+out_gabor/
+out_bi/
+data

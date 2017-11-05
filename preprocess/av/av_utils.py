@@ -1,7 +1,7 @@
 import numpy as np
 from matplotlib import pyplot as plt
 
-import preprocess.image.image_utils as img
+import commons.IMG_UTILS as img
 
 
 def get_onh_radius(av_data_set):

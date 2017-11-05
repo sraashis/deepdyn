@@ -1,0 +1,5 @@
+size2_gamma-0.5_lambd-10_sigma-2.png.png
+size4_gamma-0.5_lambd-10_sigma-2.png.png
+size12_gamma-0.5_lambd-10_sigma-2.png.png
+size24_gamma-0.5_lambd-10_sigma-2.png.png
+size32_gamma-0.5_lambd-10_sigma-2.png.png

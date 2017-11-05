@@ -2,8 +2,8 @@ from multiprocessing import Process
 
 import numpy as np
 
-import preprocess.filter.image_filters as fil
-import preprocess.image.image_utils as img
+import commons.IMG_UTILS as img
+import preprocess.av.image_filters as fil
 
 
 def try_all(image_arr=None, ii=25, jj=5, k_size=4):
