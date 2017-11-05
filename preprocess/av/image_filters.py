@@ -55,17 +55,17 @@ def show_kernels(kernels=None, save_fig=False, file_name=str(int(time.time()))):
 
 
 def apply_bilateral(img_arr, k_size=9, sig1=75, sig2=75):
-    bi_img = ocv.bilateralFilter(img_arr, k_size, sig1, sig2)
-    return 255 - (img_arr - bi_img)
+    return ocv.bilateralFilter(img_arr, k_size, sig1, sig2)
 
 
 def get_chosen_gabor_bank():
-    kernels1 = build_filter_bank(k_size=24, gamma=0.5, lambd=10, sigma=3)
-    kernels2 = build_filter_bank(k_size=32, gamma=0.5, lambd=10, sigma=3)
-    kernels3 = build_filter_bank(k_size=36, gamma=0.5, lambd=10, sigma=3)
-    kernels4 = build_filter_bank(k_size=42, gamma=0.5, lambd=10, sigma=3)
-    return kernels1 + kernels2 + kernels3 + kernels4
+    kernels1 = build_filter_bank(k_size=3, gamma=0.5, lambd=10, sigma=3)
+    kernels2 = build_filter_bank(k_size=5, gamma=0.5, lambd=10, sigma=3)
+    kernels3 = build_filter_bank(k_size=7, gamma=0.5, lambd=10, sigma=3)
+    kernels4 = build_filter_bank(k_size=10, gamma=0.5, lambd=10, sigma=3)
+    kernels5 = build_filter_bank(k_size=48, gamma=0.6, lambd=10, sigma=2)
+    return kernels1 + kernels2 + kernels3 + kernels4 + kernels5
 
 
 def apply_gabor(image_arr, filter_bank=None):
-    return 255 - process(255 - image_arr, filter_bank)
+    return process(image_arr, filter_bank)
