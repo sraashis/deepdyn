@@ -18,26 +18,25 @@ class IUtils(Logger):
         self.img_array = self.mat.get_image(img_key)
 
     @staticmethod
-    def from_array(self, image_array):
+    def from_array(image_array):
         return Image.fromarray(image_array)
 
     @staticmethod
-    def show_image(self, image_array):
-        self.from_array(image_array).show()
+    def show_image(image_array):
+        Image.fromarray(image_array).show()
 
     @staticmethod
-    def save_image(self, image_array, name="image-" + str(int(time.time()))):
-        image = Image.from_array(image_array)
+    def save_image(image_array, name="image-" + str(int(time.time()))):
+        image = Image.fromarray(image_array)
         file_name = name + '.png'
         os.chdir(cfg.output_path)
         image.save(file_name)
 
     @staticmethod
-    def histogram(self, image_arr):
+    def histogram(image_arr):
         plt.hist(image_arr.ravel(), bins=64)
         plt.show()
 
-    @staticmethod
     def show_av_graph(self, image_show=True, onh_show=True, av_only=True, gray_scale=None):
         av.show_av_graph(av_data_set=self.mat, image_show=image_show, onh_show=onh_show, av_only=av_only,
                          gray_scale=gray_scale)
