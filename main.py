@@ -11,6 +11,7 @@ if __name__ == '__main__':
     img.apply_bilateral(img.img_array[:, :, 1])
     # img.show_image(img.img_bilateral)
     img.apply_gabor(arr=img.img_bilateral, filter_bank=img.kernel_bank)
+    img.img_gabor[img.img_gabor > 100] = 255
     img.show_image(img.img_gabor)
 
 
