@@ -1,7 +1,6 @@
 import numpy as np
 from matplotlib import pyplot as plt
-
-import commons.IMG_UTILS as img
+from PIL import Image
 
 
 def get_onh_radius(av_data_set):
@@ -39,6 +38,6 @@ def show_av_graph(av_data_set, image_show=True, onh_show=True, av_only=True, gra
 
     if image_show:
         image_array = av_data_set.get_image('I2')
-        plt.imshow(img.from_array(image_array), aspect='auto', cmap=gray_scale)
+        plt.imshow(Image.from_array(image_array), aspect='auto', cmap=gray_scale)
     plt.show()
 
