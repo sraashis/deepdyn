@@ -30,9 +30,11 @@ def assign_cost(graph=nx.Graph(), images={}, alpha=1, override=False, log=False)
             if graph[n1][n2] == {} or override:
                 cost = 0.0
                 for weight, arr in images.items():
-                    i_diff = abs(int(arr[n1[0], n1[1]]) - int(arr[n2[0], n2[1]]))
-                    cost += float(weight) / float(1 + mth.pow(mth.e, -(float(alpha) * i_diff)))
+                    i_diff = abs(arr[n1[0], n1[1]] - arr[n2[0], n2[1]])
+                    cost += weight * mth.pow(mth.e, (alpha * i_diff)/255)
                     if log:
                         print(str(i) + ':' + str(n1) + str(n2) + ' cost:' + str(cost) + ' pix-diff: ' + str(i_diff))
+                if log:
+                    print('---------------------------------------------------------------------')
                 graph[n1][n2]['cost'] = cost
-                i = i + 1
+                i += 1
