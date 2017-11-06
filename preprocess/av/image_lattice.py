@@ -1,4 +1,3 @@
-import itertools as itr
 import math as mth
 
 import networkx as nx
@@ -24,12 +23,16 @@ def create_lattice_graph(image_arr_2d):
     return graph, n_pos
 
 
-def assign_cost(graph=nx.Graph(), images={}, alpha=1):
-    for n1, n2 in itr.combinations(graph.nodes(), 2):
-        if n1 in graph.neighbors(n2):
-            cost = 0.0
-            for weight, arr in images.items():
-                i_diff = abs(int(arr[n1[0], n1[1]]) - int(arr[n2[0], n2[1]]))
-                cost += float(weight) / float(1 + mth.pow(mth.e, -(float(alpha) * i_diff)))
-            graph[n1][n2]['cost'] = cost
-
+def assign_cost(graph=nx.Graph(), images={}, alpha=1, override=False, log=False):
+    i = 0
+    for n1 in graph.nodes():
+        for n2 in nx.neighbors(graph, n1):
+            if graph[n1][n2] == {} or override:
+                cost = 0.0
+                for weight, arr in images.items():
+                    i_diff = abs(int(arr[n1[0], n1[1]]) - int(arr[n2[0], n2[1]]))
+                    cost += float(weight) / float(1 + mth.pow(mth.e, -(float(alpha) * i_diff)))
+                    if log:
+                        print(str(i) + ':' + str(n1) + str(n2) + ' cost:' + str(cost) + ' pix-diff: ' + str(i_diff))
+                graph[n1][n2]['cost'] = cost
+                i = i + 1
