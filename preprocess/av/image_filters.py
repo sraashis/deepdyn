@@ -10,7 +10,7 @@ import path_config as cfg
 
 
 def build_filter_bank(k_size, sigma=2, lambd=5, gamma=0.5, psi=0,
-                      k_type=ocv.CV_32F, orientations=49):
+                      k_type=ocv.CV_32F, orientations=64):
     filters = []
     for theta in np.arange(0, np.pi, np.pi / orientations):  # Number of orientations
         params = {'ksize': (k_size, k_size), 'sigma': sigma, 'theta': theta, 'lambd': lambd,
@@ -59,12 +59,11 @@ def apply_bilateral(img_arr, k_size=9, sig1=75, sig2=75):
 
 
 def get_chosen_gabor_bank():
-    kernels1 = build_filter_bank(k_size=4, gamma=0.6, lambd=10, sigma=1)
-    kernels2 = build_filter_bank(k_size=12, gamma=0.6, lambd=10, sigma=1)
-    kernels3 = build_filter_bank(k_size=24, gamma=0.6, lambd=10, sigma=1)
-    kernels4 = build_filter_bank(k_size=32, gamma=0.6, lambd=10, sigma=1)
-    kernels5 = build_filter_bank(k_size=48, gamma=0.6, lambd=10, sigma=1)
-    return kernels1 + kernels2 + kernels3 + kernels4 + kernels5
+    kernels1 = build_filter_bank(k_size=8, gamma=0.6, lambd=4, sigma=1)
+    kernels2 = build_filter_bank(k_size=16, gamma=0.6, lambd=4, sigma=1)
+    kernels3 = build_filter_bank(k_size=32, gamma=0.6, lambd=4, sigma=1)
+    kernels4 = build_filter_bank(k_size=48, gamma=0.6, lambd=7, sigma=2)
+    return kernels1  + kernels2 + kernels3 + kernels4
 
 
 def apply_gabor(image_arr, filter_bank=None):
