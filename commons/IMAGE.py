@@ -19,7 +19,7 @@ class Image(IUtils):
         self.img_bilateral = None
         self.img_gabor = None
         self.img_skeleton = None
-        self.lattice = nx.Graph, []
+        self.lattice = None
 
     def apply_bilateral(self, arr=None, k_size=9, sig1=75, sig2=75):
         Image.log('Applying Bilateral filter.')
