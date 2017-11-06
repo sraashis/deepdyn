@@ -9,7 +9,9 @@ if __name__ == '__main__':
     # img.show_image(img.img_bilateral)
     img_temp = img.img_array[:, :, 1] - img.img_bilateral
     img.apply_gabor(arr=img_temp, filter_bank=fil.get_chosen_gabor_bank())
-    # img.img_gabor[img.img_gabor<100] = 0
+    # img.histogram(255 - img.img_gabor)
+    # img.img_gabor[img.img_gabor<250] = 0
     img.show_image(255-img.img_gabor)
-    img.show_image(img.img_array)
+    # img.show_image(img.img_array)
+    # img.show_kernel(fil.get_chosen_gabor_bank())
     # img.show_av_graph(mat_file=img.mat, image_arr=img.img_gabor, av_only=False)
