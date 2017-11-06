@@ -16,7 +16,7 @@ img.histogram(img.img_gabor)
 
 img.create_lattice_graph(image_arr_2d=img.img_array[:,:,1])
 img.create_skeleton_by_threshold(array_2d=img.img_gabor, threshold=250)
-images = {0.5:255-img.img_skeleton,0.25:img.img_array[:,:,1], 0.25:255-img.img_gabor}
+images = {0.5:255-img.img_skeleton, 0.25:img.img_array[:,:,1], 0.25:255-img.img_gabor}
 img.assign_cost(images=images,alpha=0.1,graph=img.lattice[0])
 nx.write_graphml(img.lattice[0], path=cfg.output_path+'\\graph\\one.graphml')
 
