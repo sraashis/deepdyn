@@ -23,14 +23,14 @@ def create_lattice_graph(image_arr_2d):
     return graph, n_pos
 
 
-def assign_cost(graph=nx.Graph(), images={}, alpha=1, override=False, log=False):
+def assign_cost(graph=nx.Graph(), images=[()], alpha=1, override=False, log=False):
     i = 0
     for n1 in graph.nodes():
         for n2 in nx.neighbors(graph, n1):
             if graph[n1][n2] == {} or override:
                 cost = 0.0
                 ix = 1
-                for weight, arr in images.items():
+                for weight, arr in images:
                     i_diff = abs(float(arr[n1[0], n1[1]]) - float(arr[n2[0], n2[1]]))
                     cost += weight * mth.pow(mth.e, alpha * (i_diff/255))
                     graph[n1][n2]['i_diff_'+str(ix)] = i_diff

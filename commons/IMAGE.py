@@ -56,7 +56,7 @@ class Image(IUtils):
         self.lattice = lat.create_lattice_graph(image_arr_2d)
 
     @staticmethod
-    def assign_cost(graph=nx.Graph(), images={}, alpha=1, override=False, log=True):
+    def assign_cost(graph=nx.Graph(), images=[()], alpha=1, override=False, log=True):
         IUtils.log('Calculating cost of moving to a neighbor.')
         lat.assign_cost(graph, images=images, alpha=alpha, override=override, log=log)
 
