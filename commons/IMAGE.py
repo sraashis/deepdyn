@@ -62,6 +62,8 @@ class Image(IUtils):
     @staticmethod
     def assign_cost(graph=nx.Graph(), images=[()], alpha=1, override=False, log=True):
         IUtils.log('Calculating cost of moving to a neighbor.')
+        if override:
+            IUtils.warn("Overriding..")
         lat.assign_cost(graph, images=images, alpha=alpha, override=override, log=log)
 
     @staticmethod

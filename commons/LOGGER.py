@@ -10,8 +10,8 @@ class Logger:
 
     @staticmethod
     def warn(msg):
-        print('[Warn] ' + msg)
+        print('[Warn] ### ' + msg)
 
     @staticmethod
     def err(msg):
-        print('[Err] msg ' + msg)
+        print('[Err] !!! msg ' + msg)
