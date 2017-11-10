@@ -58,6 +58,13 @@ def apply_bilateral(img_arr, k_size=9, sig1=75, sig2=75):
     return ocv.bilateralFilter(img_arr, k_size, sig1, sig2)
 
 
+def get_signed_diff(image_arr1=None, image_arr2=None):
+    s_diff = np.array(image_arr1 - image_arr2, dtype=np.int8)
+    tmp1 = s_diff - np.min(s_diff)
+    scaled = rescale2d_0_1(tmp1) * 255
+    return scaled.astype(np.uint8)
+
+
 def get_chosen_gabor_bank():
     kernels1 = build_filter_bank(k_size=50, gamma=0.5, lambd=4, sigma=1)
     kernels2 = build_filter_bank(k_size=50, gamma=0.5, lambd=10, sigma=2)
