@@ -21,7 +21,7 @@ class Image(IUtils):
         self.img_skeleton = None
         self.lattice = None
 
-    def apply_bilateral(self, arr=None, k_size=9, sig1=75, sig2=75):
+    def apply_bilateral(self, arr=None, k_size=41, sig1=20, sig2=20):
         Image.log('Applying Bilateral filter.')
         if self.img_bilateral is not None:
             Image.warn('Bilateral filter already applied. Overriding...')
