@@ -28,8 +28,8 @@ class Image(IUtils):
         self.img_bilateral = fil.apply_bilateral(arr, k_size=k_size, sig1=sig1, sig2=sig2)
 
     @staticmethod
-    def get_signed_diff(image_arr1=None, image_arr2=None):
-        return fil.get_signed_diff(image_arr1=image_arr1, image_arr2=image_arr2)
+    def get_signed_diff_int8(image_arr1=None, image_arr2=None):
+        return fil.get_signed_diff_int8(image_arr1=image_arr1, image_arr2=image_arr2)
 
     def load_kernel_bank(self, kern_file_name='kernel_bank.pkl'):
         Image.log('Loading filter kernel bank.')

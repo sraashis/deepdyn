@@ -32,8 +32,8 @@ class IUtils(Logger):
         image.save(file_name)
 
     @staticmethod
-    def histogram(image_arr):
-        plt.hist(image_arr.ravel(), bins=64)
+    def histogram(image_arr, bins=32):
+        plt.hist(image_arr.ravel(), bins)
         plt.show()
 
     @staticmethod

@@ -21,15 +21,15 @@ def build_filter_bank(k_size, sigma=2, lambd=5, gamma=0.5, psi=0,
     return filters
 
 
-def rescale2d_0_1(arr):
+def rescale2d_unsigned(arr):
     m = np.max(arr)
     n = np.min(arr)
     return (arr - n) / (m - n)
 
 
 # Rescale 3d arrays
-def rescale3d_0_1(arrays):
-    return list((rescale2d_0_1(arr) for arr in arrays))
+def rescale3d_unsigned(arrays):
+    return list((rescale2d_unsigned(arr) for arr in arrays))
 
 
 def process(image, filters):
@@ -58,19 +58,18 @@ def apply_bilateral(img_arr, k_size=9, sig1=75, sig2=75):
     return ocv.bilateralFilter(img_arr, k_size, sig1, sig2)
 
 
-def get_signed_diff(image_arr1=None, image_arr2=None):
-    s_diff = np.array(image_arr1 - image_arr2, dtype=np.int8)
-    tmp1 = s_diff - np.min(s_diff)
-    scaled = rescale2d_0_1(tmp1) * 255
-    return scaled.astype(np.uint8)
+def get_signed_diff_int8(image_arr1=None, image_arr2=None):
+    signed_diff = np.array(image_arr1 - image_arr2, dtype=np.int8)
+    fx = np.array(signed_diff - np.min(signed_diff), np.uint8)
+    fx = rescale2d_unsigned(fx)
+    return np.array(fx * 255, np.uint8)
 
 
 def get_chosen_gabor_bank():
-    kernels1 = build_filter_bank(k_size=50, gamma=0.5, lambd=4, sigma=1)
-    kernels2 = build_filter_bank(k_size=50, gamma=0.5, lambd=10, sigma=2)
-    kernels3 = build_filter_bank(k_size=50, gamma=0.5, lambd=10, sigma=3)
-    kernels4 = build_filter_bank(k_size=50, gamma=0.5, lambd=20, sigma=7)
-    return kernels1 + kernels2 + kernels3 + kernels4
+    kernels1 = build_filter_bank(k_size=31, gamma=0.7, lambd=5, sigma=2)
+    kernels2 = build_filter_bank(k_size=31, gamma=0.7, lambd=7, sigma=3)
+    kernels3 = build_filter_bank(k_size=31, gamma=0.7, lambd=10, sigma=4)
+    return kernels1 + kernels2 + kernels3
 
 
 def apply_gabor(image_arr, filter_bank=None):
