@@ -45,7 +45,7 @@ def rescale3d_unsigned(arrays):
     return list((rescale2d_unsigned(arr) for arr in arrays))
 
 
-def process(image, filters):
+def apply_gabor(image, filters):
     accumulator = np.zeros_like(image)
     for kern in filters:
         final_image = ocv.filter2D(image, ocv.CV_8UC3, kern)
@@ -84,6 +84,3 @@ def get_chosen_gabor_bank():
     kernels3 = build_filter_bank(k_size=31, gamma=0.7, lambd=10, sigma=4)
     return kernels1 + kernels2 + kernels3
 
-
-def apply_gabor(image_arr, filter_bank=None):
-    return process(image_arr, filter_bank)
