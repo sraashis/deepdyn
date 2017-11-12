@@ -1,14 +1,22 @@
+"""
+A utility function for av related tasks.
+"""
+
 import numpy as np
-from matplotlib import pyplot as plt
 from PIL import Image
+from matplotlib import pyplot as plt
+
+__all__ = [
+    "get_onh_radius(av_data_set)",
+    "get_av_nodes_positions(av_data_set=None, vessel="", av_only=True)",
+    "show_av_graph(av_data_set=None, image_array=None, image_show=True, onh_show=True, av_only=True, gray_scale=None)"
+]
 
 
 def get_onh_radius(av_data_set):
     return np.linalg.norm(av_data_set.get_graph('onh')[0] - av_data_set.get_graph('onh_pos'))
 
 
-# Function to get AV region nodes
-# Pass 'art' for arteries && 'ven' for veins.
 def get_av_nodes_positions(av_data_set=None, vessel="", av_only=True):
     node_marker = av_data_set.get_graph(vessel)
     av_radius = 2.5 * get_onh_radius(av_data_set)
@@ -22,7 +30,6 @@ def get_av_nodes_positions(av_data_set=None, vessel="", av_only=True):
 
 
 def show_av_graph(av_data_set=None, image_array=None, image_show=True, onh_show=True, av_only=True, gray_scale=None):
-
     onh = av_data_set.get_graph('onh')
     av_art = np.array(list(get_av_nodes_positions(av_data_set, vessel="art", av_only=av_only)))
     av_ven = np.array(list(get_av_nodes_positions(av_data_set, vessel="ven", av_only=av_only)))
@@ -39,4 +46,3 @@ def show_av_graph(av_data_set=None, image_array=None, image_show=True, onh_show=
     if image_show:
         plt.imshow(Image.fromarray(image_array), aspect='auto', cmap=gray_scale)
     plt.show()
-

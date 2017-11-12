@@ -1,6 +1,13 @@
 import math as mth
-
 import networkx as nx
+import numpy as np
+
+
+__all__ = [
+    'create_lattice_graph(image_arr_2d)',
+    'assign_cost(graph=nx.Graph(), images=[()], alpha=1, override=False, log=False)',
+    'assign_node_metrics(graph=nx.Graph(), metrics=np.ndarray((0, 0)))'
+]
 
 
 def create_lattice_graph(image_arr_2d):
@@ -32,10 +39,17 @@ def assign_cost(graph=nx.Graph(), images=[()], alpha=1, override=False, log=Fals
                 ix = 1
                 for weight, arr in images:
                     i_diff = abs(float(arr[n1[0], n1[1]]) - float(arr[n2[0], n2[1]]))
-                    cost += weight * mth.pow(mth.e, alpha * (i_diff/255))
-                    graph[n1][n2]['i_diff_'+str(ix)] = i_diff
+                    cost += weight * mth.pow(mth.e, alpha * (i_diff / 255))
+                    graph[n1][n2]['i_diff_' + str(ix)] = i_diff
                     ix += 1
                 graph[n1][n2]['cost'] = cost
         if log:
             print('\r' + str(i) + ': ' + str(n1), end='')
             i += 1
+
+
+def assign_node_metrics(graph=nx.Graph(), metrics=np.ndarray((0, 0))):
+    for i in range(metrics.shape[0]):
+        print('\r' + str(i), end='')
+        for j in range(metrics.shape[1]):
+            graph[(i, j)]["skeleton"] = metrics[i, j]

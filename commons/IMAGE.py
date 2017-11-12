@@ -10,7 +10,26 @@ from commons.IMG_UTILS import IUtils
 import networkx as nx
 
 
+__all__ = [
+    'Image'
+]
+
+
 class Image(IUtils):
+
+    __all__ = [
+        '__init__(self, av_file_name, img_key=\'I2\'',
+        'apply_bilateral(self, arr=None, k_size=41, sig1=20, sig2=20)',
+        'get_signed_diff_int8(image_arr1=None, image_arr2=None)',
+        'load_kernel_bank(self, kern_file_name=\'kernel_bank.pkl\')',
+        'apply_gabor(self, arr=None, filter_bank=None)',
+        'create_skeleton_by_threshold(self, array_2d=None, threshold=250)',
+        'create_lattice_graph(self, image_arr_2d=None)',
+        'assign_cost(graph=nx.Graph(), images=[()], alpha=10, override=False, log=True)',
+        'assign_node_metrics(graph=nx.Graph(), metrics=np.ndarray((0, 0)))',
+        'show_kernel(kernels, save_fig=False)'
+    ]
+
     kernel_bank = None
 
     def __init__(self, av_file_name, img_key='I2'):
@@ -65,6 +84,10 @@ class Image(IUtils):
         if override:
             IUtils.warn("Overriding..")
         lat.assign_cost(graph, images=images, alpha=alpha, override=override, log=log)
+
+    @staticmethod
+    def assign_node_metrics(graph=nx.Graph(), metrics=np.ndarray((0, 0))):
+        lat.assign_node_metrics(graph=graph,metrics=metrics)
 
     @staticmethod
     def show_kernel(kernels, save_fig=False):
