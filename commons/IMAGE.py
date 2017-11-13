@@ -68,11 +68,13 @@ class Image(IUtils):
         Image.log('Applying Gabor filter.')
         self.img_gabor = fil.apply_gabor(arr, filter_bank)
 
-    def create_skeleton_by_threshold(self, array_2d=None, threshold=250):
+    def create_skeleton_by_threshold(self, array_2d=None, threshold=5):
+        array_2d = 255 - array_2d
         if self.img_skeleton is not None:
             self.warn('A skeleton already present. Overriding..')
         self.img_skeleton = np.copy(array_2d)
-        self.img_skeleton[self.img_skeleton < threshold] = 0
+        self.img_skeleton[self.img_skeleton > threshold] = 255
+        self.img_skeleton[self.img_skeleton <= threshold] = 0
 
     @check_time
     def create_lattice_graph(self, image_arr_2d=None):
