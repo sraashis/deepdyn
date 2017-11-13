@@ -1,5 +1,6 @@
 from heapq import heappop, heappush
 from itertools import count
+from commons.timer import check_time
 
 import networkx as nx
 
@@ -10,6 +11,7 @@ import networkx as nx
   """
 
 
+@check_time
 def get_skeleton(nodes, metrics):
     while nodes:
         n = nodes.pop(0)
@@ -17,6 +19,7 @@ def get_skeleton(nodes, metrics):
             yield n
 
 
+@check_time
 def prim_mst_edges(graph, weight='weight', data=True):
     if graph.is_directed():
         raise nx.NetworkXError(
@@ -52,6 +55,7 @@ def prim_mst_edges(graph, weight='weight', data=True):
                 yield u, v
 
 
+@check_time
 def prim_mst(graph, weight='weight'):
     """
      If the graph is not connected a spanning forest is constructed.  A
