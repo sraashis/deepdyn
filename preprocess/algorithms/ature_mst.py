@@ -1,8 +1,13 @@
+from functools import wraps
 from heapq import heappop, heappush
 from itertools import count
-from commons.timer import check_time
+from multiprocessing import Process
 
 import networkx as nx
+import numpy as np
+
+from commons.IMAGE import Image
+from commons.timer import check_time
 
 """
   A minimum spanning tree is a sub-graph of the graph (a tree)
@@ -12,15 +17,38 @@ import networkx as nx
 
 
 @check_time
-def get_skeleton(nodes, metrics):
-    while nodes:
-        n = nodes.pop(0)
-        if n[metrics] == 0:
-            yield n
+def job_mst(sub_graph, accumulator_arr):
+    sub_mst = nx.algorithms.prim_mst(sub_graph, weight='cost')
+    for x, y in sub_mst:
+        pass
+
+
+def _ll_prim_mst(func):
+    @wraps(func)
+    def inner(image=Image()):
+
+        acc = np.zeros_like(image.img_array[:, :, 1])
+        g = image.lattice[0].nodes()
+        step = 50000
+        num_of_nodes = image.lattice[0].number_of_nodes() - step
+        all_p = []
+
+        for i in range(0, num_of_nodes, step):
+            p = Process(target=func(sub_graph=nx.subgraph(g, g[i:i + step - 1]), accumulator_arr=acc))
+            all_p.append(p)
+
+        for p in all_p:
+            p.run()
+        for p in all_p:
+            p.join()
+
+        return acc
+
+    return inner
 
 
 @check_time
-def prim_mst_edges(graph, weight='weight', data=True):
+def prim_mst_edges(graph, weight='cost', data=True):
     if graph.is_directed():
         raise nx.NetworkXError(
             "Minimum spanning tree not defined for directed graphs.")
@@ -30,8 +58,6 @@ def prim_mst_edges(graph, weight='weight', data=True):
 
     nodes = graph.nodes()
     c = count()
-
-    nodes = get_skeleton(graph, weight)
 
     while nodes:
         u = nodes.pop(0)
@@ -55,13 +81,15 @@ def prim_mst_edges(graph, weight='weight', data=True):
                 yield u, v
 
 
-@check_time
-def prim_mst(graph, weight='weight'):
+@_ll_prim_mst
+def prim_mst(image=Image(), weight='cost'):
     """
      If the graph is not connected a spanning forest is constructed.  A
      spanning forest is a union of the spanning trees for each
      connected component of the graph.
     """
+
+    graph = image.lattice[0]
 
     t = nx.Graph(nx.prim_mst_edges(graph, weight=weight, data=True))
     # Add isolated nodes

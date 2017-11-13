@@ -21,11 +21,7 @@ def try_all(image_arr=None, ii=25, jj=5, k_size=4):
 
 
 def p1(image_array):
-    try_all(image_arr=image_array, k_size=42)
-
-
-def p2(image_array):
-    try_all(image_arr=image_array, k_size=42)
+    try_all(image_arr=image_array, k_size=50)
 
 
 def run_test(image_array):
@@ -33,6 +29,6 @@ def run_test(image_array):
     pr1.start()
     pr1.join()
 
-    # pr2 = Process(target=p2(image_array))
-    # pr2.start()
-    # pr2.join()
+    pr2 = Process(target=p2(image_array))
+    pr2.start()
+    pr2.join()
