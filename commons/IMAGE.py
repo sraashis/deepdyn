@@ -1,20 +1,18 @@
 import os
 
 import joblib as jlb
-import networkx as nx
 import numpy as np
 
 import path_config as cfg
 import preprocess.av.image_filters as fil
-from commons.IMG_UTILS import IUtils
-from commons.timer import  check_time
+from commons.timer import check_time
 
 __all__ = [
     'Image'
 ]
 
 
-class Image(IUtils):
+class Image:
     __all__ = [
         '__init__(self, av_file_name, img_key=\'I2\'',
         'apply_bilateral(self, arr=None, k_size=41, sig1=20, sig2=20)',
@@ -29,9 +27,8 @@ class Image(IUtils):
 
     kernel_bank = None
 
-    def __init__(self, av_file_name, img_key='I2'):
-        Image.log('Loading file ### ' + av_file_name)
-        IUtils.__init__(self, av_file_name, img_key='I2')
+    def __init__(self, image_arr):
+        self.img_array = image_arr
         self.img_bilateral = None
         self.img_gabor = None
         self.img_skeleton = None
