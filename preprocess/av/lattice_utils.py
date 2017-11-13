@@ -5,7 +5,6 @@ import networkx as nx
 import numpy as np
 
 from commons.LOGGER import Logger
-from commons.timer import check_time
 
 __all__ = [
     'create_lattice_graph(image_arr_2d)',
@@ -63,7 +62,6 @@ def generate_lattice_graph(image_arr_2d):
     return graph
 
 
-@check_time
 def assign_cost(graph=nx.Graph(), images=[()], alpha=10, override=False, log=False):
     i = 0
     for n1 in graph.nodes():
@@ -85,11 +83,10 @@ def assign_cost(graph=nx.Graph(), images=[()], alpha=10, override=False, log=Fal
 def assign_cost_parallel(lattices, images=[()], alpha=10, override=False):
     all_p = []
     for a_lattice in lattices:
-        p = Process(target=assign_cost(a_lattice, images, alpha, override, True))
+        p = Process(target=assign_cost(a_lattice, images, alpha, override, False))
         all_p.append(p)
     for p in all_p:
         p.run()
-    for p in all_p:
         p.join()
 
 
