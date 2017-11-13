@@ -1,18 +1,23 @@
 from heapq import heappop, heappush
 from itertools import count
-from commons.LOGGER import Logger
-import networkx.algorithms.mst
 
 import networkx as nx
 
+"""
+  A minimum spanning tree is a sub-graph of the graph (a tree)
+  with the minimum sum of edge weights.  A spanning forest is a
+  union of the spanning trees for each connected component of the graph.
+  """
+
+
+def get_skeleton(nodes, metrics):
+    while nodes:
+        n = nodes.pop(0)
+        if n[metrics] == 0:
+            yield n
+
 
 def prim_mst_edges(graph, weight='weight', data=True):
-    """
-    A minimum spanning tree is a sub-graph of the graph (a tree)
-    with the minimum sum of edge weights.  A spanning forest is a
-    union of the spanning trees for each connected component of the graph.
-    """
-
     if graph.is_directed():
         raise nx.NetworkXError(
             "Minimum spanning tree not defined for directed graphs.")
@@ -22,6 +27,8 @@ def prim_mst_edges(graph, weight='weight', data=True):
 
     nodes = graph.nodes()
     c = count()
+
+    nodes = get_skeleton(graph, weight)
 
     while nodes:
         u = nodes.pop(0)
