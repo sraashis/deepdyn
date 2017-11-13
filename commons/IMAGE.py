@@ -6,7 +6,6 @@ import numpy as np
 
 import path_config as cfg
 import preprocess.av.image_filters as fil
-import preprocess.av.image_lattice as lat
 from commons.IMG_UTILS import IUtils
 from commons.timer import  check_time
 
@@ -23,7 +22,6 @@ class Image(IUtils):
         'load_kernel_bank(self, kern_file_name=\'kernel_bank.pkl\')',
         'apply_gabor(self, arr=None, filter_bank=None)',
         'create_skeleton_by_threshold(self, array_2d=None, threshold=250)',
-        'create_lattice_graph(self, image_arr_2d=None)',
         'assign_cost(graph=nx.Graph(), images=[()], alpha=10, override=False, log=True)',
         'assign_node_metrics(graph=nx.Graph(), metrics=np.ndarray((0, 0)))',
         'show_kernel(kernels, save_fig=False)'
@@ -37,7 +35,6 @@ class Image(IUtils):
         self.img_bilateral = None
         self.img_gabor = None
         self.img_skeleton = None
-        self.lattice = None
 
     @check_time
     def apply_bilateral(self, arr=None, k_size=41, sig1=20, sig2=20):
