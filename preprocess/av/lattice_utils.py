@@ -1,8 +1,11 @@
 import math as mth
+from multiprocessing import Process
 
 import networkx as nx
 import numpy as np
+
 from commons.LOGGER import Logger
+from commons.timer import check_time
 
 __all__ = [
     'create_lattice_graph(image_arr_2d)',
@@ -60,7 +63,8 @@ def generate_lattice_graph(image_arr_2d):
     return graph
 
 
-def assign_cost(graph=nx.Graph(), images=[()], alpha=1, override=False, log=False):
+@check_time
+def assign_cost(graph=nx.Graph(), images=[()], alpha=10, override=False, log=False):
     i = 0
     for n1 in graph.nodes():
         for n2 in nx.neighbors(graph, n1):
@@ -78,8 +82,17 @@ def assign_cost(graph=nx.Graph(), images=[()], alpha=1, override=False, log=Fals
             i += 1
 
 
+def assign_cost_parallel(lattices, images=[()], alpha=10, override=False):
+    all_p = []
+    for a_lattice in lattices:
+        p = Process(target=assign_cost(a_lattice, images, alpha, override, True))
+        all_p.append(p)
+    for p in all_p:
+        p.run()
+    for p in all_p:
+        p.join()
+
+
 def assign_node_metrics(graph=nx.Graph(), metrics=np.ndarray((0, 0))):
-    for i in range(metrics.shape[0]):
-        print('\r' + str(i), end='')
-        for j in range(metrics.shape[1]):
-            graph[(i, j)]["skeleton"] = metrics[i, j]
+    for i, j in graph.nodes():
+        graph[(i, j)]['skeleton'] = metrics[i, j]

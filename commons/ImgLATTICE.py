@@ -27,12 +27,17 @@ class Lattice:
         self.k_lattices = lat.chunk_lattice(self.image_2d, full_lattice, grid_size)
 
     @staticmethod
-    @check_time
     def assign_cost(graph=nx.Graph(), images=[()], alpha=10, override=False, log=True):
         Logger.log('Calculating cost of moving to a neighbor.')
         if override:
             Logger.warn("Overriding..")
         lat.assign_cost(graph, images=images, alpha=alpha, override=override, log=log)
+
+    def assign_cost_parallel(self, images=[()], alpha=10, override=False):
+        Logger.log("Running assign cost in parallel.")
+        if override:
+            Logger.warn("Overriding..")
+        lat.assign_cost_parallel(self.k_lattices, images, alpha, override)
 
     @staticmethod
     @check_time
