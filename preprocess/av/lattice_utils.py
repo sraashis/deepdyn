@@ -2,6 +2,7 @@ import math as mth
 
 import networkx as nx
 import numpy as np
+from commons.LOGGER import Logger
 
 __all__ = [
     'create_lattice_graph(image_arr_2d)',
@@ -35,7 +36,7 @@ def chunk_lattice(image_arr_2d, full_lattice, grid_size=(0, 0)):
                 x_size = x_block_size + remain_x
             if j + y_block_size == y_end:
                 y_size = y_block_size + remain_y
-            print(str(i) + ',' + str(j))
+            Logger.log(str(i) + ',' + str(j))
             sub_graphs_nodes.append(nx.subgraph(full_lattice, get_sub_lattice(i, j, x_size, y_size)))
     return sub_graphs_nodes
 
