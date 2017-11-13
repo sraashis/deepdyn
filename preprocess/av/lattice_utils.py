@@ -16,7 +16,7 @@ def get_sub_lattice(i, j, x_block_size, y_block_size):
             yield (p, q)
 
 
-def chunk_lattices(image_arr_2d, full_lattice, grid_size=(0, 0)):
+def chunk_lattice(image_arr_2d, full_lattice, grid_size=(0, 0)):
     sub_graphs_nodes = []
     x_limit, y_limit = image_arr_2d.shape
     x_block_size = int(x_limit / grid_size[0])
@@ -40,9 +40,8 @@ def chunk_lattices(image_arr_2d, full_lattice, grid_size=(0, 0)):
     return sub_graphs_nodes
 
 
-def create_lattice_graph(image_arr_2d, grid_size):
+def generate_lattice_graph(image_arr_2d):
     graph = nx.grid_graph([image_arr_2d.shape[0], image_arr_2d.shape[1]])
-    n_pos = dict(zip(graph.nodes(), graph.nodes()))
     # for i, j in graph.nodes():
     #     n0 = (i, j)
     #     n1 = (i - 1, j + 1)
@@ -57,7 +56,7 @@ def create_lattice_graph(image_arr_2d, grid_size):
     #         graph.add_edge(n0, n3)
     #     if n4 in graph.nodes():
     #         graph.add_edge(n0, n4)
-    return graph, n_pos
+    return graph
 
 
 def assign_cost(graph=nx.Graph(), images=[()], alpha=1, override=False, log=False):

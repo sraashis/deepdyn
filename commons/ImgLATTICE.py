@@ -7,23 +7,25 @@ from commons.timer import check_time
 
 
 class Lattice(Logger):
-    def __init__(self, image_2d=[], lattice_grid_size=(1, 1)):
+    def __init__(self, image_2d=[]):
+        Logger.__init__()
         self.image_2d = image_2d
-        self.grid_size = lattice_grid_size
+        self.grid_size = (2, 3)
         self.k_lattices = []
+        self.lattice = None
         self.accumulator = np.zeros_like(image_2d)
 
     @check_time
-    def create_lattice_graph(self, image_arr_2d=None):
+    def generate_lattice_graph(self):
         Logger.log('Creating 4-connected lattice.')
         if self.lattice is not None:
             Logger.warn('Lattice already exists. Overriding..')
-        self.k_lattices = lat.create_lattice_graph(image_arr_2d, self.grid_size)
+        self.lattice = lat.generate_lattice_graph(self.image_2d)
 
     @check_time
-    def chunk_lattice(self, image_arr_2d, full_lattice, grid_size):
+    def chunk_lattice(self, full_lattice, grid_size):
         Logger.log("Chunking lattice to " + str(grid_size) + " Lattices.")
-        self.k_lattices = lat.chunk_lattices(image_arr_2d, full_lattice, grid_size)
+        self.k_lattices = lat.chunk_lattice(self.image_2d, full_lattice, grid_size)
 
     @staticmethod
     @check_time
