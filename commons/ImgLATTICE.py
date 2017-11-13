@@ -43,3 +43,10 @@ class Lattice:
     @check_time
     def assign_node_metrics(graph=nx.Graph(), metrics=np.ndarray((0, 0))):
         lat.assign_node_metrics(graph=graph, metrics=metrics)
+
+    @staticmethod
+    def get_lattice_portion(self, image_2d=None, a_lattice=nx.Graph()):
+        res = np.zeros_like(image_2d)
+        for i, j in a_lattice.nodes():
+            res[i, j] = image_2d[i, j]
+        return res
