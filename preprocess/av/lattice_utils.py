@@ -1,7 +1,7 @@
 import math as mth
+
 import networkx as nx
 import numpy as np
-
 
 __all__ = [
     'create_lattice_graph(image_arr_2d)',
@@ -10,7 +10,37 @@ __all__ = [
 ]
 
 
-def create_lattice_graph(image_arr_2d):
+def get_sub_lattice(i, j, x_block_size, y_block_size):
+    for p in range(i, i + x_block_size, 1):
+        for q in range(j, j + y_block_size, 1):
+            yield (p, q)
+
+
+def chunk_lattices(image_arr_2d, full_lattice, grid_size=(0, 0)):
+    sub_graphs_nodes = []
+    x_limit, y_limit = image_arr_2d.shape
+    x_block_size = int(x_limit / grid_size[0])
+    y_block_size = int(y_limit / grid_size[1])
+
+    remain_x = x_limit % x_block_size
+    x_end = x_limit - remain_x
+    remain_y = y_limit % y_block_size
+    y_end = y_limit - remain_y
+
+    for i in range(0, x_end, x_block_size):
+        for j in range(0, y_end, y_block_size):
+            x_size = x_block_size
+            y_size = y_block_size
+            if i + x_block_size == x_end:
+                x_size = x_block_size + remain_x
+            if j + y_block_size == y_end:
+                y_size = y_block_size + remain_y
+            print(str(i) + ',' + str(j))
+            sub_graphs_nodes.append(nx.subgraph(full_lattice, get_sub_lattice(i, j, x_size, y_size)))
+    return sub_graphs_nodes
+
+
+def create_lattice_graph(image_arr_2d, grid_size):
     graph = nx.grid_graph([image_arr_2d.shape[0], image_arr_2d.shape[1]])
     n_pos = dict(zip(graph.nodes(), graph.nodes()))
     # for i, j in graph.nodes():

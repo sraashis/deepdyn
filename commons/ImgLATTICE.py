@@ -18,7 +18,12 @@ class Lattice(Logger):
         Logger.log('Creating 4-connected lattice.')
         if self.lattice is not None:
             Logger.warn('Lattice already exists. Overriding..')
-        self.k_lattices = lat.create_lattice_graph(image_arr_2d)
+        self.k_lattices = lat.create_lattice_graph(image_arr_2d, self.grid_size)
+
+    @check_time
+    def chunk_lattice(self, image_arr_2d, full_lattice, grid_size):
+        Logger.log("Chunking lattice to " + str(grid_size) + " Lattices.")
+        self.k_lattices = lat.chunk_lattices(image_arr_2d, full_lattice, grid_size)
 
     @staticmethod
     @check_time
