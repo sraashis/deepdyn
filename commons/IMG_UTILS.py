@@ -12,6 +12,7 @@ from commons.MAT import Mat
 
 class IUtils(Logger):
     def __init__(self, av_file_name, img_key='I2'):
+        Logger.__init__(self)
         self.av_file = av_file_name
         self.mat = Mat(file_name=av_file_name)
         self.img_array = self.mat.get_image(img_key)

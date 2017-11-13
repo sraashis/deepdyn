@@ -6,9 +6,8 @@ from commons.LOGGER import Logger
 from commons.timer import check_time
 
 
-class Lattice(Logger):
+class Lattice:
     def __init__(self, image_2d=[]):
-        Logger.__init__()
         self.image_2d = image_2d
         self.grid_size = (2, 3)
         self.k_lattices = []
