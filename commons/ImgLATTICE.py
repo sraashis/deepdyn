@@ -71,11 +71,6 @@ class Lattice:
                 self.k_lattices.append(nx.subgraph(full_lattice, Lattice._get_sub_lattice(i, j, x_size, y_size)))
 
     @staticmethod
-    def assign_node_metrics(graph=nx.Graph(), metrics=np.ndarray((0, 0)), metrics_name=None):
-        for i, j in graph.nodes():
-            graph[(i, j)][metrics_name] = metrics[i, j]
-
-    @staticmethod
     def get_lattice_portion(image_2d=None, a_lattice=nx.Graph()):
         res = np.zeros_like(image_2d)
         for i, j in a_lattice.nodes():
