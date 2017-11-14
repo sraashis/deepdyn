@@ -30,3 +30,8 @@ def assign_cost_parallel(lattices, images=[()], alpha=10, override=False):
     for p in all_p:
         p.run()
         p.join()
+
+
+def assign_node_metrics(graph=nx.Graph(), metrics=None, metrics_name=None):
+    for i, j in graph.nodes():
+        graph[(i, j)][metrics_name] = metrics[i, j]
