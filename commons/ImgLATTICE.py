@@ -5,13 +5,12 @@ import numpy as np
 
 
 class Lattice:
-    def __init__(self, image_2d=None):
+    def __init__(self, lattice_size=()):
         logger.basicConfig(level=logger.INFO)
-        self.image_2d = image_2d
-        self.grid_size = (2, 3)
+        self.x_size, self.y_size = lattice_size
         self.k_lattices = []
         self.lattice = None
-        self.accumulator = np.zeros_like(image_2d)
+        self.accumulator = np.zeros([self.x_size, self.y_size])
 
     @staticmethod
     def _connect_8(graph):
@@ -37,7 +36,7 @@ class Lattice:
             logger.info(msg='Creating 4-connected lattice.')
         if self.lattice is not None:
             logger.warning(msg='Lattice already exists. Overriding..')
-        self.lattice = nx.grid_graph([self.image_2d.shape[0], self.image_2d.shape[1]])
+        self.lattice = nx.grid_graph([self.x_size, self.y_size])
 
         if eight_connected:
             Lattice._connect_8(self.lattice)
@@ -48,16 +47,15 @@ class Lattice:
             for q in range(j, j + y_block_size, 1):
                 yield (p, q)
 
-    def chunk_lattice(self, image_arr_2d, full_lattice, grid_size=(0, 0)):
+    def chunk_lattice(self, full_lattice, grid_size=(0, 0)):
         self.k_lattices = []
-        x_limit, y_limit = image_arr_2d.shape
-        x_block_size = int(x_limit / grid_size[0])
-        y_block_size = int(y_limit / grid_size[1])
+        x_block_size = int(self.x_size / grid_size[0])
+        y_block_size = int(self.y_size / grid_size[1])
 
-        remain_x = x_limit % x_block_size
-        x_end = x_limit - remain_x
-        remain_y = y_limit % y_block_size
-        y_end = y_limit - remain_y
+        remain_x = self.x_size % x_block_size
+        x_end = self.x_size - remain_x
+        remain_y = self.y_size % y_block_size
+        y_end = self.y_size - remain_y
 
         for i in range(0, x_end, x_block_size):
             for j in range(0, y_end, y_block_size):
@@ -71,8 +69,8 @@ class Lattice:
                 self.k_lattices.append(nx.subgraph(full_lattice, Lattice._get_sub_lattice(i, j, x_size, y_size)))
 
     @staticmethod
-    def get_lattice_portion(image_2d=None, a_lattice=nx.Graph()):
-        res = np.zeros_like(image_2d)
+    def get_lattice_portion(image_array_2d=None, a_lattice=nx.Graph()):
+        res = np.zeros_like(image_array_2d)
         for i, j in a_lattice.nodes():
-            res[i, j] = image_2d[i, j]
+            res[i, j] = image_array_2d[i, j]
         return res
