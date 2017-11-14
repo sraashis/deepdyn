@@ -48,9 +48,8 @@ class Lattice:
             for q in range(j, j + y_block_size, 1):
                 yield (p, q)
 
-    @staticmethod
-    def chunk_lattice(image_arr_2d, full_lattice, grid_size=(0, 0)):
-        sub_graphs_nodes = []
+    def chunk_lattice(self, image_arr_2d, full_lattice, grid_size=(0, 0)):
+        self.k_lattices = []
         x_limit, y_limit = image_arr_2d.shape
         x_block_size = int(x_limit / grid_size[0])
         y_block_size = int(y_limit / grid_size[1])
@@ -69,8 +68,7 @@ class Lattice:
                 if j + y_block_size == y_end:
                     y_size = y_block_size + remain_y
                 logger.info(msg=str(i) + ',' + str(j))
-                sub_graphs_nodes.append(nx.subgraph(full_lattice, Lattice._get_sub_lattice(i, j, x_size, y_size)))
-        return sub_graphs_nodes
+                self.k_lattices.append(nx.subgraph(full_lattice, Lattice._get_sub_lattice(i, j, x_size, y_size)))
 
     @staticmethod
     def assign_node_metrics(graph=nx.Graph(), metrics=np.ndarray((0, 0)), metrics_name=None):
