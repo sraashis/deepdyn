@@ -5,9 +5,9 @@ import numpy as np
 
 
 class Lattice:
-    def __init__(self, lattice_size=()):
+    def __init__(self, grid_size=()):
         logger.basicConfig(level=logger.INFO)
-        self.x_size, self.y_size = lattice_size
+        self.x_size, self.y_size = grid_size
         self.k_lattices = []
         self.lattice = None
         self.accumulator = np.zeros([self.x_size, self.y_size])
@@ -47,10 +47,10 @@ class Lattice:
             for q in range(j, j + y_block_size, 1):
                 yield (p, q)
 
-    def chunk_lattice(self, full_lattice, grid_size=(0, 0)):
+    def chunk_lattice(self, full_lattice, chunk_size=(0, 0)):
         self.k_lattices = []
-        x_block_size = int(self.x_size / grid_size[0])
-        y_block_size = int(self.y_size / grid_size[1])
+        x_block_size = int(self.x_size / chunk_size[0])
+        y_block_size = int(self.y_size / chunk_size[1])
 
         remain_x = self.x_size % x_block_size
         x_end = self.x_size - remain_x
