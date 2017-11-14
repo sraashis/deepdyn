@@ -1,12 +1,15 @@
+import logging as logger
+import math as mt
 import os
+import time
 
-import joblib as jlb
+import cv2 as ocv
+import matplotlib.pyplot as plt
 import numpy as np
+from PIL import Image as Img
 
 import path_config as cfg
 import preprocess.av.image_filters as fil
-from commons.LOGGER import Logger
-from commons.timer import check_time
 
 __all__ = [
     'Image'
@@ -14,18 +17,6 @@ __all__ = [
 
 
 class Image:
-    __all__ = [
-        '__init__(self, av_file_name, img_key=\'I2\'',
-        'apply_bilateral(self, arr=None, k_size=41, sig1=20, sig2=20)',
-        'get_signed_diff_int8(image_arr1=None, image_arr2=None)',
-        'load_kernel_bank(self, kern_file_name=\'kernel_bank.pkl\')',
-        'apply_gabor(self, arr=None, filter_bank=None)',
-        'create_skeleton_by_threshold(self, array_2d=None, threshold=250)',
-        'assign_cost(graph=nx.Graph(), images=[()], alpha=10, override=False, log=True)',
-        'assign_node_metrics(graph=nx.Graph(), metrics=np.ndarray((0, 0)))',
-        'show_kernel(kernels, save_fig=False)'
-    ]
-
     kernel_bank = None
 
     def __init__(self, image_arr):
@@ -34,43 +25,70 @@ class Image:
         self.img_gabor = None
         self.img_skeleton = None
 
-    @check_time
-    def apply_bilateral(self, arr=None, k_size=41, sig1=20, sig2=20):
-        Logger.log('Applying Bilateral filter.')
+    def apply_bilateral(self, image_arr=None, k_size=41, sig_color=20, sig_space=20):
+        logger.log('Applying Bilateral filter.')
         if self.img_bilateral is not None:
-            Logger.warn('Bilateral filter already applied. Overriding...')
-        self.img_bilateral = fil.apply_bilateral(arr, k_size=k_size, sig1=sig1, sig2=sig2)
+            logger.warning('Bilateral filter already applied. Overriding...')
+        self.img_bilateral = ocv.bilateralFilter(image_arr, k_size, sigmaColor=sig_color, sigmaSpace=sig_space)
+
+    @staticmethod
+    def rescale2d_unsigned(arr):
+        m = np.max(arr)
+        n = np.min(arr)
+        return (arr - n) / (m - n)
+
+    @staticmethod
+    def rescale3d_unsigned(arrays):
+        return list((Image.rescale2d_unsigned(arr) for arr in arrays))
 
     @staticmethod
     def get_signed_diff_int8(image_arr1=None, image_arr2=None):
-        return fil.get_signed_diff_int8(image_arr1=image_arr1, image_arr2=image_arr2)
+        signed_diff = np.array(image_arr1 - image_arr2, dtype=np.int8)
+        fx = np.array(signed_diff - np.min(signed_diff), np.uint8)
+        fx = Image.rescale2d_unsigned(fx)
+        return np.array(fx * 255, np.uint8)
 
-    @check_time
-    def load_kernel_bank(self, kern_file_name='kernel_bank.pkl'):
-        Logger.log('Loading filter kernel bank.')
-        if Image.kernel_bank is not None:
-            Logger.warn('Kernel already loaded. Overriding...')
-        try:
-            os.chdir(cfg.kernel_dmp_path)
-            Image.kernel_bank = jlb.load(kern_file_name)
-        except:
-            Logger.warn('Cannot load gabor kernel from kern.pkl. Creating new and dumping.')
-            Image.kernel_bank = fil.get_chosen_gabor_bank()
-            jlb.dump(Image.kernel_bank, filename=kern_file_name, compress=True)
-
-    @check_time
-    def apply_gabor(self, arr, filter_bank):
-        Logger.log('Applying Gabor filter.')
-        self.img_gabor = fil.apply_gabor(arr, filter_bank)
+    def apply_gabor(self, image_arr, kernel_bank):
+        logger.log('Applying Gabor filter.')
+        self.img_gabor = np.zeros_like(image_arr)
+        for kern in kernel_bank:
+            final_image = ocv.filter2D(image_arr, ocv.CV_8UC3, kern)
+            np.maximum(self.img_gabor, final_image, self.img_gabor)
 
     def create_skeleton_by_threshold(self, array_2d=None, threshold=5):
         array_2d = 255 - array_2d
         if self.img_skeleton is not None:
-            Logger.warn('A skeleton already present. Overriding..')
+            logger.warning('A skeleton already present. Overriding..')
         self.img_skeleton = np.copy(array_2d)
         self.img_skeleton[self.img_skeleton > threshold] = 255
         self.img_skeleton[self.img_skeleton <= threshold] = 0
 
     @staticmethod
-    def show_kernel(kernels, save_fig=False):
-        fil.show_kernels(kernels, save_fig=save_fig)
+    def show_kernels(kernels):
+        grid_size = mt.ceil(mt.sqrt(len(kernels)))
+        for ix, kernel in enumerate(kernels):
+            plt.subplot(grid_size, grid_size, ix + 1)
+            plt.xticks([], [])
+            plt.yticks([], [])
+            plt.imshow(kernel, cmap='gray', aspect='auto')
+            plt.show()
+
+    @staticmethod
+    def from_array(image_array):
+        return Img.fromarray(image_array)
+
+    @staticmethod
+    def show_image(image_array):
+        Img.fromarray(image_array).show()
+
+    @staticmethod
+    def save_image(image_array, name="image-" + str(int(time.time()))):
+        image = Img.fromarray(image_array)
+        file_name = name + '.png'
+        os.chdir(cfg.output_path)
+        image.save(file_name)
+
+    @staticmethod
+    def histogram(image_arr, bins=32):
+        plt.hist(image_arr.ravel(), bins)
+        plt.show()
