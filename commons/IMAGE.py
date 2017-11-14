@@ -9,7 +9,6 @@ import numpy as np
 from PIL import Image as Img
 
 import path_config as cfg
-import preprocess.av.image_filters as fil
 
 __all__ = [
     'Image'
@@ -20,15 +19,16 @@ class Image:
     kernel_bank = None
 
     def __init__(self, image_arr):
+        logger.basicConfig(level=logger.INFO)
         self.img_array = image_arr
         self.img_bilateral = None
         self.img_gabor = None
         self.img_skeleton = None
 
     def apply_bilateral(self, image_arr=None, k_size=41, sig_color=20, sig_space=20):
-        logger.log('Applying Bilateral filter.')
+        logger.info(msg='Applying Bilateral filter.')
         if self.img_bilateral is not None:
-            logger.warning('Bilateral filter already applied. Overriding...')
+            logger.warning(msg='Bilateral filter already applied. Overriding...')
         self.img_bilateral = ocv.bilateralFilter(image_arr, k_size, sigmaColor=sig_color, sigmaSpace=sig_space)
 
     @staticmethod
@@ -49,7 +49,7 @@ class Image:
         return np.array(fx * 255, np.uint8)
 
     def apply_gabor(self, image_arr, kernel_bank):
-        logger.log('Applying Gabor filter.')
+        logger.info(msg='Applying Gabor filter.')
         self.img_gabor = np.zeros_like(image_arr)
         for kern in kernel_bank:
             final_image = ocv.filter2D(image_arr, ocv.CV_8UC3, kern)
@@ -58,7 +58,7 @@ class Image:
     def create_skeleton_by_threshold(self, array_2d=None, threshold=5):
         array_2d = 255 - array_2d
         if self.img_skeleton is not None:
-            logger.warning('A skeleton already present. Overriding..')
+            logger.warning(msg='A skeleton already present. Overriding..')
         self.img_skeleton = np.copy(array_2d)
         self.img_skeleton[self.img_skeleton > threshold] = 255
         self.img_skeleton[self.img_skeleton <= threshold] = 0

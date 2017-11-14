@@ -6,6 +6,7 @@ import numpy as np
 
 class Lattice:
     def __init__(self, image_2d=None):
+        logger.basicConfig(level=logger.INFO)
         self.image_2d = image_2d
         self.grid_size = (2, 3)
         self.k_lattices = []
@@ -31,11 +32,11 @@ class Lattice:
 
     def generate_lattice_graph(self, eight_connected=False):
         if eight_connected:
-            logger.log('Creating 8-connected lattice.')
+            logger.info(msg='Creating 8-connected lattice.')
         else:
-            logger.log('Creating 8-connected lattice.')
+            logger.info(msg='Creating 8-connected lattice.')
         if self.lattice is not None:
-            logger.warning('Lattice already exists. Overriding..')
+            logger.warning(msg='Lattice already exists. Overriding..')
         self.lattice = nx.grid_graph([self.image_2d.shape[0], self.image_2d.shape[1]])
 
         if eight_connected:
@@ -67,7 +68,7 @@ class Lattice:
                     x_size = x_block_size + remain_x
                 if j + y_block_size == y_end:
                     y_size = y_block_size + remain_y
-                logger.log(str(i) + ',' + str(j))
+                logger.info(msg=str(i) + ',' + str(j))
                 sub_graphs_nodes.append(nx.subgraph(full_lattice, Lattice._get_sub_lattice(i, j, x_size, y_size)))
         return sub_graphs_nodes
 
