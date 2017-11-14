@@ -34,7 +34,7 @@ class Lattice:
         if eight_connected:
             logger.info(msg='Creating 8-connected lattice.')
         else:
-            logger.info(msg='Creating 8-connected lattice.')
+            logger.info(msg='Creating 4-connected lattice.')
         if self.lattice is not None:
             logger.warning(msg='Lattice already exists. Overriding..')
         self.lattice = nx.grid_graph([self.image_2d.shape[0], self.image_2d.shape[1]])
