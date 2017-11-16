@@ -69,8 +69,20 @@ class Lattice:
                 self.k_lattices.append(nx.subgraph(full_lattice, Lattice._get_sub_lattice(i, j, x_size, y_size)))
 
     @staticmethod
-    def get_lattice_portion(image_array_2d=None, a_lattice=nx.Graph()):
+    def get_slice_focused(image_array_2d=None, a_lattice=nx.Graph()):
         res = np.zeros_like(image_array_2d)
         for i, j in a_lattice.nodes():
             res[i, j] = image_array_2d[i, j]
         return res
+
+    @staticmethod
+    def get_slice_only(image_array_2d=None, a_lattice=nx.Graph()):
+        x_min, y_min = min(a_lattice.nodes())
+        x_max, y_max = max(a_lattice.nodes())
+        x = x_max - x_min
+        y = y_max - y_min
+        arr = np.zeros([x, y])
+        for i in range(x):
+            for j in range(y):
+                arr[i, j] = image_array_2d[x + i, y + j]
+        return arr
