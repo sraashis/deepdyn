@@ -10,7 +10,7 @@ class Lattice:
         self.x_size, self.y_size = image_arr_2d.shape
         self.k_lattices = []
         self.lattice = None
-        self.accumulator = np.zeros([self.x_size, self.y_size])
+        self.accumulator = np.zeros([self.x_size, self.y_size], dtype=np.uint8)
 
     @staticmethod
     def _connect_8(graph):
