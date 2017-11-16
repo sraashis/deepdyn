@@ -58,7 +58,7 @@ def _prim_mst(lattice=None, lattice_object=None, threshold=None, weight=None, se
     _prim_mst_edges(lattice=lattice, lattice_object=lattice_object, threshold=threshold, weight=weight, seed=seed)
 
 
-def run_mst(lattice_object=None, threshold=50000, weight='cost', seed=[], test_index=-1):
+def run_mst(lattice_object=None, threshold=None, weight='cost', seed=None, test_index=-1):
     all_p = []
 
     if test_index >= 0:
@@ -77,7 +77,7 @@ def run_mst(lattice_object=None, threshold=50000, weight='cost', seed=[], test_i
         all_p.append(p)
 
     for p in all_p:
-        p.run()
+        p.start()
 
     for p in all_p:
         p.join()
