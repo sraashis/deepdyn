@@ -1,12 +1,11 @@
+import itertools as itr
 from heapq import heappop, heappush
 from itertools import count
 from multiprocessing import Process
 
 import networkx as nx
-import numpy as np
 
 from commons.timer import check_time
-from commons.ImgLATTICE import Lattice
 
 """
   A minimum spanning tree is a sub-graph of the graph (a tree)
@@ -16,23 +15,24 @@ from commons.ImgLATTICE import Lattice
 
 
 @check_time
-def _prim_mst_edges(graph, weight='cost', data=True, acc=None):
-    if graph.is_directed():
+def _prim_mst_edges(lattice=None, img_lattice=None, threshold=None, weight=None, seed=None):
+    c = itr.count()
+    if lattice.is_directed():
         raise nx.NetworkXError(
             "Minimum spanning tree not defined for directed graphs.")
 
     push = heappush
     pop = heappop
 
-    nodes = graph.nodes()
+    nodes = lattice.nodes()
     c = count()
 
     while nodes:
-        u = nodes.pop(0)
+        u = seed.pop(0)
         frontier = []
         visited = [u]
-        for u, v in graph.edges(u):
-            push(frontier, (graph[u][v].get(weight, 1), next(c), u, v))
+        for u, v in lattice.edges(u):
+            push(frontier, (lattice[u][v].get(weight, 1), next(c), u, v))
 
         while frontier:
             _, _, u, v = pop(frontier)
@@ -40,38 +40,42 @@ def _prim_mst_edges(graph, weight='cost', data=True, acc=None):
                 continue
             visited.append(v)
             nodes.remove(v)
-            for v, w in graph.edges(v):
+            for v, w in lattice.edges(v):
                 if w not in visited:
-                    push(frontier, (graph[v][w].get(weight, 1), next(c), v, w))
-            if data:
-                yield u, v, graph[u][v]
-            else:
-                yield u, v
+                    push(frontier, (lattice[v][w].get(weight, 1), next(c), v, w))
+
+            if 0 == threshold:
+                return
+
+            lattice.accumulator[u, v] = 255
+            threshold = threshold - 1
 
 
-def _prim_mst(graph, weight='cost', acc=None):
+def _prim_mst(lattice=None, lattice_object=None, threshold=None, weight=None, seed=None):
     """
      If the graph is not connected a spanning forest is constructed.  A
      spanning forest is a union of the spanning trees for each
      connected component of the graph.
     """
-
-    t = nx.Graph(_prim_mst_edges(graph, weight=weight, data=True))
-    # Add isolated nodes
-    if len(t) != len(graph):
-        t.add_nodes_from([n for n, d in graph.degree().items() if d == 0])
-    # Add node and graph attributes as shallow copy
-    for n in t:
-        t.node[n] = graph.node[n].copy()
-    t.graph = graph.graph.copy()
-    return t
+    _prim_mst_edges(lattice=lattice, lattice_object=lattice_object, threshold=threshold, weight=weight, seed=seed)
 
 
-def run_mst(img_lattice=Lattice()):
+def run_mst(lattice_object=None, threshold=50000, weight='cost', seed=[], test_index=-1):
     all_p = []
-    for a_lattice in img_lattice.k_lattices:
-        p = Process(target=_prim_mst(a_lattice, img_lattice.accumulator))
+    if test_index >= 0:
+        p = Process(
+            target=_prim_mst(lattice=lattice_object.k_lattices[test_index], lattice_object=lattice_object,
+                             threshold=threshold, weight=weight,
+                             seed=seed))
         all_p.append(p)
+
+    else:
+        for a_lattice in lattice_object.k_lattices:
+            p = Process(
+                target=_prim_mst(lattice=a_lattice, lattice_object=lattice_object, threshold=threshold, weight=weight,
+                                 seed=seed))
+        all_p.append(p)
+
     for p in all_p:
         p.run()
     for p in all_p:
