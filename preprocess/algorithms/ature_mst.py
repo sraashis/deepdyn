@@ -1,4 +1,3 @@
-import itertools as itr
 from heapq import heappop, heappush
 from itertools import count
 from multiprocessing import Process
@@ -15,8 +14,7 @@ from commons.timer import check_time
 
 
 @check_time
-def _prim_mst_edges(lattice=None, img_lattice=None, threshold=None, weight=None, seed=None):
-    c = itr.count()
+def _prim_mst_edges(lattice=None, lattice_object=None, threshold=None, weight=None, seed=None):
     if lattice.is_directed():
         raise nx.NetworkXError(
             "Minimum spanning tree not defined for directed graphs.")
@@ -27,7 +25,7 @@ def _prim_mst_edges(lattice=None, img_lattice=None, threshold=None, weight=None,
     nodes = lattice.nodes()
     c = count()
 
-    while nodes:
+    while seed:
         u = seed.pop(0)
         frontier = []
         visited = [u]
@@ -47,7 +45,7 @@ def _prim_mst_edges(lattice=None, img_lattice=None, threshold=None, weight=None,
             if 0 == threshold:
                 return
 
-            lattice.accumulator[u, v] = 255
+            lattice_object.accumulator[u, v] = 255
             threshold = threshold - 1
 
 
@@ -62,11 +60,13 @@ def _prim_mst(lattice=None, lattice_object=None, threshold=None, weight=None, se
 
 def run_mst(lattice_object=None, threshold=50000, weight='cost', seed=[], test_index=-1):
     all_p = []
+
     if test_index >= 0:
+        seed = set.intersection(set(seed), lattice_object.k_lattices[test_index].nodes())
         p = Process(
             target=_prim_mst(lattice=lattice_object.k_lattices[test_index], lattice_object=lattice_object,
                              threshold=threshold, weight=weight,
-                             seed=seed))
+                             seed=list(seed)))
         all_p.append(p)
 
     else:
@@ -78,5 +78,6 @@ def run_mst(lattice_object=None, threshold=50000, weight='cost', seed=[], test_i
 
     for p in all_p:
         p.run()
+
     for p in all_p:
         p.join()
