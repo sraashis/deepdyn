@@ -12,7 +12,7 @@ def assign_cost(graph=nx.Graph(), images=[()], alpha=10, override=False, log=Fal
                 cost = 0.0
                 ix = 1
                 for weight, arr in images:
-                    i_diff = abs(float(arr[n1[0], n1[1]]) - float(arr[n2[0], n2[1]]))
+                    i_diff = max(arr[n1[0], n1[1]], arr[n2[0], n2[1]])
                     cost += weight * mth.pow(mth.e, alpha * (i_diff / 255))
                     graph[n1][n2]['i_diff_' + str(ix)] = i_diff
                     ix += 1
@@ -35,3 +35,12 @@ def assign_cost_parallel(lattices, images=[()], alpha=10, override=False):
 def assign_node_metrics(graph=nx.Graph(), metrics=None, metrics_name=None):
     for i, j in graph.nodes():
         graph[(i, j)][metrics_name] = metrics[i, j]
+
+
+def get_seed_node_list(image_array_2d=None):
+    seed = []
+    for i in range(image_array_2d.shape[0]):
+        for j in range(image_array_2d.shape[1]):
+            if image_array_2d[i, j] == 0:
+                seed.append((i, j))
+    return seed
