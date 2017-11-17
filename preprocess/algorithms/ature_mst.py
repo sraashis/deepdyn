@@ -1,6 +1,7 @@
 from heapq import heappop, heappush
 from itertools import count
 from multiprocessing import Process
+import numpy as np
 
 import networkx as nx
 
@@ -56,6 +57,9 @@ def _prim_mst(lattice=None, lattice_object=None, threshold=None, weight=None, se
      spanning forest is a union of the spanning trees for each
      connected component of the graph.
     """
+    # Reset before running again.
+    lattice_object.accumulator = np.zeros([lattice_object.x_size, lattice_object.y_size], dtype=np.uint8)
+    lattice_object.total_weight = 0.0
     _prim_mst_edges(lattice=lattice, lattice_object=lattice_object, threshold=threshold, weight=weight, seed=seed)
 
 
