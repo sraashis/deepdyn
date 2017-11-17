@@ -3,7 +3,7 @@ import math as mth
 import networkx as nx
 
 
-def assign_cost(graph=nx.Graph(), images=[()], alpha=10, override=False, log=False):
+def assign_cost(graph=nx.Graph(), images=[()], alpha=1, override=False, log=False):
     i = 0
     for n1 in graph.nodes():
         for n2 in nx.neighbors(graph, n1):
