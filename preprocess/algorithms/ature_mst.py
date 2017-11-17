@@ -43,12 +43,11 @@ def _prim_mst_edges(lattice=None, lattice_object=None, threshold=None, weight=No
                 if w not in visited:
                     push(frontier, (lattice[v][w].get(weight, 1), next(c), v, w))
 
-            if 0 == threshold:
-                return
-
             lattice_object.accumulator[v[0], v[1]] = 255
             lattice_object.total_weight += float(lattice[u][v].get(weight, 1))
-            threshold = threshold - 1
+
+            if lattice_object.total_weight > threshold:
+                return
 
 
 def _prim_mst(lattice=None, lattice_object=None, threshold=None, weight=None, seed=None):
