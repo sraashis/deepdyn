@@ -19,3 +19,13 @@ def get_chosen_gabor_bank():
     kernels2 = build_filter_bank(k_size=31, gamma=0.7, lambd=7, sigma=3)
     kernels3 = build_filter_bank(k_size=31, gamma=0.7, lambd=10, sigma=4)
     return kernels1 + kernels2 + kernels3
+
+
+def get_chosen_skeleton_filter():
+    kernel = [[0, 0, 0, 0, 0],
+              [0, 0, 1, 0, 0],
+              [0, 1, 1, 1, 0],
+              [0, 0, 1, 0, 0],
+              [0, 0, 0, 0, 0]
+              ]
+    return np.array(kernel)

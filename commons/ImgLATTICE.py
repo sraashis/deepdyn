@@ -11,6 +11,7 @@ class Lattice:
         self.k_lattices = []
         self.lattice = None
         self.accumulator = np.zeros([self.x_size, self.y_size], dtype=np.uint8)
+        self.total_weight = 0.0
 
     @staticmethod
     def _connect_8(graph):

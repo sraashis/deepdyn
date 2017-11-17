@@ -55,13 +55,14 @@ class Image:
             final_image = ocv.filter2D(image_arr, ocv.CV_8UC3, kern)
             np.maximum(self.img_gabor, final_image, self.img_gabor)
 
-    def create_skeleton_by_threshold(self, array_2d=None, threshold=5):
+    def create_skeleton(self, array_2d=None, threshold=0, kernels=None):
         array_2d = 255 - array_2d
         if self.img_skeleton is not None:
             logger.warning(msg='A skeleton already present. Overriding..')
         self.img_skeleton = np.copy(array_2d)
         self.img_skeleton[self.img_skeleton > threshold] = 255
         self.img_skeleton[self.img_skeleton <= threshold] = 0
+        self.img_skeleton = ocv.filter2D(self.img_skeleton, ocv.CV_8UC3, kernels)
 
     @staticmethod
     def show_kernels(kernels):

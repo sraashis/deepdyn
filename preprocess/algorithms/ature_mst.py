@@ -45,7 +45,8 @@ def _prim_mst_edges(lattice=None, lattice_object=None, threshold=None, weight=No
             if 0 == threshold:
                 return
 
-            lattice_object.accumulator[u, v] = 255
+            lattice_object.accumulator[v[0], v[1]] = 255
+            lattice_object.total_weight += float(lattice[u][v].get(weight, 1))
             threshold = threshold - 1
 
 
@@ -58,9 +59,13 @@ def _prim_mst(lattice=None, lattice_object=None, threshold=None, weight=None, se
     _prim_mst_edges(lattice=lattice, lattice_object=lattice_object, threshold=threshold, weight=weight, seed=seed)
 
 
-def run_mst(lattice_object=None, threshold=None, weight='cost', seed=None, test_index=-1):
-    all_p = []
+def run_mst(lattice_object=None, threshold=None, weight='cost', seed=None):
+    _prim_mst(lattice=lattice_object.lattice, lattice_object=lattice_object, threshold=threshold, weight=weight,
+              seed=seed)
 
+
+def run_mst_parallel(lattice_object=None, threshold=None, weight='cost', seed=None, test_index=-1):
+    all_p = []
     if test_index >= 0:
         seed = set.intersection(set(seed), lattice_object.k_lattices[test_index].nodes())
         p = Process(
@@ -68,7 +73,6 @@ def run_mst(lattice_object=None, threshold=None, weight='cost', seed=None, test_
                              threshold=threshold, weight=weight,
                              seed=list(seed)))
         all_p.append(p)
-
     else:
         for a_lattice in lattice_object.k_lattices:
             p = Process(
