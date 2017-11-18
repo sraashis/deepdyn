@@ -52,10 +52,15 @@ def _prim_mst(lattice=None, lattice_object=None, weight_limit_per_seed=None, wei
 
             # Keep records and control track
             lattice_object.accumulator[v[0], v[1]] = 255
-            seed_weight += float(lattice[u][v].get(weight, 1))
             node_count += 1
 
             visited.append(v)
+
+            # We only count non-seed's weight.
+            if v in seed:
+                seed.remove(v)
+            else:
+                seed_weight += float(lattice[u][v].get(weight, 1))
 
             for v, w in lattice.edges(v):
                 if w not in visited:
@@ -63,11 +68,11 @@ def _prim_mst(lattice=None, lattice_object=None, weight_limit_per_seed=None, wei
 
 
 def run_mst(lattice_object=None, weight_limit_per_seed=20000, weight='cost', seed=None, node_limit_per_seed=10000,
-            number_of_seeds=35):
+            number_of_seeds=35, expansion_rate=1):
     shuffle(seed)
     lattice_object.accumulator = np.zeros([lattice_object.x_size, lattice_object.y_size], dtype=np.uint8)
     lattice_object.total_weight = 0.0
     _prim_mst(lattice=lattice_object.lattice, lattice_object=lattice_object,
               weight_limit_per_seed=weight_limit_per_seed,
               weight=weight,
-              seed=seed, node_limit_per_seed=node_limit_per_seed,number_of_seeds=number_of_seeds)
+              seed=seed, node_limit_per_seed=node_limit_per_seed, number_of_seeds=number_of_seeds)
