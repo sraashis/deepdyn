@@ -16,7 +16,7 @@ from commons.timer import check_time
 
 @check_time
 def _prim_mst(lattice=None, lattice_object=None, weight_limit_per_seed=None, weight=None, seed=None,
-              node_limit_per_seed=None, number_of_seeds=50):
+              node_limit_per_seed=None, number_of_seeds=None):
     if lattice.is_directed():
         raise nx.NetworkXError(
             "Minimum spanning tree not defined for directed graphs.")
@@ -63,11 +63,11 @@ def _prim_mst(lattice=None, lattice_object=None, weight_limit_per_seed=None, wei
 
 
 def run_mst(lattice_object=None, weight_limit_per_seed=20000, weight='cost', seed=None, node_limit_per_seed=10000,
-            number_of_seeds=50):
+            number_of_seeds=35):
     shuffle(seed)
     lattice_object.accumulator = np.zeros([lattice_object.x_size, lattice_object.y_size], dtype=np.uint8)
     lattice_object.total_weight = 0.0
     _prim_mst(lattice=lattice_object.lattice, lattice_object=lattice_object,
               weight_limit_per_seed=weight_limit_per_seed,
               weight=weight,
-              seed=seed, node_limit_per_seed=node_limit_per_seed)
+              seed=seed, node_limit_per_seed=node_limit_per_seed,number_of_seeds=number_of_seeds)
