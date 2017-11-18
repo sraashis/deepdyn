@@ -1,9 +1,10 @@
 from heapq import heappop, heappush
 from itertools import count
 from multiprocessing import Process
-import numpy as np
+from random import shuffle
 
 import networkx as nx
+import numpy as np
 
 from commons.timer import check_time
 
@@ -15,7 +16,8 @@ from commons.timer import check_time
 
 
 @check_time
-def _prim_mst_edges(lattice=None, lattice_object=None, threshold=None, weight=None, seed=None):
+def _prim_mst(lattice=None, lattice_object=None, weight_limit_per_seed=None, weight=None, seed=None,
+              node_limit_per_seed=None):
     if lattice.is_directed():
         raise nx.NetworkXError(
             "Minimum spanning tree not defined for directed graphs.")
@@ -23,11 +25,12 @@ def _prim_mst_edges(lattice=None, lattice_object=None, threshold=None, weight=No
     push = heappush
     pop = heappop
 
-    nodes = lattice.nodes()
     c = count()
-
     while seed:
+        print("New Seed.")
         u = seed.pop(0)
+        node_count = 0
+        seed_weight = 0.0
         frontier = []
         visited = [u]
         for u, v in lattice.edges(u):
@@ -35,56 +38,33 @@ def _prim_mst_edges(lattice=None, lattice_object=None, threshold=None, weight=No
 
         while frontier:
             _, _, u, v = pop(frontier)
+
             if v in visited:
                 continue
+
+            # Start with new Seed
+            if node_count > node_limit_per_seed or seed_weight > weight_limit_per_seed:
+                print('Node Count: ' + str(node_count) + ", Weight: " + str(seed_weight))
+                break
+
+            # Keep records and control track
+            lattice_object.accumulator[v[0], v[1]] = 255
+            seed_weight += float(lattice[u][v].get(weight, 1))
+            node_count += 1
+
             visited.append(v)
-            nodes.remove(v)
+
             for v, w in lattice.edges(v):
                 if w not in visited:
                     push(frontier, (lattice[v][w].get(weight, 1), next(c), v, w))
 
-            lattice_object.accumulator[v[0], v[1]] = 255
-            lattice_object.total_weight += float(lattice[u][v].get(weight, 1))
 
-            if lattice_object.total_weight > threshold:
-                return
-
-
-def _prim_mst(lattice=None, lattice_object=None, threshold=None, weight=None, seed=None):
-    """
-     If the graph is not connected a spanning forest is constructed.  A
-     spanning forest is a union of the spanning trees for each
-     connected component of the graph.
-    """
-    # Reset before running again.
+def run_mst(lattice_object=None, weight_limit_per_seed=20000, weight='cost', seed=None, node_limit_per_seed=10000):
+    shuffle(seed)
     lattice_object.accumulator = np.zeros([lattice_object.x_size, lattice_object.y_size], dtype=np.uint8)
     lattice_object.total_weight = 0.0
-    _prim_mst_edges(lattice=lattice, lattice_object=lattice_object, threshold=threshold, weight=weight, seed=seed)
+    _prim_mst(lattice=lattice_object.lattice, lattice_object=lattice_object,
+              weight_limit_per_seed=weight_limit_per_seed,
+              weight=weight,
+              seed=seed, node_limit_per_seed=node_limit_per_seed)
 
-
-def run_mst(lattice_object=None, threshold=None, weight='cost', seed=None):
-    _prim_mst(lattice=lattice_object.lattice, lattice_object=lattice_object, threshold=threshold, weight=weight,
-              seed=seed)
-
-
-def run_mst_parallel(lattice_object=None, threshold=None, weight='cost', seed=None, test_index=-1):
-    all_p = []
-    if test_index >= 0:
-        seed = set.intersection(set(seed), lattice_object.k_lattices[test_index].nodes())
-        p = Process(
-            target=_prim_mst(lattice=lattice_object.k_lattices[test_index], lattice_object=lattice_object,
-                             threshold=threshold, weight=weight,
-                             seed=list(seed)))
-        all_p.append(p)
-    else:
-        for a_lattice in lattice_object.k_lattices:
-            p = Process(
-                target=_prim_mst(lattice=a_lattice, lattice_object=lattice_object, threshold=threshold, weight=weight,
-                                 seed=seed))
-        all_p.append(p)
-
-    for p in all_p:
-        p.start()
-
-    for p in all_p:
-        p.join()
