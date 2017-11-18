@@ -62,7 +62,8 @@ class Image:
         self.img_skeleton = np.copy(array_2d)
         self.img_skeleton[self.img_skeleton > threshold] = 255
         self.img_skeleton[self.img_skeleton <= threshold] = 0
-        self.img_skeleton = ocv.filter2D(self.img_skeleton, ocv.CV_8UC3, kernels)
+        if kernels is not None:
+            self.img_skeleton = ocv.filter2D(self.img_skeleton, ocv.CV_8UC3, kernels)
 
     @staticmethod
     def show_kernels(kernels):
