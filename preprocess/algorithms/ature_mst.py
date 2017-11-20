@@ -68,7 +68,7 @@ def _prim_mst(lattice=None, lattice_object=None, weight_limit_per_seed=None, wei
 
 
 def run_mst(lattice_object=None, weight_limit_per_seed=20000, weight='cost', seed=None, node_limit_per_seed=10000,
-            number_of_seeds=35, expansion_rate=1):
+            number_of_seeds=35):
     shuffle(seed)
     lattice_object.accumulator = np.zeros([lattice_object.x_size, lattice_object.y_size], dtype=np.uint8)
     lattice_object.total_weight = 0.0
