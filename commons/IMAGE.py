@@ -73,7 +73,7 @@ class Image:
             plt.xticks([], [])
             plt.yticks([], [])
             plt.imshow(kernel, cmap='gray', aspect='auto')
-            plt.show()
+        plt.show()
 
     @staticmethod
     def from_array(image_array):
