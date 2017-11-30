@@ -36,7 +36,7 @@ def _prim_mst(lattice=None,
         u = seed.pop(0)
         if seed_used >= number_of_seeds:
             break
-        print("SEED: " + str(u))
+        # print("SEED: " + str(u))
         seed_used += 1
         node_count = 0
         seed_weight = 0.0
@@ -59,7 +59,7 @@ def _prim_mst(lattice=None,
             lattice_object.accumulator[v[0], v[1]] = 255
             node_count += 1
             seed_weight += float(lattice[u][v].get(weight, 1))
-            print('\nNode Count: ' + str(node_count) + ", Total Weight: " + str(seed_weight), end='')
+            # print('\nNode Count: ' + str(node_count) + ", Total Weight: " + str(seed_weight), end='')
 
             visited.append(v)
 
