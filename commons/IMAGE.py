@@ -94,3 +94,12 @@ class Image:
     def histogram(image_arr, bins=32):
         plt.hist(image_arr.ravel(), bins)
         plt.show()
+
+    @staticmethod
+    def get_seed_node_list(skeleton_img=None):
+        seed = []
+        for i in range(skeleton_img.shape[0]):
+            for j in range(skeleton_img.shape[1]):
+                if skeleton_img[i, j] == 0:
+                    seed.append((i, j))
+        return seed

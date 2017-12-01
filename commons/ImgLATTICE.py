@@ -2,6 +2,8 @@ import logging as logger
 
 import networkx as nx
 import numpy as np
+import math as mth
+
 from commons.timer import check_time
 
 
@@ -42,3 +44,21 @@ class Lattice:
 
         if eight_connected:
             Lattice._connect_8(self.lattice)
+
+    @check_time
+    def assign_cost(self, images=[()], alpha=1, override=False, log=False):
+        i = 0
+        for n1 in self.lattice.nodes():
+            for n2 in nx.neighbors(self.lattice, n1):
+                if self.lattice[n1][n2] == {} or override:
+                    cost = 0.0
+                    # ix = 1
+                    for weight, arr in images:
+                        i_diff = max(arr[n1[0], n1[1]], arr[n2[0], n2[1]])
+                        cost += weight * mth.pow(mth.e, alpha * (i_diff / 255))
+                        # graph[n1][n2]['i_diff_' + str(ix)] = i_diff
+                        # ix += 1
+                        self.lattice[n1][n2]['cost'] = cost
+            if log:
+                print('\r' + str(i) + ': ' + str(n1), end='')
+                i += 1
