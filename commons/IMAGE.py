@@ -25,11 +25,11 @@ class Image:
         self.img_gabor = None
         self.img_skeleton = None
 
-    def apply_bilateral(self, image_arr=None, k_size=41, sig_color=20, sig_space=20):
+    def apply_bilateral(self, k_size=41, sig_color=20, sig_space=20):
         logger.info(msg='Applying Bilateral filter.')
         if self.img_bilateral is not None:
             logger.warning(msg='Bilateral filter already applied. Overriding...')
-        self.img_bilateral = ocv.bilateralFilter(image_arr, k_size, sigmaColor=sig_color, sigmaSpace=sig_space)
+        self.img_bilateral = ocv.bilateralFilter(self.img_array, k_size, sigmaColor=sig_color, sigmaSpace=sig_space)
 
     @staticmethod
     def rescale2d_unsigned(arr):
@@ -55,8 +55,8 @@ class Image:
             final_image = ocv.filter2D(image_arr, ocv.CV_8UC3, kern)
             np.maximum(self.img_gabor, final_image, self.img_gabor)
 
-    def create_skeleton(self, array_2d=None, threshold=0, kernels=None):
-        array_2d = 255 - array_2d
+    def create_skeleton(self, threshold=0, kernels=None):
+        array_2d = 255 - self.img_gabor
         if self.img_skeleton is not None:
             logger.warning(msg='A skeleton already present. Overriding..')
         self.img_skeleton = np.copy(array_2d)
