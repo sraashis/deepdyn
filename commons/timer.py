@@ -1,13 +1,11 @@
 import time
 
-import logging as logger
-
 
 def check_time(func):
     def inner(*args, **kwargs):
         start = time.time()
         result = func(*args, **kwargs)
-        logger.warning(msg="------[ RUNNING Time: " + str(time.time() - start) + " seconds ]------")
+        print("------[ RUNNING Time: " + str(time.time() - start) + " seconds ]------")
         return result
-    return inner
 
+    return inner
