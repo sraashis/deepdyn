@@ -15,18 +15,18 @@ def build_filter_bank(k_size, sigma=2, lambd=5, gamma=0.5, psi=0,
 
 
 def get_chosen_gabor_bank():
-    kernels1 = build_filter_bank(k_size=31, gamma=0.7, lambd=5, sigma=2)
-    kernels2 = build_filter_bank(k_size=31, gamma=0.7, lambd=7, sigma=3)
-    kernels3 = build_filter_bank(k_size=31, gamma=0.7, lambd=10, sigma=4)
+    kernels1 = build_filter_bank(k_size=31, gamma=0.9, lambd=5, sigma=2)
+    kernels2 = build_filter_bank(k_size=31, gamma=0.9, lambd=9, sigma=3)
+    kernels3 = build_filter_bank(k_size=31, gamma=0.9, lambd=13, sigma=5)
     return kernels1 + kernels2 + kernels3
 
 
 def get_chosen_skeleton_filter():
-    kernel = [[0.0, 0.0, 0.0, 0.1, 0.0, 0.0, 0.0],
-              [0.0, 0.0, 0.0, 0.5, 0.0, 0.0, 0.0],
-              [0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0],
-              [0.0, 0.2, 1.0, 1.0, 1.0, 0.2, 0.0],
-              [0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0],
-              [0.0, 0.0, 0.0, 0.5, 0.0, 0.0, 0.0],
-              [0.0, 0.0, 0.0, 0.1, 0.0, 0.0, 0.0]]
+    kernel = [
+        [0.0, 0.0, 0.0, 0.0, 0.0],
+        [0.0, 0.0, 1.0, 0.0, 0.0],
+        [0.0, 1.0, 1.0, 1.0, 0.0],
+        [0.0, 0.0, 1.0, 0.0, 0.0],
+        [0.0, 0.0, 0.0, 0.0, 0.0],
+    ]
     return np.array(kernel)
