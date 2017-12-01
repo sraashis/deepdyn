@@ -34,7 +34,7 @@ def _prim_mst(lattice_object=None,
                 # If the next pixel to add is less costly then threshold consider as vessel pixel.
                 lattice_object.accumulator[v[0], v[1]] = 255
             elif relocate:
-                # If no any pixel has acceptable threshold in this frontier and if there are any unvisited seed:
+                # If no any pixel has acceptable threshold in this frontier and if there are any unvisited seeds:
                 # Start from another seed. This solves the problem of missing isolated vessels.
                 break
 
@@ -80,14 +80,12 @@ def _dijkstra(lattice_object=None,
                 break
 
             lattice_object.accumulator[v[0], v[1]] = 255
-            node_count += 1
             seed_weight += float(lattice_object.lattice[u][v].get(weight, 1))
 
             visited.append(v)
 
             if v in seed:
                 seed.remove(v)
-                node_count = 0
                 seed_weight = 0.0
 
             for v, w in lattice_object.lattice.edges(v):
