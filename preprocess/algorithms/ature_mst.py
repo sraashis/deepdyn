@@ -11,7 +11,8 @@ from commons.timer import check_time
 def _prim_mst(lattice_object=None,
               weight=None,
               seed=None,
-              threshold=None):
+              threshold=None,
+              relocate=None):
     push = heappush
     pop = heappop
 
@@ -30,8 +31,11 @@ def _prim_mst(lattice_object=None,
                 continue
 
             if lattice_object.lattice[u][v].get(weight, 1) < threshold:
+                # If the next pixel to add is less costly then threshold consider as vessel pixel.
                 lattice_object.accumulator[v[0], v[1]] = 255
-            else:
+            elif relocate:
+                # If no any pixel has acceptable threshold in this frontier and if there are any unvisited seed:
+                # Start from another seed. This solves the problem of missing isolated vessels.
                 break
 
             visited.append(v)
@@ -93,13 +97,13 @@ def _dijkstra(lattice_object=None,
 
 def run_mst(lattice_object=None,
             weight='cost',
-            seed=None, threshold=3.0):
+            seed=None, threshold=3.0, relocate=True):
     shuffle(seed)
     lattice_object.accumulator = np.zeros([lattice_object.x_size, lattice_object.y_size], dtype=np.uint8)
     lattice_object.total_weight = 0.0
     _prim_mst(lattice_object=lattice_object,
               weight=weight,
-              seed=seed, threshold=threshold)
+              seed=seed, threshold=threshold, relocate=relocate)
 
 
 def run_dijkstra(lattice_object=None,
