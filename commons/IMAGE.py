@@ -16,20 +16,43 @@ __all__ = [
 
 
 class Image:
-    kernel_bank = None
-
-    def __init__(self, image_arr):
+    def __init__(self, image_arr=None, mask=None):
         logger.basicConfig(level=logger.INFO)
         self.img_array = image_arr
+        self.mask = mask
         self.img_bilateral = None
         self.img_gabor = None
         self.img_skeleton = None
 
+        if self.mask is not None:
+            self.img_array = Image.apply_mask(self.img_array, mask=self.mask)
+
     def apply_bilateral(self, k_size=41, sig_color=20, sig_space=20):
         logger.info(msg='Applying Bilateral filter.')
-        if self.img_bilateral is not None:
-            logger.warning(msg='Bilateral filter already applied. Overriding...')
         self.img_bilateral = ocv.bilateralFilter(self.img_array, k_size, sigmaColor=sig_color, sigmaSpace=sig_space)
+        if self.mask is not None:
+            self.img_bilateral = Image.apply_mask(self.img_bilateral, mask=self.mask)
+
+    def apply_gabor(self, image_arr, kernel_bank):
+        logger.info(msg='Applying Gabor filter.')
+        self.img_gabor = np.zeros_like(image_arr)
+        for kern in kernel_bank:
+            final_image = ocv.filter2D(image_arr, ocv.CV_8UC3, kern)
+            np.maximum(self.img_gabor, final_image, self.img_gabor)
+        if self.mask is not None:
+            self.img_gabor = Image.apply_mask(self.img_gabor, mask=self.mask)
+
+    def create_skeleton(self, threshold=0, kernels=None):
+        array_2d = 255 - self.img_gabor
+        if self.img_skeleton:
+            logger.warning(msg='A skeleton already present. Overriding..')
+        self.img_skeleton = np.copy(array_2d)
+        self.img_skeleton[self.img_skeleton > threshold] = 255
+        self.img_skeleton[self.img_skeleton <= threshold] = 0
+        if kernels is not None:
+            self.img_skeleton = ocv.filter2D(self.img_skeleton, ocv.CV_8UC3, kernels)
+        if self.mask is not None:
+            self.img_skeleton = Image.apply_mask(self.img_skeleton, mask=self.mask)
 
     @staticmethod
     def rescale2d_unsigned(arr):
@@ -47,23 +70,6 @@ class Image:
         fx = np.array(signed_diff - np.min(signed_diff), np.uint8)
         fx = Image.rescale2d_unsigned(fx)
         return np.array(fx * 255, np.uint8)
-
-    def apply_gabor(self, image_arr, kernel_bank):
-        logger.info(msg='Applying Gabor filter.')
-        self.img_gabor = np.zeros_like(image_arr)
-        for kern in kernel_bank:
-            final_image = ocv.filter2D(image_arr, ocv.CV_8UC3, kern)
-            np.maximum(self.img_gabor, final_image, self.img_gabor)
-
-    def create_skeleton(self, threshold=0, kernels=None):
-        array_2d = 255 - self.img_gabor
-        if self.img_skeleton is not None:
-            logger.warning(msg='A skeleton already present. Overriding..')
-        self.img_skeleton = np.copy(array_2d)
-        self.img_skeleton[self.img_skeleton > threshold] = 255
-        self.img_skeleton[self.img_skeleton <= threshold] = 0
-        if kernels is not None:
-            self.img_skeleton = ocv.filter2D(self.img_skeleton, ocv.CV_8UC3, kernels)
 
     @staticmethod
     def show_kernels(kernels):
@@ -103,3 +109,7 @@ class Image:
                 if skeleton_img[i, j] == 0:
                     seed.append((i, j))
         return seed
+
+    @staticmethod
+    def apply_mask(src=None, mask=None):
+        return ocv.bitwise_and(src, src, mask=mask)
