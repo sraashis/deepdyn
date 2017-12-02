@@ -1,4 +1,7 @@
+import math as mt
+
 import cv2 as ocv
+import matplotlib.pyplot as plt
 import numpy as np
 
 
@@ -30,3 +33,13 @@ def get_chosen_skeleton_filter():
         [0, 0, 0, 0, 0],
     ]
     return np.array(kernel)
+
+
+def show_kernels(kernels):
+    grid_size = mt.ceil(mt.sqrt(len(kernels)))
+    for ix, kernel in enumerate(kernels):
+        plt.subplot(grid_size, grid_size, ix + 1)
+        plt.xticks([], [])
+        plt.yticks([], [])
+        plt.imshow(kernel, cmap='gray', aspect='auto')
+    plt.show()
