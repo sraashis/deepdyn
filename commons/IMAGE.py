@@ -4,6 +4,7 @@ import cv2 as ocv
 import numpy as np
 
 import preprocess.utils.image_utils as imgutil
+import commons.constants as const
 
 __all__ = [
     'Image'
@@ -19,7 +20,8 @@ class Image:
         self.img_gabor = None
         self.img_skeleton = None
 
-    def apply_bilateral(self, k_size=41, sig_color=20, sig_space=20):
+    def apply_bilateral(self, k_size=const.BILATERAL_KERNEL_SIZE, sig_color=const.BILATERAL_SIGMA_COLOR,
+                        sig_space=const.BILATERAL_SIGMA_SPACE):
         logger.info(msg='Applying Bilateral filter.')
         self.img_bilateral = ocv.bilateralFilter(self.img_array, k_size, sigmaColor=sig_color, sigmaSpace=sig_space)
         self.diff_bilateral = imgutil.get_signed_diff_int8(self.img_array, self.img_bilateral)
@@ -28,11 +30,11 @@ class Image:
         logger.info(msg='Applying Gabor filter.')
         self.img_gabor = np.zeros_like(self.diff_bilateral)
         for kern in kernel_bank:
-            final_image = ocv.filter2D(255-self.diff_bilateral, ocv.CV_8UC3, kern)
+            final_image = ocv.filter2D(255 - self.diff_bilateral, ocv.CV_8UC3, kern)
             np.maximum(self.img_gabor, final_image, self.img_gabor)
-        self.img_gabor = 255-self.img_gabor
+        self.img_gabor = 255 - self.img_gabor
 
-    def create_skeleton(self, threshold=0, kernels=None):
+    def create_skeleton(self, threshold=const.SKELETONIZE_THRESHOLD, kernels=None):
         array_2d = self.img_gabor
         self.img_skeleton = np.copy(array_2d)
         self.img_skeleton[self.img_skeleton > threshold] = 255

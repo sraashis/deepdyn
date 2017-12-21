@@ -3,6 +3,7 @@ import logging as logger
 import networkx as nx
 import numpy as np
 import math as mth
+import commons.constants as const
 
 from commons.timer import check_time
 
@@ -33,7 +34,7 @@ class Lattice:
                 graph.add_edge(n0, n4)
 
     @check_time
-    def generate_lattice_graph(self, eight_connected=False):
+    def generate_lattice_graph(self, eight_connected=const.IMG_LATTICE_EIGHT_CONNECTED):
         if eight_connected:
             logger.info(msg='Creating 8-connected lattice.')
         else:
@@ -46,7 +47,7 @@ class Lattice:
             Lattice._connect_8(self.lattice)
 
     @check_time
-    def assign_cost(self, images=[()], alpha=1, override=False, log=False):
+    def assign_cost(self, images=[()], alpha=const.IMG_LATTICE_COST_ASSIGNMENT_ALPHA, override=True):
         i = 0
         for n1 in self.lattice.nodes():
             for n2 in nx.neighbors(self.lattice, n1):
@@ -59,6 +60,3 @@ class Lattice:
                         # graph[n1][n2]['i_diff_' + str(ix)] = i_diff
                         # ix += 1
                         self.lattice[n1][n2]['cost'] = cost
-            if log:
-                print('\r' + str(i) + ': ' + str(n1), end='')
-                i += 1
