@@ -5,12 +5,7 @@ A utility function for av related tasks.
 import numpy as np
 from PIL import Image
 from matplotlib import pyplot as plt
-
-__all__ = [
-    "get_onh_radius(av_data_set)",
-    "get_av_nodes_positions(av_data_set=None, vessel="", av_only=True)",
-    "show_av_graph(av_data_set=None, image_array=None, image_show=True, onh_show=True, av_only=True, gray_scale=None)"
-]
+import networkx as nx
 
 
 def get_onh_radius(av_data_set):
@@ -46,3 +41,26 @@ def show_av_graph(av_data_set=None, image_array=None, image_show=True, onh_show=
     if image_show:
         plt.imshow(Image.fromarray(image_array), aspect='auto', cmap=gray_scale)
     plt.show()
+
+
+def show_graph(adj_matrix, node_pos=None, node_color='red', edge_color='black'):
+    graph = nx.from_scipy_sparse_matrix(adj_matrix)
+    nx.draw_networkx(graph, pos=node_pos, edge_color=edge_color, node_color=node_color, with_labels=False, node_size=4,
+                     width=0.5)
+    plt.show()
+
+
+def color_artery(x): return x == 1 and 'r' or 'b'
+
+
+def color_vein(x): return x == 1 and 'b' or 'r'
+
+
+def color_av(a, v):
+    if a == 1 and v == 1:
+        return 'g'
+    if a == 1 and v == 0:
+        return 'b'
+    if a == 0 and v == 1:
+        return 'r'
+    return 'g'

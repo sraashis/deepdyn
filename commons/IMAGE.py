@@ -3,7 +3,7 @@ import logging as logger
 import cv2 as ocv
 import numpy as np
 
-import preprocess.utils.image_utils as imgutil
+import preprocess.utils.img_utils as imgutil
 import commons.constants as const
 from commons.timer import check_time
 

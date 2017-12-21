@@ -12,7 +12,7 @@ class Lattice:
     def __init__(self, image_arr_2d):
         logger.basicConfig(level=logger.INFO)
         self.x_size, self.y_size = image_arr_2d.shape
-        self.lattice = None
+        self.graph = None
         self.accumulator = np.zeros([self.x_size, self.y_size], dtype=np.uint8)
         self.total_weight = 0.0
 
@@ -39,19 +39,19 @@ class Lattice:
             logger.info(msg='Creating 8-connected lattice.')
         else:
             logger.info(msg='Creating 4-connected lattice.')
-        if self.lattice is not None:
+        if self.graph is not None:
             logger.warning(msg='Lattice already exists. Overriding..')
-        self.lattice = nx.grid_2d_graph(self.x_size, self.y_size)
+        self.graph = nx.grid_2d_graph(self.x_size, self.y_size)
 
         if eight_connected:
-            Lattice._connect_8(self.lattice)
+            Lattice._connect_8(self.graph)
 
     @check_time
     def assign_cost(self, images=[()], alpha=const.IMG_LATTICE_COST_ASSIGNMENT_ALPHA, override=True):
         i = 0
-        for n1 in self.lattice.nodes():
-            for n2 in nx.neighbors(self.lattice, n1):
-                if self.lattice[n1][n2] == {} or override:
+        for n1 in self.graph.nodes():
+            for n2 in nx.neighbors(self.graph, n1):
+                if self.graph[n1][n2] == {} or override:
                     cost = 0.0
                     # ix = 1
                     for weight, arr in images:
@@ -59,4 +59,4 @@ class Lattice:
                         cost += weight * mth.pow(mth.e, alpha * (i_diff / 255))
                         # graph[n1][n2]['i_diff_' + str(ix)] = i_diff
                         # ix += 1
-                        self.lattice[n1][n2]['cost'] = cost
+                        self.graph[n1][n2]['cost'] = cost
