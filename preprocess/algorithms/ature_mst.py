@@ -5,6 +5,7 @@ from random import shuffle
 import numpy as np
 
 from commons.timer import check_time
+import commons.constants as const
 
 
 @check_time
@@ -94,8 +95,8 @@ def _dijkstra(lattice_object=None,
 
 
 def run_mst(lattice_object=None,
-            weight='cost',
-            seed=None, threshold=3.0, relocate=True):
+            weight=const.GRAPH_WEIGHT_METRICS,
+            seed=None, threshold=const.SEGMENTATION_THRESHOLD, relocate=True):
     shuffle(seed)
     lattice_object.accumulator = np.zeros([lattice_object.x_size, lattice_object.y_size], dtype=np.uint8)
     lattice_object.total_weight = 0.0

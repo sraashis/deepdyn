@@ -3,10 +3,11 @@ import math as mt
 import cv2 as ocv
 import matplotlib.pyplot as plt
 import numpy as np
+import commons.constants as const
 
 
-def build_filter_bank(k_size, sigma=2, lambd=5, gamma=0.5, psi=0,
-                      k_type=ocv.CV_32F, orientations=64):
+def build_filter_bank(k_size, sigma=None, lambd=None, gamma=None, psi=None,
+                      k_type=ocv.CV_32F, orientations=None):
     filters = []
     for theta in np.arange(0, np.pi, np.pi / orientations):  # Number of orientations
         params = {'ksize': (k_size, k_size), 'sigma': sigma, 'theta': theta, 'lambd': lambd,
@@ -18,9 +19,27 @@ def build_filter_bank(k_size, sigma=2, lambd=5, gamma=0.5, psi=0,
 
 
 def get_chosen_gabor_bank():
-    kernels1 = build_filter_bank(k_size=31, gamma=0.7, lambd=5, sigma=2)
-    kernels2 = build_filter_bank(k_size=31, gamma=0.7, lambd=8, sigma=3)
-    kernels3 = build_filter_bank(k_size=31, gamma=0.7, lambd=11, sigma=4)
+    kernels1 = build_filter_bank(k_size=const.GABOR_KERNEL_SIZE1,
+                                 gamma=const.GABOR_KERNEL_GAMMA1,
+                                 lambd=const.GABOR_KERNEL_LAMBDA1,
+                                 sigma=const.GABOR_KERNEL_SIGMA1,
+                                 orientations=const.GABOR_KERNEL_NUM_OF_ORIENTATIONS,
+                                 psi=const.GABOR_KERNEL_PSI)
+
+    kernels2 = build_filter_bank(k_size=const.GABOR_KERNEL_SIZE2,
+                                 gamma=const.GABOR_KERNEL_GAMMA2,
+                                 lambd=const.GABOR_KERNEL_LAMBDA2,
+                                 sigma=const.GABOR_KERNEL_SIGMA2,
+                                 orientations=const.GABOR_KERNEL_NUM_OF_ORIENTATIONS,
+                                 psi=const.GABOR_KERNEL_PSI)
+
+    kernels3 = build_filter_bank(k_size=const.GABOR_KERNEL_SIZE3,
+                                 gamma=const.GABOR_KERNEL_GAMMA3,
+                                 lambd=const.GABOR_KERNEL_LAMBDA3,
+                                 sigma=const.GABOR_KERNEL_SIGMA3,
+                                 orientations=const.GABOR_KERNEL_NUM_OF_ORIENTATIONS,
+                                 psi=const.GABOR_KERNEL_PSI)
+
     return kernels1 + kernels2 + kernels3
 
 
