@@ -17,62 +17,11 @@ os.chdir(base_path)
 from commons.IMAGE import Image
 from commons.ImgLATTICE import Lattice
 import preprocess.utils.img_utils as imgutils
-from commons.MAT import Mat
 from PIL import Image as IMG
 import numpy as np
-from commons import constants as const
 import cv2
 from preprocess.algorithms import fast_mst as fmst
 import itertools as itr
-
-# In[ ]:
-
-
-#########Load av wide mat file#########
-# os.chdir(pth.join(data_path, 'av_wide_data_set'))
-# file = Mat(file_name='wide_image_06.mat')
-# original = file.get_image('I2')
-# img = Image(image_arr=original[:,:,1])
-# img.apply_bilateral()
-# img.apply_gabor(kernel_bank=imgutils.get_chosen_gabor_bank() )
-
-
-# In[ ]:
-
-
-#######Load image directly##########
-# os.chdir(data_file_path)
-# original = IMG.open('01_test.tif')
-# original = np.array(original.getdata(), np.uint8).reshape(original.size[1], original.size[0], 3)
-# img = Image(image_arr=original[:,:,1])
-# img.apply_bilateral()
-# img.apply_gabor(kernel_bank=imgutils.get_chosen_gabor_bank())
-
-
-# In[ ]:
-
-
-# -------CONSTANTS--------
-# SKELETONIZE_THRESHOLD = 20
-
-# # Image lattice constants
-# IMG_LATTICE_COST_ASSIGNMENT_ALPHA = 5
-
-# IMG_LATTICE_COST_GABOR_IMAGE_CONTRIBUTION = 0.6
-
-# # MST algorithm parameters
-# SEGMENTATION_THRESHOLD = 8
-
-
-# In[ ]:
-
-
-log_file = open("output.csv", 'w')
-log_file.write(
-    "FSCORE,SKELETONIZE_THRESHOLD,IMG_LATTICE_COST_ASSIGNMENT_ALPHA,IMG_LATTICE_COST_GABOR_IMAGE_CONTRIBUTION,SEGMENTATION_THRESHOLD\n")
-
-
-# In[ ]:
 
 
 def run(img_obj, lattice_obj, params, mask, truth):
@@ -117,9 +66,6 @@ def run(img_obj, lattice_obj, params, mask, truth):
     log_file.flush()
 
 
-# In[74]:
-
-
 ############# ENTRY POINT HERE ###############
 ############################################
 SK_THRESHOLD_PARAMS = np.arange(0, 50, 5)
@@ -133,6 +79,10 @@ PARAMS_COMBINATION = itr.product(SK_THRESHOLD_PARAMS, ALPHA_PARAMS, GABOR_CONTRI
 #### Work on all images in a directory
 os.chdir(data_file_path)
 for test_image in os.listdir(os.getcwd()):
+
+    log_file = open(test_image + "_log.csv", 'w')
+    log_file.write(
+        "FSCORE,SKELETONIZE_THRESHOLD,IMG_LATTICE_COST_ASSIGNMENT_ALPHA,IMG_LATTICE_COST_GABOR_IMAGE_CONTRIBUTION,SEGMENTATION_THRESHOLD\n")
 
     print('WORKING ON: ' + test_image)
     original = IMG.open(test_image)
@@ -162,4 +112,3 @@ for test_image in os.listdir(os.getcwd()):
     for params in PARAMS_COMBINATION:
         run(img_obj, lattice_obj, params, mask, truth)
 log_file.close()
-
