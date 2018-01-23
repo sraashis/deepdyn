@@ -1,12 +1,12 @@
 # coding: utf-8
 
-# In[36]:
+# In[ ]:
 
 
 import os
 
 base_path = "C:\\Projects\\ature\\"  # WINDOWS
-# base_path = "home/ak/Projects/ature/" #LINUX
+# base_path = "home/ak/Projects/ature/" # LINUX
 
 data_file_path = base_path + "\\data\\DRIVE\\test\\images"
 mask_path = base_path + "\\data\\DRIVE\\test\\mask"
@@ -25,7 +25,7 @@ import cv2
 from preprocess.algorithms import fast_mst as fmst
 import itertools as itr
 
-# In[37]:
+# In[ ]:
 
 
 #########Load av wide mat file#########
@@ -37,7 +37,7 @@ import itertools as itr
 # img.apply_gabor(kernel_bank=imgutils.get_chosen_gabor_bank() )
 
 
-# In[38]:
+# In[ ]:
 
 
 #######Load image directly##########
@@ -49,7 +49,7 @@ import itertools as itr
 # img.apply_gabor(kernel_bank=imgutils.get_chosen_gabor_bank())
 
 
-# In[39]:
+# In[ ]:
 
 
 # -------CONSTANTS--------
@@ -64,38 +64,38 @@ import itertools as itr
 # SEGMENTATION_THRESHOLD = 8
 
 
-# In[40]:
+# In[ ]:
 
 
-log_file = open("output.txt", 'w')
+log_file = open("output.csv", 'w')
 log_file.write(
     "FSCORE,SKELETONIZE_THRESHOLD,IMG_LATTICE_COST_ASSIGNMENT_ALPHA,IMG_LATTICE_COST_GABOR_IMAGE_CONTRIBUTION,SEGMENTATION_THRESHOLD\n")
 
 
-# In[41]:
+# In[ ]:
 
 
-def run(img, params, mask, truth):
-    #####Unpack all params
+def run(img_obj, lattice_obj, params, mask, truth):
+    ##### Unpack all params
     SKELETONIZE_THRESHOLD, IMG_LATTICE_COST_ASSIGNMENT_ALPHA, IMG_LATTICE_COST_GABOR_IMAGE_CONTRIBUTION, SEGMENTATION_THRESHOLD = params
 
-    #####Create skeleton based on threshold
-    img.create_skeleton(threshold=SKELETONIZE_THRESHOLD, kernels=imgutils.get_chosen_skeleton_filter())
-    seed_node_list = imgutils.get_seed_node_list(img.img_skeleton)
+    ##### Create skeleton based on threshold
+    img_obj.create_skeleton(threshold=SKELETONIZE_THRESHOLD, kernels=imgutils.get_chosen_skeleton_filter())
+    seed_node_list = imgutils.get_seed_node_list(img_obj.img_skeleton)
 
-    #####Run segmnetation
-    graph = fmst.run_segmentation(image_object=img,
-                                  lattice_object=lattice,
+    ##### Run segmnetation
+    graph = fmst.run_segmentation(image_object=img_obj,
+                                  lattice_object=lattice_obj,
                                   seed_list=seed_node_list,
                                   segmentation_threshold=SEGMENTATION_THRESHOLD,
                                   alpha=IMG_LATTICE_COST_ASSIGNMENT_ALPHA,
                                   img_gabor_contribution=IMG_LATTICE_COST_GABOR_IMAGE_CONTRIBUTION,
                                   img_original_contribution=1 - IMG_LATTICE_COST_GABOR_IMAGE_CONTRIBUTION)
 
-    #####Apply mask
-    segmented = cv2.bitwise_and(lattice.accumulator, lattice.accumulator, mask=mask)
+    ##### Apply mask
+    segmented = cv2.bitwise_and(lattice_obj.accumulator, lattice_obj.accumulator, mask=mask)
 
-    #####Calculate F1 measure
+    ##### Calculate F1 measure
     TP = 0  # True Positive
     FP = 0  # False Positive
     FN = 0  # False Negative
@@ -109,7 +109,7 @@ def run(img, params, mask, truth):
                 FN += 1
     F_score = 2 * TP / (2 * TP + FP + FN)
 
-    #####Log result
+    ##### Log result
     parms = str(round(F_score, 3)) + ',' + str(SKELETONIZE_THRESHOLD) + ',' + str(
         IMG_LATTICE_COST_ASSIGNMENT_ALPHA) + ',' + str(IMG_LATTICE_COST_GABOR_IMAGE_CONTRIBUTION) + ',' + str(
         SEGMENTATION_THRESHOLD)
@@ -117,10 +117,10 @@ def run(img, params, mask, truth):
     log_file.flush()
 
 
-# In[42]:
+# In[74]:
 
 
-#############ENTRY POINT HERE###############
+############# ENTRY POINT HERE ###############
 ############################################
 SK_THRESHOLD_PARAMS = np.arange(0, 50, 5)
 ALPHA_PARAMS = np.arange(1, 11, 1)
@@ -130,46 +130,36 @@ SEGMENTATION_THRESHOLD_PARAMS = np.arange(2, 22, 2)
 PARAMS_COMBINATION = itr.product(SK_THRESHOLD_PARAMS, ALPHA_PARAMS, GABOR_CONTRIBUTION_PARAMS,
                                  SEGMENTATION_THRESHOLD_PARAMS)
 
-####Work on all images in a directory
+#### Work on all images in a directory
 os.chdir(data_file_path)
 for test_image in os.listdir(os.getcwd()):
 
     print('WORKING ON: ' + test_image)
     original = IMG.open(test_image)
     original = np.array(original.getdata(), np.uint8).reshape(original.size[1], original.size[0], 3)
-    img = Image(image_arr=original[:, :, 1])
-    img.apply_bilateral()
-    img.apply_gabor(kernel_bank=imgutils.get_chosen_gabor_bank())
+    img_obj = Image(image_arr=original[:, :, 1])
+    img_obj.apply_bilateral()
+    img_obj.apply_gabor(kernel_bank=imgutils.get_chosen_gabor_bank())
 
     #### Load the corresponding mask as array
     os.chdir(mask_path)
-    ####Read image as array
+    #### Read image as array
     mask_file = test_image[:2] + '_test_mask.gif'
     mask = IMG.open(mask_file)
     print("MASK LOADED: " + mask_file)
     mask = np.array(mask.getdata(), np.uint8).reshape(mask.size[1], mask.size[0], 1)[:, :, 0]
 
-    ####Load ground truth segmented result as an array
+    #### Load ground truth segmented result as an array
     os.chdir(ground_truth_path)
     ground_truth_file = test_image[:2] + '_manual1.gif'
     truth = IMG.open(ground_truth_file)
     print("GROUND TRUTH LOADED: " + ground_truth_file)
     truth = np.array(truth.getdata(), np.uint8).reshape(truth.size[1], truth.size[0], 1)[:, :, 0]
 
-    lattice = Lattice(image_arr_2d=img.img_gabor)
-    lattice.generate_lattice_graph()
+    lattice_obj = Lattice(image_arr_2d=img_obj.img_gabor)
+    lattice_obj.generate_lattice_graph()
 
     for params in PARAMS_COMBINATION:
-        run(img, params, mask, truth)
+        run(img_obj, lattice_obj, params, mask, truth)
 log_file.close()
-
-# In[31]:
-
-
-import datetime
-
-# In[35]:
-
-
-datetime.datetime.today()
 
