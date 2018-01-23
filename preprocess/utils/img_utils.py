@@ -6,6 +6,7 @@ import math as mth
 import cv2 as ocv
 import commons.constants as const
 import networkx as nx
+import PIL.Image as IMG
 
 
 def rescale2d_unsigned(arr):
@@ -106,3 +107,8 @@ def get_seed_node_list(image_array_2d=None):
             if image_array_2d[i, j] == 0:
                 seed.append((i, j))
     return seed
+
+
+def as_array(file_name=None):
+    original = IMG.open(file_name)
+    return np.array(original.getdata(), np.uint8).reshape(original.size[1], original.size[0], 3)
