@@ -116,10 +116,10 @@ def run(img_obj, lattice_obj, params, mask, truth):
 
 ############# ENTRY POINT HERE ###############
 ############################################
-SK_THRESHOLD_PARAMS = np.arange(0, 50, 5)
-ALPHA_PARAMS = np.arange(1, 11, 1)
-GABOR_CONTRIBUTION_PARAMS = np.arange(0.1, 1.1, 0.1)
-SEGMENTATION_THRESHOLD_PARAMS = np.arange(2, 22, 2)
+SK_THRESHOLD_PARAMS = np.arange(0, 50, 10)
+ALPHA_PARAMS = np.arange(5, 11, 1)
+GABOR_CONTRIBUTION_PARAMS = np.arange(0.5, 1.1, 0.1)
+SEGMENTATION_THRESHOLD_PARAMS = np.arange(6, 22, 2)
 
 PARAMS_COMBINATION = itr.product(SK_THRESHOLD_PARAMS, ALPHA_PARAMS, GABOR_CONTRIBUTION_PARAMS,
                                  SEGMENTATION_THRESHOLD_PARAMS)
