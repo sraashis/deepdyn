@@ -142,14 +142,14 @@ for test_image in os.listdir(os.getcwd()):
     #### Load the corresponding mask as array
     os.chdir(mask_path)
     #### Read image as array
-    mask_file = test_image[:2] + '_test_mask.gif'
+    mask_file = test_image.split('_')[0] + '_test_mask.gif'
     mask = IMG.open(mask_file)
     print("MASK LOADED: " + mask_file)
     mask = np.array(mask.getdata(), np.uint8).reshape(mask.size[1], mask.size[0], 1)[:, :, 0]
 
     #### Load ground truth segmented result as an array
     os.chdir(ground_truth_path)
-    ground_truth_file = test_image[:2] + '_manual1.gif'
+    ground_truth_file = test_image.split('_')[0] + '_manual1.gif'
     truth = IMG.open(ground_truth_file)
     print("GROUND TRUTH LOADED: " + ground_truth_file)
     truth = np.array(truth.getdata(), np.uint8).reshape(truth.size[1], truth.size[0], 1)[:, :, 0]
