@@ -1,10 +1,8 @@
 import logging as logger
+import math as mth
 
 import networkx as nx
 import numpy as np
-import math as mth
-
-from commons.timer import check_time
 
 
 class Lattice:
@@ -32,7 +30,6 @@ class Lattice:
             if n4 in graph.nodes():
                 graph.add_edge(n0, n4)
 
-    # @check_time
     def generate_lattice_graph(self, eight_connected=False):
         if eight_connected:
             logger.info(msg='Creating 8-connected lattice.')
@@ -45,10 +42,9 @@ class Lattice:
         if eight_connected:
             Lattice._connect_8(self.lattice)
 
-    # @check_time
-    def assign_cost(self, images=[()], alpha=1, threshold=np.inf,override=False, log=False):
+    def assign_cost(self, images=[()], alpha=1, threshold=np.inf, override=False, log=False):
         i = 0
-        edgesToRemove = []
+        edges_to_remove = []
         for n1 in self.lattice.nodes():
             for n2 in nx.neighbors(self.lattice, n1):
                 if self.lattice[n1][n2] == {} or override:
@@ -59,13 +55,13 @@ class Lattice:
                     if cost <= threshold:
                         self.lattice[n1][n2]['cost'] = cost
                     else:
-                        edgesToRemove.append((n1,n2))
+                        edges_to_remove.append((n1, n2))
             if log:
                 print('\r' + str(i) + ': ' + str(n1), end='')
                 i += 1
 
         # Remove edges that exceed the threshold
-        self.lattice.remove_edges_from(edgesToRemove)
+        self.lattice.remove_edges_from(edges_to_remove)
 
         # Remove isolated (i.e. zero-degree) nodes
         self.lattice.remove_nodes_from(list(nx.isolates(self.lattice)))

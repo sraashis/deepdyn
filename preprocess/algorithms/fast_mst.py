@@ -5,7 +5,6 @@ import networkx as nx
 import numpy as np
 
 
-@check_time
 def run_segmentation(image_object=None,
                      lattice_object=None,
                      seed_list=None,

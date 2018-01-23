@@ -1,11 +1,10 @@
 import logging as logger
+import math as mth
 
 import networkx as nx
 import numpy as np
-import math as mth
-import commons.constants as const
 
-from commons.timer import check_time
+import commons.constants as const
 
 
 class Lattice:
@@ -33,20 +32,11 @@ class Lattice:
             if n4 in graph.nodes():
                 graph.add_edge(n0, n4)
 
-    @check_time
     def generate_lattice_graph(self, eight_connected=const.IMG_LATTICE_EIGHT_CONNECTED):
-        if eight_connected:
-            logger.info(msg='Creating 8-connected lattice.')
-        else:
-            logger.info(msg='Creating 4-connected lattice.')
-        if self.graph is not None:
-            logger.warning(msg='Lattice already exists. Overriding..')
         self.graph = nx.grid_2d_graph(self.x_size, self.y_size)
-
         if eight_connected:
             Lattice._connect_8(self.graph)
 
-    @check_time
     def assign_cost(self, images=[()], alpha=const.IMG_LATTICE_COST_ASSIGNMENT_ALPHA, override=True):
         i = 0
         for n1 in self.graph.nodes():
