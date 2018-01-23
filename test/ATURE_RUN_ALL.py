@@ -111,4 +111,4 @@ for test_image in os.listdir(os.getcwd()):
 
     for params in PARAMS_COMBINATION:
         run(img_obj, lattice_obj, params, mask, truth)
-log_file.close()
+    log_file.close()
