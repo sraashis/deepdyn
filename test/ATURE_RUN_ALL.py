@@ -25,6 +25,7 @@ from commons import constants as const
 import cv2
 from preprocess.algorithms import fast_mst as fmst
 import itertools as itr
+from itertools import count
 
 
 # In[23]:
@@ -108,7 +109,7 @@ def run(img_obj, lattice_obj, params, mask, truth, log_file, test_image):
         IMG_LATTICE_COST_ASSIGNMENT_ALPHA) + ',' + str(IMG_LATTICE_COST_GABOR_IMAGE_CONTRIBUTION) + ',' + str(
         SEGMENTATION_THRESHOLD)
     log_file.write(parms + '\n')
-    IMG.fromarray(segmented).save(test_image + '_' + parms + '.JPEG')
+    IMG.fromarray(segmented).save(str(next(c)) + '_' + test_image + '_' + parms + '.JPEG')
     log_file.flush()
 
 
@@ -120,10 +121,12 @@ def run(img_obj, lattice_obj, params, mask, truth, log_file, test_image):
 SK_THRESHOLD_PARAMS = np.arange(0, 50, 10)
 ALPHA_PARAMS = np.arange(5, 11, 1)
 GABOR_CONTRIBUTION_PARAMS = np.arange(0.3, 1.1, 0.1)
-SEGMENTATION_THRESHOLD_PARAMS = np.arange(6, 20, 0.5)
+SEGMENTATION_THRESHOLD_PARAMS = np.arange(6, 12, 0.5)
 
 PARAMS_COMBINATION = itr.product(SK_THRESHOLD_PARAMS, ALPHA_PARAMS, GABOR_CONTRIBUTION_PARAMS,
                                  SEGMENTATION_THRESHOLD_PARAMS)
+
+c = count()
 
 #### Work on all images in a directory
 os.chdir(data_file_path)
