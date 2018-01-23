@@ -1,6 +1,6 @@
 # coding: utf-8
 
-# In[ ]:
+# In[22]:
 
 
 import os
@@ -11,7 +11,7 @@ base_path = "C:\\Projects\\ature\\"  # WINDOWS
 data_file_path = base_path + "\\data\\DRIVE\\test\\images"
 mask_path = base_path + "\\data\\DRIVE\\test\\mask"
 ground_truth_path = base_path + "\\data\\DRIVE\\test\\1st_manual"
-log_path = base_path + "\\log"
+log_path = base_path + "\\logs"
 
 os.chdir(base_path)
 
@@ -27,7 +27,7 @@ from preprocess.algorithms import fast_mst as fmst
 import itertools as itr
 
 
-# In[ ]:
+# In[23]:
 
 
 #########Load av wide mat file#########
@@ -39,7 +39,7 @@ import itertools as itr
 # img.apply_gabor(kernel_bank=imgutils.get_chosen_gabor_bank() )
 
 
-# In[ ]:
+# In[24]:
 
 
 #######Load image directly##########
@@ -51,7 +51,7 @@ import itertools as itr
 # img.apply_gabor(kernel_bank=imgutils.get_chosen_gabor_bank())
 
 
-# In[ ]:
+# In[25]:
 
 
 # -------CONSTANTS--------
@@ -66,10 +66,10 @@ import itertools as itr
 # SEGMENTATION_THRESHOLD = 8
 
 
-# In[ ]:
+# In[36]:
 
 
-def run(img_obj, lattice_obj, params, mask, truth):
+def run(img_obj, lattice_obj, params, mask, truth, log_file, test_image):
     ##### Unpack all params
     SKELETONIZE_THRESHOLD, IMG_LATTICE_COST_ASSIGNMENT_ALPHA, IMG_LATTICE_COST_GABOR_IMAGE_CONTRIBUTION, SEGMENTATION_THRESHOLD = params
 
@@ -108,10 +108,11 @@ def run(img_obj, lattice_obj, params, mask, truth):
         IMG_LATTICE_COST_ASSIGNMENT_ALPHA) + ',' + str(IMG_LATTICE_COST_GABOR_IMAGE_CONTRIBUTION) + ',' + str(
         SEGMENTATION_THRESHOLD)
     log_file.write(parms + '\n')
+    IMG.fromarray(segmented).save(test_image + '_' + parms + '.JPEG')
     log_file.flush()
 
 
-# In[ ]:
+# In[37]:
 
 
 ############# ENTRY POINT HERE ###############
@@ -119,7 +120,7 @@ def run(img_obj, lattice_obj, params, mask, truth):
 SK_THRESHOLD_PARAMS = np.arange(0, 50, 10)
 ALPHA_PARAMS = np.arange(5, 11, 1)
 GABOR_CONTRIBUTION_PARAMS = np.arange(0.5, 1.1, 0.1)
-SEGMENTATION_THRESHOLD_PARAMS = np.arange(6, 22, 2)
+SEGMENTATION_THRESHOLD_PARAMS = np.arange(6, 20, 0.5)
 
 PARAMS_COMBINATION = itr.product(SK_THRESHOLD_PARAMS, ALPHA_PARAMS, GABOR_CONTRIBUTION_PARAMS,
                                  SEGMENTATION_THRESHOLD_PARAMS)
@@ -154,11 +155,10 @@ for test_image in os.listdir(os.getcwd()):
     lattice_obj.generate_lattice_graph()
 
     os.chdir(log_path)
-    log_file = open(test_image + "_log.csv", 'w')
+    log_file = open(test_image + "_output.csv", 'w')
     log_file.write(
         "FSCORE,SKELETONIZE_THRESHOLD,IMG_LATTICE_COST_ASSIGNMENT_ALPHA,IMG_LATTICE_COST_GABOR_IMAGE_CONTRIBUTION,SEGMENTATION_THRESHOLD\n")
-
     for params in PARAMS_COMBINATION:
-        run(img_obj, lattice_obj, params, mask, truth)
+        run(img_obj, lattice_obj, params, mask, truth, log_file, test_image)
     log_file.close()
 
