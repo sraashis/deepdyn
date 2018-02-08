@@ -2,281 +2,280 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="5fcadf5f-510d-4dd0-aeb9-c274096ae36f" name="Default" comment="">
-      <change type="DELETED" beforePath="$PROJECT_DIR$/DRIVE/test/1st_manual/01_manual1.gif" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/DRIVE/test/1st_manual/02_manual1.gif" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/DRIVE/test/1st_manual/03_manual1.gif" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/DRIVE/test/1st_manual/04_manual1.gif" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/DRIVE/test/1st_manual/05_manual1.gif" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/DRIVE/test/1st_manual/06_manual1.gif" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/DRIVE/test/1st_manual/07_manual1.gif" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/DRIVE/test/1st_manual/08_manual1.gif" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/DRIVE/test/1st_manual/09_manual1.gif" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/DRIVE/test/1st_manual/10_manual1.gif" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/DRIVE/test/1st_manual/11_manual1.gif" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/DRIVE/test/1st_manual/12_manual1.gif" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/DRIVE/test/1st_manual/13_manual1.gif" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/DRIVE/test/1st_manual/14_manual1.gif" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/DRIVE/test/1st_manual/15_manual1.gif" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/DRIVE/test/1st_manual/16_manual1.gif" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/DRIVE/test/1st_manual/17_manual1.gif" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/DRIVE/test/1st_manual/18_manual1.gif" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/DRIVE/test/1st_manual/19_manual1.gif" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/DRIVE/test/1st_manual/20_manual1.gif" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/DRIVE/test/2nd_manual/01_manual2.gif" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/DRIVE/test/2nd_manual/02_manual2.gif" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/DRIVE/test/2nd_manual/03_manual2.gif" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/DRIVE/test/2nd_manual/04_manual2.gif" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/DRIVE/test/2nd_manual/05_manual2.gif" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/DRIVE/test/2nd_manual/06_manual2.gif" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/DRIVE/test/2nd_manual/07_manual2.gif" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/DRIVE/test/2nd_manual/08_manual2.gif" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/DRIVE/test/2nd_manual/09_manual2.gif" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/DRIVE/test/2nd_manual/10_manual2.gif" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/DRIVE/test/2nd_manual/11_manual2.gif" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/DRIVE/test/2nd_manual/12_manual2.gif" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/DRIVE/test/2nd_manual/13_manual2.gif" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/DRIVE/test/2nd_manual/14_manual2.gif" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/DRIVE/test/2nd_manual/15_manual2.gif" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/DRIVE/test/2nd_manual/16_manual2.gif" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/DRIVE/test/2nd_manual/17_manual2.gif" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/DRIVE/test/2nd_manual/18_manual2.gif" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/DRIVE/test/2nd_manual/19_manual2.gif" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/DRIVE/test/2nd_manual/20_manual2.gif" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/DRIVE/test/images/01_test.tif" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/DRIVE/test/images/02_test.tif" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/DRIVE/test/images/03_test.tif" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/DRIVE/test/images/04_test.tif" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/DRIVE/test/images/05_test.tif" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/DRIVE/test/images/06_test.tif" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/DRIVE/test/images/07_test.tif" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/DRIVE/test/images/08_test.tif" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/DRIVE/test/images/09_test.tif" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/DRIVE/test/images/10_test.tif" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/DRIVE/test/images/11_test.tif" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/DRIVE/test/images/12_test.tif" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/DRIVE/test/images/13_test.tif" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/DRIVE/test/images/14_test.tif" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/DRIVE/test/images/15_test.tif" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/DRIVE/test/images/16_test.tif" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/DRIVE/test/images/17_test.tif" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/DRIVE/test/images/18_test.tif" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/DRIVE/test/images/19_test.tif" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/DRIVE/test/images/20_test.tif" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/DRIVE/test/keypoints/01_manual1.psd" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/DRIVE/test/keypoints/manual 01.psd" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/DRIVE/test/keypoints/manual 02.psd" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/DRIVE/test/keypoints/manual 03.psd" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/DRIVE/test/keypoints_filter/drive_01.psd" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/DRIVE/test/keypoints_filter/drive_02.psd" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/DRIVE/test/keypoints_filter/drive_02_branchpoints.png" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/DRIVE/test/keypoints_filter/drive_02_endpoints.png" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/DRIVE/test/keypoints_filter/drive_02_tree.png" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/DRIVE/test/keypoints_filter/drive_04.psd" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/DRIVE/test/keypoints_filter/drive_04_branchpoints.png" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/DRIVE/test/keypoints_filter/drive_04_endpoints.png" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/DRIVE/test/keypoints_filter/drive_04_tree.png" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/DRIVE/test/keypoints_filter/drive_06.psd" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/DRIVE/test/keypoints_filter/drive_06_branchpoints.png" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/DRIVE/test/keypoints_filter/drive_06_endpoints.png" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/DRIVE/test/keypoints_filter/drive_06_tree.png" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/DRIVE/test/keypoints_filter/drive_07.psd" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/DRIVE/test/keypoints_filter/drive_07_branchpoints.png" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/DRIVE/test/keypoints_filter/drive_07_endpoints.png" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/DRIVE/test/keypoints_filter/drive_07_tree.png" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/DRIVE/test/keypoints_filter/drive_09.psd" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/DRIVE/test/keypoints_filter/drive_09_branchpoints.png" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/DRIVE/test/keypoints_filter/drive_09_endpoints.png" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/DRIVE/test/keypoints_filter/drive_09_tree.png" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/DRIVE/test/keypoints_filter/drive_10_tree.png" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/DRIVE/test/keypoints_filter/drive_12_tree.png" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/DRIVE/test/keypoints_filter/drive_13_tree.png" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/DRIVE/test/keypoints_filter/drive_15_tree (2).png" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/DRIVE/test/keypoints_filter/drive_15_tree.png" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/DRIVE/test/keypoints_filter/drive_16_tree.png" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/DRIVE/test/keypoints_filter/drive_19_tree.png" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/DRIVE/test/mask/01_test_mask.gif" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/DRIVE/test/mask/02_test_mask.gif" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/DRIVE/test/mask/03_test_mask.gif" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/DRIVE/test/mask/04_test_mask.gif" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/DRIVE/test/mask/05_test_mask.gif" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/DRIVE/test/mask/06_test_mask.gif" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/DRIVE/test/mask/07_test_mask.gif" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/DRIVE/test/mask/08_test_mask.gif" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/DRIVE/test/mask/09_test_mask.gif" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/DRIVE/test/mask/10_test_mask.gif" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/DRIVE/test/mask/11_test_mask.gif" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/DRIVE/test/mask/12_test_mask.gif" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/DRIVE/test/mask/13_test_mask.gif" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/DRIVE/test/mask/14_test_mask.gif" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/DRIVE/test/mask/15_test_mask.gif" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/DRIVE/test/mask/16_test_mask.gif" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/DRIVE/test/mask/17_test_mask.gif" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/DRIVE/test/mask/18_test_mask.gif" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/DRIVE/test/mask/19_test_mask.gif" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/DRIVE/test/mask/20_test_mask.gif" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/DRIVE/test/mask_eroded/01_test_mask.gif" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/DRIVE/test/mask_eroded/02_test_mask.gif" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/DRIVE/test/mask_eroded/03_test_mask.gif" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/DRIVE/test/mask_eroded/04_test_mask.gif" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/DRIVE/test/mask_eroded/05_test_mask.gif" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/DRIVE/test/mask_eroded/06_test_mask.gif" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/DRIVE/test/mask_eroded/07_test_mask.gif" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/DRIVE/test/mask_eroded/08_test_mask.gif" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/DRIVE/test/mask_eroded/09_test_mask.gif" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/DRIVE/test/mask_eroded/10_test_mask.gif" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/DRIVE/test/mask_eroded/11_test_mask.gif" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/DRIVE/test/mask_eroded/12_test_mask.gif" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/DRIVE/test/mask_eroded/13_test_mask.gif" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/DRIVE/test/mask_eroded/14_test_mask.gif" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/DRIVE/test/mask_eroded/15_test_mask.gif" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/DRIVE/test/mask_eroded/16_test_mask.gif" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/DRIVE/test/mask_eroded/17_test_mask.gif" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/DRIVE/test/mask_eroded/18_test_mask.gif" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/DRIVE/test/mask_eroded/19_test_mask.gif" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/DRIVE/test/mask_eroded/20_test_mask.gif" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/DRIVE/test/mask_fixed/01_test_mask.gif" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/DRIVE/test/mask_fixed/02_test_mask.gif" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/DRIVE/test/mask_fixed/03_test_mask.gif" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/DRIVE/test/mask_fixed/04_test_mask.gif" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/DRIVE/test/mask_fixed/05_test_mask.gif" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/DRIVE/test/mask_fixed/06_test_mask.gif" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/DRIVE/test/mask_fixed/07_test_mask.gif" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/DRIVE/test/mask_fixed/08_test_mask.gif" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/DRIVE/test/mask_fixed/09_test_mask.gif" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/DRIVE/test/mask_fixed/10_test_mask.gif" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/DRIVE/test/mask_fixed/11_test_mask.gif" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/DRIVE/test/mask_fixed/12_test_mask.gif" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/DRIVE/test/mask_fixed/13_test_mask.gif" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/DRIVE/test/mask_fixed/14_test_mask.gif" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/DRIVE/test/mask_fixed/15_test_mask.gif" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/DRIVE/test/mask_fixed/16_test_mask.gif" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/DRIVE/test/mask_fixed/17_test_mask.gif" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/DRIVE/test/mask_fixed/18_test_mask.gif" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/DRIVE/test/mask_fixed/19_test_mask.gif" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/DRIVE/test/mask_fixed/20_test_mask.gif" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/DRIVE/training/1st_manual/21_manual1.gif" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/DRIVE/training/1st_manual/22_manual1.gif" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/DRIVE/training/1st_manual/23_manual1.gif" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/DRIVE/training/1st_manual/24_manual1.gif" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/DRIVE/training/1st_manual/25_manual1.gif" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/DRIVE/training/1st_manual/26_manual1.gif" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/DRIVE/training/1st_manual/27_manual1.gif" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/DRIVE/training/1st_manual/28_manual1.gif" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/DRIVE/training/1st_manual/29_manual1.gif" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/DRIVE/training/1st_manual/30_manual1.gif" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/DRIVE/training/1st_manual/31_manual1.gif" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/DRIVE/training/1st_manual/32_manual1.gif" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/DRIVE/training/1st_manual/33_manual1.gif" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/DRIVE/training/1st_manual/34_manual1.gif" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/DRIVE/training/1st_manual/35_manual1.gif" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/DRIVE/training/1st_manual/36_manual1.gif" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/DRIVE/training/1st_manual/37_manual1.gif" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/DRIVE/training/1st_manual/38_manual1.gif" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/DRIVE/training/1st_manual/39_manual1.gif" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/DRIVE/training/1st_manual/40_manual1.gif" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/DRIVE/training/1st_manual_bm/21_manual1.gif" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/DRIVE/training/1st_manual_bm/21_manual1_skel" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/DRIVE/training/1st_manual_bm/21_manual1_skel.bm" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/DRIVE/training/1st_manual_bm/22_manual1.gif" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/DRIVE/training/1st_manual_bm/23_manual1.gif" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/DRIVE/training/1st_manual_bm/24_manual1.gif" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/DRIVE/training/1st_manual_bm/25_manual1.gif" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/DRIVE/training/1st_manual_bm/26_manual1.gif" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/DRIVE/training/1st_manual_bm/27_manual1.gif" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/DRIVE/training/1st_manual_bm/28_manual1.gif" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/DRIVE/training/1st_manual_bm/29_manual1.gif" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/DRIVE/training/1st_manual_bm/30_manual1.gif" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/DRIVE/training/1st_manual_bm/31_manual1.gif" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/DRIVE/training/1st_manual_bm/32_manual1.gif" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/DRIVE/training/1st_manual_bm/33_manual1.gif" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/DRIVE/training/1st_manual_bm/34_manual1.gif" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/DRIVE/training/1st_manual_bm/35_manual1.gif" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/DRIVE/training/1st_manual_bm/36_manual1.gif" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/DRIVE/training/1st_manual_bm/37_manual1.gif" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/DRIVE/training/1st_manual_bm/38_manual1.gif" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/DRIVE/training/1st_manual_bm/39_manual1.gif" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/DRIVE/training/1st_manual_bm/40_manual1.gif" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/DRIVE/training/images/21_training.tif" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/DRIVE/training/images/22_training.tif" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/DRIVE/training/images/23_training.tif" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/DRIVE/training/images/24_training.tif" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/DRIVE/training/images/25_training.tif" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/DRIVE/training/images/26_training.tif" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/DRIVE/training/images/27_training.tif" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/DRIVE/training/images/28_training.tif" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/DRIVE/training/images/29_training.tif" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/DRIVE/training/images/30_training.tif" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/DRIVE/training/images/31_training.tif" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/DRIVE/training/images/32_training.tif" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/DRIVE/training/images/33_training.tif" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/DRIVE/training/images/34_training.tif" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/DRIVE/training/images/35_training.tif" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/DRIVE/training/images/36_training.tif" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/DRIVE/training/images/37_training.tif" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/DRIVE/training/images/38_training.tif" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/DRIVE/training/images/39_training.tif" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/DRIVE/training/images/40_training.tif" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/DRIVE/training/mask/21_training_mask.gif" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/DRIVE/training/mask/22_training_mask.gif" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/DRIVE/training/mask/23_training_mask.gif" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/DRIVE/training/mask/24_training_mask.gif" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/DRIVE/training/mask/25_training_mask.gif" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/DRIVE/training/mask/26_training_mask.gif" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/DRIVE/training/mask/27_training_mask.gif" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/DRIVE/training/mask/28_training_mask.gif" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/DRIVE/training/mask/29_training_mask.gif" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/DRIVE/training/mask/30_training_mask.gif" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/DRIVE/training/mask/31_training_mask.gif" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/DRIVE/training/mask/32_training_mask.gif" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/DRIVE/training/mask/33_training_mask.gif" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/DRIVE/training/mask/34_training_mask.gif" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/DRIVE/training/mask/35_training_mask.gif" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/DRIVE/training/mask/36_training_mask.gif" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/DRIVE/training/mask/37_training_mask.gif" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/DRIVE/training/mask/38_training_mask.gif" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/DRIVE/training/mask/39_training_mask.gif" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/DRIVE/training/mask/40_training_mask.gif" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/DRIVE/training/mask_eroded/21_training_mask.gif" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/DRIVE/training/mask_eroded/22_training_mask.gif" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/DRIVE/training/mask_eroded/23_training_mask.gif" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/DRIVE/training/mask_eroded/24_training_mask.gif" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/DRIVE/training/mask_eroded/25_training_mask.gif" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/DRIVE/training/mask_eroded/26_training_mask.gif" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/DRIVE/training/mask_eroded/27_training_mask.gif" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/DRIVE/training/mask_eroded/28_training_mask.gif" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/DRIVE/training/mask_eroded/29_training_mask.gif" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/DRIVE/training/mask_eroded/30_training_mask.gif" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/DRIVE/training/mask_eroded/31_training_mask.gif" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/DRIVE/training/mask_eroded/32_training_mask.gif" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/DRIVE/training/mask_eroded/33_training_mask.gif" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/DRIVE/training/mask_eroded/34_training_mask.gif" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/DRIVE/training/mask_eroded/35_training_mask.gif" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/DRIVE/training/mask_eroded/36_training_mask.gif" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/DRIVE/training/mask_eroded/37_training_mask.gif" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/DRIVE/training/mask_eroded/38_training_mask.gif" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/DRIVE/training/mask_eroded/39_training_mask.gif" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/DRIVE/training/mask_eroded/40_training_mask.gif" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/DRIVE/training/mask_fixed/21_training_mask.gif" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/DRIVE/training/mask_fixed/22_training_mask.gif" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/DRIVE/training/mask_fixed/23_training_mask.gif" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/DRIVE/training/mask_fixed/24_training_mask.gif" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/DRIVE/training/mask_fixed/25_training_mask.gif" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/DRIVE/training/mask_fixed/26_training_mask.gif" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/DRIVE/training/mask_fixed/27_training_mask.gif" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/DRIVE/training/mask_fixed/28_training_mask.gif" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/DRIVE/training/mask_fixed/29_training_mask.gif" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/DRIVE/training/mask_fixed/30_training_mask.gif" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/DRIVE/training/mask_fixed/31_training_mask.gif" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/DRIVE/training/mask_fixed/32_training_mask.gif" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/DRIVE/training/mask_fixed/33_training_mask.gif" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/DRIVE/training/mask_fixed/34_training_mask.gif" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/DRIVE/training/mask_fixed/35_training_mask.gif" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/DRIVE/training/mask_fixed/36_training_mask.gif" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/DRIVE/training/mask_fixed/37_training_mask.gif" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/DRIVE/training/mask_fixed/38_training_mask.gif" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/DRIVE/training/mask_fixed/39_training_mask.gif" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/DRIVE/training/mask_fixed/40_training_mask.gif" afterPath="" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.gitignore" afterPath="$PROJECT_DIR$/.gitignore" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/data/DRIVE/test/1st_manual/01_manual1.gif" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/data/DRIVE/test/1st_manual/02_manual1.gif" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/data/DRIVE/test/1st_manual/03_manual1.gif" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/data/DRIVE/test/1st_manual/04_manual1.gif" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/data/DRIVE/test/1st_manual/05_manual1.gif" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/data/DRIVE/test/1st_manual/06_manual1.gif" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/data/DRIVE/test/1st_manual/07_manual1.gif" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/data/DRIVE/test/1st_manual/08_manual1.gif" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/data/DRIVE/test/1st_manual/09_manual1.gif" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/data/DRIVE/test/1st_manual/10_manual1.gif" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/data/DRIVE/test/1st_manual/11_manual1.gif" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/data/DRIVE/test/1st_manual/12_manual1.gif" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/data/DRIVE/test/1st_manual/13_manual1.gif" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/data/DRIVE/test/1st_manual/14_manual1.gif" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/data/DRIVE/test/1st_manual/15_manual1.gif" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/data/DRIVE/test/1st_manual/16_manual1.gif" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/data/DRIVE/test/1st_manual/17_manual1.gif" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/data/DRIVE/test/1st_manual/18_manual1.gif" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/data/DRIVE/test/1st_manual/19_manual1.gif" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/data/DRIVE/test/1st_manual/20_manual1.gif" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/data/DRIVE/test/2nd_manual/01_manual2.gif" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/data/DRIVE/test/2nd_manual/02_manual2.gif" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/data/DRIVE/test/2nd_manual/03_manual2.gif" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/data/DRIVE/test/2nd_manual/04_manual2.gif" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/data/DRIVE/test/2nd_manual/05_manual2.gif" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/data/DRIVE/test/2nd_manual/06_manual2.gif" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/data/DRIVE/test/2nd_manual/07_manual2.gif" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/data/DRIVE/test/2nd_manual/08_manual2.gif" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/data/DRIVE/test/2nd_manual/09_manual2.gif" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/data/DRIVE/test/2nd_manual/10_manual2.gif" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/data/DRIVE/test/2nd_manual/11_manual2.gif" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/data/DRIVE/test/2nd_manual/12_manual2.gif" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/data/DRIVE/test/2nd_manual/13_manual2.gif" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/data/DRIVE/test/2nd_manual/14_manual2.gif" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/data/DRIVE/test/2nd_manual/15_manual2.gif" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/data/DRIVE/test/2nd_manual/16_manual2.gif" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/data/DRIVE/test/2nd_manual/17_manual2.gif" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/data/DRIVE/test/2nd_manual/18_manual2.gif" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/data/DRIVE/test/2nd_manual/19_manual2.gif" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/data/DRIVE/test/2nd_manual/20_manual2.gif" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/data/DRIVE/test/images/01_test.tif" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/data/DRIVE/test/images/02_test.tif" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/data/DRIVE/test/images/03_test.tif" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/data/DRIVE/test/images/04_test.tif" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/data/DRIVE/test/images/05_test.tif" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/data/DRIVE/test/images/06_test.tif" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/data/DRIVE/test/images/07_test.tif" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/data/DRIVE/test/images/08_test.tif" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/data/DRIVE/test/images/09_test.tif" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/data/DRIVE/test/images/10_test.tif" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/data/DRIVE/test/images/11_test.tif" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/data/DRIVE/test/images/12_test.tif" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/data/DRIVE/test/images/13_test.tif" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/data/DRIVE/test/images/14_test.tif" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/data/DRIVE/test/images/15_test.tif" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/data/DRIVE/test/images/16_test.tif" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/data/DRIVE/test/images/17_test.tif" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/data/DRIVE/test/images/18_test.tif" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/data/DRIVE/test/images/19_test.tif" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/data/DRIVE/test/images/20_test.tif" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/data/DRIVE/test/keypoints/01_manual1.psd" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/data/DRIVE/test/keypoints/manual 01.psd" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/data/DRIVE/test/keypoints/manual 02.psd" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/data/DRIVE/test/keypoints/manual 03.psd" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/data/DRIVE/test/keypoints_filter/drive_01.psd" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/data/DRIVE/test/keypoints_filter/drive_02.psd" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/data/DRIVE/test/keypoints_filter/drive_02_branchpoints.png" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/data/DRIVE/test/keypoints_filter/drive_02_endpoints.png" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/data/DRIVE/test/keypoints_filter/drive_02_tree.png" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/data/DRIVE/test/keypoints_filter/drive_04.psd" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/data/DRIVE/test/keypoints_filter/drive_04_branchpoints.png" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/data/DRIVE/test/keypoints_filter/drive_04_endpoints.png" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/data/DRIVE/test/keypoints_filter/drive_04_tree.png" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/data/DRIVE/test/keypoints_filter/drive_06.psd" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/data/DRIVE/test/keypoints_filter/drive_06_branchpoints.png" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/data/DRIVE/test/keypoints_filter/drive_06_endpoints.png" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/data/DRIVE/test/keypoints_filter/drive_06_tree.png" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/data/DRIVE/test/keypoints_filter/drive_07.psd" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/data/DRIVE/test/keypoints_filter/drive_07_branchpoints.png" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/data/DRIVE/test/keypoints_filter/drive_07_endpoints.png" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/data/DRIVE/test/keypoints_filter/drive_07_tree.png" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/data/DRIVE/test/keypoints_filter/drive_09.psd" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/data/DRIVE/test/keypoints_filter/drive_09_branchpoints.png" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/data/DRIVE/test/keypoints_filter/drive_09_endpoints.png" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/data/DRIVE/test/keypoints_filter/drive_09_tree.png" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/data/DRIVE/test/keypoints_filter/drive_10_tree.png" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/data/DRIVE/test/keypoints_filter/drive_12_tree.png" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/data/DRIVE/test/keypoints_filter/drive_13_tree.png" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/data/DRIVE/test/keypoints_filter/drive_15_tree (2).png" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/data/DRIVE/test/keypoints_filter/drive_15_tree.png" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/data/DRIVE/test/keypoints_filter/drive_16_tree.png" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/data/DRIVE/test/keypoints_filter/drive_19_tree.png" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/data/DRIVE/test/mask/01_test_mask.gif" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/data/DRIVE/test/mask/02_test_mask.gif" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/data/DRIVE/test/mask/03_test_mask.gif" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/data/DRIVE/test/mask/04_test_mask.gif" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/data/DRIVE/test/mask/05_test_mask.gif" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/data/DRIVE/test/mask/06_test_mask.gif" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/data/DRIVE/test/mask/07_test_mask.gif" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/data/DRIVE/test/mask/08_test_mask.gif" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/data/DRIVE/test/mask/09_test_mask.gif" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/data/DRIVE/test/mask/10_test_mask.gif" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/data/DRIVE/test/mask/11_test_mask.gif" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/data/DRIVE/test/mask/12_test_mask.gif" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/data/DRIVE/test/mask/13_test_mask.gif" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/data/DRIVE/test/mask/14_test_mask.gif" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/data/DRIVE/test/mask/15_test_mask.gif" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/data/DRIVE/test/mask/16_test_mask.gif" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/data/DRIVE/test/mask/17_test_mask.gif" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/data/DRIVE/test/mask/18_test_mask.gif" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/data/DRIVE/test/mask/19_test_mask.gif" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/data/DRIVE/test/mask/20_test_mask.gif" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/data/DRIVE/test/mask_eroded/01_test_mask.gif" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/data/DRIVE/test/mask_eroded/02_test_mask.gif" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/data/DRIVE/test/mask_eroded/03_test_mask.gif" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/data/DRIVE/test/mask_eroded/04_test_mask.gif" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/data/DRIVE/test/mask_eroded/05_test_mask.gif" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/data/DRIVE/test/mask_eroded/06_test_mask.gif" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/data/DRIVE/test/mask_eroded/07_test_mask.gif" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/data/DRIVE/test/mask_eroded/08_test_mask.gif" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/data/DRIVE/test/mask_eroded/09_test_mask.gif" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/data/DRIVE/test/mask_eroded/10_test_mask.gif" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/data/DRIVE/test/mask_eroded/11_test_mask.gif" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/data/DRIVE/test/mask_eroded/12_test_mask.gif" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/data/DRIVE/test/mask_eroded/13_test_mask.gif" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/data/DRIVE/test/mask_eroded/14_test_mask.gif" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/data/DRIVE/test/mask_eroded/15_test_mask.gif" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/data/DRIVE/test/mask_eroded/16_test_mask.gif" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/data/DRIVE/test/mask_eroded/17_test_mask.gif" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/data/DRIVE/test/mask_eroded/18_test_mask.gif" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/data/DRIVE/test/mask_eroded/19_test_mask.gif" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/data/DRIVE/test/mask_eroded/20_test_mask.gif" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/data/DRIVE/test/mask_fixed/01_test_mask.gif" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/data/DRIVE/test/mask_fixed/02_test_mask.gif" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/data/DRIVE/test/mask_fixed/03_test_mask.gif" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/data/DRIVE/test/mask_fixed/04_test_mask.gif" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/data/DRIVE/test/mask_fixed/05_test_mask.gif" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/data/DRIVE/test/mask_fixed/06_test_mask.gif" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/data/DRIVE/test/mask_fixed/07_test_mask.gif" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/data/DRIVE/test/mask_fixed/08_test_mask.gif" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/data/DRIVE/test/mask_fixed/09_test_mask.gif" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/data/DRIVE/test/mask_fixed/10_test_mask.gif" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/data/DRIVE/test/mask_fixed/11_test_mask.gif" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/data/DRIVE/test/mask_fixed/12_test_mask.gif" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/data/DRIVE/test/mask_fixed/13_test_mask.gif" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/data/DRIVE/test/mask_fixed/14_test_mask.gif" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/data/DRIVE/test/mask_fixed/15_test_mask.gif" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/data/DRIVE/test/mask_fixed/16_test_mask.gif" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/data/DRIVE/test/mask_fixed/17_test_mask.gif" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/data/DRIVE/test/mask_fixed/18_test_mask.gif" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/data/DRIVE/test/mask_fixed/19_test_mask.gif" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/data/DRIVE/test/mask_fixed/20_test_mask.gif" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/data/DRIVE/training/1st_manual/21_manual1.gif" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/data/DRIVE/training/1st_manual/22_manual1.gif" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/data/DRIVE/training/1st_manual/23_manual1.gif" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/data/DRIVE/training/1st_manual/24_manual1.gif" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/data/DRIVE/training/1st_manual/25_manual1.gif" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/data/DRIVE/training/1st_manual/26_manual1.gif" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/data/DRIVE/training/1st_manual/27_manual1.gif" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/data/DRIVE/training/1st_manual/28_manual1.gif" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/data/DRIVE/training/1st_manual/29_manual1.gif" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/data/DRIVE/training/1st_manual/30_manual1.gif" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/data/DRIVE/training/1st_manual/31_manual1.gif" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/data/DRIVE/training/1st_manual/32_manual1.gif" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/data/DRIVE/training/1st_manual/33_manual1.gif" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/data/DRIVE/training/1st_manual/34_manual1.gif" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/data/DRIVE/training/1st_manual/35_manual1.gif" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/data/DRIVE/training/1st_manual/36_manual1.gif" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/data/DRIVE/training/1st_manual/37_manual1.gif" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/data/DRIVE/training/1st_manual/38_manual1.gif" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/data/DRIVE/training/1st_manual/39_manual1.gif" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/data/DRIVE/training/1st_manual/40_manual1.gif" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/data/DRIVE/training/1st_manual_bm/21_manual1.gif" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/data/DRIVE/training/1st_manual_bm/22_manual1.gif" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/data/DRIVE/training/1st_manual_bm/23_manual1.gif" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/data/DRIVE/training/1st_manual_bm/24_manual1.gif" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/data/DRIVE/training/1st_manual_bm/25_manual1.gif" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/data/DRIVE/training/1st_manual_bm/26_manual1.gif" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/data/DRIVE/training/1st_manual_bm/27_manual1.gif" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/data/DRIVE/training/1st_manual_bm/28_manual1.gif" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/data/DRIVE/training/1st_manual_bm/29_manual1.gif" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/data/DRIVE/training/1st_manual_bm/30_manual1.gif" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/data/DRIVE/training/1st_manual_bm/31_manual1.gif" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/data/DRIVE/training/1st_manual_bm/32_manual1.gif" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/data/DRIVE/training/1st_manual_bm/33_manual1.gif" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/data/DRIVE/training/1st_manual_bm/34_manual1.gif" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/data/DRIVE/training/1st_manual_bm/35_manual1.gif" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/data/DRIVE/training/1st_manual_bm/36_manual1.gif" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/data/DRIVE/training/1st_manual_bm/37_manual1.gif" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/data/DRIVE/training/1st_manual_bm/38_manual1.gif" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/data/DRIVE/training/1st_manual_bm/39_manual1.gif" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/data/DRIVE/training/1st_manual_bm/40_manual1.gif" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/data/DRIVE/training/images/21_training.tif" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/data/DRIVE/training/images/22_training.tif" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/data/DRIVE/training/images/23_training.tif" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/data/DRIVE/training/images/24_training.tif" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/data/DRIVE/training/images/25_training.tif" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/data/DRIVE/training/images/26_training.tif" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/data/DRIVE/training/images/27_training.tif" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/data/DRIVE/training/images/28_training.tif" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/data/DRIVE/training/images/29_training.tif" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/data/DRIVE/training/images/30_training.tif" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/data/DRIVE/training/images/31_training.tif" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/data/DRIVE/training/images/32_training.tif" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/data/DRIVE/training/images/33_training.tif" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/data/DRIVE/training/images/34_training.tif" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/data/DRIVE/training/images/35_training.tif" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/data/DRIVE/training/images/36_training.tif" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/data/DRIVE/training/images/37_training.tif" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/data/DRIVE/training/images/38_training.tif" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/data/DRIVE/training/images/39_training.tif" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/data/DRIVE/training/images/40_training.tif" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/data/DRIVE/training/mask/21_training_mask.gif" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/data/DRIVE/training/mask/22_training_mask.gif" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/data/DRIVE/training/mask/23_training_mask.gif" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/data/DRIVE/training/mask/24_training_mask.gif" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/data/DRIVE/training/mask/25_training_mask.gif" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/data/DRIVE/training/mask/26_training_mask.gif" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/data/DRIVE/training/mask/27_training_mask.gif" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/data/DRIVE/training/mask/28_training_mask.gif" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/data/DRIVE/training/mask/29_training_mask.gif" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/data/DRIVE/training/mask/30_training_mask.gif" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/data/DRIVE/training/mask/31_training_mask.gif" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/data/DRIVE/training/mask/32_training_mask.gif" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/data/DRIVE/training/mask/33_training_mask.gif" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/data/DRIVE/training/mask/34_training_mask.gif" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/data/DRIVE/training/mask/35_training_mask.gif" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/data/DRIVE/training/mask/36_training_mask.gif" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/data/DRIVE/training/mask/37_training_mask.gif" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/data/DRIVE/training/mask/38_training_mask.gif" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/data/DRIVE/training/mask/39_training_mask.gif" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/data/DRIVE/training/mask/40_training_mask.gif" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/data/DRIVE/training/mask_eroded/21_training_mask.gif" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/data/DRIVE/training/mask_eroded/22_training_mask.gif" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/data/DRIVE/training/mask_eroded/23_training_mask.gif" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/data/DRIVE/training/mask_eroded/24_training_mask.gif" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/data/DRIVE/training/mask_eroded/25_training_mask.gif" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/data/DRIVE/training/mask_eroded/26_training_mask.gif" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/data/DRIVE/training/mask_eroded/27_training_mask.gif" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/data/DRIVE/training/mask_eroded/28_training_mask.gif" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/data/DRIVE/training/mask_eroded/29_training_mask.gif" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/data/DRIVE/training/mask_eroded/30_training_mask.gif" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/data/DRIVE/training/mask_eroded/31_training_mask.gif" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/data/DRIVE/training/mask_eroded/32_training_mask.gif" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/data/DRIVE/training/mask_eroded/33_training_mask.gif" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/data/DRIVE/training/mask_eroded/34_training_mask.gif" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/data/DRIVE/training/mask_eroded/35_training_mask.gif" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/data/DRIVE/training/mask_eroded/36_training_mask.gif" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/data/DRIVE/training/mask_eroded/37_training_mask.gif" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/data/DRIVE/training/mask_eroded/38_training_mask.gif" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/data/DRIVE/training/mask_eroded/39_training_mask.gif" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/data/DRIVE/training/mask_eroded/40_training_mask.gif" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/data/DRIVE/training/mask_fixed/21_training_mask.gif" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/data/DRIVE/training/mask_fixed/22_training_mask.gif" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/data/DRIVE/training/mask_fixed/23_training_mask.gif" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/data/DRIVE/training/mask_fixed/24_training_mask.gif" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/data/DRIVE/training/mask_fixed/25_training_mask.gif" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/data/DRIVE/training/mask_fixed/26_training_mask.gif" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/data/DRIVE/training/mask_fixed/27_training_mask.gif" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/data/DRIVE/training/mask_fixed/28_training_mask.gif" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/data/DRIVE/training/mask_fixed/29_training_mask.gif" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/data/DRIVE/training/mask_fixed/30_training_mask.gif" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/data/DRIVE/training/mask_fixed/31_training_mask.gif" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/data/DRIVE/training/mask_fixed/32_training_mask.gif" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/data/DRIVE/training/mask_fixed/33_training_mask.gif" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/data/DRIVE/training/mask_fixed/34_training_mask.gif" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/data/DRIVE/training/mask_fixed/35_training_mask.gif" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/data/DRIVE/training/mask_fixed/36_training_mask.gif" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/data/DRIVE/training/mask_fixed/37_training_mask.gif" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/data/DRIVE/training/mask_fixed/38_training_mask.gif" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/data/DRIVE/training/mask_fixed/39_training_mask.gif" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/data/DRIVE/training/mask_fixed/40_training_mask.gif" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/data/DRIVE/training/1st_manual_bm/21_manual1_skel" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/data/DRIVE/training/1st_manual_bm/21_manual1_skel.bm" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
@@ -434,27 +433,6 @@
               <item name="ature" type="b2602c69:ProjectViewProjectNode" />
               <item name="ature" type="462c0819:PsiDirectoryNode" />
               <item name="data" type="462c0819:PsiDirectoryNode" />
-            </path>
-            <path>
-              <item name="ature" type="b2602c69:ProjectViewProjectNode" />
-              <item name="ature" type="462c0819:PsiDirectoryNode" />
-              <item name="data" type="462c0819:PsiDirectoryNode" />
-              <item name="DRIVE" type="462c0819:PsiDirectoryNode" />
-            </path>
-            <path>
-              <item name="ature" type="b2602c69:ProjectViewProjectNode" />
-              <item name="ature" type="462c0819:PsiDirectoryNode" />
-              <item name="data" type="462c0819:PsiDirectoryNode" />
-              <item name="DRIVE" type="462c0819:PsiDirectoryNode" />
-              <item name="test" type="462c0819:PsiDirectoryNode" />
-            </path>
-            <path>
-              <item name="ature" type="b2602c69:ProjectViewProjectNode" />
-              <item name="ature" type="462c0819:PsiDirectoryNode" />
-              <item name="data" type="462c0819:PsiDirectoryNode" />
-              <item name="DRIVE" type="462c0819:PsiDirectoryNode" />
-              <item name="test" type="462c0819:PsiDirectoryNode" />
-              <item name="images" type="462c0819:PsiDirectoryNode" />
             </path>
             <path>
               <item name="ature" type="b2602c69:ProjectViewProjectNode" />
@@ -859,7 +837,14 @@
       <option name="project" value="LOCAL" />
       <updated>1518120470364</updated>
     </task>
-    <option name="localTasksCounter" value="35" />
+    <task id="LOCAL-00035" summary="Moved drive to data folder.">
+      <created>1518120940464</created>
+      <option name="number" value="00035" />
+      <option name="presentableId" value="LOCAL-00035" />
+      <option name="project" value="LOCAL" />
+      <updated>1518120940464</updated>
+    </task>
+    <option name="localTasksCounter" value="36" />
     <servers />
   </component>
   <component name="ToolWindowManager">
@@ -943,7 +928,8 @@
     <MESSAGE value="Gabor Kernel Pickled." />
     <MESSAGE value="apply_gabor(..) fixed." />
     <MESSAGE value="Removed old test folder." />
-    <option name="LAST_COMMIT_MESSAGE" value="Removed old test folder." />
+    <MESSAGE value="Moved drive to data folder." />
+    <option name="LAST_COMMIT_MESSAGE" value="Moved drive to data folder." />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
