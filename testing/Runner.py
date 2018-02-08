@@ -1,8 +1,10 @@
+#!/home/akhanal1/Spring2018/pl-env/bin/python3.5
 import os
+import sys
 
 ### CHANGE path HERE
 base_path_win = "C:\\Projects\\ature\\"  # WINDOWS
-base_path_lin = "/home/akhanal1/Spring2018/ature"  # LINUX
+base_path_lin = "/home/akhanal1/Spring2018/ature/"  # LINUX
 
 if os.name == 'nt':
     base_path = base_path_win
@@ -16,6 +18,8 @@ data_file_path = base_path + sep + 'data' + sep + 'DRIVE' + sep + 'test' + sep +
 mask_path = base_path + sep + 'data' + sep + 'DRIVE' + sep + 'test' + sep + 'mask'
 ground_truth_path = base_path + sep + 'data' + sep + 'DRIVE' + sep + 'test' + sep + '1st_manual'
 
+# for ubuntu
+sys.path.append(base_path)
 os.chdir(base_path)
 
 import numpy as np
@@ -54,8 +58,8 @@ params = {'sk_threshold': 60,
 tester = AtureTestErode(data_path=data_file_path,out='out_ak')
 tester.load_mask(mask_path=mask_path, fget_mask_file=get_mask_file)
 tester.load_ground_truth(ground_truth_path=ground_truth_path, fget_ground_truth_file=get_ground_truth_file)
-tester.run_for_one_image(test_file_name='01_test.tif', params_combination=[params], save=True)
-# tester.run_for_all_images(params=params)
+#tester.run_for_one_image(test_file_name='01_test.tif', params_combination=[params], save=True)
+tester.run_for_all_images(params=all_params)
 
 
 ############# Run for mat files in av_wide_data_set dir ###############
@@ -73,8 +77,8 @@ mask_path = base_path + sep + 'data' + sep + 'DRIVE' + sep + 'test' + sep + 'mas
 tester = AtureTestErode(data_path=data_file_path,out='out_rj')
 tester.load_mask(mask_path=mask_path, fget_mask_file=get_mask_file)
 tester.load_ground_truth(ground_truth_path=ground_truth_path, fget_ground_truth_file=get_ground_truth_file)
-tester.run_for_one_image(test_file_name='01_test.tif', params_combination=[params], save=True)
-# tester.run_for_all_images(params=params)
+#tester.run_for_one_image(test_file_name='01_test.tif', params_combination=[params], save=True)
+tester.run_for_all_images(params=all_params)
 
 ############# Run for mat files in av_wide_data_set dir ###############
 ############################################
