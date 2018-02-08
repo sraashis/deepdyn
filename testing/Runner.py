@@ -59,7 +59,7 @@ tester = AtureTestErode(data_path=data_file_path,out='out_ak')
 tester.load_mask(mask_path=mask_path, fget_mask_file=get_mask_file)
 tester.load_ground_truth(ground_truth_path=ground_truth_path, fget_ground_truth_file=get_ground_truth_file)
 #tester.run_for_one_image(test_file_name='01_test.tif', params_combination=[params], save=True)
-tester.run_for_all_images(params=all_params)
+tester.run_for_all_images(params_combination=all_params)
 
 
 ############# Run for mat files in av_wide_data_set dir ###############
@@ -78,7 +78,7 @@ tester = AtureTestErode(data_path=data_file_path,out='out_rj')
 tester.load_mask(mask_path=mask_path, fget_mask_file=get_mask_file)
 tester.load_ground_truth(ground_truth_path=ground_truth_path, fget_ground_truth_file=get_ground_truth_file)
 #tester.run_for_one_image(test_file_name='01_test.tif', params_combination=[params], save=True)
-tester.run_for_all_images(params=all_params)
+tester.run_for_all_images(params_combination=all_params)
 
 ############# Run for mat files in av_wide_data_set dir ###############
 ############################################

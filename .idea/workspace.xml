@@ -2,10 +2,352 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="5fcadf5f-510d-4dd0-aeb9-c274096ae36f" name="Default" comment="">
-      <change type="MOVED" beforePath="$PROJECT_DIR$/script_02_av_gabor_rje.py" afterPath="$PROJECT_DIR$/preprocess/script_02_av_gabor_rje.py" />
-      <change type="MOVED" beforePath="$PROJECT_DIR$/script_03_drive_masks.py" afterPath="$PROJECT_DIR$/preprocess/script_03_drive_masks.py" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.gitignore" afterPath="$PROJECT_DIR$/.gitignore" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
+      <change beforePath="$PROJECT_DIR$/.gitignore" afterPath="$PROJECT_DIR$/.gitignore" />
+      <change beforePath="$PROJECT_DIR$/.idea/ature.iml" afterPath="$PROJECT_DIR$/.idea/ature.iml" />
+      <change beforePath="$PROJECT_DIR$/.idea/dictionaries/ak.xml" afterPath="$PROJECT_DIR$/.idea/dictionaries/ak.xml" />
+      <change beforePath="$PROJECT_DIR$/.idea/misc.xml" afterPath="$PROJECT_DIR$/.idea/misc.xml" />
+      <change beforePath="$PROJECT_DIR$/.idea/modules.xml" afterPath="$PROJECT_DIR$/.idea/modules.xml" />
+      <change beforePath="$PROJECT_DIR$/.idea/vcs.xml" afterPath="$PROJECT_DIR$/.idea/vcs.xml" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
+      <change beforePath="$PROJECT_DIR$/assests/for_bilateral/Filters.txt" afterPath="$PROJECT_DIR$/assests/for_bilateral/Filters.txt" />
+      <change beforePath="$PROJECT_DIR$/assests/requirements.txt" afterPath="$PROJECT_DIR$/assests/requirements.txt" />
+      <change beforePath="$PROJECT_DIR$/commons/IMAGE.py" afterPath="$PROJECT_DIR$/commons/IMAGE.py" />
+      <change beforePath="$PROJECT_DIR$/commons/ImgLATTICE.py" afterPath="$PROJECT_DIR$/commons/ImgLATTICE.py" />
+      <change beforePath="$PROJECT_DIR$/commons/ImgLATTICE_rje.py" afterPath="$PROJECT_DIR$/commons/ImgLATTICE_rje.py" />
+      <change beforePath="$PROJECT_DIR$/commons/MAT.py" afterPath="$PROJECT_DIR$/commons/MAT.py" />
+      <change beforePath="$PROJECT_DIR$/commons/__init__.py" afterPath="$PROJECT_DIR$/commons/__init__.py" />
+      <change beforePath="$PROJECT_DIR$/commons/constants.py" afterPath="$PROJECT_DIR$/commons/constants.py" />
+      <change beforePath="$PROJECT_DIR$/commons/timer.py" afterPath="$PROJECT_DIR$/commons/timer.py" />
+      <change beforePath="$PROJECT_DIR$/conf/__init__.py" afterPath="$PROJECT_DIR$/conf/__init__.py" />
+      <change beforePath="$PROJECT_DIR$/conf/app_config" afterPath="$PROJECT_DIR$/conf/app_config" />
+      <change beforePath="$PROJECT_DIR$/conf/db_conf" afterPath="$PROJECT_DIR$/conf/db_conf" />
+      <change beforePath="$PROJECT_DIR$/data/DRIVE/test/1st_manual/01_manual1.gif" afterPath="$PROJECT_DIR$/data/DRIVE/test/1st_manual/01_manual1.gif" />
+      <change beforePath="$PROJECT_DIR$/data/DRIVE/test/1st_manual/02_manual1.gif" afterPath="$PROJECT_DIR$/data/DRIVE/test/1st_manual/02_manual1.gif" />
+      <change beforePath="$PROJECT_DIR$/data/DRIVE/test/1st_manual/03_manual1.gif" afterPath="$PROJECT_DIR$/data/DRIVE/test/1st_manual/03_manual1.gif" />
+      <change beforePath="$PROJECT_DIR$/data/DRIVE/test/1st_manual/04_manual1.gif" afterPath="$PROJECT_DIR$/data/DRIVE/test/1st_manual/04_manual1.gif" />
+      <change beforePath="$PROJECT_DIR$/data/DRIVE/test/1st_manual/05_manual1.gif" afterPath="$PROJECT_DIR$/data/DRIVE/test/1st_manual/05_manual1.gif" />
+      <change beforePath="$PROJECT_DIR$/data/DRIVE/test/1st_manual/06_manual1.gif" afterPath="$PROJECT_DIR$/data/DRIVE/test/1st_manual/06_manual1.gif" />
+      <change beforePath="$PROJECT_DIR$/data/DRIVE/test/1st_manual/07_manual1.gif" afterPath="$PROJECT_DIR$/data/DRIVE/test/1st_manual/07_manual1.gif" />
+      <change beforePath="$PROJECT_DIR$/data/DRIVE/test/1st_manual/08_manual1.gif" afterPath="$PROJECT_DIR$/data/DRIVE/test/1st_manual/08_manual1.gif" />
+      <change beforePath="$PROJECT_DIR$/data/DRIVE/test/1st_manual/09_manual1.gif" afterPath="$PROJECT_DIR$/data/DRIVE/test/1st_manual/09_manual1.gif" />
+      <change beforePath="$PROJECT_DIR$/data/DRIVE/test/1st_manual/10_manual1.gif" afterPath="$PROJECT_DIR$/data/DRIVE/test/1st_manual/10_manual1.gif" />
+      <change beforePath="$PROJECT_DIR$/data/DRIVE/test/1st_manual/11_manual1.gif" afterPath="$PROJECT_DIR$/data/DRIVE/test/1st_manual/11_manual1.gif" />
+      <change beforePath="$PROJECT_DIR$/data/DRIVE/test/1st_manual/12_manual1.gif" afterPath="$PROJECT_DIR$/data/DRIVE/test/1st_manual/12_manual1.gif" />
+      <change beforePath="$PROJECT_DIR$/data/DRIVE/test/1st_manual/13_manual1.gif" afterPath="$PROJECT_DIR$/data/DRIVE/test/1st_manual/13_manual1.gif" />
+      <change beforePath="$PROJECT_DIR$/data/DRIVE/test/1st_manual/14_manual1.gif" afterPath="$PROJECT_DIR$/data/DRIVE/test/1st_manual/14_manual1.gif" />
+      <change beforePath="$PROJECT_DIR$/data/DRIVE/test/1st_manual/15_manual1.gif" afterPath="$PROJECT_DIR$/data/DRIVE/test/1st_manual/15_manual1.gif" />
+      <change beforePath="$PROJECT_DIR$/data/DRIVE/test/1st_manual/16_manual1.gif" afterPath="$PROJECT_DIR$/data/DRIVE/test/1st_manual/16_manual1.gif" />
+      <change beforePath="$PROJECT_DIR$/data/DRIVE/test/1st_manual/17_manual1.gif" afterPath="$PROJECT_DIR$/data/DRIVE/test/1st_manual/17_manual1.gif" />
+      <change beforePath="$PROJECT_DIR$/data/DRIVE/test/1st_manual/18_manual1.gif" afterPath="$PROJECT_DIR$/data/DRIVE/test/1st_manual/18_manual1.gif" />
+      <change beforePath="$PROJECT_DIR$/data/DRIVE/test/1st_manual/19_manual1.gif" afterPath="$PROJECT_DIR$/data/DRIVE/test/1st_manual/19_manual1.gif" />
+      <change beforePath="$PROJECT_DIR$/data/DRIVE/test/1st_manual/20_manual1.gif" afterPath="$PROJECT_DIR$/data/DRIVE/test/1st_manual/20_manual1.gif" />
+      <change beforePath="$PROJECT_DIR$/data/DRIVE/test/2nd_manual/01_manual2.gif" afterPath="$PROJECT_DIR$/data/DRIVE/test/2nd_manual/01_manual2.gif" />
+      <change beforePath="$PROJECT_DIR$/data/DRIVE/test/2nd_manual/02_manual2.gif" afterPath="$PROJECT_DIR$/data/DRIVE/test/2nd_manual/02_manual2.gif" />
+      <change beforePath="$PROJECT_DIR$/data/DRIVE/test/2nd_manual/03_manual2.gif" afterPath="$PROJECT_DIR$/data/DRIVE/test/2nd_manual/03_manual2.gif" />
+      <change beforePath="$PROJECT_DIR$/data/DRIVE/test/2nd_manual/04_manual2.gif" afterPath="$PROJECT_DIR$/data/DRIVE/test/2nd_manual/04_manual2.gif" />
+      <change beforePath="$PROJECT_DIR$/data/DRIVE/test/2nd_manual/05_manual2.gif" afterPath="$PROJECT_DIR$/data/DRIVE/test/2nd_manual/05_manual2.gif" />
+      <change beforePath="$PROJECT_DIR$/data/DRIVE/test/2nd_manual/06_manual2.gif" afterPath="$PROJECT_DIR$/data/DRIVE/test/2nd_manual/06_manual2.gif" />
+      <change beforePath="$PROJECT_DIR$/data/DRIVE/test/2nd_manual/07_manual2.gif" afterPath="$PROJECT_DIR$/data/DRIVE/test/2nd_manual/07_manual2.gif" />
+      <change beforePath="$PROJECT_DIR$/data/DRIVE/test/2nd_manual/08_manual2.gif" afterPath="$PROJECT_DIR$/data/DRIVE/test/2nd_manual/08_manual2.gif" />
+      <change beforePath="$PROJECT_DIR$/data/DRIVE/test/2nd_manual/09_manual2.gif" afterPath="$PROJECT_DIR$/data/DRIVE/test/2nd_manual/09_manual2.gif" />
+      <change beforePath="$PROJECT_DIR$/data/DRIVE/test/2nd_manual/10_manual2.gif" afterPath="$PROJECT_DIR$/data/DRIVE/test/2nd_manual/10_manual2.gif" />
+      <change beforePath="$PROJECT_DIR$/data/DRIVE/test/2nd_manual/11_manual2.gif" afterPath="$PROJECT_DIR$/data/DRIVE/test/2nd_manual/11_manual2.gif" />
+      <change beforePath="$PROJECT_DIR$/data/DRIVE/test/2nd_manual/12_manual2.gif" afterPath="$PROJECT_DIR$/data/DRIVE/test/2nd_manual/12_manual2.gif" />
+      <change beforePath="$PROJECT_DIR$/data/DRIVE/test/2nd_manual/13_manual2.gif" afterPath="$PROJECT_DIR$/data/DRIVE/test/2nd_manual/13_manual2.gif" />
+      <change beforePath="$PROJECT_DIR$/data/DRIVE/test/2nd_manual/14_manual2.gif" afterPath="$PROJECT_DIR$/data/DRIVE/test/2nd_manual/14_manual2.gif" />
+      <change beforePath="$PROJECT_DIR$/data/DRIVE/test/2nd_manual/15_manual2.gif" afterPath="$PROJECT_DIR$/data/DRIVE/test/2nd_manual/15_manual2.gif" />
+      <change beforePath="$PROJECT_DIR$/data/DRIVE/test/2nd_manual/16_manual2.gif" afterPath="$PROJECT_DIR$/data/DRIVE/test/2nd_manual/16_manual2.gif" />
+      <change beforePath="$PROJECT_DIR$/data/DRIVE/test/2nd_manual/17_manual2.gif" afterPath="$PROJECT_DIR$/data/DRIVE/test/2nd_manual/17_manual2.gif" />
+      <change beforePath="$PROJECT_DIR$/data/DRIVE/test/2nd_manual/18_manual2.gif" afterPath="$PROJECT_DIR$/data/DRIVE/test/2nd_manual/18_manual2.gif" />
+      <change beforePath="$PROJECT_DIR$/data/DRIVE/test/2nd_manual/19_manual2.gif" afterPath="$PROJECT_DIR$/data/DRIVE/test/2nd_manual/19_manual2.gif" />
+      <change beforePath="$PROJECT_DIR$/data/DRIVE/test/2nd_manual/20_manual2.gif" afterPath="$PROJECT_DIR$/data/DRIVE/test/2nd_manual/20_manual2.gif" />
+      <change beforePath="$PROJECT_DIR$/data/DRIVE/test/images/01_test.tif" afterPath="$PROJECT_DIR$/data/DRIVE/test/images/01_test.tif" />
+      <change beforePath="$PROJECT_DIR$/data/DRIVE/test/images/02_test.tif" afterPath="$PROJECT_DIR$/data/DRIVE/test/images/02_test.tif" />
+      <change beforePath="$PROJECT_DIR$/data/DRIVE/test/images/03_test.tif" afterPath="$PROJECT_DIR$/data/DRIVE/test/images/03_test.tif" />
+      <change beforePath="$PROJECT_DIR$/data/DRIVE/test/images/04_test.tif" afterPath="$PROJECT_DIR$/data/DRIVE/test/images/04_test.tif" />
+      <change beforePath="$PROJECT_DIR$/data/DRIVE/test/images/05_test.tif" afterPath="$PROJECT_DIR$/data/DRIVE/test/images/05_test.tif" />
+      <change beforePath="$PROJECT_DIR$/data/DRIVE/test/images/06_test.tif" afterPath="$PROJECT_DIR$/data/DRIVE/test/images/06_test.tif" />
+      <change beforePath="$PROJECT_DIR$/data/DRIVE/test/images/07_test.tif" afterPath="$PROJECT_DIR$/data/DRIVE/test/images/07_test.tif" />
+      <change beforePath="$PROJECT_DIR$/data/DRIVE/test/images/08_test.tif" afterPath="$PROJECT_DIR$/data/DRIVE/test/images/08_test.tif" />
+      <change beforePath="$PROJECT_DIR$/data/DRIVE/test/images/09_test.tif" afterPath="$PROJECT_DIR$/data/DRIVE/test/images/09_test.tif" />
+      <change beforePath="$PROJECT_DIR$/data/DRIVE/test/images/10_test.tif" afterPath="$PROJECT_DIR$/data/DRIVE/test/images/10_test.tif" />
+      <change beforePath="$PROJECT_DIR$/data/DRIVE/test/images/11_test.tif" afterPath="$PROJECT_DIR$/data/DRIVE/test/images/11_test.tif" />
+      <change beforePath="$PROJECT_DIR$/data/DRIVE/test/images/12_test.tif" afterPath="$PROJECT_DIR$/data/DRIVE/test/images/12_test.tif" />
+      <change beforePath="$PROJECT_DIR$/data/DRIVE/test/images/13_test.tif" afterPath="$PROJECT_DIR$/data/DRIVE/test/images/13_test.tif" />
+      <change beforePath="$PROJECT_DIR$/data/DRIVE/test/images/14_test.tif" afterPath="$PROJECT_DIR$/data/DRIVE/test/images/14_test.tif" />
+      <change beforePath="$PROJECT_DIR$/data/DRIVE/test/images/15_test.tif" afterPath="$PROJECT_DIR$/data/DRIVE/test/images/15_test.tif" />
+      <change beforePath="$PROJECT_DIR$/data/DRIVE/test/images/16_test.tif" afterPath="$PROJECT_DIR$/data/DRIVE/test/images/16_test.tif" />
+      <change beforePath="$PROJECT_DIR$/data/DRIVE/test/images/17_test.tif" afterPath="$PROJECT_DIR$/data/DRIVE/test/images/17_test.tif" />
+      <change beforePath="$PROJECT_DIR$/data/DRIVE/test/images/18_test.tif" afterPath="$PROJECT_DIR$/data/DRIVE/test/images/18_test.tif" />
+      <change beforePath="$PROJECT_DIR$/data/DRIVE/test/images/19_test.tif" afterPath="$PROJECT_DIR$/data/DRIVE/test/images/19_test.tif" />
+      <change beforePath="$PROJECT_DIR$/data/DRIVE/test/images/20_test.tif" afterPath="$PROJECT_DIR$/data/DRIVE/test/images/20_test.tif" />
+      <change beforePath="$PROJECT_DIR$/data/DRIVE/test/keypoints/01_manual1.psd" afterPath="$PROJECT_DIR$/data/DRIVE/test/keypoints/01_manual1.psd" />
+      <change beforePath="$PROJECT_DIR$/data/DRIVE/test/keypoints/manual 01.psd" afterPath="$PROJECT_DIR$/data/DRIVE/test/keypoints/manual 01.psd" />
+      <change beforePath="$PROJECT_DIR$/data/DRIVE/test/keypoints/manual 02.psd" afterPath="$PROJECT_DIR$/data/DRIVE/test/keypoints/manual 02.psd" />
+      <change beforePath="$PROJECT_DIR$/data/DRIVE/test/keypoints/manual 03.psd" afterPath="$PROJECT_DIR$/data/DRIVE/test/keypoints/manual 03.psd" />
+      <change beforePath="$PROJECT_DIR$/data/DRIVE/test/keypoints_filter/drive_01.psd" afterPath="$PROJECT_DIR$/data/DRIVE/test/keypoints_filter/drive_01.psd" />
+      <change beforePath="$PROJECT_DIR$/data/DRIVE/test/keypoints_filter/drive_02.psd" afterPath="$PROJECT_DIR$/data/DRIVE/test/keypoints_filter/drive_02.psd" />
+      <change beforePath="$PROJECT_DIR$/data/DRIVE/test/keypoints_filter/drive_02_branchpoints.png" afterPath="$PROJECT_DIR$/data/DRIVE/test/keypoints_filter/drive_02_branchpoints.png" />
+      <change beforePath="$PROJECT_DIR$/data/DRIVE/test/keypoints_filter/drive_02_endpoints.png" afterPath="$PROJECT_DIR$/data/DRIVE/test/keypoints_filter/drive_02_endpoints.png" />
+      <change beforePath="$PROJECT_DIR$/data/DRIVE/test/keypoints_filter/drive_02_tree.png" afterPath="$PROJECT_DIR$/data/DRIVE/test/keypoints_filter/drive_02_tree.png" />
+      <change beforePath="$PROJECT_DIR$/data/DRIVE/test/keypoints_filter/drive_04.psd" afterPath="$PROJECT_DIR$/data/DRIVE/test/keypoints_filter/drive_04.psd" />
+      <change beforePath="$PROJECT_DIR$/data/DRIVE/test/keypoints_filter/drive_04_branchpoints.png" afterPath="$PROJECT_DIR$/data/DRIVE/test/keypoints_filter/drive_04_branchpoints.png" />
+      <change beforePath="$PROJECT_DIR$/data/DRIVE/test/keypoints_filter/drive_04_endpoints.png" afterPath="$PROJECT_DIR$/data/DRIVE/test/keypoints_filter/drive_04_endpoints.png" />
+      <change beforePath="$PROJECT_DIR$/data/DRIVE/test/keypoints_filter/drive_04_tree.png" afterPath="$PROJECT_DIR$/data/DRIVE/test/keypoints_filter/drive_04_tree.png" />
+      <change beforePath="$PROJECT_DIR$/data/DRIVE/test/keypoints_filter/drive_06.psd" afterPath="$PROJECT_DIR$/data/DRIVE/test/keypoints_filter/drive_06.psd" />
+      <change beforePath="$PROJECT_DIR$/data/DRIVE/test/keypoints_filter/drive_06_branchpoints.png" afterPath="$PROJECT_DIR$/data/DRIVE/test/keypoints_filter/drive_06_branchpoints.png" />
+      <change beforePath="$PROJECT_DIR$/data/DRIVE/test/keypoints_filter/drive_06_endpoints.png" afterPath="$PROJECT_DIR$/data/DRIVE/test/keypoints_filter/drive_06_endpoints.png" />
+      <change beforePath="$PROJECT_DIR$/data/DRIVE/test/keypoints_filter/drive_06_tree.png" afterPath="$PROJECT_DIR$/data/DRIVE/test/keypoints_filter/drive_06_tree.png" />
+      <change beforePath="$PROJECT_DIR$/data/DRIVE/test/keypoints_filter/drive_07.psd" afterPath="$PROJECT_DIR$/data/DRIVE/test/keypoints_filter/drive_07.psd" />
+      <change beforePath="$PROJECT_DIR$/data/DRIVE/test/keypoints_filter/drive_07_branchpoints.png" afterPath="$PROJECT_DIR$/data/DRIVE/test/keypoints_filter/drive_07_branchpoints.png" />
+      <change beforePath="$PROJECT_DIR$/data/DRIVE/test/keypoints_filter/drive_07_endpoints.png" afterPath="$PROJECT_DIR$/data/DRIVE/test/keypoints_filter/drive_07_endpoints.png" />
+      <change beforePath="$PROJECT_DIR$/data/DRIVE/test/keypoints_filter/drive_07_tree.png" afterPath="$PROJECT_DIR$/data/DRIVE/test/keypoints_filter/drive_07_tree.png" />
+      <change beforePath="$PROJECT_DIR$/data/DRIVE/test/keypoints_filter/drive_09.psd" afterPath="$PROJECT_DIR$/data/DRIVE/test/keypoints_filter/drive_09.psd" />
+      <change beforePath="$PROJECT_DIR$/data/DRIVE/test/keypoints_filter/drive_09_branchpoints.png" afterPath="$PROJECT_DIR$/data/DRIVE/test/keypoints_filter/drive_09_branchpoints.png" />
+      <change beforePath="$PROJECT_DIR$/data/DRIVE/test/keypoints_filter/drive_09_endpoints.png" afterPath="$PROJECT_DIR$/data/DRIVE/test/keypoints_filter/drive_09_endpoints.png" />
+      <change beforePath="$PROJECT_DIR$/data/DRIVE/test/keypoints_filter/drive_09_tree.png" afterPath="$PROJECT_DIR$/data/DRIVE/test/keypoints_filter/drive_09_tree.png" />
+      <change beforePath="$PROJECT_DIR$/data/DRIVE/test/keypoints_filter/drive_10_tree.png" afterPath="$PROJECT_DIR$/data/DRIVE/test/keypoints_filter/drive_10_tree.png" />
+      <change beforePath="$PROJECT_DIR$/data/DRIVE/test/keypoints_filter/drive_12_tree.png" afterPath="$PROJECT_DIR$/data/DRIVE/test/keypoints_filter/drive_12_tree.png" />
+      <change beforePath="$PROJECT_DIR$/data/DRIVE/test/keypoints_filter/drive_13_tree.png" afterPath="$PROJECT_DIR$/data/DRIVE/test/keypoints_filter/drive_13_tree.png" />
+      <change beforePath="$PROJECT_DIR$/data/DRIVE/test/keypoints_filter/drive_15_tree (2).png" afterPath="$PROJECT_DIR$/data/DRIVE/test/keypoints_filter/drive_15_tree (2).png" />
+      <change beforePath="$PROJECT_DIR$/data/DRIVE/test/keypoints_filter/drive_15_tree.png" afterPath="$PROJECT_DIR$/data/DRIVE/test/keypoints_filter/drive_15_tree.png" />
+      <change beforePath="$PROJECT_DIR$/data/DRIVE/test/keypoints_filter/drive_16_tree.png" afterPath="$PROJECT_DIR$/data/DRIVE/test/keypoints_filter/drive_16_tree.png" />
+      <change beforePath="$PROJECT_DIR$/data/DRIVE/test/keypoints_filter/drive_19_tree.png" afterPath="$PROJECT_DIR$/data/DRIVE/test/keypoints_filter/drive_19_tree.png" />
+      <change beforePath="$PROJECT_DIR$/data/DRIVE/test/mask/01_test_mask.gif" afterPath="$PROJECT_DIR$/data/DRIVE/test/mask/01_test_mask.gif" />
+      <change beforePath="$PROJECT_DIR$/data/DRIVE/test/mask/02_test_mask.gif" afterPath="$PROJECT_DIR$/data/DRIVE/test/mask/02_test_mask.gif" />
+      <change beforePath="$PROJECT_DIR$/data/DRIVE/test/mask/03_test_mask.gif" afterPath="$PROJECT_DIR$/data/DRIVE/test/mask/03_test_mask.gif" />
+      <change beforePath="$PROJECT_DIR$/data/DRIVE/test/mask/04_test_mask.gif" afterPath="$PROJECT_DIR$/data/DRIVE/test/mask/04_test_mask.gif" />
+      <change beforePath="$PROJECT_DIR$/data/DRIVE/test/mask/05_test_mask.gif" afterPath="$PROJECT_DIR$/data/DRIVE/test/mask/05_test_mask.gif" />
+      <change beforePath="$PROJECT_DIR$/data/DRIVE/test/mask/06_test_mask.gif" afterPath="$PROJECT_DIR$/data/DRIVE/test/mask/06_test_mask.gif" />
+      <change beforePath="$PROJECT_DIR$/data/DRIVE/test/mask/07_test_mask.gif" afterPath="$PROJECT_DIR$/data/DRIVE/test/mask/07_test_mask.gif" />
+      <change beforePath="$PROJECT_DIR$/data/DRIVE/test/mask/08_test_mask.gif" afterPath="$PROJECT_DIR$/data/DRIVE/test/mask/08_test_mask.gif" />
+      <change beforePath="$PROJECT_DIR$/data/DRIVE/test/mask/09_test_mask.gif" afterPath="$PROJECT_DIR$/data/DRIVE/test/mask/09_test_mask.gif" />
+      <change beforePath="$PROJECT_DIR$/data/DRIVE/test/mask/10_test_mask.gif" afterPath="$PROJECT_DIR$/data/DRIVE/test/mask/10_test_mask.gif" />
+      <change beforePath="$PROJECT_DIR$/data/DRIVE/test/mask/11_test_mask.gif" afterPath="$PROJECT_DIR$/data/DRIVE/test/mask/11_test_mask.gif" />
+      <change beforePath="$PROJECT_DIR$/data/DRIVE/test/mask/12_test_mask.gif" afterPath="$PROJECT_DIR$/data/DRIVE/test/mask/12_test_mask.gif" />
+      <change beforePath="$PROJECT_DIR$/data/DRIVE/test/mask/13_test_mask.gif" afterPath="$PROJECT_DIR$/data/DRIVE/test/mask/13_test_mask.gif" />
+      <change beforePath="$PROJECT_DIR$/data/DRIVE/test/mask/14_test_mask.gif" afterPath="$PROJECT_DIR$/data/DRIVE/test/mask/14_test_mask.gif" />
+      <change beforePath="$PROJECT_DIR$/data/DRIVE/test/mask/15_test_mask.gif" afterPath="$PROJECT_DIR$/data/DRIVE/test/mask/15_test_mask.gif" />
+      <change beforePath="$PROJECT_DIR$/data/DRIVE/test/mask/16_test_mask.gif" afterPath="$PROJECT_DIR$/data/DRIVE/test/mask/16_test_mask.gif" />
+      <change beforePath="$PROJECT_DIR$/data/DRIVE/test/mask/17_test_mask.gif" afterPath="$PROJECT_DIR$/data/DRIVE/test/mask/17_test_mask.gif" />
+      <change beforePath="$PROJECT_DIR$/data/DRIVE/test/mask/18_test_mask.gif" afterPath="$PROJECT_DIR$/data/DRIVE/test/mask/18_test_mask.gif" />
+      <change beforePath="$PROJECT_DIR$/data/DRIVE/test/mask/19_test_mask.gif" afterPath="$PROJECT_DIR$/data/DRIVE/test/mask/19_test_mask.gif" />
+      <change beforePath="$PROJECT_DIR$/data/DRIVE/test/mask/20_test_mask.gif" afterPath="$PROJECT_DIR$/data/DRIVE/test/mask/20_test_mask.gif" />
+      <change beforePath="$PROJECT_DIR$/data/DRIVE/test/mask_eroded/01_test_mask.gif" afterPath="$PROJECT_DIR$/data/DRIVE/test/mask_eroded/01_test_mask.gif" />
+      <change beforePath="$PROJECT_DIR$/data/DRIVE/test/mask_eroded/02_test_mask.gif" afterPath="$PROJECT_DIR$/data/DRIVE/test/mask_eroded/02_test_mask.gif" />
+      <change beforePath="$PROJECT_DIR$/data/DRIVE/test/mask_eroded/03_test_mask.gif" afterPath="$PROJECT_DIR$/data/DRIVE/test/mask_eroded/03_test_mask.gif" />
+      <change beforePath="$PROJECT_DIR$/data/DRIVE/test/mask_eroded/04_test_mask.gif" afterPath="$PROJECT_DIR$/data/DRIVE/test/mask_eroded/04_test_mask.gif" />
+      <change beforePath="$PROJECT_DIR$/data/DRIVE/test/mask_eroded/05_test_mask.gif" afterPath="$PROJECT_DIR$/data/DRIVE/test/mask_eroded/05_test_mask.gif" />
+      <change beforePath="$PROJECT_DIR$/data/DRIVE/test/mask_eroded/06_test_mask.gif" afterPath="$PROJECT_DIR$/data/DRIVE/test/mask_eroded/06_test_mask.gif" />
+      <change beforePath="$PROJECT_DIR$/data/DRIVE/test/mask_eroded/07_test_mask.gif" afterPath="$PROJECT_DIR$/data/DRIVE/test/mask_eroded/07_test_mask.gif" />
+      <change beforePath="$PROJECT_DIR$/data/DRIVE/test/mask_eroded/08_test_mask.gif" afterPath="$PROJECT_DIR$/data/DRIVE/test/mask_eroded/08_test_mask.gif" />
+      <change beforePath="$PROJECT_DIR$/data/DRIVE/test/mask_eroded/09_test_mask.gif" afterPath="$PROJECT_DIR$/data/DRIVE/test/mask_eroded/09_test_mask.gif" />
+      <change beforePath="$PROJECT_DIR$/data/DRIVE/test/mask_eroded/10_test_mask.gif" afterPath="$PROJECT_DIR$/data/DRIVE/test/mask_eroded/10_test_mask.gif" />
+      <change beforePath="$PROJECT_DIR$/data/DRIVE/test/mask_eroded/11_test_mask.gif" afterPath="$PROJECT_DIR$/data/DRIVE/test/mask_eroded/11_test_mask.gif" />
+      <change beforePath="$PROJECT_DIR$/data/DRIVE/test/mask_eroded/12_test_mask.gif" afterPath="$PROJECT_DIR$/data/DRIVE/test/mask_eroded/12_test_mask.gif" />
+      <change beforePath="$PROJECT_DIR$/data/DRIVE/test/mask_eroded/13_test_mask.gif" afterPath="$PROJECT_DIR$/data/DRIVE/test/mask_eroded/13_test_mask.gif" />
+      <change beforePath="$PROJECT_DIR$/data/DRIVE/test/mask_eroded/14_test_mask.gif" afterPath="$PROJECT_DIR$/data/DRIVE/test/mask_eroded/14_test_mask.gif" />
+      <change beforePath="$PROJECT_DIR$/data/DRIVE/test/mask_eroded/15_test_mask.gif" afterPath="$PROJECT_DIR$/data/DRIVE/test/mask_eroded/15_test_mask.gif" />
+      <change beforePath="$PROJECT_DIR$/data/DRIVE/test/mask_eroded/16_test_mask.gif" afterPath="$PROJECT_DIR$/data/DRIVE/test/mask_eroded/16_test_mask.gif" />
+      <change beforePath="$PROJECT_DIR$/data/DRIVE/test/mask_eroded/17_test_mask.gif" afterPath="$PROJECT_DIR$/data/DRIVE/test/mask_eroded/17_test_mask.gif" />
+      <change beforePath="$PROJECT_DIR$/data/DRIVE/test/mask_eroded/18_test_mask.gif" afterPath="$PROJECT_DIR$/data/DRIVE/test/mask_eroded/18_test_mask.gif" />
+      <change beforePath="$PROJECT_DIR$/data/DRIVE/test/mask_eroded/19_test_mask.gif" afterPath="$PROJECT_DIR$/data/DRIVE/test/mask_eroded/19_test_mask.gif" />
+      <change beforePath="$PROJECT_DIR$/data/DRIVE/test/mask_eroded/20_test_mask.gif" afterPath="$PROJECT_DIR$/data/DRIVE/test/mask_eroded/20_test_mask.gif" />
+      <change beforePath="$PROJECT_DIR$/data/DRIVE/test/mask_fixed/01_test_mask.gif" afterPath="$PROJECT_DIR$/data/DRIVE/test/mask_fixed/01_test_mask.gif" />
+      <change beforePath="$PROJECT_DIR$/data/DRIVE/test/mask_fixed/02_test_mask.gif" afterPath="$PROJECT_DIR$/data/DRIVE/test/mask_fixed/02_test_mask.gif" />
+      <change beforePath="$PROJECT_DIR$/data/DRIVE/test/mask_fixed/03_test_mask.gif" afterPath="$PROJECT_DIR$/data/DRIVE/test/mask_fixed/03_test_mask.gif" />
+      <change beforePath="$PROJECT_DIR$/data/DRIVE/test/mask_fixed/04_test_mask.gif" afterPath="$PROJECT_DIR$/data/DRIVE/test/mask_fixed/04_test_mask.gif" />
+      <change beforePath="$PROJECT_DIR$/data/DRIVE/test/mask_fixed/05_test_mask.gif" afterPath="$PROJECT_DIR$/data/DRIVE/test/mask_fixed/05_test_mask.gif" />
+      <change beforePath="$PROJECT_DIR$/data/DRIVE/test/mask_fixed/06_test_mask.gif" afterPath="$PROJECT_DIR$/data/DRIVE/test/mask_fixed/06_test_mask.gif" />
+      <change beforePath="$PROJECT_DIR$/data/DRIVE/test/mask_fixed/07_test_mask.gif" afterPath="$PROJECT_DIR$/data/DRIVE/test/mask_fixed/07_test_mask.gif" />
+      <change beforePath="$PROJECT_DIR$/data/DRIVE/test/mask_fixed/08_test_mask.gif" afterPath="$PROJECT_DIR$/data/DRIVE/test/mask_fixed/08_test_mask.gif" />
+      <change beforePath="$PROJECT_DIR$/data/DRIVE/test/mask_fixed/09_test_mask.gif" afterPath="$PROJECT_DIR$/data/DRIVE/test/mask_fixed/09_test_mask.gif" />
+      <change beforePath="$PROJECT_DIR$/data/DRIVE/test/mask_fixed/10_test_mask.gif" afterPath="$PROJECT_DIR$/data/DRIVE/test/mask_fixed/10_test_mask.gif" />
+      <change beforePath="$PROJECT_DIR$/data/DRIVE/test/mask_fixed/11_test_mask.gif" afterPath="$PROJECT_DIR$/data/DRIVE/test/mask_fixed/11_test_mask.gif" />
+      <change beforePath="$PROJECT_DIR$/data/DRIVE/test/mask_fixed/12_test_mask.gif" afterPath="$PROJECT_DIR$/data/DRIVE/test/mask_fixed/12_test_mask.gif" />
+      <change beforePath="$PROJECT_DIR$/data/DRIVE/test/mask_fixed/13_test_mask.gif" afterPath="$PROJECT_DIR$/data/DRIVE/test/mask_fixed/13_test_mask.gif" />
+      <change beforePath="$PROJECT_DIR$/data/DRIVE/test/mask_fixed/14_test_mask.gif" afterPath="$PROJECT_DIR$/data/DRIVE/test/mask_fixed/14_test_mask.gif" />
+      <change beforePath="$PROJECT_DIR$/data/DRIVE/test/mask_fixed/15_test_mask.gif" afterPath="$PROJECT_DIR$/data/DRIVE/test/mask_fixed/15_test_mask.gif" />
+      <change beforePath="$PROJECT_DIR$/data/DRIVE/test/mask_fixed/16_test_mask.gif" afterPath="$PROJECT_DIR$/data/DRIVE/test/mask_fixed/16_test_mask.gif" />
+      <change beforePath="$PROJECT_DIR$/data/DRIVE/test/mask_fixed/17_test_mask.gif" afterPath="$PROJECT_DIR$/data/DRIVE/test/mask_fixed/17_test_mask.gif" />
+      <change beforePath="$PROJECT_DIR$/data/DRIVE/test/mask_fixed/18_test_mask.gif" afterPath="$PROJECT_DIR$/data/DRIVE/test/mask_fixed/18_test_mask.gif" />
+      <change beforePath="$PROJECT_DIR$/data/DRIVE/test/mask_fixed/19_test_mask.gif" afterPath="$PROJECT_DIR$/data/DRIVE/test/mask_fixed/19_test_mask.gif" />
+      <change beforePath="$PROJECT_DIR$/data/DRIVE/test/mask_fixed/20_test_mask.gif" afterPath="$PROJECT_DIR$/data/DRIVE/test/mask_fixed/20_test_mask.gif" />
+      <change beforePath="$PROJECT_DIR$/data/DRIVE/training/1st_manual/21_manual1.gif" afterPath="$PROJECT_DIR$/data/DRIVE/training/1st_manual/21_manual1.gif" />
+      <change beforePath="$PROJECT_DIR$/data/DRIVE/training/1st_manual/22_manual1.gif" afterPath="$PROJECT_DIR$/data/DRIVE/training/1st_manual/22_manual1.gif" />
+      <change beforePath="$PROJECT_DIR$/data/DRIVE/training/1st_manual/23_manual1.gif" afterPath="$PROJECT_DIR$/data/DRIVE/training/1st_manual/23_manual1.gif" />
+      <change beforePath="$PROJECT_DIR$/data/DRIVE/training/1st_manual/24_manual1.gif" afterPath="$PROJECT_DIR$/data/DRIVE/training/1st_manual/24_manual1.gif" />
+      <change beforePath="$PROJECT_DIR$/data/DRIVE/training/1st_manual/25_manual1.gif" afterPath="$PROJECT_DIR$/data/DRIVE/training/1st_manual/25_manual1.gif" />
+      <change beforePath="$PROJECT_DIR$/data/DRIVE/training/1st_manual/26_manual1.gif" afterPath="$PROJECT_DIR$/data/DRIVE/training/1st_manual/26_manual1.gif" />
+      <change beforePath="$PROJECT_DIR$/data/DRIVE/training/1st_manual/27_manual1.gif" afterPath="$PROJECT_DIR$/data/DRIVE/training/1st_manual/27_manual1.gif" />
+      <change beforePath="$PROJECT_DIR$/data/DRIVE/training/1st_manual/28_manual1.gif" afterPath="$PROJECT_DIR$/data/DRIVE/training/1st_manual/28_manual1.gif" />
+      <change beforePath="$PROJECT_DIR$/data/DRIVE/training/1st_manual/29_manual1.gif" afterPath="$PROJECT_DIR$/data/DRIVE/training/1st_manual/29_manual1.gif" />
+      <change beforePath="$PROJECT_DIR$/data/DRIVE/training/1st_manual/30_manual1.gif" afterPath="$PROJECT_DIR$/data/DRIVE/training/1st_manual/30_manual1.gif" />
+      <change beforePath="$PROJECT_DIR$/data/DRIVE/training/1st_manual/31_manual1.gif" afterPath="$PROJECT_DIR$/data/DRIVE/training/1st_manual/31_manual1.gif" />
+      <change beforePath="$PROJECT_DIR$/data/DRIVE/training/1st_manual/32_manual1.gif" afterPath="$PROJECT_DIR$/data/DRIVE/training/1st_manual/32_manual1.gif" />
+      <change beforePath="$PROJECT_DIR$/data/DRIVE/training/1st_manual/33_manual1.gif" afterPath="$PROJECT_DIR$/data/DRIVE/training/1st_manual/33_manual1.gif" />
+      <change beforePath="$PROJECT_DIR$/data/DRIVE/training/1st_manual/34_manual1.gif" afterPath="$PROJECT_DIR$/data/DRIVE/training/1st_manual/34_manual1.gif" />
+      <change beforePath="$PROJECT_DIR$/data/DRIVE/training/1st_manual/35_manual1.gif" afterPath="$PROJECT_DIR$/data/DRIVE/training/1st_manual/35_manual1.gif" />
+      <change beforePath="$PROJECT_DIR$/data/DRIVE/training/1st_manual/36_manual1.gif" afterPath="$PROJECT_DIR$/data/DRIVE/training/1st_manual/36_manual1.gif" />
+      <change beforePath="$PROJECT_DIR$/data/DRIVE/training/1st_manual/37_manual1.gif" afterPath="$PROJECT_DIR$/data/DRIVE/training/1st_manual/37_manual1.gif" />
+      <change beforePath="$PROJECT_DIR$/data/DRIVE/training/1st_manual/38_manual1.gif" afterPath="$PROJECT_DIR$/data/DRIVE/training/1st_manual/38_manual1.gif" />
+      <change beforePath="$PROJECT_DIR$/data/DRIVE/training/1st_manual/39_manual1.gif" afterPath="$PROJECT_DIR$/data/DRIVE/training/1st_manual/39_manual1.gif" />
+      <change beforePath="$PROJECT_DIR$/data/DRIVE/training/1st_manual/40_manual1.gif" afterPath="$PROJECT_DIR$/data/DRIVE/training/1st_manual/40_manual1.gif" />
+      <change beforePath="$PROJECT_DIR$/data/DRIVE/training/1st_manual_bm/21_manual1.gif" afterPath="$PROJECT_DIR$/data/DRIVE/training/1st_manual_bm/21_manual1.gif" />
+      <change beforePath="$PROJECT_DIR$/data/DRIVE/training/1st_manual_bm/21_manual1_skel" afterPath="$PROJECT_DIR$/data/DRIVE/training/1st_manual_bm/21_manual1_skel" />
+      <change beforePath="$PROJECT_DIR$/data/DRIVE/training/1st_manual_bm/21_manual1_skel.bm" afterPath="$PROJECT_DIR$/data/DRIVE/training/1st_manual_bm/21_manual1_skel.bm" />
+      <change beforePath="$PROJECT_DIR$/data/DRIVE/training/1st_manual_bm/22_manual1.gif" afterPath="$PROJECT_DIR$/data/DRIVE/training/1st_manual_bm/22_manual1.gif" />
+      <change beforePath="$PROJECT_DIR$/data/DRIVE/training/1st_manual_bm/23_manual1.gif" afterPath="$PROJECT_DIR$/data/DRIVE/training/1st_manual_bm/23_manual1.gif" />
+      <change beforePath="$PROJECT_DIR$/data/DRIVE/training/1st_manual_bm/24_manual1.gif" afterPath="$PROJECT_DIR$/data/DRIVE/training/1st_manual_bm/24_manual1.gif" />
+      <change beforePath="$PROJECT_DIR$/data/DRIVE/training/1st_manual_bm/25_manual1.gif" afterPath="$PROJECT_DIR$/data/DRIVE/training/1st_manual_bm/25_manual1.gif" />
+      <change beforePath="$PROJECT_DIR$/data/DRIVE/training/1st_manual_bm/26_manual1.gif" afterPath="$PROJECT_DIR$/data/DRIVE/training/1st_manual_bm/26_manual1.gif" />
+      <change beforePath="$PROJECT_DIR$/data/DRIVE/training/1st_manual_bm/27_manual1.gif" afterPath="$PROJECT_DIR$/data/DRIVE/training/1st_manual_bm/27_manual1.gif" />
+      <change beforePath="$PROJECT_DIR$/data/DRIVE/training/1st_manual_bm/28_manual1.gif" afterPath="$PROJECT_DIR$/data/DRIVE/training/1st_manual_bm/28_manual1.gif" />
+      <change beforePath="$PROJECT_DIR$/data/DRIVE/training/1st_manual_bm/29_manual1.gif" afterPath="$PROJECT_DIR$/data/DRIVE/training/1st_manual_bm/29_manual1.gif" />
+      <change beforePath="$PROJECT_DIR$/data/DRIVE/training/1st_manual_bm/30_manual1.gif" afterPath="$PROJECT_DIR$/data/DRIVE/training/1st_manual_bm/30_manual1.gif" />
+      <change beforePath="$PROJECT_DIR$/data/DRIVE/training/1st_manual_bm/31_manual1.gif" afterPath="$PROJECT_DIR$/data/DRIVE/training/1st_manual_bm/31_manual1.gif" />
+      <change beforePath="$PROJECT_DIR$/data/DRIVE/training/1st_manual_bm/32_manual1.gif" afterPath="$PROJECT_DIR$/data/DRIVE/training/1st_manual_bm/32_manual1.gif" />
+      <change beforePath="$PROJECT_DIR$/data/DRIVE/training/1st_manual_bm/33_manual1.gif" afterPath="$PROJECT_DIR$/data/DRIVE/training/1st_manual_bm/33_manual1.gif" />
+      <change beforePath="$PROJECT_DIR$/data/DRIVE/training/1st_manual_bm/34_manual1.gif" afterPath="$PROJECT_DIR$/data/DRIVE/training/1st_manual_bm/34_manual1.gif" />
+      <change beforePath="$PROJECT_DIR$/data/DRIVE/training/1st_manual_bm/35_manual1.gif" afterPath="$PROJECT_DIR$/data/DRIVE/training/1st_manual_bm/35_manual1.gif" />
+      <change beforePath="$PROJECT_DIR$/data/DRIVE/training/1st_manual_bm/36_manual1.gif" afterPath="$PROJECT_DIR$/data/DRIVE/training/1st_manual_bm/36_manual1.gif" />
+      <change beforePath="$PROJECT_DIR$/data/DRIVE/training/1st_manual_bm/37_manual1.gif" afterPath="$PROJECT_DIR$/data/DRIVE/training/1st_manual_bm/37_manual1.gif" />
+      <change beforePath="$PROJECT_DIR$/data/DRIVE/training/1st_manual_bm/38_manual1.gif" afterPath="$PROJECT_DIR$/data/DRIVE/training/1st_manual_bm/38_manual1.gif" />
+      <change beforePath="$PROJECT_DIR$/data/DRIVE/training/1st_manual_bm/39_manual1.gif" afterPath="$PROJECT_DIR$/data/DRIVE/training/1st_manual_bm/39_manual1.gif" />
+      <change beforePath="$PROJECT_DIR$/data/DRIVE/training/1st_manual_bm/40_manual1.gif" afterPath="$PROJECT_DIR$/data/DRIVE/training/1st_manual_bm/40_manual1.gif" />
+      <change beforePath="$PROJECT_DIR$/data/DRIVE/training/images/21_training.tif" afterPath="$PROJECT_DIR$/data/DRIVE/training/images/21_training.tif" />
+      <change beforePath="$PROJECT_DIR$/data/DRIVE/training/images/22_training.tif" afterPath="$PROJECT_DIR$/data/DRIVE/training/images/22_training.tif" />
+      <change beforePath="$PROJECT_DIR$/data/DRIVE/training/images/23_training.tif" afterPath="$PROJECT_DIR$/data/DRIVE/training/images/23_training.tif" />
+      <change beforePath="$PROJECT_DIR$/data/DRIVE/training/images/24_training.tif" afterPath="$PROJECT_DIR$/data/DRIVE/training/images/24_training.tif" />
+      <change beforePath="$PROJECT_DIR$/data/DRIVE/training/images/25_training.tif" afterPath="$PROJECT_DIR$/data/DRIVE/training/images/25_training.tif" />
+      <change beforePath="$PROJECT_DIR$/data/DRIVE/training/images/26_training.tif" afterPath="$PROJECT_DIR$/data/DRIVE/training/images/26_training.tif" />
+      <change beforePath="$PROJECT_DIR$/data/DRIVE/training/images/27_training.tif" afterPath="$PROJECT_DIR$/data/DRIVE/training/images/27_training.tif" />
+      <change beforePath="$PROJECT_DIR$/data/DRIVE/training/images/28_training.tif" afterPath="$PROJECT_DIR$/data/DRIVE/training/images/28_training.tif" />
+      <change beforePath="$PROJECT_DIR$/data/DRIVE/training/images/29_training.tif" afterPath="$PROJECT_DIR$/data/DRIVE/training/images/29_training.tif" />
+      <change beforePath="$PROJECT_DIR$/data/DRIVE/training/images/30_training.tif" afterPath="$PROJECT_DIR$/data/DRIVE/training/images/30_training.tif" />
+      <change beforePath="$PROJECT_DIR$/data/DRIVE/training/images/31_training.tif" afterPath="$PROJECT_DIR$/data/DRIVE/training/images/31_training.tif" />
+      <change beforePath="$PROJECT_DIR$/data/DRIVE/training/images/32_training.tif" afterPath="$PROJECT_DIR$/data/DRIVE/training/images/32_training.tif" />
+      <change beforePath="$PROJECT_DIR$/data/DRIVE/training/images/33_training.tif" afterPath="$PROJECT_DIR$/data/DRIVE/training/images/33_training.tif" />
+      <change beforePath="$PROJECT_DIR$/data/DRIVE/training/images/34_training.tif" afterPath="$PROJECT_DIR$/data/DRIVE/training/images/34_training.tif" />
+      <change beforePath="$PROJECT_DIR$/data/DRIVE/training/images/35_training.tif" afterPath="$PROJECT_DIR$/data/DRIVE/training/images/35_training.tif" />
+      <change beforePath="$PROJECT_DIR$/data/DRIVE/training/images/36_training.tif" afterPath="$PROJECT_DIR$/data/DRIVE/training/images/36_training.tif" />
+      <change beforePath="$PROJECT_DIR$/data/DRIVE/training/images/37_training.tif" afterPath="$PROJECT_DIR$/data/DRIVE/training/images/37_training.tif" />
+      <change beforePath="$PROJECT_DIR$/data/DRIVE/training/images/38_training.tif" afterPath="$PROJECT_DIR$/data/DRIVE/training/images/38_training.tif" />
+      <change beforePath="$PROJECT_DIR$/data/DRIVE/training/images/39_training.tif" afterPath="$PROJECT_DIR$/data/DRIVE/training/images/39_training.tif" />
+      <change beforePath="$PROJECT_DIR$/data/DRIVE/training/images/40_training.tif" afterPath="$PROJECT_DIR$/data/DRIVE/training/images/40_training.tif" />
+      <change beforePath="$PROJECT_DIR$/data/DRIVE/training/mask/21_training_mask.gif" afterPath="$PROJECT_DIR$/data/DRIVE/training/mask/21_training_mask.gif" />
+      <change beforePath="$PROJECT_DIR$/data/DRIVE/training/mask/22_training_mask.gif" afterPath="$PROJECT_DIR$/data/DRIVE/training/mask/22_training_mask.gif" />
+      <change beforePath="$PROJECT_DIR$/data/DRIVE/training/mask/23_training_mask.gif" afterPath="$PROJECT_DIR$/data/DRIVE/training/mask/23_training_mask.gif" />
+      <change beforePath="$PROJECT_DIR$/data/DRIVE/training/mask/24_training_mask.gif" afterPath="$PROJECT_DIR$/data/DRIVE/training/mask/24_training_mask.gif" />
+      <change beforePath="$PROJECT_DIR$/data/DRIVE/training/mask/25_training_mask.gif" afterPath="$PROJECT_DIR$/data/DRIVE/training/mask/25_training_mask.gif" />
+      <change beforePath="$PROJECT_DIR$/data/DRIVE/training/mask/26_training_mask.gif" afterPath="$PROJECT_DIR$/data/DRIVE/training/mask/26_training_mask.gif" />
+      <change beforePath="$PROJECT_DIR$/data/DRIVE/training/mask/27_training_mask.gif" afterPath="$PROJECT_DIR$/data/DRIVE/training/mask/27_training_mask.gif" />
+      <change beforePath="$PROJECT_DIR$/data/DRIVE/training/mask/28_training_mask.gif" afterPath="$PROJECT_DIR$/data/DRIVE/training/mask/28_training_mask.gif" />
+      <change beforePath="$PROJECT_DIR$/data/DRIVE/training/mask/29_training_mask.gif" afterPath="$PROJECT_DIR$/data/DRIVE/training/mask/29_training_mask.gif" />
+      <change beforePath="$PROJECT_DIR$/data/DRIVE/training/mask/30_training_mask.gif" afterPath="$PROJECT_DIR$/data/DRIVE/training/mask/30_training_mask.gif" />
+      <change beforePath="$PROJECT_DIR$/data/DRIVE/training/mask/31_training_mask.gif" afterPath="$PROJECT_DIR$/data/DRIVE/training/mask/31_training_mask.gif" />
+      <change beforePath="$PROJECT_DIR$/data/DRIVE/training/mask/32_training_mask.gif" afterPath="$PROJECT_DIR$/data/DRIVE/training/mask/32_training_mask.gif" />
+      <change beforePath="$PROJECT_DIR$/data/DRIVE/training/mask/33_training_mask.gif" afterPath="$PROJECT_DIR$/data/DRIVE/training/mask/33_training_mask.gif" />
+      <change beforePath="$PROJECT_DIR$/data/DRIVE/training/mask/34_training_mask.gif" afterPath="$PROJECT_DIR$/data/DRIVE/training/mask/34_training_mask.gif" />
+      <change beforePath="$PROJECT_DIR$/data/DRIVE/training/mask/35_training_mask.gif" afterPath="$PROJECT_DIR$/data/DRIVE/training/mask/35_training_mask.gif" />
+      <change beforePath="$PROJECT_DIR$/data/DRIVE/training/mask/36_training_mask.gif" afterPath="$PROJECT_DIR$/data/DRIVE/training/mask/36_training_mask.gif" />
+      <change beforePath="$PROJECT_DIR$/data/DRIVE/training/mask/37_training_mask.gif" afterPath="$PROJECT_DIR$/data/DRIVE/training/mask/37_training_mask.gif" />
+      <change beforePath="$PROJECT_DIR$/data/DRIVE/training/mask/38_training_mask.gif" afterPath="$PROJECT_DIR$/data/DRIVE/training/mask/38_training_mask.gif" />
+      <change beforePath="$PROJECT_DIR$/data/DRIVE/training/mask/39_training_mask.gif" afterPath="$PROJECT_DIR$/data/DRIVE/training/mask/39_training_mask.gif" />
+      <change beforePath="$PROJECT_DIR$/data/DRIVE/training/mask/40_training_mask.gif" afterPath="$PROJECT_DIR$/data/DRIVE/training/mask/40_training_mask.gif" />
+      <change beforePath="$PROJECT_DIR$/data/DRIVE/training/mask_eroded/21_training_mask.gif" afterPath="$PROJECT_DIR$/data/DRIVE/training/mask_eroded/21_training_mask.gif" />
+      <change beforePath="$PROJECT_DIR$/data/DRIVE/training/mask_eroded/22_training_mask.gif" afterPath="$PROJECT_DIR$/data/DRIVE/training/mask_eroded/22_training_mask.gif" />
+      <change beforePath="$PROJECT_DIR$/data/DRIVE/training/mask_eroded/23_training_mask.gif" afterPath="$PROJECT_DIR$/data/DRIVE/training/mask_eroded/23_training_mask.gif" />
+      <change beforePath="$PROJECT_DIR$/data/DRIVE/training/mask_eroded/24_training_mask.gif" afterPath="$PROJECT_DIR$/data/DRIVE/training/mask_eroded/24_training_mask.gif" />
+      <change beforePath="$PROJECT_DIR$/data/DRIVE/training/mask_eroded/25_training_mask.gif" afterPath="$PROJECT_DIR$/data/DRIVE/training/mask_eroded/25_training_mask.gif" />
+      <change beforePath="$PROJECT_DIR$/data/DRIVE/training/mask_eroded/26_training_mask.gif" afterPath="$PROJECT_DIR$/data/DRIVE/training/mask_eroded/26_training_mask.gif" />
+      <change beforePath="$PROJECT_DIR$/data/DRIVE/training/mask_eroded/27_training_mask.gif" afterPath="$PROJECT_DIR$/data/DRIVE/training/mask_eroded/27_training_mask.gif" />
+      <change beforePath="$PROJECT_DIR$/data/DRIVE/training/mask_eroded/28_training_mask.gif" afterPath="$PROJECT_DIR$/data/DRIVE/training/mask_eroded/28_training_mask.gif" />
+      <change beforePath="$PROJECT_DIR$/data/DRIVE/training/mask_eroded/29_training_mask.gif" afterPath="$PROJECT_DIR$/data/DRIVE/training/mask_eroded/29_training_mask.gif" />
+      <change beforePath="$PROJECT_DIR$/data/DRIVE/training/mask_eroded/30_training_mask.gif" afterPath="$PROJECT_DIR$/data/DRIVE/training/mask_eroded/30_training_mask.gif" />
+      <change beforePath="$PROJECT_DIR$/data/DRIVE/training/mask_eroded/31_training_mask.gif" afterPath="$PROJECT_DIR$/data/DRIVE/training/mask_eroded/31_training_mask.gif" />
+      <change beforePath="$PROJECT_DIR$/data/DRIVE/training/mask_eroded/32_training_mask.gif" afterPath="$PROJECT_DIR$/data/DRIVE/training/mask_eroded/32_training_mask.gif" />
+      <change beforePath="$PROJECT_DIR$/data/DRIVE/training/mask_eroded/33_training_mask.gif" afterPath="$PROJECT_DIR$/data/DRIVE/training/mask_eroded/33_training_mask.gif" />
+      <change beforePath="$PROJECT_DIR$/data/DRIVE/training/mask_eroded/34_training_mask.gif" afterPath="$PROJECT_DIR$/data/DRIVE/training/mask_eroded/34_training_mask.gif" />
+      <change beforePath="$PROJECT_DIR$/data/DRIVE/training/mask_eroded/35_training_mask.gif" afterPath="$PROJECT_DIR$/data/DRIVE/training/mask_eroded/35_training_mask.gif" />
+      <change beforePath="$PROJECT_DIR$/data/DRIVE/training/mask_eroded/36_training_mask.gif" afterPath="$PROJECT_DIR$/data/DRIVE/training/mask_eroded/36_training_mask.gif" />
+      <change beforePath="$PROJECT_DIR$/data/DRIVE/training/mask_eroded/37_training_mask.gif" afterPath="$PROJECT_DIR$/data/DRIVE/training/mask_eroded/37_training_mask.gif" />
+      <change beforePath="$PROJECT_DIR$/data/DRIVE/training/mask_eroded/38_training_mask.gif" afterPath="$PROJECT_DIR$/data/DRIVE/training/mask_eroded/38_training_mask.gif" />
+      <change beforePath="$PROJECT_DIR$/data/DRIVE/training/mask_eroded/39_training_mask.gif" afterPath="$PROJECT_DIR$/data/DRIVE/training/mask_eroded/39_training_mask.gif" />
+      <change beforePath="$PROJECT_DIR$/data/DRIVE/training/mask_eroded/40_training_mask.gif" afterPath="$PROJECT_DIR$/data/DRIVE/training/mask_eroded/40_training_mask.gif" />
+      <change beforePath="$PROJECT_DIR$/data/DRIVE/training/mask_fixed/21_training_mask.gif" afterPath="$PROJECT_DIR$/data/DRIVE/training/mask_fixed/21_training_mask.gif" />
+      <change beforePath="$PROJECT_DIR$/data/DRIVE/training/mask_fixed/22_training_mask.gif" afterPath="$PROJECT_DIR$/data/DRIVE/training/mask_fixed/22_training_mask.gif" />
+      <change beforePath="$PROJECT_DIR$/data/DRIVE/training/mask_fixed/23_training_mask.gif" afterPath="$PROJECT_DIR$/data/DRIVE/training/mask_fixed/23_training_mask.gif" />
+      <change beforePath="$PROJECT_DIR$/data/DRIVE/training/mask_fixed/24_training_mask.gif" afterPath="$PROJECT_DIR$/data/DRIVE/training/mask_fixed/24_training_mask.gif" />
+      <change beforePath="$PROJECT_DIR$/data/DRIVE/training/mask_fixed/25_training_mask.gif" afterPath="$PROJECT_DIR$/data/DRIVE/training/mask_fixed/25_training_mask.gif" />
+      <change beforePath="$PROJECT_DIR$/data/DRIVE/training/mask_fixed/26_training_mask.gif" afterPath="$PROJECT_DIR$/data/DRIVE/training/mask_fixed/26_training_mask.gif" />
+      <change beforePath="$PROJECT_DIR$/data/DRIVE/training/mask_fixed/27_training_mask.gif" afterPath="$PROJECT_DIR$/data/DRIVE/training/mask_fixed/27_training_mask.gif" />
+      <change beforePath="$PROJECT_DIR$/data/DRIVE/training/mask_fixed/28_training_mask.gif" afterPath="$PROJECT_DIR$/data/DRIVE/training/mask_fixed/28_training_mask.gif" />
+      <change beforePath="$PROJECT_DIR$/data/DRIVE/training/mask_fixed/29_training_mask.gif" afterPath="$PROJECT_DIR$/data/DRIVE/training/mask_fixed/29_training_mask.gif" />
+      <change beforePath="$PROJECT_DIR$/data/DRIVE/training/mask_fixed/30_training_mask.gif" afterPath="$PROJECT_DIR$/data/DRIVE/training/mask_fixed/30_training_mask.gif" />
+      <change beforePath="$PROJECT_DIR$/data/DRIVE/training/mask_fixed/31_training_mask.gif" afterPath="$PROJECT_DIR$/data/DRIVE/training/mask_fixed/31_training_mask.gif" />
+      <change beforePath="$PROJECT_DIR$/data/DRIVE/training/mask_fixed/32_training_mask.gif" afterPath="$PROJECT_DIR$/data/DRIVE/training/mask_fixed/32_training_mask.gif" />
+      <change beforePath="$PROJECT_DIR$/data/DRIVE/training/mask_fixed/33_training_mask.gif" afterPath="$PROJECT_DIR$/data/DRIVE/training/mask_fixed/33_training_mask.gif" />
+      <change beforePath="$PROJECT_DIR$/data/DRIVE/training/mask_fixed/34_training_mask.gif" afterPath="$PROJECT_DIR$/data/DRIVE/training/mask_fixed/34_training_mask.gif" />
+      <change beforePath="$PROJECT_DIR$/data/DRIVE/training/mask_fixed/35_training_mask.gif" afterPath="$PROJECT_DIR$/data/DRIVE/training/mask_fixed/35_training_mask.gif" />
+      <change beforePath="$PROJECT_DIR$/data/DRIVE/training/mask_fixed/36_training_mask.gif" afterPath="$PROJECT_DIR$/data/DRIVE/training/mask_fixed/36_training_mask.gif" />
+      <change beforePath="$PROJECT_DIR$/data/DRIVE/training/mask_fixed/37_training_mask.gif" afterPath="$PROJECT_DIR$/data/DRIVE/training/mask_fixed/37_training_mask.gif" />
+      <change beforePath="$PROJECT_DIR$/data/DRIVE/training/mask_fixed/38_training_mask.gif" afterPath="$PROJECT_DIR$/data/DRIVE/training/mask_fixed/38_training_mask.gif" />
+      <change beforePath="$PROJECT_DIR$/data/DRIVE/training/mask_fixed/39_training_mask.gif" afterPath="$PROJECT_DIR$/data/DRIVE/training/mask_fixed/39_training_mask.gif" />
+      <change beforePath="$PROJECT_DIR$/data/DRIVE/training/mask_fixed/40_training_mask.gif" afterPath="$PROJECT_DIR$/data/DRIVE/training/mask_fixed/40_training_mask.gif" />
+      <change beforePath="$PROJECT_DIR$/data/av_wide_data_set/wide_image_01.mat" afterPath="$PROJECT_DIR$/data/av_wide_data_set/wide_image_01.mat" />
+      <change beforePath="$PROJECT_DIR$/data/av_wide_data_set/wide_image_02.mat" afterPath="$PROJECT_DIR$/data/av_wide_data_set/wide_image_02.mat" />
+      <change beforePath="$PROJECT_DIR$/data/av_wide_data_set/wide_image_03.mat" afterPath="$PROJECT_DIR$/data/av_wide_data_set/wide_image_03.mat" />
+      <change beforePath="$PROJECT_DIR$/data/av_wide_data_set/wide_image_04.mat" afterPath="$PROJECT_DIR$/data/av_wide_data_set/wide_image_04.mat" />
+      <change beforePath="$PROJECT_DIR$/data/av_wide_data_set/wide_image_05.mat" afterPath="$PROJECT_DIR$/data/av_wide_data_set/wide_image_05.mat" />
+      <change beforePath="$PROJECT_DIR$/data/av_wide_data_set/wide_image_06.mat" afterPath="$PROJECT_DIR$/data/av_wide_data_set/wide_image_06.mat" />
+      <change beforePath="$PROJECT_DIR$/data/av_wide_data_set/wide_image_07.mat" afterPath="$PROJECT_DIR$/data/av_wide_data_set/wide_image_07.mat" />
+      <change beforePath="$PROJECT_DIR$/data/av_wide_data_set/wide_image_08.mat" afterPath="$PROJECT_DIR$/data/av_wide_data_set/wide_image_08.mat" />
+      <change beforePath="$PROJECT_DIR$/data/av_wide_data_set/wide_image_09.mat" afterPath="$PROJECT_DIR$/data/av_wide_data_set/wide_image_09.mat" />
+      <change beforePath="$PROJECT_DIR$/data/av_wide_data_set/wide_image_10.mat" afterPath="$PROJECT_DIR$/data/av_wide_data_set/wide_image_10.mat" />
+      <change beforePath="$PROJECT_DIR$/data/av_wide_data_set/wide_image_11.mat" afterPath="$PROJECT_DIR$/data/av_wide_data_set/wide_image_11.mat" />
+      <change beforePath="$PROJECT_DIR$/data/av_wide_data_set/wide_image_12.mat" afterPath="$PROJECT_DIR$/data/av_wide_data_set/wide_image_12.mat" />
+      <change beforePath="$PROJECT_DIR$/data/av_wide_data_set/wide_image_13.mat" afterPath="$PROJECT_DIR$/data/av_wide_data_set/wide_image_13.mat" />
+      <change beforePath="$PROJECT_DIR$/data/av_wide_data_set/wide_image_14.mat" afterPath="$PROJECT_DIR$/data/av_wide_data_set/wide_image_14.mat" />
+      <change beforePath="$PROJECT_DIR$/data/av_wide_data_set/wide_image_15.mat" afterPath="$PROJECT_DIR$/data/av_wide_data_set/wide_image_15.mat" />
+      <change beforePath="$PROJECT_DIR$/data/av_wide_data_set/wide_image_16.mat" afterPath="$PROJECT_DIR$/data/av_wide_data_set/wide_image_16.mat" />
+      <change beforePath="$PROJECT_DIR$/data/av_wide_data_set/wide_image_17.mat" afterPath="$PROJECT_DIR$/data/av_wide_data_set/wide_image_17.mat" />
+      <change beforePath="$PROJECT_DIR$/data/av_wide_data_set/wide_image_18.mat" afterPath="$PROJECT_DIR$/data/av_wide_data_set/wide_image_18.mat" />
+      <change beforePath="$PROJECT_DIR$/data/av_wide_data_set/wide_image_19.mat" afterPath="$PROJECT_DIR$/data/av_wide_data_set/wide_image_19.mat" />
+      <change beforePath="$PROJECT_DIR$/data/av_wide_data_set/wide_image_20.mat" afterPath="$PROJECT_DIR$/data/av_wide_data_set/wide_image_20.mat" />
+      <change beforePath="$PROJECT_DIR$/data/av_wide_data_set/wide_image_21.mat" afterPath="$PROJECT_DIR$/data/av_wide_data_set/wide_image_21.mat" />
+      <change beforePath="$PROJECT_DIR$/data/av_wide_data_set/wide_image_22.mat" afterPath="$PROJECT_DIR$/data/av_wide_data_set/wide_image_22.mat" />
+      <change beforePath="$PROJECT_DIR$/data/av_wide_data_set/wide_image_23.mat" afterPath="$PROJECT_DIR$/data/av_wide_data_set/wide_image_23.mat" />
+      <change beforePath="$PROJECT_DIR$/data/av_wide_data_set/wide_image_24.mat" afterPath="$PROJECT_DIR$/data/av_wide_data_set/wide_image_24.mat" />
+      <change beforePath="$PROJECT_DIR$/data/av_wide_data_set/wide_image_25.mat" afterPath="$PROJECT_DIR$/data/av_wide_data_set/wide_image_25.mat" />
+      <change beforePath="$PROJECT_DIR$/data/av_wide_data_set/wide_image_26.mat" afterPath="$PROJECT_DIR$/data/av_wide_data_set/wide_image_26.mat" />
+      <change beforePath="$PROJECT_DIR$/data/av_wide_data_set/wide_image_27.mat" afterPath="$PROJECT_DIR$/data/av_wide_data_set/wide_image_27.mat" />
+      <change beforePath="$PROJECT_DIR$/data/av_wide_data_set/wide_image_28.mat" afterPath="$PROJECT_DIR$/data/av_wide_data_set/wide_image_28.mat" />
+      <change beforePath="$PROJECT_DIR$/data/av_wide_data_set/wide_image_29.mat" afterPath="$PROJECT_DIR$/data/av_wide_data_set/wide_image_29.mat" />
+      <change beforePath="$PROJECT_DIR$/data/av_wide_data_set/wide_image_30.mat" afterPath="$PROJECT_DIR$/data/av_wide_data_set/wide_image_30.mat" />
+      <change beforePath="$PROJECT_DIR$/deploy.py" afterPath="$PROJECT_DIR$/deploy.py" />
+      <change beforePath="$PROJECT_DIR$/main.py" afterPath="$PROJECT_DIR$/main.py" />
+      <change beforePath="$PROJECT_DIR$/notebook/.ipynb_checkpoints/ATURE-checkpoint.ipynb" afterPath="$PROJECT_DIR$/notebook/.ipynb_checkpoints/ATURE-checkpoint.ipynb" />
+      <change beforePath="$PROJECT_DIR$/notebook/ATURE-WIDE.ipynb" afterPath="$PROJECT_DIR$/notebook/ATURE-WIDE.ipynb" />
+      <change beforePath="$PROJECT_DIR$/notebook/ATURE.ipynb" afterPath="$PROJECT_DIR$/notebook/ATURE.ipynb" />
+      <change beforePath="$PROJECT_DIR$/notebook/av_gabor.ipynb" afterPath="$PROJECT_DIR$/notebook/av_gabor.ipynb" />
+      <change beforePath="$PROJECT_DIR$/notebook/slides/Guided MST for vessel segmentation.docx" afterPath="$PROJECT_DIR$/notebook/slides/Guided MST for vessel segmentation.docx" />
+      <change beforePath="$PROJECT_DIR$/notebook/slides/Guided MST for vessle segmentation.pptx" afterPath="$PROJECT_DIR$/notebook/slides/Guided MST for vessle segmentation.pptx" />
+      <change beforePath="$PROJECT_DIR$/path_config.py" afterPath="$PROJECT_DIR$/path_config.py" />
+      <change beforePath="$PROJECT_DIR$/preprocess/__init__.py" afterPath="$PROJECT_DIR$/preprocess/__init__.py" />
+      <change beforePath="$PROJECT_DIR$/preprocess/algorithms/__init__.py" afterPath="$PROJECT_DIR$/preprocess/algorithms/__init__.py" />
+      <change beforePath="$PROJECT_DIR$/preprocess/algorithms/ature_mst.py" afterPath="$PROJECT_DIR$/preprocess/algorithms/ature_mst.py" />
+      <change beforePath="$PROJECT_DIR$/preprocess/algorithms/fast_mst.py" afterPath="$PROJECT_DIR$/preprocess/algorithms/fast_mst.py" />
+      <change beforePath="$PROJECT_DIR$/preprocess/algorithms/mst_sparks.py" afterPath="$PROJECT_DIR$/preprocess/algorithms/mst_sparks.py" />
+      <change beforePath="$PROJECT_DIR$/preprocess/algorithms/rje_mst.py" afterPath="$PROJECT_DIR$/preprocess/algorithms/rje_mst.py" />
+      <change beforePath="$PROJECT_DIR$/preprocess/script_02_av_gabor_rje.py" afterPath="$PROJECT_DIR$/preprocess/script_02_av_gabor_rje.py" />
+      <change beforePath="$PROJECT_DIR$/preprocess/script_03_drive_masks.py" afterPath="$PROJECT_DIR$/preprocess/script_03_drive_masks.py" />
+      <change beforePath="$PROJECT_DIR$/preprocess/utils/__init__.py" afterPath="$PROJECT_DIR$/preprocess/utils/__init__.py" />
+      <change beforePath="$PROJECT_DIR$/preprocess/utils/av_utils.py" afterPath="$PROJECT_DIR$/preprocess/utils/av_utils.py" />
+      <change beforePath="$PROJECT_DIR$/preprocess/utils/graph_utils.py" afterPath="$PROJECT_DIR$/preprocess/utils/graph_utils.py" />
+      <change beforePath="$PROJECT_DIR$/preprocess/utils/img_utils.py" afterPath="$PROJECT_DIR$/preprocess/utils/img_utils.py" />
+      <change beforePath="$PROJECT_DIR$/testing/Runner.py" afterPath="$PROJECT_DIR$/testing/Runner.py" />
+      <change beforePath="$PROJECT_DIR$/testing/segmentation_test.py" afterPath="$PROJECT_DIR$/testing/segmentation_test.py" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="TRACKING_ENABLED" value="true" />
@@ -15,13 +357,13 @@
     <option name="LAST_RESOLUTION" value="IGNORE" />
   </component>
   <component name="CoverageDataManager">
-    <SUITE FILE_PATH="coverage/ature$Runner.coverage" NAME="Runner Coverage Results" MODIFIED="1518121148906" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/testing" />
-    <SUITE FILE_PATH="coverage/ature$image_filters.coverage" NAME="image_filters Coverage Results" MODIFIED="1509074112689" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/preprocess/filter" />
-    <SUITE FILE_PATH="coverage/ature$test_file_restrada.coverage" NAME="test_file_restrada Coverage Results" MODIFIED="1509238861470" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
-    <SUITE FILE_PATH="coverage/ature$ature.coverage" NAME="ature Coverage Results" MODIFIED="1508375790766" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="" />
-    <SUITE FILE_PATH="coverage/ature$segmentation_test.coverage" NAME="segmentation_test Coverage Results" MODIFIED="1518121123131" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/testing" />
     <SUITE FILE_PATH="coverage/ature$image_graph.coverage" NAME="image_graph Coverage Results" MODIFIED="1509755729267" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/preprocess/graph" />
+    <SUITE FILE_PATH="coverage/ature$image_filters.coverage" NAME="image_filters Coverage Results" MODIFIED="1509074112689" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/preprocess/filter" />
+    <SUITE FILE_PATH="coverage/ature$ature.coverage" NAME="ature Coverage Results" MODIFIED="1508375790766" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="" />
+    <SUITE FILE_PATH="coverage/ature$test_file_restrada.coverage" NAME="test_file_restrada Coverage Results" MODIFIED="1509238861470" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
     <SUITE FILE_PATH="coverage/ature$main.coverage" NAME="main Coverage Results" MODIFIED="1509809170112" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
+    <SUITE FILE_PATH="coverage/ature$Runner.coverage" NAME="Runner Coverage Results" MODIFIED="1518121148906" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/testing" />
+    <SUITE FILE_PATH="coverage/ature$segmentation_test.coverage" NAME="segmentation_test Coverage Results" MODIFIED="1518121123131" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/testing" />
   </component>
   <component name="FileEditorManager">
     <leaf SIDE_TABS_SIZE_LIMIT_KEY="300">
@@ -35,34 +377,11 @@
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="segmentation_test.py" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/testing/segmentation_test.py">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="4363">
-              <caret line="250" column="50" lean-forward="false" selection-start-line="250" selection-start-column="50" selection-end-line="250" selection-end-column="50" />
-              <folding>
-                <element signature="e#0#9#0" expanded="true" />
-                <marker date="1518096837382" expanded="true" signature="308:9835" ph="..." />
-              </folding>
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="Runner.py" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/testing/Runner.py">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="198">
-              <caret line="11" column="12" lean-forward="true" selection-start-line="11" selection-start-column="12" selection-end-line="11" selection-end-column="12" />
-              <folding />
-            </state>
-          </provider>
-        </entry>
-      </file>
       <file leaf-file-name=".gitignore" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/.gitignore">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="216">
-              <caret line="12" column="10" lean-forward="true" selection-start-line="12" selection-start-column="10" selection-end-line="12" selection-end-column="10" />
+            <state relative-caret-position="306">
+              <caret line="17" column="30" lean-forward="true" selection-start-line="17" selection-start-column="30" selection-end-line="17" selection-end-column="30" />
               <folding />
             </state>
           </provider>
@@ -87,11 +406,33 @@
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="path_config.py" pinned="false" current-in-tab="true">
+      <file leaf-file-name="path_config.py" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/path_config.py">
           <provider selected="true" editor-type-id="text-editor">
             <state relative-caret-position="270">
               <caret line="15" column="12" lean-forward="false" selection-start-line="15" selection-start-column="12" selection-end-line="15" selection-end-column="12" />
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="Runner.py" pinned="false" current-in-tab="true">
+        <entry file="file://$PROJECT_DIR$/testing/Runner.py">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="473">
+              <caret line="69" column="30" lean-forward="true" selection-start-line="69" selection-start-column="30" selection-end-line="69" selection-end-column="30" />
+              <folding>
+                <element signature="e#49#58#0" expanded="true" />
+              </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="segmentation_test.py" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/testing/segmentation_test.py">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="388">
+              <caret line="192" column="14" lean-forward="true" selection-start-line="192" selection-start-column="14" selection-end-line="192" selection-end-column="14" />
               <folding />
             </state>
           </provider>
@@ -134,6 +475,7 @@
         <option value="$PROJECT_DIR$/path_config.py" />
         <option value="$PROJECT_DIR$/commons/IMAGE.py" />
         <option value="$PROJECT_DIR$/.gitignore" />
+        <option value="$PROJECT_DIR$/testing/Runner.py" />
       </list>
     </option>
   </component>
@@ -164,6 +506,8 @@
       <foldersAlwaysOnTop value="true" />
     </navigator>
     <panes>
+      <pane id="Scope" />
+      <pane id="Scratches" />
       <pane id="ProjectPane">
         <subPane>
           <expand>
@@ -185,8 +529,6 @@
           <select />
         </subPane>
       </pane>
-      <pane id="Scope" />
-      <pane id="Scratches" />
     </panes>
   </component>
   <component name="PropertiesComponent">
@@ -197,15 +539,16 @@
     <property name="SearchEverywhereHistoryKey" value="conc&#9;ACTION&#9;ActivateConcurrentActivitiesDiagramToolWindow&#10;con&#9;ACTION&#9;ConcurrencyExecutor&#10;concu&#9;ACTION&#9;ActivateConcurrentActivitiesDiagramToolWindow&#10;runn&#9;ACTION&#9;ShowLiveRunConfigurations" />
   </component>
   <component name="RecentsManager">
-    <key name="CopyFile.RECENT_KEYS">
-      <recent name="D:\idea projects\pycharm projects\ature\notebook" />
-    </key>
     <key name="MoveFile.RECENT_KEYS">
       <recent name="C:\Projects\ature\preprocess" />
       <recent name="D:\idea projects\pycharm projects\ature\out" />
       <recent name="D:\idea projects\pycharm projects\ature\preprocess\av" />
       <recent name="D:\idea projects\pycharm projects\ature\commons" />
       <recent name="D:\idea projects\pycharm projects\ature\preprocess\" />
+    </key>
+    <key name="CopyFile.RECENT_KEYS">
+      <recent name="$PROJECT_DIR$/testing" />
+      <recent name="D:\idea projects\pycharm projects\ature\notebook" />
     </key>
   </component>
   <component name="RunDashboard">
@@ -238,6 +581,7 @@
       <option name="PARAMETERS" value="" />
       <option name="SHOW_COMMAND_LINE" value="false" />
       <option name="EMULATE_TERMINAL" value="false" />
+      <option name="MODULE_MODE" value="false" />
     </configuration>
     <configuration name="ature" type="PythonConfigurationType" factoryName="Python" singleton="true">
       <option name="INTERPRETER_OPTIONS" value="" />
@@ -256,6 +600,7 @@
       <option name="PARAMETERS" value="" />
       <option name="SHOW_COMMAND_LINE" value="false" />
       <option name="EMULATE_TERMINAL" value="false" />
+      <option name="MODULE_MODE" value="false" />
     </configuration>
     <configuration name="image_graph" type="PythonConfigurationType" factoryName="Python" temporary="true">
       <option name="INTERPRETER_OPTIONS" value="" />
@@ -274,6 +619,7 @@
       <option name="PARAMETERS" value="" />
       <option name="SHOW_COMMAND_LINE" value="false" />
       <option name="EMULATE_TERMINAL" value="false" />
+      <option name="MODULE_MODE" value="false" />
     </configuration>
     <configuration name="main" type="PythonConfigurationType" factoryName="Python" temporary="true">
       <option name="INTERPRETER_OPTIONS" value="" />
@@ -292,6 +638,7 @@
       <option name="PARAMETERS" value="" />
       <option name="SHOW_COMMAND_LINE" value="false" />
       <option name="EMULATE_TERMINAL" value="false" />
+      <option name="MODULE_MODE" value="false" />
     </configuration>
     <configuration name="segmentation_test" type="PythonConfigurationType" factoryName="Python" temporary="true">
       <option name="INTERPRETER_OPTIONS" value="" />
@@ -310,6 +657,7 @@
       <option name="PARAMETERS" value="" />
       <option name="SHOW_COMMAND_LINE" value="false" />
       <option name="EMULATE_TERMINAL" value="false" />
+      <option name="MODULE_MODE" value="false" />
     </configuration>
     <configuration name="test_file_restrada" type="PythonConfigurationType" factoryName="Python" temporary="true">
       <option name="INTERPRETER_OPTIONS" value="" />
@@ -328,6 +676,7 @@
       <option name="PARAMETERS" value="" />
       <option name="SHOW_COMMAND_LINE" value="false" />
       <option name="EMULATE_TERMINAL" value="false" />
+      <option name="MODULE_MODE" value="false" />
     </configuration>
     <list size="6">
       <item index="0" class="java.lang.String" itemvalue="Python.ature" />
@@ -613,24 +962,32 @@
       <option name="project" value="LOCAL" />
       <updated>1518121010342</updated>
     </task>
-    <option name="localTasksCounter" value="37" />
+    <task id="LOCAL-00037" summary="Fixed to run as script.">
+      <created>1518111682321</created>
+      <option name="number" value="00037" />
+      <option name="presentableId" value="LOCAL-00037" />
+      <option name="project" value="LOCAL" />
+      <updated>1518111682321</updated>
+    </task>
+    <option name="localTasksCounter" value="38" />
     <servers />
   </component>
   <component name="ToolWindowManager">
-    <frame x="-6" y="-6" width="1613" height="883" extended-state="6" />
+    <frame x="-10" y="0" width="1857" height="1092" extended-state="6" />
     <layout>
-      <window_info id="Project" active="true" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.19074422" sideWeight="0.5" order="0" side_tool="false" content_ui="combo" />
       <window_info id="TODO" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="6" side_tool="false" content_ui="tabs" />
       <window_info id="Event Log" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.16752577" sideWeight="0.51469666" order="7" side_tool="true" content_ui="tabs" />
-      <window_info id="Database" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
       <window_info id="Version Control" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.2822165" sideWeight="0.49530956" order="7" side_tool="false" content_ui="tabs" />
       <window_info id="Python Console" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
-      <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.23771581" sideWeight="0.4853033" order="2" side_tool="false" content_ui="tabs" />
-      <window_info id="Structure" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
+      <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.23771581" sideWeight="0.4853033" order="2" side_tool="false" content_ui="tabs" />
       <window_info id="Terminal" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
+      <window_info id="Project" active="true" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.1902965" sideWeight="0.5" order="0" side_tool="false" content_ui="combo" />
+      <window_info id="Docker" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="false" weight="0.33" sideWeight="0.5" order="-1" side_tool="false" content_ui="tabs" />
+      <window_info id="Database" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
+      <window_info id="SciView" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="-1" side_tool="false" content_ui="tabs" />
+      <window_info id="Structure" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
       <window_info id="Favorites" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="2" side_tool="true" content_ui="tabs" />
       <window_info id="Debug" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.27448454" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
-      <window_info id="Data View" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
       <window_info id="Cvs" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="4" side_tool="false" content_ui="tabs" />
       <window_info id="Message" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="0" side_tool="false" content_ui="tabs" />
       <window_info id="Commander" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.4" sideWeight="0.5" order="0" side_tool="false" content_ui="tabs" />
@@ -639,6 +996,7 @@
       <window_info id="Find" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.3298969" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
       <window_info id="Ant Build" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
       <window_info id="Concurrent Activities Diagram" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.34536082" sideWeight="0.49530956" order="8" side_tool="false" content_ui="tabs" />
+      <window_info id="Data View" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
     </layout>
     <layout-to-restore>
       <window_info id="TODO" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="6" side_tool="false" content_ui="tabs" />
@@ -698,7 +1056,8 @@
     <MESSAGE value="apply_gabor(..) fixed." />
     <MESSAGE value="Removed old test folder." />
     <MESSAGE value="Moved drive to data folder." />
-    <option name="LAST_COMMIT_MESSAGE" value="Moved drive to data folder." />
+    <MESSAGE value="Fixed to run as script." />
+    <option name="LAST_COMMIT_MESSAGE" value="Fixed to run as script." />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
@@ -721,8 +1080,6 @@
     <watches-manager />
   </component>
   <component name="editorHistoryManager">
-    <entry file="file://$PROJECT_DIR$/preprocess/av/av_utils.py" />
-    <entry file="file://D:/eclipse-py-virtuanenv/py_ature/Lib/site-packages/matplotlib/pyplot.py" />
     <entry file="file://$PROJECT_DIR$/preprocess/av/graph_utils.py" />
     <entry file="file://$PROJECT_DIR$/commons/IMG_UTILS.py" />
     <entry file="file://D:/eclipse-py-virtuanenv/py_ature/Lib/site-packages/PIL/ImageEnhance.py" />
@@ -767,13 +1124,7 @@
     <entry file="file://$PROJECT_DIR$/ature.py" />
     <entry file="file://$PROJECT_DIR$/.gitignore.txt" />
     <entry file="file://D:/eclipse-py-virtuanenv/py_ature/Lib/site-packages/PIL/ImageEnhance.py" />
-    <entry file="file://$USER_HOME$/.PyCharm2017.2/system/python_stubs/1723508493/numpy/core/umath.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="58429">
-          <caret line="3437" column="4" lean-forward="false" selection-start-line="3437" selection-start-column="4" selection-end-line="3437" selection-end-column="4" />
-        </state>
-      </provider>
-    </entry>
+    <entry file="file://$USER_HOME$/.PyCharm2017.2/system/python_stubs/1723508493/numpy/core/umath.py" />
     <entry file="file://D:/eclipse-py-virtuanenv/py_ature/Lib/site-packages/numpy/core/numeric.py" />
     <entry file="file://$PROJECT_DIR$/temp.png" />
     <entry file="file://D:/eclipse-py-virtuanenv/py_ature/Lib/site-packages/numpy/random/__init__.py" />
@@ -783,13 +1134,7 @@
     <entry file="file://D:/eclipse-py-virtuanenv/py_ature/Lib/site-packages/pandas/core/dtypes/concat.py" />
     <entry file="file://$PROJECT_DIR$/test_file_restrada.py" />
     <entry file="file://D:/eclipse-py-virtuanenv/py_ature/Lib/site-packages/networkx/drawing/nx_pylab.py" />
-    <entry file="file://$USER_HOME$/.PyCharm2017.2/system/python_stubs/1723508493/cv2/cv2.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="133059">
-          <caret line="7838" column="4" lean-forward="false" selection-start-line="7838" selection-start-column="4" selection-end-line="7838" selection-end-column="4" />
-        </state>
-      </provider>
-    </entry>
+    <entry file="file://$USER_HOME$/.PyCharm2017.2/system/python_stubs/1723508493/cv2/cv2.py" />
     <entry file="file://$PROJECT_DIR$/notebook/after_filter.ipynb" />
     <entry file="file://$PROJECT_DIR$/notebook/Test.ipynb" />
     <entry file="file://$PROJECT_DIR$/notebook/av_gabor.ipynb">
@@ -832,33 +1177,6 @@
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/test/ATURE_RUN_ALL.py" />
-    <entry file="file://$PROJECT_DIR$/testing/segmentation_test.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="4363">
-          <caret line="250" column="50" lean-forward="false" selection-start-line="250" selection-start-column="50" selection-end-line="250" selection-end-column="50" />
-          <folding>
-            <element signature="e#0#9#0" expanded="true" />
-            <marker date="1518096837382" expanded="true" signature="308:9835" ph="..." />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/testing/Runner.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="198">
-          <caret line="11" column="12" lean-forward="true" selection-start-line="11" selection-start-column="12" selection-end-line="11" selection-end-column="12" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/.gitignore">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="216">
-          <caret line="12" column="10" lean-forward="true" selection-start-line="12" selection-start-column="10" selection-end-line="12" selection-end-column="10" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/main.py">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="0">
@@ -872,6 +1190,48 @@
         <state relative-caret-position="270">
           <caret line="15" column="12" lean-forward="false" selection-start-line="15" selection-start-column="12" selection-end-line="15" selection-end-column="12" />
           <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/testing/os">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="288">
+          <caret line="16" column="13" lean-forward="false" selection-start-line="16" selection-start-column="13" selection-end-line="16" selection-end-column="13" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/testing/RunnerUbuntu.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="-36">
+          <caret line="14" column="31" lean-forward="true" selection-start-line="14" selection-start-column="31" selection-end-line="14" selection-end-column="31" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/testing/segmentation_test.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="388">
+          <caret line="192" column="14" lean-forward="true" selection-start-line="192" selection-start-column="14" selection-end-line="192" selection-end-column="14" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/.gitignore">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="306">
+          <caret line="17" column="30" lean-forward="true" selection-start-line="17" selection-start-column="30" selection-end-line="17" selection-end-column="30" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/testing/Runner.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="473">
+          <caret line="69" column="30" lean-forward="true" selection-start-line="69" selection-start-column="30" selection-end-line="69" selection-end-column="30" />
+          <folding>
+            <element signature="e#49#58#0" expanded="true" />
+          </folding>
         </state>
       </provider>
     </entry>
