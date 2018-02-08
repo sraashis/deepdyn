@@ -97,9 +97,12 @@ class AtureTest:
 
         return img_obj, lattice_obj, truth
 
-    def precision_recall_accuracy(self, segmented=None, truth=None, color_diff=False):
+    def precision_recall_accuracy(self, segmented=None, truth=None, segmented_rgb=None):
 
         if truth is None:
+            segmented_rgb[:, :, 0] = segmented
+            segmented_rgb[:, :, 1] = segmented
+            segmented_rgb[:, :, 2] = segmented
             return 0.01, 0.01, 0.01
 
         TP = 0  # True Positive
@@ -108,17 +111,26 @@ class AtureTest:
         TN = 0  # True Negative
         for i in range(0, segmented.shape[0]):
             for j in range(0, segmented.shape[1]):
+
+                if segmented[i, j] == 255:
+                    segmented_rgb[i, j, 0] = 255
+                    segmented_rgb[i, j, 1] = 255
+                    segmented_rgb[i, j, 2] = 255
+
                 if segmented[i, j] == 255 and truth[i, j] == 255:
                     TP += 1
                 if segmented[i, j] == 255 and truth[i, j] == 0:
+                    segmented_rgb[i, j, 0] = 0
+                    segmented_rgb[i, j, 1] = 255
+                    segmented_rgb[i, j, 2] = 0
                     FP += 1
                 if segmented[i, j] == 0 and truth[i, j] == 255:
+                    segmented_rgb[i, j, 0] = 255
+                    segmented_rgb[i, j, 1] = 0
+                    segmented_rgb[i, j, 2] = 0
                     FN += 1
                 if segmented[i, j] == 0 and truth[i, j] == 0:
                     TN += 1
-
-        if color_diff:
-            pass
 
         return TP / (TP + FP), TP / (TP + FN), (TP + TN) / (TP + FP + FN + TN)
 
@@ -133,7 +145,7 @@ class AtureTest:
         plt.ylim((0, 1))
         plt.savefig(log_file_name + '.png')
 
-    def _run(self, test_file_name=None, params_combination=[], color_diff=False, log=False):
+    def _run(self, test_file_name=None, params_combination=[], save_segmentation=False, log=False):
 
         img_obj, lattice_obj, truth = self._preprocess(test_file_name)
         c = count(1)
@@ -153,8 +165,13 @@ class AtureTest:
 
         print('Working...')
         for params in params_combination:
+
             self._segment_now(img_obj=img_obj, lattice_obj=lattice_obj, params=params)
-            precision, recall, accuracy = self.precision_recall_accuracy(lattice_obj.accumulator, truth, color_diff=color_diff)
+
+            segmented_rgb = np.zeros([lattice_obj.accumulator.shape[0], lattice_obj.accumulator.shape[1], 3], dtype=np.uint8)
+            precision, recall, accuracy = self.precision_recall_accuracy(segmented=lattice_obj.accumulator,
+                                                                         truth=truth,
+                                                                         segmented_rgb=segmented_rgb)
             f1_score = 2 * precision * recall / (precision + recall)
 
             i = next(c)
@@ -171,7 +188,8 @@ class AtureTest:
                 log_file.write(line + '\n')
                 log_file.flush()
 
-            IMG.fromarray(lattice_obj.accumulator).save(test_file_name + '_[' + line + ']' + '.JPEG')
+            if save_segmentation:
+                IMG.fromarray(segmented_rgb).save(test_file_name + '_[' + line + ']' + '.JPEG')
             print('Number of parameter combinations tried: ' + str(i), end='\r')
 
         if log:
@@ -186,7 +204,7 @@ class AtureTest:
     def run_for_all_images(self, params={}):
         os.chdir(self.data_path)
         for test_file_name in os.listdir(os.getcwd()):
-            self._run(test_file_name=test_file_name, params_combination=[params], log=False)
+            self._run(test_file_name=test_file_name, params_combination=[params], log=True)
 
     def run_for_one_image(self, test_file_name=None, params_combination=[]):
         os.chdir(self.data_path)
@@ -194,7 +212,7 @@ class AtureTest:
 
     def run_for_one_image(self, test_file_name=None, params={}):
         os.chdir(self.data_path)
-        self._run(test_file_name=test_file_name, params_combination=[params], color_diff=True, log=False)
+        self._run(test_file_name=test_file_name, params_combination=[params], save_segmentation=True, log=False)
 
 
 class AtureTestMat(AtureTest):
