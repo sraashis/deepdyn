@@ -2,7 +2,6 @@ import os
 from itertools import count
 
 import cv2
-import matplotlib.pyplot as plt
 import numpy as np
 from PIL import Image as IMG
 
@@ -14,7 +13,6 @@ from commons.MAT import Mat
 
 
 class AtureTest:
-
     def __init__(self, data_path=None):
 
         self.data_path = data_path
@@ -22,11 +20,23 @@ class AtureTest:
 
         if os.path.isdir(self.log_path) is False:
             os.makedirs(self.log_path)
+            self.log_file = open(self.log_path + os.sep + "segmentation_result.csv", 'w')
+        else:
+            self.log_file = open(self.log_path + os.sep + "segmentation_result.csv", 'w')
+
+        self.log_file.write(
+            'ITERATION,FILE_NAME,FSCORE,PRECISION,RECALL,ACCURACY,' \
+            'SKELETONIZE_THRESHOLD,' \
+            'IMG_LATTICE_COST_ASSIGNMENT_ALPHA,' \
+            'IMG_LATTICE_COST_GABOR_IMAGE_CONTRIBUTION,' \
+            'SEGMENTATION_THRESHOLD\n'
+        )
 
         self.mask_path = None
         self.ground_truth_path = None
         self.fget_mask_file = None
         self.fget_ground_truth_file = None
+        self.c = count(1)
 
     def load_mask(self, mask_path=None, fget_mask_file=None):
         self.mask_path = mask_path
@@ -51,7 +61,7 @@ class AtureTest:
     def _load_test_file(self, test_file_name=None):
         img = IMG.open(test_file_name)
         orig = np.array(img.getdata(), np.uint8).reshape(img.size[1], img.size[0], 3)
-        print('### File loaded: ' + test_file_name)
+        print('\n### File loaded: ' + test_file_name)
         return orig
 
     def _load_mask(self, test_file_name):
@@ -134,48 +144,25 @@ class AtureTest:
 
         return TP / (TP + FP), TP / (TP + FN), (TP + TN) / (TP + FP + FN + TN)
 
-    def plot_precision_recall(self, log_file_name=None):
-        os.chdir(self.log_path)
-        log = np.loadtxt(log_file_name, skiprows=1, delimiter=',')
-        plt.title('Precision vs Recall plot')
-        plt.xlabel('Recall')
-        plt.ylabel('Precision')
-        plt.scatter(log[:, 2], log[:, 3])
-        plt.xlim((0, 1))
-        plt.ylim((0, 1))
-        plt.savefig(log_file_name + '.png')
-
     def _run(self, test_file_name=None, params_combination=[], save_segmentation=False, log=False):
 
         img_obj, lattice_obj, truth = self._preprocess(test_file_name)
-        c = count(1)
-        os.chdir(self.log_path)
-
-        if log:
-            log_file_name = test_file_name + "_result.csv"
-            log_file = open(log_file_name, 'w')
-
-            log_file.write(
-                'ITERATION,FSCORE,PRECISION,RECALL,ACCURACY,' \
-                'SKELETONIZE_THRESHOLD,' \
-                'IMG_LATTICE_COST_ASSIGNMENT_ALPHA,' \
-                'IMG_LATTICE_COST_GABOR_IMAGE_CONTRIBUTION,' \
-                'SEGMENTATION_THRESHOLD\n'
-            )
 
         print('Working...')
         for params in params_combination:
 
             self._segment_now(img_obj=img_obj, lattice_obj=lattice_obj, params=params)
 
-            segmented_rgb = np.zeros([lattice_obj.accumulator.shape[0], lattice_obj.accumulator.shape[1], 3], dtype=np.uint8)
+            segmented_rgb = np.zeros([lattice_obj.accumulator.shape[0], lattice_obj.accumulator.shape[1], 3],
+                                     dtype=np.uint8)
             precision, recall, accuracy = self.precision_recall_accuracy(segmented=lattice_obj.accumulator,
                                                                          truth=truth,
                                                                          segmented_rgb=segmented_rgb)
             f1_score = 2 * precision * recall / (precision + recall)
 
-            i = next(c)
+            i = next(self.c)
             line = str(i) + ',' + \
+                   str(test_file_name) + ',' + \
                    str(round(f1_score, 3)) + ',' + \
                    str(round(precision, 3)) + ',' + \
                    str(round(recall, 3)) + ',' + \
@@ -185,38 +172,29 @@ class AtureTest:
                    str(round(params['gabor_contrib'], 3)) + ',' + \
                    str(round(params['seg_threshold'], 3))
             if log:
-                log_file.write(line + '\n')
-                log_file.flush()
+                self.log_file.write(line + '\n')
+                self.log_file.flush()
 
             if save_segmentation:
+                os.chdir(self.log_path)
                 IMG.fromarray(segmented_rgb).save(test_file_name + '_[' + line + ']' + '.JPEG')
             print('Number of parameter combinations tried: ' + str(i), end='\r')
 
-        if log:
-            self.plot_precision_recall(log_file.name)
-            log_file.close()
-
-    def run_for_all_images(self, params_combination=[]):
+    def run_for_all_images(self, params_combination=[], save=False):
         os.chdir(self.data_path)
         for test_file_name in os.listdir(os.getcwd()):
-            self._run(test_file_name=test_file_name, params_combination=params_combination, log=True)
+            self._run(test_file_name=test_file_name, params_combination=params_combination, save_segmentation=save,
+                      log=True)
+        self.log_file.close()
 
-    def run_for_all_images(self, params={}):
+    def run_for_one_image(self, test_file_name=None, params_combination=[], save=False):
         os.chdir(self.data_path)
-        for test_file_name in os.listdir(os.getcwd()):
-            self._run(test_file_name=test_file_name, params_combination=[params], save_segmentation=True, log=False)
-
-    def run_for_one_image(self, test_file_name=None, params_combination=[]):
-        os.chdir(self.data_path)
-        self._run(test_file_name=test_file_name, params_combination=params_combination, log=True)
-
-    def run_for_one_image(self, test_file_name=None, params={}):
-        os.chdir(self.data_path)
-        self._run(test_file_name=test_file_name, params_combination=[params], save_segmentation=True, log=False)
+        self._run(test_file_name=test_file_name, params_combination=params_combination, save_segmentation=save,
+                  log=True)
+        self.log_file.close()
 
 
 class AtureTestMat(AtureTest):
-
     def __init__(self, data_path=None):
         super().__init__(data_path=data_path)
 
@@ -228,7 +206,6 @@ class AtureTestMat(AtureTest):
 
 
 class AtureTestErode(AtureTest):
-
     def __init__(self, data_path=None):
         super().__init__(data_path=data_path)
 
@@ -249,7 +226,6 @@ class AtureTestErode(AtureTest):
 
 
 class AtureTestMatErode(AtureTest):
-
     def __init__(self, data_path=None):
         super().__init__(data_path=data_path)
 
