@@ -12,3 +12,7 @@ assests/Filters/
 assests/Final/
 out_gabor/
 out_bi/
+.idea
+out/
+data/
+data/DRIVE/test/images/out_ak/
