@@ -204,7 +204,7 @@ class AtureTest:
     def run_for_all_images(self, params={}):
         os.chdir(self.data_path)
         for test_file_name in os.listdir(os.getcwd()):
-            self._run(test_file_name=test_file_name, params_combination=[params], log=True)
+            self._run(test_file_name=test_file_name, params_combination=[params], save_segmentation=True, log=False)
 
     def run_for_one_image(self, test_file_name=None, params_combination=[]):
         os.chdir(self.data_path)
