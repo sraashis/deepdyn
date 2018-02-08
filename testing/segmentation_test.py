@@ -14,6 +14,7 @@ from commons.MAT import Mat
 
 
 class AtureTest:
+
     def __init__(self, data_path=None):
 
         self.data_path = data_path
@@ -35,8 +36,7 @@ class AtureTest:
         self.ground_truth_path = ground_truth_path
         self.fget_ground_truth_file = fget_ground_truth_file
 
-    def _segment_now(img_obj=None, lattice_obj=None, params={}):
-
+    def _segment_now(self, img_obj=None, lattice_obj=None, params={}):
         img_obj.create_skeleton(threshold=params['sk_threshold'], kernels=imgutils.get_chosen_skeleton_filter())
         seed_node_list = imgutils.get_seed_node_list(img_obj.img_skeleton)
 
@@ -97,10 +97,10 @@ class AtureTest:
 
         return img_obj, lattice_obj, truth
 
-    def get_precision_recall_accuracy(segmented=None, truth=None):
+    def precision_recall_accuracy(self, segmented=None, truth=None, color_diff=False):
 
         if truth is None:
-            return 0, 0, 0
+            return 0.01, 0.01, 0.01
 
         TP = 0  # True Positive
         FP = 0  # False Positive
@@ -117,6 +117,9 @@ class AtureTest:
                 if segmented[i, j] == 0 and truth[i, j] == 0:
                     TN += 1
 
+        if color_diff:
+            pass
+
         return TP / (TP + FP), TP / (TP + FN), (TP + TN) / (TP + FP + FN + TN)
 
     def plot_precision_recall(self, log_file_name=None):
@@ -130,7 +133,7 @@ class AtureTest:
         plt.ylim((0, 1))
         plt.savefig(log_file_name + '.png')
 
-    def _run(self, test_file_name=None, params_combination=[], log=False):
+    def _run(self, test_file_name=None, params_combination=[], color_diff=False, log=False):
 
         img_obj, lattice_obj, truth = self._preprocess(test_file_name)
         c = count(1)
@@ -150,9 +153,8 @@ class AtureTest:
 
         print('Working...')
         for params in params_combination:
-
-            AtureTest._segment_now(img_obj=img_obj, lattice_obj=lattice_obj, params=params)
-            precision, recall, accuracy = AtureTest.get_precision_recall_accuracy(lattice_obj.accumulator, truth)
+            self._segment_now(img_obj=img_obj, lattice_obj=lattice_obj, params=params)
+            precision, recall, accuracy = self.precision_recall_accuracy(lattice_obj.accumulator, truth, color_diff=color_diff)
             f1_score = 2 * precision * recall / (precision + recall)
 
             i = next(c)
@@ -192,7 +194,7 @@ class AtureTest:
 
     def run_for_one_image(self, test_file_name=None, params={}):
         os.chdir(self.data_path)
-        self._run(test_file_name=test_file_name, params_combination=[params], log=False)
+        self._run(test_file_name=test_file_name, params_combination=[params], color_diff=True, log=False)
 
 
 class AtureTestMat(AtureTest):
