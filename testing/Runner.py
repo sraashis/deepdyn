@@ -51,16 +51,35 @@ params = {'sk_threshold': 60,
 
 ############# Run for images in data dir ###############
 ############################################
-tester = AtureTestErode(data_path=data_file_path)
+tester = AtureTestErode(data_path=data_file_path,out='out_ak')
 tester.load_mask(mask_path=mask_path, fget_mask_file=get_mask_file)
 tester.load_ground_truth(ground_truth_path=ground_truth_path, fget_ground_truth_file=get_ground_truth_file)
-tester.run_for_one_image(test_file_name='02_test.tif', params_combination=all_params)
+tester.run_for_one_image(test_file_name='01_test.tif', params_combination=[params])
 # tester.run_for_all_images(params=params)
 
 
 ############# Run for mat files in av_wide_data_set dir ###############
 ############################################
-tester = AtureTestMat(data_path=data_file_path)
+# tester = AtureTestMat(data_path=data_file_path, out='out_ak')
+# tester.load_mask(mask_path=mask_path, fget_mask_file=get_mask_file)
+# tester.load_ground_truth(ground_truth_path=ground_truth_path, fget_ground_truth_file=get_ground_truth_file)
+# tester.run_for_one_image(test_file_name='wide_image_03.mat', params=params)
+
+### With another mask
+
+mask_path = base_path + sep + 'data' + sep + 'DRIVE' + sep + 'test' + sep + 'mask_fixed'
+############# Run for images in data dir ###############
+############################################
+tester = AtureTestErode(data_path=data_file_path,out='out_rj')
 tester.load_mask(mask_path=mask_path, fget_mask_file=get_mask_file)
 tester.load_ground_truth(ground_truth_path=ground_truth_path, fget_ground_truth_file=get_ground_truth_file)
+tester.run_for_one_image(test_file_name='01_test.gif', params_combination=[params])
+# tester.run_for_all_images(params=params)
+
+
+############# Run for mat files in av_wide_data_set dir ###############
+############################################
+# tester = AtureTestMat(data_path=data_file_path, out='out_rj')
+# tester.load_mask(mask_path=mask_path, fget_mask_file=get_mask_file)
+# tester.load_ground_truth(ground_truth_path=ground_truth_path, fget_ground_truth_file=get_ground_truth_file)
 # tester.run_for_one_image(test_file_name='wide_image_03.mat', params=params)

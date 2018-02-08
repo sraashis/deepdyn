@@ -13,10 +13,10 @@ from commons.MAT import Mat
 
 
 class AtureTest:
-    def __init__(self, data_path=None):
+    def __init__(self, data_path=None, out=None):
 
         self.data_path = data_path
-        self.log_path = data_path + os.sep + 'segmentation_output'
+        self.log_path = data_path + os.sep + out
 
         if os.path.isdir(self.log_path) is False:
             os.makedirs(self.log_path)
@@ -195,8 +195,8 @@ class AtureTest:
 
 
 class AtureTestMat(AtureTest):
-    def __init__(self, data_path=None):
-        super().__init__(data_path=data_path)
+    def __init__(self, data_path=None, out=None):
+        super().__init__(data_path=data_path, out=out)
 
     def _load_test_file(self, test_file_name=None):
         file = Mat(file_name=test_file_name)
@@ -206,8 +206,8 @@ class AtureTestMat(AtureTest):
 
 
 class AtureTestErode(AtureTest):
-    def __init__(self, data_path=None):
-        super().__init__(data_path=data_path)
+    def __init__(self, data_path=None, out=None):
+        super().__init__(data_path=data_path, out=out)
 
     def _load_mask(self, test_file_name):
         mask = IMG.open(self.fget_mask_file(test_file_name))
@@ -226,8 +226,8 @@ class AtureTestErode(AtureTest):
 
 
 class AtureTestMatErode(AtureTest):
-    def __init__(self, data_path=None):
-        super().__init__(data_path=data_path)
+    def __init__(self, data_path=None, out=None):
+        super().__init__(data_path=data_path, out=out)
 
     def _load_test_file(self, test_file_name=None):
         file = Mat(file_name=test_file_name)
