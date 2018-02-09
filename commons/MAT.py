@@ -5,8 +5,8 @@ import path_config as cfg
 class Mat:
     mat_file = None
 
-    def __init__(self, root_path=cfg.av_wide_data, file_name=None):
-        self.mat_file = io.loadmat(cfg.join(root_path, file_name))
+    def __init__(self, mat_file=None):
+        self.mat_file = io.loadmat(mat_file)
 
     def get_graph(self, graph_dict_key, root_structure='G'):
         return self.mat_file[root_structure][0][graph_dict_key][()][0]

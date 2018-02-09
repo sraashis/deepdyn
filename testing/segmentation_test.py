@@ -13,16 +13,16 @@ from commons.MAT import Mat
 
 
 class AtureTest:
-    def __init__(self, data_path=None, out=None):
+    def __init__(self, data_dir=None, log_dir=None):
 
-        self.data_path = data_path
-        self.log_path = data_path + os.sep + out
+        self.data_dir = data_dir
+        self.log_dir = log_dir
 
-        if os.path.isdir(self.log_path) is False:
-            os.makedirs(self.log_path)
-            self.log_file = open(self.log_path + os.sep + "segmentation_result.csv", 'w')
+        if os.path.isdir(self.log_dir) is False:
+            os.makedirs(self.log_dir)
+            self.log_file = open(self.log_dir + os.sep + "segmentation_result.csv", 'w')
         else:
-            self.log_file = open(self.log_path + os.sep + "segmentation_result.csv", 'w')
+            self.log_file = open(self.log_dir + os.sep + "segmentation_result.csv", 'w')
 
         self.log_file.write(
             'ITERATION,FILE_NAME,FSCORE,PRECISION,RECALL,ACCURACY,' \
@@ -32,18 +32,20 @@ class AtureTest:
             'SEGMENTATION_THRESHOLD\n'
         )
 
-        self.mask_path = None
-        self.ground_truth_path = None
+        self.mask_dir = None
+        self.ground_truth_dir = None
         self.fget_mask_file = None
         self.fget_ground_truth_file = None
+        self.erode_mask = None
         self.c = count(1)
 
-    def load_mask(self, mask_path=None, fget_mask_file=None):
-        self.mask_path = mask_path
+    def load_mask(self, mask_dir=None, fget_mask_file=None, erode_mask=False):
+        self.mask_dir = mask_dir
         self.fget_mask_file = fget_mask_file
+        self.erode_mask = erode_mask
 
-    def load_ground_truth(self, ground_truth_path=None, fget_ground_truth_file=None):
-        self.ground_truth_path = ground_truth_path
+    def load_ground_truth(self, ground_truth_dir=None, fget_ground_truth_file=None):
+        self.ground_truth_dir = ground_truth_dir
         self.fget_ground_truth_file = fget_ground_truth_file
 
     def _segment_now(self, img_obj=None, lattice_obj=None, params={}):
@@ -58,32 +60,43 @@ class AtureTest:
                               img_gabor_contribution=params['gabor_contrib'],
                               img_original_contribution=1.5 - params['gabor_contrib'])
 
-    def _load_test_file(self, test_file_name=None):
-        img = IMG.open(test_file_name)
+    def _load_file(self, file_name=None):
+        img = IMG.open(os.path.join(self.data_dir, file_name))
         orig = np.array(img.getdata(), np.uint8).reshape(img.size[1], img.size[0], 3)
-        print('\n### File loaded: ' + test_file_name)
+        print('\n### File loaded: ' + file_name)
         return orig
 
-    def _load_mask(self, test_file_name):
-        mask = IMG.open(self.fget_mask_file(test_file_name))
+    def _load_mask(self, file_name):
+        mask_file = self.fget_mask_file(file_name)
+        mask = IMG.open(os.path.join(self.mask_dir, mask_file))
         mask = np.array(mask.getdata(), np.uint8).reshape(mask.size[1], mask.size[0], 1)[:, :, 0]
+
+        if self.erode_mask:
+            kern = np.array([
+                [0.0, 0.0, 0.5, 0.0, 0.0],
+                [0.0, 0.2, 1.0, 0.2, 0.0],
+                [0.5, 1.0, 1.0, 1.0, 0.5],
+                [0.0, 0.2, 1.0, 0.2, 0.0],
+                [0.0, 0.0, 0.5, 0.0, 0.0],
+            ], np.uint8)
+
+            mask = cv2.erode(mask, kern, iterations=5)
         print('Mask loaded')
         return mask
 
-    def _load_ground_truth(self, test_file_name=None):
-        truth = IMG.open(self.fget_ground_truth_file(test_file_name))
+    def _load_ground_truth(self, file_name=None):
+        gt_file = self.fget_ground_truth_file(file_name)
+        truth = IMG.open(os.path.join(self.ground_truth_dir, gt_file))
         truth = np.array(truth.getdata(), np.uint8).reshape(truth.size[1], truth.size[0], 1)[:, :, 0]
         print('Ground truth loaded')
         return truth
 
-    def _preprocess(self, test_file_name=None):
+    def _preprocess(self, file_name=None):
 
-        os.chdir(self.data_path)
-        original = self._load_test_file(test_file_name=test_file_name)
+        original = self._load_file(file_name=file_name)
         use_this = original[:, :, 1]
         try:
-            os.chdir(self.mask_path)
-            mask = self._load_mask(test_file_name=test_file_name)
+            mask = self._load_mask(file_name=file_name)
             use_this = cv2.bitwise_and(use_this, use_this, mask=mask)
         except:
             print('!!! Mask not found')
@@ -91,8 +104,7 @@ class AtureTest:
         img_obj = Image(image_arr=use_this)
 
         try:
-            os.chdir(self.ground_truth_path)
-            truth = self._load_ground_truth(test_file_name=test_file_name)
+            truth = self._load_ground_truth(file_name=file_name)
         except:
             truth = None
             print('!!! Ground truth not found')
@@ -144,9 +156,9 @@ class AtureTest:
 
         return TP / (TP + FP), TP / (TP + FN), (TP + TN) / (TP + FP + FN + TN)
 
-    def _run(self, test_file_name=None, params_combination=[], save_segmentation=False, log=False):
+    def _run(self, file_name=None, params_combination=[], save_segmentation=False, log=False):
 
-        img_obj, lattice_obj, truth = self._preprocess(test_file_name)
+        img_obj, lattice_obj, truth = self._preprocess(file_name)
 
         print('Working...')
         for params in params_combination:
@@ -162,7 +174,7 @@ class AtureTest:
 
             i = next(self.c)
             line = str(i) + ',' + \
-                   str(test_file_name) + ',' + \
+                   str(file_name) + ',' + \
                    str(round(f1_score, 3)) + ',' + \
                    str(round(precision, 3)) + ',' + \
                    str(round(recall, 3)) + ',' + \
@@ -175,77 +187,28 @@ class AtureTest:
                 self.log_file.write(line + '\n')
                 self.log_file.flush()
 
-            if save_segmentation:
-                os.chdir(self.log_path)
-                IMG.fromarray(segmented_rgb).save(test_file_name + '_[' + line + ']' + '.JPEG')
+            if save_segmentation or f1_score > 0.8:
+                IMG.fromarray(segmented_rgb).save(os.path.join(self.log_dir, file_name + '_[' + line + ']' + '.JPEG'))
             print('Number of parameter combinations tried: ' + str(i), end='\r')
 
     def run_for_all_images(self, params_combination=[], save=False):
-        os.chdir(self.data_path)
-        for test_file_name in os.listdir(os.getcwd()):
-            self._run(test_file_name=test_file_name, params_combination=params_combination, save_segmentation=save,
+        for file_name in os.listdir(self.data_dir):
+            self._run(file_name=file_name, params_combination=params_combination, save_segmentation=save,
                       log=True)
         self.log_file.close()
 
-    def run_for_one_image(self, test_file_name=None, params_combination=[], save=False):
-        os.chdir(self.data_path)
-        self._run(test_file_name=test_file_name, params_combination=params_combination, save_segmentation=save,
+    def run_for_one_image(self, file_name=None, params_combination=[], save=False):
+        self._run(file_name=file_name, params_combination=params_combination, save_segmentation=save,
                   log=True)
         self.log_file.close()
 
 
 class AtureTestMat(AtureTest):
-    def __init__(self, data_path=None, out=None):
-        super().__init__(data_path=data_path, out=out)
+    def __init__(self, data_dir=None, log_dir=None):
+        super().__init__(data_dir=data_dir, log_dir=log_dir)
 
-    def _load_test_file(self, test_file_name=None):
-        file = Mat(file_name=test_file_name)
+    def _load_file(self, file_name=None):
+        file = Mat(mat_file=file_name)
         orig = file.get_image('I2')
-        print('File loaded: ' + test_file_name)
+        print('File loaded: ' + file_name)
         return orig
-
-
-class AtureTestErode(AtureTest):
-    def __init__(self, data_path=None, out=None):
-        super().__init__(data_path=data_path, out=out)
-
-    def _load_mask(self, test_file_name):
-        mask = IMG.open(self.fget_mask_file(test_file_name))
-        mask = np.array(mask.getdata(), np.uint8).reshape(mask.size[1], mask.size[0], 1)[:, :, 0]
-        print('Mask loaded.')
-
-        kern = np.array([
-            [0.0, 0.0, 0.5, 0.0, 0.0],
-            [0.0, 0.2, 1.0, 0.2, 0.0],
-            [0.5, 1.0, 1.0, 1.0, 0.5],
-            [0.0, 0.2, 1.0, 0.2, 0.0],
-            [0.0, 0.0, 0.5, 0.0, 0.0],
-        ], np.uint8)
-
-        return cv2.erode(mask, kern, iterations=5)
-
-
-class AtureTestMatErode(AtureTest):
-    def __init__(self, data_path=None, out=None):
-        super().__init__(data_path=data_path, out=out)
-
-    def _load_test_file(self, test_file_name=None):
-        file = Mat(file_name=test_file_name)
-        orig = file.get_image('I2')
-        print('File loaded: ' + test_file_name)
-        return orig
-
-    def _load_mask(self, test_file_name):
-        mask = IMG.open(self.fget_mask_file(test_file_name))
-        mask = np.array(mask.getdata(), np.uint8).reshape(mask.size[1], mask.size[0], 1)[:, :, 0]
-        print('Mask loaded.')
-
-        kern = np.array([
-            [0.0, 0.0, 0.5, 0.0, 0.0],
-            [0.0, 0.2, 1.0, 0.2, 0.0],
-            [0.5, 1.0, 1.0, 1.0, 0.5],
-            [0.0, 0.2, 1.0, 0.2, 0.0],
-            [0.0, 0.0, 0.5, 0.0, 0.0],
-        ], np.uint8)
-
-        return cv2.erode(mask, kern, iterations=5)

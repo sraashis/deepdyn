@@ -41,7 +41,7 @@ Flags['checkRunningTime'] = False #True
 ##############################################################################
 if Flags['loadImage']:
     t = time.time()    
-    file = Mat(file_name=Dirs['data']+Files['matFile'])
+    file = Mat(mat_file=Dirs['data'] + Files['matFile'])
     # original = file.get_image('I2')[300:400,500:600,1]
     # original = file.get_image('I2')[300:700,100:700,1]
     original = file.get_image('I2')[:,:,1]
