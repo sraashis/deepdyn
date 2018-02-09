@@ -1,11 +1,16 @@
 #!/home/akhanal1/Spring2018/pl-env/bin/python3.5
 import os
 import sys
-import path_config as pth
 import numpy as np
 import itertools as itr
 from random import shuffle
+
+
+# for ubuntu
+sys.path.append('/home/akhanal1/Spring2018/ature')
+
 from testing.segmentation_test import AtureTestMat, AtureTest
+import path_config as pth
 
 sep = os.sep
 data_file_path = pth.DATA_PATH + sep + 'DRIVE' + sep + 'test' + sep + 'images'
@@ -14,10 +19,7 @@ av_data = pth.DATA_PATH + sep + 'av_wide_data_set'
 mask_path = pth.DATA_PATH + sep + 'DRIVE' + sep + 'test' + sep + 'mask'
 ground_truth_path = pth.DATA_PATH + sep + 'DRIVE' + sep + 'test' + sep + '1st_manual'
 
-# for ubuntu
-sys.path.append(pth.CONTEXT_PATH)
 os.chdir(pth.CONTEXT_PATH)
-
 
 def get_mask_file(file_name): return file_name.split('_')[0] + '_test_mask.gif'
 
