@@ -39,7 +39,7 @@ shuffle(PARAMS_COMBINATION)
 
 keys = ('sk_threshold', 'alpha', 'gabor_contrib', 'seg_threshold')
 
-all_params = (dict(zip(keys, param)) for param in PARAMS_COMBINATION)
+all_params = list(dict(zip(keys, param)) for param in PARAMS_COMBINATION)
 
 params = {'sk_threshold': 60,
           'alpha': 5.0,
@@ -50,19 +50,19 @@ params = {'sk_threshold': 60,
 tester = AtureTest(data_dir=data_file_path, log_dir=os.path.join(pth.OUT_PATH, 'out_ak'))
 tester.load_mask(mask_dir=mask_path, fget_mask_file=get_mask_file, erode_mask=True)
 tester.load_ground_truth(ground_truth_dir=ground_truth_path, fget_ground_truth_file=get_ground_truth_file)
-tester.run_for_one_image(file_name='01_test.tif', params_combination=[params], save=True)
+# tester.run_for_one_image(file_name='01_test.tif', params_combination=[params], save=True)
 tester.run_for_all_images(params_combination=all_params)
 
-mask_path = pth.DATA_PATH + sep + 'DRIVE' + sep + 'test' + sep + 'mask_fixed'
+# mask_path = pth.DATA_PATH + sep + 'DRIVE' + sep + 'test' + sep + 'mask_fixed'
 # Run for mask fixed by Dr. Estrada
-tester = AtureTest(data_dir=data_file_path, log_dir=os.path.join(pth.OUT_PATH, 'out_rj'))
-tester.load_mask(mask_dir=mask_path, fget_mask_file=get_mask_file, erode_mask=False)
-tester.load_ground_truth(ground_truth_dir=ground_truth_path, fget_ground_truth_file=get_ground_truth_file)
-tester.run_for_one_image(file_name='01_test.tif', params_combination=[params], save=True)
-tester.run_for_all_images(params_combination=all_params)
+# tester = AtureTest(data_dir=data_file_path, log_dir=os.path.join(pth.OUT_PATH, 'out_rj'))
+# tester.load_mask(mask_dir=mask_path, fget_mask_file=get_mask_file, erode_mask=False)
+# tester.load_ground_truth(ground_truth_dir=ground_truth_path, fget_ground_truth_file=get_ground_truth_file)
+# tester.run_for_one_image(file_name='01_test.tif', params_combination=[params], save=True)
+# tester.run_for_all_images(params_combination=all_params)
 
 # Run for mat files in av_wide_data_set dir
-tester = AtureTestMat(data_dir=data_file_path, log_dir=os.path.join(pth.OUT_PATH, 'out_ak'))
-tester.load_mask(mask_dir=mask_path, fget_mask_file=get_mask_file)
-tester.load_ground_truth(ground_truth_dir=ground_truth_path, fget_ground_truth_file=get_ground_truth_file)
-tester.run_for_one_image(test_file_name='wide_image_03.mat', params=params)
+# tester = AtureTestMat(data_dir=data_file_path, log_dir=os.path.join(pth.OUT_PATH, 'out_ak'))
+# tester.load_mask(mask_dir=mask_path, fget_mask_file=get_mask_file)
+# tester.load_ground_truth(ground_truth_dir=ground_truth_path, fget_ground_truth_file=get_ground_truth_file)
+# tester.run_for_one_image(test_file_name='wide_image_03.mat', params=params)
