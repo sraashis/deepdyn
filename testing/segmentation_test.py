@@ -58,7 +58,7 @@ class AtureTest:
                               segmentation_threshold=params['seg_threshold'],
                               alpha=params['alpha'],
                               img_gabor_contribution=params['gabor_contrib'],
-                              img_original_contribution=2.0 - params['gabor_contrib'])
+                              img_original_contribution=1.0 - params['gabor_contrib'])
 
     def _load_file(self, file_name=None):
         img = IMG.open(os.path.join(self.data_dir, file_name))
@@ -160,8 +160,9 @@ class AtureTest:
 
         img_obj, lattice_obj, truth = self._preprocess(file_name)
         self.c = count(1)
+        params_count = len(params_combination)
 
-        print('Working...')
+        print('Starting with ' + str(params_count) + ' parameter combination...')
         for params in params_combination:
 
             self._segment_now(img_obj=img_obj, lattice_obj=lattice_obj, params=params)
@@ -188,9 +189,9 @@ class AtureTest:
                 self.log_file.write(line + '\n')
                 self.log_file.flush()
 
-            if save_segmentation or f1_score >= 0.8:
+            if save_segmentation or f1_score >= 0.78:
                 IMG.fromarray(segmented_rgb).save(os.path.join(self.log_dir, file_name + '_[' + line + ']' + '.JPEG'))
-            print('Number of parameter combinations tried: ' + str(i), end='\r')
+            print('Number of parameter combinations tried: ' + str(i) + ' / ' + str(params_count), end='\r')
 
     def run_for_all_images(self, params_combination=[], save=False):
         for file_name in os.listdir(self.data_dir):
