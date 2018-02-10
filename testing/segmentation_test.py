@@ -58,7 +58,7 @@ class AtureTest:
                               segmentation_threshold=params['seg_threshold'],
                               alpha=params['alpha'],
                               img_gabor_contribution=params['gabor_contrib'],
-                              img_original_contribution=2.0 - params['gabor_contrib'])
+                              img_original_contribution=1.0 - params['gabor_contrib'])
 
     def _load_file(self, file_name=None):
         img = IMG.open(os.path.join(self.data_dir, file_name))
@@ -188,7 +188,7 @@ class AtureTest:
                 self.log_file.write(line + '\n')
                 self.log_file.flush()
 
-            if save_segmentation or f1_score >= 0.8:
+            if save_segmentation or f1_score >= 0.78:
                 IMG.fromarray(segmented_rgb).save(os.path.join(self.log_dir, file_name + '_[' + line + ']' + '.JPEG'))
             print('Number of parameter combinations tried: ' + str(i), end='\r')
 

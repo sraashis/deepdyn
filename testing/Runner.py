@@ -29,8 +29,8 @@ def get_ground_truth_file(file_name): return file_name.split('_')[0] + '_manual1
 
 SK_THRESHOLD_PARAMS = np.arange(40, 61, 20)
 ALPHA_PARAMS = np.arange(5, 7, 0.5)
-GABOR_CONTRIBUTION_PARAMS = np.arange(1.5, 2.0, 0.2)
-SEGMENTATION_THRESHOLD_PARAMS = np.arange(10, 16, 0.5)
+GABOR_CONTRIBUTION_PARAMS = np.arange(0.6, 1.1, 0.2)
+SEGMENTATION_THRESHOLD_PARAMS = np.arange(9, 15, 0.5)
 
 PARAMS_ITR = itr.product(SK_THRESHOLD_PARAMS, ALPHA_PARAMS, GABOR_CONTRIBUTION_PARAMS, SEGMENTATION_THRESHOLD_PARAMS)
 
@@ -42,9 +42,9 @@ keys = ('sk_threshold', 'alpha', 'gabor_contrib', 'seg_threshold')
 all_params = list(dict(zip(keys, param)) for param in PARAMS_COMBINATION)
 
 params = {'sk_threshold': 60,
-          'alpha': 5.0,
-          'gabor_contrib': 1.3,
-          'seg_threshold': 10.5}
+          'alpha': 5.5,
+          'gabor_contrib': 0.7,
+          'seg_threshold': 11.5}
 
 # Run for image files with in-time mask erosion
 tester = AtureTest(data_dir=data_file_path, log_dir=os.path.join(pth.OUT_PATH, 'out_ak'))
