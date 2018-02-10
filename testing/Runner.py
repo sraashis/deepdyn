@@ -5,7 +5,6 @@ import numpy as np
 import itertools as itr
 from random import shuffle
 
-
 # for ubuntu
 sys.path.append('/home/akhanal1/Spring2018/ature')
 
@@ -21,6 +20,7 @@ ground_truth_path = pth.DATA_PATH + sep + 'DRIVE' + sep + 'test' + sep + '1st_ma
 
 os.chdir(pth.CONTEXT_PATH)
 
+
 def get_mask_file(file_name): return file_name.split('_')[0] + '_test_mask.gif'
 
 
@@ -29,8 +29,8 @@ def get_ground_truth_file(file_name): return file_name.split('_')[0] + '_manual1
 
 SK_THRESHOLD_PARAMS = np.arange(40, 61, 20)
 ALPHA_PARAMS = np.arange(5, 7, 0.5)
-GABOR_CONTRIBUTION_PARAMS = np.arange(0.9, 1.4, 0.2)
-SEGMENTATION_THRESHOLD_PARAMS = np.arange(8, 15, 0.5)
+GABOR_CONTRIBUTION_PARAMS = np.arange(1.5, 2.0, 0.2)
+SEGMENTATION_THRESHOLD_PARAMS = np.arange(10, 16, 0.5)
 
 PARAMS_ITR = itr.product(SK_THRESHOLD_PARAMS, ALPHA_PARAMS, GABOR_CONTRIBUTION_PARAMS, SEGMENTATION_THRESHOLD_PARAMS)
 
