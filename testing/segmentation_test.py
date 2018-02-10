@@ -160,8 +160,9 @@ class AtureTest:
 
         img_obj, lattice_obj, truth = self._preprocess(file_name)
         self.c = count(1)
+        params_count = len(params_combination)
 
-        print('Working...')
+        print('Starting with ' + str(params_count) + ' parameter combination...')
         for params in params_combination:
 
             self._segment_now(img_obj=img_obj, lattice_obj=lattice_obj, params=params)
@@ -190,7 +191,7 @@ class AtureTest:
 
             if save_segmentation or f1_score >= 0.78:
                 IMG.fromarray(segmented_rgb).save(os.path.join(self.log_dir, file_name + '_[' + line + ']' + '.JPEG'))
-            print('Number of parameter combinations tried: ' + str(i), end='\r')
+            print('Number of parameter combinations tried: ' + str(i) + ' / ' + str(params_count), end='\r')
 
     def run_for_all_images(self, params_combination=[], save=False):
         for file_name in os.listdir(self.data_dir):
