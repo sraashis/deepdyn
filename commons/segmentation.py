@@ -66,48 +66,49 @@ class AtureTest:
         print('\nFile loaded: ' + file_name)
         return orig
 
-    def _load_mask(self, file_name):
-        mask_file = self.fget_mask_file(file_name)
-        mask = IMG.open(os.path.join(self.mask_dir, mask_file))
-        mask = np.array(mask.getdata(), np.uint8).reshape(mask.size[1], mask.size[0], 1)[:, :, 0]
+    def _load_mask(self, img_object=None):
+        mask_file = self.fget_mask_file(img_object.file_name)
 
-        if self.erode_mask:
-            kern = np.array([
-                [0.0, 0.0, 0.5, 0.0, 0.0],
-                [0.0, 0.2, 1.0, 0.2, 0.0],
-                [0.5, 1.0, 1.0, 1.0, 0.5],
-                [0.0, 0.2, 1.0, 0.2, 0.0],
-                [0.0, 0.0, 0.5, 0.0, 0.0],
-            ], np.uint8)
+        try:
+            mask = IMG.open(os.path.join(self.mask_dir, mask_file))
+            mask = np.array(mask.getdata(), np.uint8).reshape(mask.size[1], mask.size[0], 1)[:, :, 0]
 
-            mask = cv2.erode(mask, kern, iterations=5)
-        print('Mask loaded: ' + mask_file)
-        return mask
+            if self.erode_mask:
+                kern = np.array([
+                    [0.0, 0.0, 0.5, 0.0, 0.0],
+                    [0.0, 0.2, 1.0, 0.2, 0.0],
+                    [0.5, 1.0, 1.5, 1.0, 0.5],
+                    [0.0, 0.2, 1.0, 0.2, 0.0],
+                    [0.0, 0.0, 0.5, 0.0, 0.0],
+                ], np.uint8)
+
+                print('Mask loaded: ' + mask_file)
+                return cv2.erode(mask, kern, iterations=5)
+        except:
+            print('!!! Mask not found')
+            return np.zeros_like(img_object.img_array)
 
     def _load_ground_truth(self, file_name=None):
-        gt_file = self.fget_ground_truth_file(file_name)
-        truth = IMG.open(os.path.join(self.ground_truth_dir, gt_file))
-        truth = np.array(truth.getdata(), np.uint8).reshape(truth.size[1], truth.size[0], 1)[:, :, 0]
-        print('Ground truth loaded: ' + gt_file)
-        return truth
+
+        try:
+            gt_file = self.fget_ground_truth_file(file_name)
+            truth = IMG.open(os.path.join(self.ground_truth_dir, gt_file))
+            truth = np.array(truth.getdata(), np.uint8).reshape(truth.size[1], truth.size[0], 1)[:, :, 0]
+            print('Ground truth loaded: ' + gt_file)
+            return truth
+        except:
+            print('!!! Ground truth not found')
+            return None
 
     def _initialize_image(self, file_name=None):
 
-        original = self._load_file(file_name=file_name)
-        use_this = original[:, :, 1]
-        try:
-            mask = self._load_mask(file_name=file_name)
-            use_this = cv2.bitwise_and(use_this, use_this, mask=mask)
-        except:
-            print('!!! Mask not found')
+        rgb = self._load_file(file_name=file_name)
+        img_obj = Image(image_arr=rgb[:, :, 1], file_name=file_name)
 
-        img_obj = Image(image_arr=use_this, file_name=file_name)
+        mask = self._load_mask(img_object=img_obj)
+        truth = self._load_ground_truth(file_name=file_name)
 
-        try:
-            truth = self._load_ground_truth(file_name=file_name)
-        except:
-            truth = None
-            print('!!! Ground truth not found')
+        img_obj.img_array = cv2.bitwise_and(img_obj.img_array, img_obj.img_array, mask=mask)
 
         img_obj.generate_lattice_graph()
         print('Lattice created')
@@ -152,7 +153,7 @@ class AtureTest:
         return TP / (TP + FP), TP / (TP + FN), (TP + TN) / (TP + FP + FN + TN)
 
     def _run(self, accumulator=None, params_combination=[],
-             save_images=False, log=False, epoch=1):
+             save_images=False, log=False, epoch=0):
 
         accumulator.img_obj.apply_bilateral()
         accumulator.img_obj.apply_gabor(kernel_bank=imgutils.get_chosen_gabor_bank())
@@ -161,40 +162,31 @@ class AtureTest:
         self.c = count(1)
 
         for params in params_combination:
-
             self._segment_now(accumulator=accumulator, params=params)
 
-            try:
-                accumulator.accumulator = cv2.bitwise_and(accumulator.accumulator, accumulator.accumulator,
-                                                          mask=accumulator.mask)
-            except:
-                print('!!! Mask not found')
+            accumulator.accumulator = cv2.bitwise_and(accumulator.accumulator, accumulator.accumulator,
+                                                      mask=accumulator.mask)
 
-            self.save(measures=self.precision_recall_accuracy(accumulator=accumulator),
-                      accumulator=accumulator, epoch=epoch,
-                      params=params,
-                      log=log,
-                      save_images=save_images)
+            self._save(measures=self.precision_recall_accuracy(accumulator=accumulator),
+                       accumulator=accumulator, epoch=epoch,
+                       params=params,
+                       log=log,
+                       save_images=save_images)
 
-    def run_for_all_images(self, params_combination=[], save_images=False):
+    def run_for_all_images(self, params_combination=[], save_images=False, epochs=1):
         for file_name in os.listdir(self.data_dir):
             accumulator = self._initialize_image(file_name)
             self._run(accumulator=accumulator, params_combination=params_combination, save_images=save_images,
                       log=True)
         self.log_file.close()
 
-    def run_for_one_image(self, file_name=None, params={}, save_images=False, epochs=1, alpha_raise=0.3):
+    def run_for_one_image(self, file_name=None, params={}, save_images=False, epochs=1, alpha_decay=0.2):
 
         accumulator = self._initialize_image(file_name)
 
         for i in range(epochs):
             if i > 0:
-                accumulator.img_obj.img_array = cv2.bitwise_and(accumulator.img_obj.img_array,
-                                                                accumulator.img_obj.img_array,
-                                                                mask=255 - accumulator.accumulator)
-
-                params['alpha'] = params['alpha'] + alpha_raise
-
+                self._mask_segmented_vessels(accumulator=accumulator, params=params, alpha_decay=alpha_decay)
             print('Running epoch: ' + str(i))
             self._run(accumulator=accumulator,
                       params_combination=[params], save_images=save_images,
@@ -203,18 +195,43 @@ class AtureTest:
         self.log_file.close()
         return accumulator
 
-    def save(self, measures=None, accumulator=None, epoch=None, params=None, log=None,
-             save_images=False):
+    def _save(self, measures=None, accumulator=None, epoch=None, params=None, log=False,
+              save_images=False):
+
         precision, recall, accuracy = measures
         f1_score = 2 * precision * recall / (precision + recall)
+
+        accumulator.res['image' + str(epoch)] = accumulator.img_obj.img_array.copy()
+        accumulator.res['gabor' + str(epoch)] = accumulator.img_obj.img_gabor.copy()
+        accumulator.res['segmented' + str(epoch)] = accumulator.accumulator.copy()
+        accumulator.res['bilateral' + str(epoch)] = accumulator.img_obj.diff_bilateral.copy()
+        accumulator.res['skeleton' + str(epoch)] = accumulator.img_obj.img_skeleton.copy()
+        accumulator.res['params' + str(epoch)] = params
+        accumulator.res['F' + str(epoch)] = f1_score
+        accumulator.res['precision' + str(epoch)] = precision
+        accumulator.res['recall' + str(epoch)] = recall
+        accumulator.res['accuracy' + str(epoch)] = accuracy
+        accumulator.accumulator = np.maximum(accumulator.res['segmented' + str(epoch)], accumulator.accumulator)
+        self._save_images(accumulator=accumulator, params=params, epoch=epoch, log=log, save_images=save_images)
+
+    def _mask_segmented_vessels(self, accumulator=None, params=None, alpha_decay=None):
+
+        for i in range(accumulator.img_obj.img_array.shape[0]):
+            for j in range(accumulator.img_obj.img_array.shape[1]):
+                if accumulator.accumulator[i, j] == 255:
+                    accumulator.img_obj.img_array[i, j] = 200
+
+        params['alpha'] -= alpha_decay
+
+    def _save_images(self, accumulator=None, params=None, epoch=None, log=False, save_images=False):
         i = next(self.c)
         line = str(i) + ',' + \
                'EP' + str(epoch) + ',' + \
                str(accumulator.img_obj.file_name) + ',' + \
-               str(round(f1_score, 3)) + ',' + \
-               str(round(precision, 3)) + ',' + \
-               str(round(recall, 3)) + ',' + \
-               str(round(accuracy, 3)) + ',' + \
+               str(round(accumulator.res['F' + str(epoch)], 3)) + ',' + \
+               str(round(accumulator.res['precision' + str(epoch)], 3)) + ',' + \
+               str(round(accumulator.res['recall' + str(epoch)], 3)) + ',' + \
+               str(round(accumulator.res['accuracy' + str(epoch)], 3)) + ',' + \
                str(round(params['sk_threshold'], 3)) + ',' + \
                str(round(params['alpha'], 3)) + ',' + \
                str(round(params['gabor_contrib'], 3)) + ',' + \
@@ -224,15 +241,6 @@ class AtureTest:
             self.log_file.flush()
         if i % 5 == 0:
             print('Number of params combination tried: ' + str(self.c))
-
-        accumulator.res['image'+str(epoch)] = accumulator.img_obj.img_array
-        accumulator.res['gabor' + str(epoch)] = accumulator.img_obj.img_gabor
-        accumulator.res['segmented' + str(epoch)] = accumulator.accumulator
-        accumulator.res['params' + str(epoch)] = params
-        accumulator.res['F' + str(epoch)] = f1_score
-        accumulator.res['precision' + str(epoch)] = precision
-        accumulator.res['recall' + str(epoch)] = recall
-        accumulator.res['accuracy' + str(epoch)] = accuracy
 
         if save_images:
             IMG.fromarray(accumulator.rgb_accumulator).save(
