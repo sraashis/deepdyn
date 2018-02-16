@@ -9,3 +9,5 @@ preprocess/image/__pycache__/
 .idea
 out/
 data/
+.ipynb_checkpoints/
+Untitled.ipynb
