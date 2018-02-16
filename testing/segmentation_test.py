@@ -25,7 +25,7 @@ class AtureTest:
             self.log_file = open(self.log_dir + os.sep + "segmentation_result.csv", 'w')
 
         self.log_file.write(
-            'ITERATION,FILE_NAME,FSCORE,PRECISION,RECALL,ACCURACY,' \
+            'ITERATION,EPOCH,FILE_NAME,FSCORE,PRECISION,RECALL,ACCURACY,' \
             'SKELETONIZE_THRESHOLD,' \
             'IMG_LATTICE_COST_ASSIGNMENT_ALPHA,' \
             'IMG_LATTICE_COST_GABOR_IMAGE_CONTRIBUTION,' \
@@ -63,7 +63,7 @@ class AtureTest:
     def _load_file(self, file_name=None):
         img = IMG.open(os.path.join(self.data_dir, file_name))
         orig = np.array(img.getdata(), np.uint8).reshape(img.size[1], img.size[0], 3)
-        print('\n### File loaded: ' + file_name)
+        print('\nFile loaded: ' + file_name)
         return orig
 
     def _load_mask(self, file_name):
@@ -81,14 +81,14 @@ class AtureTest:
             ], np.uint8)
 
             mask = cv2.erode(mask, kern, iterations=5)
-        print('Mask loaded')
+        print('Mask loaded: ' + mask_file)
         return mask
 
     def _load_ground_truth(self, file_name=None):
         gt_file = self.fget_ground_truth_file(file_name)
         truth = IMG.open(os.path.join(self.ground_truth_dir, gt_file))
         truth = np.array(truth.getdata(), np.uint8).reshape(truth.size[1], truth.size[0], 1)[:, :, 0]
-        print('Ground truth loaded')
+        print('Ground truth loaded: ' + gt_file)
         return truth
 
     def _preprocess(self, file_name=None):
@@ -109,11 +109,7 @@ class AtureTest:
             truth = None
             print('!!! Ground truth not found')
 
-        img_obj.apply_bilateral()
-        img_obj.apply_gabor(kernel_bank=imgutils.get_chosen_gabor_bank())
-        print('Filter applied')
-
-        lattice_obj = Lattice(image_arr_2d=img_obj.img_gabor)
+        lattice_obj = Lattice(image_arr_2d=img_obj.img_array)
         lattice_obj.generate_lattice_graph()
         print('Lattice created')
 
@@ -156,16 +152,20 @@ class AtureTest:
 
         return TP / (TP + FP), TP / (TP + FN), (TP + TN) / (TP + FP + FN + TN)
 
-    def _run(self, file_name=None, params_combination=[], save_segmentation=False, log=False):
+    def _run(self, file_name=None, image_obj=None, lattice_obj=None, truth=None, params_combination=[],
+             save_segmentation=False, log=False, epoch=1):
 
-        img_obj, lattice_obj, truth = self._preprocess(file_name)
+        image_obj.apply_bilateral()
+        image_obj.apply_gabor(kernel_bank=imgutils.get_chosen_gabor_bank())
+        print('Filter applied')
+        IMG.fromarray(image_obj.img_gabor).show()
+
         self.c = count(1)
         params_count = len(params_combination)
 
-        print('Starting with ' + str(params_count) + ' parameter combination...')
         for params in params_combination:
 
-            self._segment_now(img_obj=img_obj, lattice_obj=lattice_obj, params=params)
+            self._segment_now(img_obj=image_obj, lattice_obj=lattice_obj, params=params)
 
             segmented_rgb = np.zeros([lattice_obj.accumulator.shape[0], lattice_obj.accumulator.shape[1], 3],
                                      dtype=np.uint8)
@@ -176,6 +176,7 @@ class AtureTest:
 
             i = next(self.c)
             line = str(i) + ',' + \
+                   'e' + str(epoch) + ',' + \
                    str(file_name) + ',' + \
                    str(round(f1_score, 3)) + ',' + \
                    str(round(precision, 3)) + ',' + \
@@ -191,17 +192,37 @@ class AtureTest:
 
             if save_segmentation or f1_score >= 0.78:
                 IMG.fromarray(segmented_rgb).save(os.path.join(self.log_dir, file_name + '_[' + line + ']' + '.JPEG'))
-            print('Number of parameter combinations tried: ' + str(i) + ' / ' + str(params_count), end='\r')
+                IMG.fromarray(image_obj.img_gabor).save(
+                    os.path.join(self.log_dir, file_name + '_[' + line + ']GABOR' + '.JPEG'))
+                IMG.fromarray(image_obj.img_array).save(
+                    os.path.join(self.log_dir, file_name + '_[' + line + ']ORIG' + '.JPEG'))
+
+            if i % 10 == 0:
+                print('Number of parameter combinations tried: ' + str(i) + ' / ' + str(params_count), end='\r')
 
     def run_for_all_images(self, params_combination=[], save=False):
         for file_name in os.listdir(self.data_dir):
-            self._run(file_name=file_name, params_combination=params_combination, save_segmentation=save,
+            img_obj, lattice_obj, truth = self._preprocess(file_name)
+            self._run(file_name=file_name, image_obj=img_obj, lattice_obj=lattice_obj, truth=truth,
+                      params_combination=params_combination, save_segmentation=save,
                       log=True)
         self.log_file.close()
 
-    def run_for_one_image(self, file_name=None, params_combination=[], save=False):
-        self._run(file_name=file_name, params_combination=params_combination, save_segmentation=save,
-                  log=True)
+    def run_for_one_image(self, file_name=None, params={}, save=False, epochs=1, alpha_raise=0.3):
+
+        img_obj, lattice_obj, truth = self._preprocess(file_name)
+
+        for i in range(epochs):
+            if i > 0:
+                img_obj.img_array = cv2.bitwise_and(img_obj.img_array, img_obj.img_array,
+                                                    mask=255 - lattice_obj.accumulator)
+                params['alpha'] = params['alpha'] + alpha_raise
+
+            print('Running epoch: ' + str(i))
+            self._run(file_name=file_name, image_obj=img_obj, lattice_obj=lattice_obj, truth=truth,
+                      params_combination=[params], save_segmentation=save,
+                      log=True, epoch=i)
+
         self.log_file.close()
 
 
