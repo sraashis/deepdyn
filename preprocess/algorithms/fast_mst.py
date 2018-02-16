@@ -1,21 +1,21 @@
-import commons.constants as const
-from commons.timer import check_time
 import math as mth
+
 import networkx as nx
 import numpy as np
 
+import commons.constants as const
 
-def run_segmentation(image_object=None,
-                     lattice_object=None,
+
+def run_segmentation(accumulator=None,
                      seed_list=None,
                      segmentation_threshold=const.SEGMENTATION_THRESHOLD,
                      alpha=const.IMG_LATTICE_COST_ASSIGNMENT_ALPHA,
                      img_gabor_contribution=const.IMG_LATTICE_COST_GABOR_IMAGE_CONTRIBUTION,
                      img_original_contribution=const.IMG_LATTICE_COST_ORIGINAL_IMAGE_CONTRIBUTION):
-
-    graph = lattice_object.graph.copy()
-    lattice_object.accumulator = np.zeros([lattice_object.x_size, lattice_object.y_size], dtype=np.uint8)
-    img_used = [(img_gabor_contribution, image_object.img_gabor), (img_original_contribution, image_object.img_array)]
+    graph = accumulator.img_obj.graph.copy()
+    accumulator.accumulator = np.zeros([accumulator.x_size, accumulator.y_size], dtype=np.uint8)
+    img_used = [(img_gabor_contribution, accumulator.img_obj.img_gabor),
+                (img_original_contribution, accumulator.img_obj.img_array)]
 
     edges_to_delete = []
     for e in graph.edges():
@@ -32,6 +32,6 @@ def run_segmentation(image_object=None,
     for component in nx.connected_components(graph):
         if component.isdisjoint(seed_list) is False:
             for node in component:
-                lattice_object.accumulator[node] = 255
+                accumulator.accumulator[node] = 255
 
     return graph
