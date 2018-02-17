@@ -13,7 +13,6 @@ def run_segmentation(accumulator=None,
                      img_gabor_contribution=const.IMG_LATTICE_COST_GABOR_IMAGE_CONTRIBUTION,
                      img_original_contribution=const.IMG_LATTICE_COST_ORIGINAL_IMAGE_CONTRIBUTION):
     graph = accumulator.img_obj.graph.copy()
-    accumulator.accumulator = np.zeros([accumulator.x_size, accumulator.y_size], dtype=np.uint8)
     img_used = [(img_gabor_contribution, accumulator.img_obj.img_gabor),
                 (img_original_contribution, accumulator.img_obj.img_array)]
 
