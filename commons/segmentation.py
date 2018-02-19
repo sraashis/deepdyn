@@ -17,21 +17,7 @@ class AtureTest:
 
         self.data_dir = data_dir
         self.log_dir = log_dir
-
-        if os.path.isdir(self.log_dir) is False:
-            os.makedirs(self.log_dir)
-            self.log_file = open(self.log_dir + os.sep + "segmentation_result.csv", 'w')
-        else:
-            self.log_file = open(self.log_dir + os.sep + "segmentation_result.csv", 'w')
-
-        self.log_file.write(
-            'ITERATION,EPOCH,FILE_NAME,FSCORE,PRECISION,RECALL,ACCURACY,' \
-            'SKELETONIZE_THRESHOLD,' \
-            'IMG_LATTICE_COST_ASSIGNMENT_ALPHA,' \
-            'IMG_LATTICE_COST_GABOR_IMAGE_CONTRIBUTION,' \
-            'SEGMENTATION_THRESHOLD\n'
-        )
-
+        self.log_file = None
         self.mask_dir = None
         self.ground_truth_dir = None
         self.fget_mask_file = None
@@ -159,8 +145,6 @@ class AtureTest:
         accumulator.img_obj.apply_gabor(kernel_bank=imgutils.get_chosen_gabor_bank())
         print('Filter applied')
 
-        self.c = count(1)
-
         for params in params_combination:
             self._segment_now(accumulator=accumulator, params=params)
 
@@ -173,7 +157,22 @@ class AtureTest:
                        log=log,
                        save_images=save_images)
 
-    def run_for_all_images(self, params_combination=[], save_images=False, epochs=1):
+    def run_for_all_images(self, params_combination=[], save_images=False):
+
+        if os.path.isdir(self.log_dir) is False:
+            os.makedirs(self.log_dir)
+            self.log_file = open(self.log_dir + os.sep + "segmentation_result.csv", 'w')
+        else:
+            self.log_file = open(self.log_dir + os.sep + "segmentation_result.csv", 'w')
+
+        self.log_file.write(
+            'ITERATION,EPOCH,FILE_NAME,FSCORE,PRECISION,RECALL,ACCURACY,' \
+            'SKELETONIZE_THRESHOLD,' \
+            'IMG_LATTICE_COST_ASSIGNMENT_ALPHA,' \
+            'IMG_LATTICE_COST_GABOR_IMAGE_CONTRIBUTION,' \
+            'SEGMENTATION_THRESHOLD\n'
+        )
+
         for file_name in os.listdir(self.data_dir):
             accumulator = self._initialize_image(file_name)
             self._run(accumulator=accumulator, params_combination=params_combination, save_images=save_images,
@@ -192,7 +191,6 @@ class AtureTest:
                       params_combination=[params], save_images=save_images,
                       log=False, epoch=i)
 
-        self.log_file.close()
         return accumulator
 
     def _save(self, measures=None, accumulator=None, epoch=None, params=None, log=False,
@@ -206,13 +204,13 @@ class AtureTest:
         accumulator.res['segmented' + str(epoch)] = accumulator.accumulator.copy()
         accumulator.res['bilateral' + str(epoch)] = accumulator.img_obj.diff_bilateral.copy()
         accumulator.res['skeleton' + str(epoch)] = accumulator.img_obj.img_skeleton.copy()
-        accumulator.res['params' + str(epoch)] = params
+        accumulator.res['params' + str(epoch)] = params.copy()
         accumulator.res['F' + str(epoch)] = f1_score
         accumulator.res['precision' + str(epoch)] = precision
         accumulator.res['recall' + str(epoch)] = recall
         accumulator.res['accuracy' + str(epoch)] = accuracy
         accumulator.accumulator = np.maximum(accumulator.res['segmented' + str(epoch)], accumulator.accumulator)
-        self._save_images(accumulator=accumulator, params=params, epoch=epoch, log=log, save_images=save_images)
+        self._log_to_file(accumulator=accumulator, params=params, epoch=epoch, log=log, save_images=save_images)
 
     def _mask_segmented_vessels(self, accumulator=None, params=None, alpha_decay=None):
 
@@ -223,7 +221,7 @@ class AtureTest:
 
         params['alpha'] -= alpha_decay
 
-    def _save_images(self, accumulator=None, params=None, epoch=None, log=False, save_images=False):
+    def _log_to_file(self, accumulator=None, params=None, epoch=None, log=False, save_images=False):
         i = next(self.c)
         line = str(i) + ',' + \
                'EP' + str(epoch) + ',' + \
@@ -239,8 +237,8 @@ class AtureTest:
         if log:
             self.log_file.write(line + '\n')
             self.log_file.flush()
-        if i % 5 == 0:
-            print('Number of params combination tried: ' + str(self.c))
+
+        print('Number of params combination tried: ' + str(i))
 
         if save_images:
             IMG.fromarray(accumulator.rgb_accumulator).save(
