@@ -72,7 +72,7 @@ class AtureTest:
                 return cv2.erode(mask, kern, iterations=5)
         except:
             print('!!! Mask not found')
-            return np.zeros_like(img_object.img_array)
+            return np.ones_like(img_object.img_array)
 
     def _load_ground_truth(self, file_name=None):
 
