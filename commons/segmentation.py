@@ -239,6 +239,7 @@ class AtureTest:
         params['alpha'] -= alpha_decay
         params['sk_threshold'] = 100
 
+    @checktime
     def _save(self, accumulator=None, params=None, epoch=None, save_images=False):
         i = next(self.c)
         base = 'scores' + str(epoch)
