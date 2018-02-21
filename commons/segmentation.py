@@ -276,5 +276,5 @@ class AtureTestMat(AtureTest):
     def _load_file(self, file_name=None):
         file = Mat(mat_file=os.path.join(self.data_dir, file_name))
         orig = file.get_image('I2')
-        print('File loaded: ' + file_name)
+        print('### File loaded: ' + file_name)
         return orig
