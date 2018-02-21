@@ -1,11 +1,11 @@
 import time
 
 
-def check_time(func):
+def checktime(func):
     def inner(*args, **kwargs):
         start = time.time()
         result = func(*args, **kwargs)
-        print("------[ RUNNING Time: " + str(time.time() - start) + " seconds ]------")
+        print('-Function  "' + func.__name__ + '(__)"  took ' + str(round(time.time() - start, 3)) + " seconds-")
         return result
 
     return inner

@@ -10,20 +10,23 @@ import preprocess.utils.img_utils as imgutils
 from commons.IMAGE import Image
 from commons.MAT import Mat
 from commons.accumulator import Accumulator
+from commons.timer import checktime
 
 
 class AtureTest:
-    def __init__(self, data_dir=None, log_dir=None):
+    def __init__(self, data_dir=None, out_dir=None):
 
         self.data_dir = data_dir
-        self.log_dir = log_dir
-        self.log_file = None
+        self.out_dir = out_dir
+        self.writer = None
         self.mask_dir = None
         self.ground_truth_dir = None
         self.fget_mask_file = None
         self.fget_ground_truth_file = None
         self.erode_mask = None
         self.c = count(1)
+        if os.path.isdir(self.out_dir) is False:
+            os.makedirs(self.out_dir)
 
     def load_mask(self, mask_dir=None, fget_mask_file=None, erode_mask=False):
         self.mask_dir = mask_dir
@@ -34,28 +37,25 @@ class AtureTest:
         self.ground_truth_dir = ground_truth_dir
         self.fget_ground_truth_file = fget_ground_truth_file
 
-    def _segment_now(self, accumulator=None, params={}):
-        accumulator.img_obj.create_skeleton(threshold=params['sk_threshold'],
-                                            kernels=imgutils.get_chosen_skeleton_filter())
-        seed_node_list = imgutils.get_seed_node_list(accumulator.img_obj.img_skeleton)
+    @checktime
+    def _segment_now(self, accumulator_2d=None, image_obj=None, params={}):
+        image_obj.create_skeleton(threshold=params['sk_threshold'],
+                                  kernels=imgutils.get_chosen_skeleton_filter())
+        seed_node_list = imgutils.get_seed_node_list(image_obj.img_skeleton)
 
-        fmst.run_segmentation(accumulator=accumulator,
-                              seed_list=seed_node_list,
-                              segmentation_threshold=params['seg_threshold'],
-                              alpha=params['alpha'],
-                              img_gabor_contribution=params['gabor_contrib'],
-                              img_original_contribution=1.0 - params['gabor_contrib'])
+        fmst.run_segmentation(accumulator_2d=accumulator_2d, image_obj=image_obj, seed_list=seed_node_list,
+                              params=params)
 
     def _load_file(self, file_name=None):
         img = IMG.open(os.path.join(self.data_dir, file_name))
         orig = np.array(img.getdata(), np.uint8).reshape(img.size[1], img.size[0], 3)
-        print('\nFile loaded: ' + file_name)
+        print('### File loaded: ' + file_name)
         return orig
 
-    def _load_mask(self, img_object=None):
-        mask_file = self.fget_mask_file(img_object.file_name)
+    def _load_mask(self, image_obj=None):
 
         try:
+            mask_file = self.fget_mask_file(image_obj.file_name)
             mask = IMG.open(os.path.join(self.mask_dir, mask_file))
             mask = np.array(mask.getdata(), np.uint8).reshape(mask.size[1], mask.size[0], 1)[:, :, 0]
 
@@ -72,186 +72,205 @@ class AtureTest:
                 return cv2.erode(mask, kern, iterations=5)
         except:
             print('!!! Mask not found')
-            return np.ones_like(img_object.img_array)
+            return np.ones_like(image_obj.img_array)
 
-    def _load_ground_truth(self, file_name=None):
+    def _load_ground_truth(self, image_obj=None):
 
         try:
-            gt_file = self.fget_ground_truth_file(file_name)
+            gt_file = self.fget_ground_truth_file(image_obj.file_name)
             truth = IMG.open(os.path.join(self.ground_truth_dir, gt_file))
             truth = np.array(truth.getdata(), np.uint8).reshape(truth.size[1], truth.size[0], 1)[:, :, 0]
             print('Ground truth loaded: ' + gt_file)
             return truth
         except:
             print('!!! Ground truth not found')
-            return None
+            return np.zeros_like(image_obj.img_array)
 
-    def _initialize_image(self, file_name=None):
+    @checktime
+    def _initialize(self, file_name=None):
 
-        rgb = self._load_file(file_name=file_name)
-        img_obj = Image(image_arr=rgb[:, :, 1], file_name=file_name)
-
-        mask = self._load_mask(img_object=img_obj)
-        truth = self._load_ground_truth(file_name=file_name)
-
+        org = self._load_file(file_name=file_name)
+        img_obj = Image(image_arr=org[:, :, 1], file_name=file_name)
+        mask = self._load_mask(image_obj=img_obj)
         img_obj.img_array = cv2.bitwise_and(img_obj.img_array, img_obj.img_array, mask=mask)
 
+        truth = self._load_ground_truth(image_obj=img_obj)
         img_obj.generate_lattice_graph()
         print('Lattice created')
 
         return Accumulator(img_obj=img_obj, mask=mask, ground_truth=truth)
 
-    def precision_recall_accuracy(self, accumulator=None):
+    @checktime
+    def _generate_rgb(self, arr_2d=None, truth=None, arr_rgb=None):
+        for i in range(0, arr_2d.shape[0]):
+            for j in range(0, arr_2d.shape[1]):
+                if arr_2d[i, j] == 255:
+                    arr_rgb[i, j, :] = 255
+                if arr_2d[i, j] == 255 and truth[i, j] == 0:
+                    arr_rgb[i, j, 0] = 0
+                    arr_rgb[i, j, 1] = 255
+                    arr_rgb[i, j, 2] = 0
+                if arr_2d[i, j] == 0 and truth[i, j] == 255:
+                    arr_rgb[i, j, 0] = 255
+                    arr_rgb[i, j, 1] = 0
+                    arr_rgb[i, j, 2] = 0
 
-        if accumulator.ground_truth is None:
-            accumulator.rgb_accumulator[:, :, 0] = accumulator.accumulator
-            accumulator.rgb_accumulator[:, :, 1] = accumulator.accumulator
-            accumulator.rgb_accumulator[:, :, 2] = accumulator.accumulator
-            return 0.01, 0.01, 0.01
+    @checktime
+    def _calculate_scores(self, arr_2d=None, truth=None):
+        tp, fp, fn, tn = 0, 0, 0, 0
+        for i in range(0, arr_2d.shape[0]):
+            for j in range(0, arr_2d.shape[1]):
+                if arr_2d[i, j] == 255 and truth[i, j] == 255:
+                    tp += 1
+                if arr_2d[i, j] == 255 and truth[i, j] == 0:
+                    fp += 1
+                if arr_2d[i, j] == 0 and truth[i, j] == 255:
+                    fn += 1
+                if arr_2d[i, j] == 0 and truth[i, j] == 0:
+                    tn += 1
+        p, r, a = 0, 0, 0
+        try:
+            p = tp / (tp + fp)
+        except ZeroDivisionError:
+            p = 0
 
-        TP = 0  # True Positive
-        FP = 0  # False Positive
-        FN = 0  # False Negative
-        TN = 0  # True Negative
-        for i in range(0, accumulator.accumulator.shape[0]):
-            for j in range(0, accumulator.accumulator.shape[1]):
+        try:
+            r = tp / (tp + fn)
+        except ZeroDivisionError:
+            r = 0
 
-                if accumulator.accumulator[i, j] == 255:
-                    accumulator.rgb_accumulator[i, j, 0] = 255
-                    accumulator.rgb_accumulator[i, j, 1] = 255
-                    accumulator.rgb_accumulator[i, j, 2] = 255
+        try:
+            a = (tp + tn) / (tp + fp + fn + tn)
+        except ZeroDivisionError:
+            a = 0
 
-                if accumulator.accumulator[i, j] == 255 and accumulator.ground_truth[i, j] == 255:
-                    TP += 1
-                if accumulator.accumulator[i, j] == 255 and accumulator.ground_truth[i, j] == 0:
-                    accumulator.rgb_accumulator[i, j, 0] = 0
-                    accumulator.rgb_accumulator[i, j, 1] = 255
-                    accumulator.rgb_accumulator[i, j, 2] = 0
-                    FP += 1
-                if accumulator.accumulator[i, j] == 0 and accumulator.ground_truth[i, j] == 255:
-                    accumulator.rgb_accumulator[i, j, 0] = 255
-                    accumulator.rgb_accumulator[i, j, 1] = 0
-                    accumulator.rgb_accumulator[i, j, 2] = 0
-                    FN += 1
-                if accumulator.accumulator[i, j] == 0 and accumulator.ground_truth[i, j] == 0:
-                    TN += 1
+        return {
+            'Precision': p,
+            'Recall': r,
+            'Accuracy': a,
+            'F1': 2 * p * r / (p + r)
+        }
 
-        return TP / (TP + FP), TP / (TP + FN), (TP + TN) / (TP + FP + FN + TN)
+    def _run(self, accumulator=None, params={},
+             save_images=False, epoch=0):
 
-    def _run(self, accumulator=None, params_combination=[],
-             save_images=False, log=False, epoch=0):
+        current_segmented = np.zeros_like(accumulator.img_obj.img_array)
+        current_rgb = np.zeros([accumulator.x_size, accumulator.y_size, 3], dtype=np.uint8)
 
-        accumulator.img_obj.apply_bilateral()
-        accumulator.img_obj.apply_gabor(kernel_bank=imgutils.get_chosen_gabor_bank())
-        print('Filter applied')
-
-        for params in params_combination:
-            self._segment_now(accumulator=accumulator, params=params)
-
-            accumulator.accumulator = cv2.bitwise_and(accumulator.accumulator, accumulator.accumulator,
-                                                      mask=accumulator.mask)
-
-            self._save(measures=self.precision_recall_accuracy(accumulator=accumulator),
-                       accumulator=accumulator, epoch=epoch,
-                       params=params,
-                       log=log,
-                       save_images=save_images)
-
-    def run_for_all_images(self, params_combination=[], save_images=False):
-
-        if os.path.isdir(self.log_dir) is False:
-            os.makedirs(self.log_dir)
-            self.log_file = open(self.log_dir + os.sep + "segmentation_result.csv", 'w')
-        else:
-            self.log_file = open(self.log_dir + os.sep + "segmentation_result.csv", 'w')
-
-        self.log_file.write(
-            'ITERATION,EPOCH,FILE_NAME,FSCORE,PRECISION,RECALL,ACCURACY,' \
-            'SKELETONIZE_THRESHOLD,' \
-            'IMG_LATTICE_COST_ASSIGNMENT_ALPHA,' \
-            'IMG_LATTICE_COST_GABOR_IMAGE_CONTRIBUTION,' \
-            'SEGMENTATION_THRESHOLD\n'
-        )
-
-        for file_name in os.listdir(self.data_dir):
-            accumulator = self._initialize_image(file_name)
-            self._run(accumulator=accumulator, params_combination=params_combination, save_images=save_images,
-                      log=True)
-        self.log_file.close()
-
-    def run_for_one_image(self, file_name=None, params={}, save_images=False, epochs=1, alpha_decay=0.2):
-
-        accumulator = self._initialize_image(file_name)
-
-        for i in range(epochs):
-            if i > 0:
-                self._mask_segmented_vessels(accumulator=accumulator, params=params, alpha_decay=alpha_decay)
-            print('Running epoch: ' + str(i))
-            self._run(accumulator=accumulator,
-                      params_combination=[params], save_images=save_images,
-                      log=False, epoch=i)
-
-        return accumulator
-
-    def _save(self, measures=None, accumulator=None, epoch=None, params=None, log=False,
-              save_images=False):
-
-        precision, recall, accuracy = measures
-        f1_score = 2 * precision * recall / (precision + recall)
+        self._segment_now(accumulator_2d=current_segmented, image_obj=accumulator.img_obj, params=params)
+        current_segmented = cv2.bitwise_and(current_segmented, current_segmented, mask=accumulator.mask)
+        accumulator.arr_2d = np.maximum(accumulator.arr_2d, current_segmented)
 
         accumulator.res['image' + str(epoch)] = accumulator.img_obj.img_array.copy()
         accumulator.res['gabor' + str(epoch)] = accumulator.img_obj.img_gabor.copy()
-        accumulator.res['segmented' + str(epoch)] = accumulator.accumulator.copy()
         accumulator.res['bilateral' + str(epoch)] = accumulator.img_obj.diff_bilateral.copy()
         accumulator.res['skeleton' + str(epoch)] = accumulator.img_obj.img_skeleton.copy()
         accumulator.res['params' + str(epoch)] = params.copy()
-        accumulator.res['F' + str(epoch)] = f1_score
-        accumulator.res['precision' + str(epoch)] = precision
-        accumulator.res['recall' + str(epoch)] = recall
-        accumulator.res['accuracy' + str(epoch)] = accuracy
-        accumulator.accumulator = np.maximum(accumulator.res['segmented' + str(epoch)], accumulator.accumulator)
-        self._log_to_file(accumulator=accumulator, params=params, epoch=epoch, log=log, save_images=save_images)
+        accumulator.res['scores' + str(epoch)] = self._calculate_scores(arr_2d=accumulator.arr_2d,
+                                                                        truth=accumulator.ground_truth)
+        self._generate_rgb(arr_2d=current_segmented, truth=accumulator.ground_truth, arr_rgb=current_rgb)
+        accumulator.res['segmented' + str(epoch)] = current_rgb
 
-    def _mask_segmented_vessels(self, accumulator=None, params=None, alpha_decay=None):
+        self._generate_rgb(arr_2d=accumulator.arr_2d, truth=accumulator.ground_truth, arr_rgb=accumulator.arr_rgb)
+        self._save(accumulator=accumulator, params=params, epoch=epoch, save_images=save_images)
+
+    def run_for_all_images(self, params_combination=[], save_images=False, epochs=1, alpha_decay=0):
+
+        self.writer = open(self.out_dir + os.sep + "segmentation_result.csv", 'w')
+        self.writer.write(
+            'ITR,EPOCH,FILE_NAME,FSCORE,PRECISION,RECALL,ACCURACY,'
+            'SK_THRESHOLD,'
+            'ALPHA,'
+            'GABOR_CONTRIB,'
+            'SEG_THRESHOLD\n'
+        )
+
+        for file_name in os.listdir(self.data_dir):
+            accumulator = self._initialize(file_name)
+            accumulator.img_obj.apply_bilateral()
+            accumulator.img_obj.apply_gabor(kernel_bank=imgutils.get_chosen_gabor_bank())
+            print('Filter applied')
+
+            for params in params_combination:
+                for i in range(epochs):
+                    print('Running epoch: ' + str(i))
+
+                    if i > 0:
+                        self._disable_segmented_vessels(accumulator=accumulator, params=params, alpha_decay=alpha_decay)
+                        accumulator.img_obj.apply_bilateral()
+                        accumulator.img_obj.apply_gabor(kernel_bank=imgutils.get_chosen_gabor_bank())
+                        print('Filter applied')
+
+                    self._run(accumulator=accumulator, params=params, save_images=save_images, epoch=i)
+
+                # Reset for new parameter combination
+                accumulator.arr_2d = np.zeros_like(accumulator.img_obj.img_array)
+                accumulator.arr_rgb = np.zeros([accumulator.x_size, accumulator.y_size, 3], dtype=np.uint8)
+                accumulator.img_obj.img_array = accumulator.res['image0']
+
+        self.writer.close()
+
+    def run_for_one_image(self, file_name=None, params={}, save_images=False, epochs=1, alpha_decay=0):
+
+        accumulator = self._initialize(file_name)
+
+        for i in range(epochs):
+            print('Running epoch: ' + str(i))
+
+            if i > 0:
+                self._disable_segmented_vessels(accumulator=accumulator, params=params, alpha_decay=alpha_decay)
+
+            accumulator.img_obj.apply_bilateral()
+            accumulator.img_obj.apply_gabor(kernel_bank=imgutils.get_chosen_gabor_bank())
+            print('Filter applied')
+
+            self._run(accumulator=accumulator, params=params, save_images=save_images, epoch=i)
+
+        return accumulator
+
+    @checktime
+    def _disable_segmented_vessels(self, accumulator=None, params=None, alpha_decay=None):
 
         for i in range(accumulator.img_obj.img_array.shape[0]):
             for j in range(accumulator.img_obj.img_array.shape[1]):
-                if accumulator.accumulator[i, j] == 255:
+                if accumulator.arr_2d[i, j] == 255:
                     accumulator.img_obj.img_array[i, j] = 200
 
         params['alpha'] -= alpha_decay
+        params['sk_threshold'] = 100
 
-    def _log_to_file(self, accumulator=None, params=None, epoch=None, log=False, save_images=False):
+    def _save(self, accumulator=None, params=None, epoch=None, save_images=False):
         i = next(self.c)
+        base = 'scores' + str(epoch)
         line = str(i) + ',' + \
                'EP' + str(epoch) + ',' + \
                str(accumulator.img_obj.file_name) + ',' + \
-               str(round(accumulator.res['F' + str(epoch)], 3)) + ',' + \
-               str(round(accumulator.res['precision' + str(epoch)], 3)) + ',' + \
-               str(round(accumulator.res['recall' + str(epoch)], 3)) + ',' + \
-               str(round(accumulator.res['accuracy' + str(epoch)], 3)) + ',' + \
+               str(round(accumulator.res[base]['F1'], 3)) + ',' + \
+               str(round(accumulator.res[base]['Precision'], 3)) + ',' + \
+               str(round(accumulator.res[base]['Recall'], 3)) + ',' + \
+               str(round(accumulator.res[base]['Accuracy'], 3)) + ',' + \
                str(round(params['sk_threshold'], 3)) + ',' + \
                str(round(params['alpha'], 3)) + ',' + \
                str(round(params['gabor_contrib'], 3)) + ',' + \
                str(round(params['seg_threshold'], 3))
-        if log:
-            self.log_file.write(line + '\n')
-            self.log_file.flush()
+        if self.writer is not None:
+            self.writer.write(line + '\n')
+            self.writer.flush()
 
         print('Number of params combination tried: ' + str(i))
 
         if save_images:
-            IMG.fromarray(accumulator.rgb_accumulator).save(
-                os.path.join(self.log_dir, accumulator.img_obj.file_name + '_[' + line + ']' + '.JPEG'))
+            IMG.fromarray(accumulator.arr_rgb).save(
+                os.path.join(self.out_dir, accumulator.img_obj.file_name + '_[' + line + ']' + '.JPEG'))
             IMG.fromarray(accumulator.img_obj.img_gabor).save(
-                os.path.join(self.log_dir, accumulator.img_obj.file_name + '_[' + line + ']GABOR' + '.JPEG'))
+                os.path.join(self.out_dir, accumulator.img_obj.file_name + '_[' + line + ']GABOR' + '.JPEG'))
             IMG.fromarray(accumulator.img_obj.img_array).save(
-                os.path.join(self.log_dir, accumulator.img_obj.file_name + '_[' + line + ']ORIG' + '.JPEG'))
+                os.path.join(self.out_dir, accumulator.img_obj.file_name + '_[' + line + ']ORIG' + '.JPEG'))
 
 
 class AtureTestMat(AtureTest):
-    def __init__(self, data_dir=None, log_dir=None):
-        super().__init__(data_dir=data_dir, log_dir=log_dir)
+    def __init__(self, data_dir=None, out_dir=None):
+        super().__init__(data_dir=data_dir, out_dir=out_dir)
 
     def _load_file(self, file_name=None):
         file = Mat(mat_file=os.path.join(self.data_dir, file_name))
