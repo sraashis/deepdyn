@@ -128,7 +128,7 @@ class AtureTest:
                     fn += 1
                 if arr_2d[i, j] == 0 and truth[i, j] == 0:
                     tn += 1
-        p, r, a = 0, 0, 0
+        p, r, a, f1 = 0, 0, 0, 0
         try:
             p = tp / (tp + fp)
         except ZeroDivisionError:
@@ -144,11 +144,16 @@ class AtureTest:
         except ZeroDivisionError:
             a = 0
 
+        try:
+            f1 = 2 * p * r / (p + r)
+        except ZeroDivisionError:
+            f1 = 0
+
         return {
             'Precision': p,
             'Recall': r,
             'Accuracy': a,
-            'F1': 2 * p * r / (p + r)
+            'F1': f1
         }
 
     def _run(self, accumulator=None, params={},
@@ -275,5 +280,5 @@ class AtureTestMat(AtureTest):
     def _load_file(self, file_name=None):
         file = Mat(mat_file=os.path.join(self.data_dir, file_name))
         orig = file.get_image('I2')
-        print('File loaded: ' + file_name)
+        print('### File loaded: ' + file_name)
         return orig
