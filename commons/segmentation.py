@@ -242,7 +242,7 @@ class AtureTest:
                     accumulator.img_obj.img_array[i, j] = 200
 
         params['alpha'] -= alpha_decay
-        params['sk_threshold'] = 100
+        # params['sk_threshold'] = 100
 
     def _save(self, accumulator=None, params=None, epoch=None, save_images=False):
         i = next(self.c)
