@@ -1,17 +1,18 @@
 import math as mth
 
 import networkx as nx
-import numpy as np
 
 import commons.constants as const
+from commons.timer import checktime
 
 
+@checktime
 def run_segmentation(accumulator_2d=None, image_obj=None,
                      seed_list=None,
                      params=None):
     graph = image_obj.graph.copy()
     img_used = [(params['gabor_contrib'], image_obj.img_gabor),
-                (1-params['gabor_contrib'], image_obj.img_array)]
+                (1 - params['gabor_contrib'], image_obj.img_array)]
 
     edges_to_delete = []
     for e in graph.edges():

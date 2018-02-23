@@ -37,7 +37,6 @@ class AtureTest:
         self.ground_truth_dir = ground_truth_dir
         self.fget_ground_truth_file = fget_ground_truth_file
 
-    @checktime
     def _segment_now(self, accumulator_2d=None, image_obj=None, params={}):
         image_obj.create_skeleton(threshold=params['sk_threshold'],
                                   kernels=imgutils.get_chosen_skeleton_filter())
@@ -86,7 +85,6 @@ class AtureTest:
             print('!!! Ground truth not found')
             return np.zeros_like(image_obj.img_array)
 
-    @checktime
     def _initialize(self, file_name=None):
 
         org = self._load_file(file_name=file_name)
@@ -96,7 +94,6 @@ class AtureTest:
 
         truth = self._load_ground_truth(image_obj=img_obj)
         img_obj.generate_lattice_graph()
-        print('Lattice created')
 
         return Accumulator(img_obj=img_obj, mask=mask, ground_truth=truth)
 
@@ -194,7 +191,6 @@ class AtureTest:
             accumulator = self._initialize(file_name)
             accumulator.img_obj.apply_bilateral()
             accumulator.img_obj.apply_gabor(kernel_bank=imgutils.get_chosen_gabor_bank())
-            print('Filter applied')
 
             for params in params_combination:
                 for i in range(epochs):
@@ -204,7 +200,6 @@ class AtureTest:
                         self._disable_segmented_vessels(accumulator=accumulator, params=params, alpha_decay=alpha_decay)
                         accumulator.img_obj.apply_bilateral()
                         accumulator.img_obj.apply_gabor(kernel_bank=imgutils.get_chosen_gabor_bank())
-                        print('Filter applied')
 
                     self._run(accumulator=accumulator, params=params, save_images=save_images, epoch=i)
 
@@ -227,7 +222,6 @@ class AtureTest:
 
             accumulator.img_obj.apply_bilateral()
             accumulator.img_obj.apply_gabor(kernel_bank=imgutils.get_chosen_gabor_bank())
-            print('Filter applied')
 
             self._run(accumulator=accumulator, params=params, save_images=save_images, epoch=i)
 
