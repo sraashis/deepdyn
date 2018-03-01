@@ -1,11 +1,14 @@
-import logging as logger
+import os
 
+import cv2
 import cv2 as ocv
+import networkx as nx
 import numpy as np
+from PIL import Image as IMG
 
 import commons.constants as const
 import preprocess.utils.img_utils as imgutil
-import networkx as nx
+from commons.MAT import Mat
 from commons.timer import checktime
 
 __all__ = [
@@ -14,20 +17,63 @@ __all__ = [
 
 
 class Image:
-    def __init__(self, image_arr=None, file_name=None):
-        self.img_array = image_arr
+    def __init__(self, data_dir=None, file_name=None):
+        self.data_dir = data_dir
+        self.file_name = file_name
+        self.rgb = self.load_rgb(file_name=file_name)
+        self.working_arr = self.rgb[:, :, 1]
         self.diff_bilateral = None
         self.img_bilateral = None
         self.img_gabor = None
         self.img_skeleton = None
-        self.file_name = file_name
         self.graph = None
+        self.mask = None
+        self.ground_truth = None
+
+    def load_rgb(self, file_name):
+        img = IMG.open(os.path.join(self.data_dir, file_name))
+        print('### File loaded: ' + file_name)
+        return np.array(img.getdata(), np.uint8).reshape(img.size[1], img.size[0], 3)
+
+    def load_mask(self, mask_dir=None, fget_mask=None, erode=False):
+        try:
+            mask_file = fget_mask(self.file_name)
+            mask = IMG.open(os.path.join(mask_dir, mask_file))
+            mask = np.array(mask.getdata(), np.uint8).reshape(mask.size[1], mask.size[0], 1)[:, :, 0]
+
+            if erode:
+                kern = np.array([
+                    [0.0, 0.0, 0.5, 0.0, 0.0],
+                    [0.0, 0.2, 1.0, 0.2, 0.0],
+                    [0.5, 1.0, 1.5, 1.0, 0.5],
+                    [0.0, 0.2, 1.0, 0.2, 0.0],
+                    [0.0, 0.0, 0.5, 0.0, 0.0],
+                ], np.uint8)
+
+                print('Mask loaded: ' + mask_file)
+                self.mask = cv2.erode(mask, kern, iterations=5)
+        except:
+            print('!!! Mask not found')
+            self.mask = np.ones_like(self.working_arr)
+
+    def load_ground_truth(self, gt_dir=None, fget_ground_truth=None):
+
+        try:
+            gt_file = fget_ground_truth(self.file_name)
+            truth = IMG.open(os.path.join(gt_dir, gt_file))
+            truth = np.array(truth.getdata(), np.uint8).reshape(truth.size[1], truth.size[0], 1)[:, :, 0]
+            print('Ground truth loaded: ' + gt_file)
+            self.ground_truth = truth
+        except:
+            print('!!! Ground truth not found')
+            self.ground_truth = np.zeros_like(self.working_arr)
 
     @checktime
-    def apply_bilateral(self, k_size=const.BILATERAL_KERNEL_SIZE, sig_color=const.BILATERAL_SIGMA_COLOR,
-                        sig_space=const.BILATERAL_SIGMA_SPACE):
-        self.img_bilateral = ocv.bilateralFilter(self.img_array, k_size, sigmaColor=sig_color, sigmaSpace=sig_space)
-        self.diff_bilateral = imgutil.get_signed_diff_int8(self.img_array, self.img_bilateral)
+    def apply_bilateral(self):
+        self.img_bilateral = ocv.bilateralFilter(self.working_arr, const.BILATERAL_KERNEL_SIZE,
+                                                 sigmaColor=const.BILATERAL_SIGMA_COLOR,
+                                                 sigmaSpace=const.BILATERAL_SIGMA_SPACE)
+        self.diff_bilateral = imgutil.get_signed_diff_int8(self.working_arr, self.img_bilateral)
 
     @checktime
     def apply_gabor(self, kernel_bank):
@@ -64,6 +110,17 @@ class Image:
 
     @checktime
     def generate_lattice_graph(self, eight_connected=const.IMG_LATTICE_EIGHT_CONNECTED):
-        self.graph = nx.grid_2d_graph(self.img_array.shape[0], self.img_array.shape[1])
+        self.graph = nx.grid_2d_graph(self.working_arr.shape[0], self.working_arr.shape[1])
         if eight_connected:
             Image._connect_8(self.graph)
+
+
+class MatImage(Image):
+    def __init__(self, data_dir=None, file_name=None):
+        super().__init__(data_dir=data_dir, file_name=file_name)
+
+    def load_rgb(self, file_name=None):
+        file = Mat(mat_file=os.path.join(self.data_dir, file_name))
+        orig = file.get_image('I2')
+        print('### File loaded: ' + file_name)
+        return orig
