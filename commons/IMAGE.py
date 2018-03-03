@@ -92,7 +92,7 @@ class Image:
         if kernels is not None:
             self.img_skeleton = ocv.filter2D(self.img_skeleton, ocv.CV_8UC3, kernels)
 
-    def _connect_8(graph):
+    def _connect_8(self, graph):
         for i, j in graph:
             n0 = (i, j)
             n1 = (i - 1, j + 1)
@@ -112,7 +112,7 @@ class Image:
     def generate_lattice_graph(self, eight_connected=const.IMG_LATTICE_EIGHT_CONNECTED):
         self.graph = nx.grid_2d_graph(self.working_arr.shape[0], self.working_arr.shape[1])
         if eight_connected:
-            Image._connect_8(self.graph)
+            Image._connect_8(graph=self.graph)
 
 
 class MatImage(Image):

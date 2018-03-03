@@ -8,7 +8,6 @@ from PIL import Image as IMG
 import preprocess.algorithms.fast_mst as fmst
 import preprocess.utils.img_utils as imgutils
 from commons.IMAGE import Image
-from commons.MAT import Mat
 from commons.accumulator import Accumulator
 from commons.timer import checktime
 
@@ -33,8 +32,8 @@ class AtureTest:
                                   kernels=imgutils.get_chosen_skeleton_filter())
         seed_node_list = imgutils.get_seed_node_list(image_obj.img_skeleton)
 
-        fmst.run_segmentation(accumulator_2d=accumulator_2d, image_obj=image_obj, seed_list=seed_node_list,
-                              params=params)
+        return fmst.run_segmentation(accumulator_2d=accumulator_2d, image_obj=image_obj, seed_list=seed_node_list,
+                                     params=params)
 
     def _initialize(self, img_obj=None):
         img_obj.working_arr = cv2.bitwise_and(img_obj.working_arr, img_obj.working_arr, mask=img_obj.mask)
@@ -44,10 +43,10 @@ class AtureTest:
         return Accumulator(img_obj=img_obj)
 
     @checktime
-    def _generate_rgb(self, arr_2d=None, truth=None, arr_rgb=None):
+    def _rgb_scores(self, arr_2d=None, truth=None, arr_rgb=None):
         for i in range(0, arr_2d.shape[0]):
             for j in range(0, arr_2d.shape[1]):
-                if arr_2d[i, j] == 255:
+                if arr_2d[i, j] == 255 and truth[i, j] == 255:
                     arr_rgb[i, j, :] = 255
                 if arr_2d[i, j] == 255 and truth[i, j] == 0:
                     arr_rgb[i, j, 0] = 0
@@ -105,8 +104,9 @@ class AtureTest:
         current_segmented = np.zeros_like(accumulator.img_obj.working_arr)
         current_rgb = np.zeros([accumulator.x_size, accumulator.y_size, 3], dtype=np.uint8)
 
-        # Todo implement logic to disable previous conected component in _run() method:
-        self._segment_now(accumulator_2d=current_segmented, image_obj=accumulator.img_obj, params=params)
+        # Todo implement logic to disable previous connected component in _run() method:
+        accumulator.res['graph' + str(epoch)] = self._segment_now(accumulator_2d=current_segmented,
+                                                                  image_obj=accumulator.img_obj, params=params)
         current_segmented = cv2.bitwise_and(current_segmented, current_segmented, mask=accumulator.img_obj.mask)
         accumulator.arr_2d = np.maximum(accumulator.arr_2d, current_segmented)
 
@@ -114,11 +114,12 @@ class AtureTest:
         accumulator.res['params' + str(epoch)] = params.copy()
         accumulator.res['scores' + str(epoch)] = self._calculate_scores(arr_2d=accumulator.arr_2d,
                                                                         truth=accumulator.img_obj.ground_truth)
-        self._generate_rgb(arr_2d=current_segmented, truth=accumulator.img_obj.ground_truth, arr_rgb=current_rgb)
-        accumulator.res['segmented' + str(epoch)] = current_rgb
+        self._rgb_scores(arr_2d=current_segmented, truth=accumulator.img_obj.ground_truth, arr_rgb=current_rgb)
+        accumulator.res['segmented_rgb' + str(epoch)] = current_rgb
+        accumulator.res['segmented' + str(epoch)] = current_segmented
 
-        self._generate_rgb(arr_2d=accumulator.arr_2d, truth=accumulator.img_obj.ground_truth,
-                           arr_rgb=accumulator.arr_rgb)
+        self._rgb_scores(arr_2d=accumulator.arr_2d, truth=accumulator.img_obj.ground_truth,
+                         arr_rgb=accumulator.arr_rgb)
         self._save(accumulator=accumulator, params=params, epoch=epoch, save_images=save_images)
 
     def run_for_all_images(self, params_combination=[], save_images=False, epochs=1, alpha_decay=0):
@@ -197,4 +198,3 @@ class AtureTest:
                 os.path.join(self.out_dir, accumulator.img_obj.file_name + '_[' + line + ']GABOR' + '.JPEG'))
             IMG.fromarray(accumulator.img_obj.working_arr).save(
                 os.path.join(self.out_dir, accumulator.img_obj.file_name + '_[' + line + ']ORIG' + '.JPEG'))
-
