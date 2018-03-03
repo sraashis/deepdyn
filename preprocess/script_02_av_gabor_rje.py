@@ -69,7 +69,7 @@ if Flags['createLattice']:
     t = time.time()    
     lattice = Lattice(image_arr_2d=img.img_gabor)
     lattice.generate_lattice_graph(eight_connected=False)
-    images =  [(0.7, img.img_gabor),(0.3, img.img_array)]
+    images =  [(0.7, img.img_gabor), (0.3, img.working_arr)]
     lattice.assign_cost(images=images,alpha=5,threshold=np.inf,log=False,override=True)
     elapsed = time.time() - t
     print(''.join(('Finished creating lattice in ',str(elapsed))))
@@ -99,7 +99,7 @@ if Flags['getConnComps']:
         lattice = Lattice(image_arr_2d=img.img_gabor)
         lattice.generate_lattice_graph(eight_connected=False)
         # images =  [(0.7, img.img_gabor[0:sx,0:sy]),(0.3, img.img_array[0:sx,0:sy])]
-        images =  [(0.7, img.img_gabor),(0.3, img.img_array)]
+        images =  [(0.7, img.img_gabor), (0.3, img.working_arr)]
         # lattice.assign_cost(images=images,alpha=5,threshold=np.inf,log=False,override=True)
         lattice.assign_cost(images=images,alpha=5,threshold=7.5,log=False,override=True)
         # lattice.assign_cost(images=images,alpha=5,threshold=10,log=False,override=True)
@@ -131,7 +131,7 @@ if Flags['checkRunningTime']:
         t = time.time()    
         lattice = Lattice(image_arr_2d=img.img_gabor[0:sx,0:sy])
         lattice.generate_lattice_graph(eight_connected=False)
-        images =  [(0.7, img.img_gabor[0:sx,0:sy]),(0.3, img.img_array[0:sx,0:sy])]
+        images =  [(0.7, img.img_gabor[0:sx,0:sy]), (0.3, img.working_arr[0:sx, 0:sy])]
         lattice.assign_cost(images=images,alpha=5,threshold=7.5,log=False,override=True)
         timesLattice[i] = time.time() - t
 

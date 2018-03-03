@@ -5,9 +5,9 @@ if __name__ == '__main__':
     img = Image('wide_image_13.mat')
     # img.show_image(image_array=img.img_array)
     img.load_kernel_bank()
-    img.apply_bilateral(img.img_array[:, :, 1])
+    img.apply_bilateral(img.image_arr[:, :, 1])
     # img.show_image(img.img_bilateral)
-    img_temp = img.img_array[:, :, 1] - img.img_bilateral
+    img_temp = img.image_arr[:, :, 1] - img.img_bilateral
     img.apply_gabor(arr=img_temp, filter_bank=fil.get_chosen_gabor_bank())
     # img.histogram(255 - img.img_gabor)
     # img.img_gabor[img.img_gabor<250] = 0

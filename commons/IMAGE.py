@@ -8,6 +8,7 @@ from PIL import Image as IMG
 
 import commons.constants as const
 import preprocess.utils.img_utils as imgutil
+import preprocess.utils.filter_utils as fu
 from commons.MAT import Mat
 from commons.timer import checktime
 
@@ -17,11 +18,11 @@ __all__ = [
 
 
 class Image:
-    def __init__(self, data_dir=None, file_name=None):
+    def __init__(self, data_dir="", file_name=None):
         self.data_dir = data_dir
         self.file_name = file_name
-        self.rgb = self.load_rgb(file_name=file_name)
-        self.working_arr = self.rgb[:, :, 1]
+        self.image_arr = self._load(os.path.join(data_dir, file_name))
+        self.working_arr = None
         self.diff_bilateral = None
         self.img_bilateral = None
         self.img_gabor = None
@@ -30,10 +31,8 @@ class Image:
         self.mask = None
         self.ground_truth = None
 
-    def load_rgb(self, file_name):
-        img = IMG.open(os.path.join(self.data_dir, file_name))
-        print('### File loaded: ' + file_name)
-        return np.array(img.getdata(), np.uint8).reshape(img.size[1], img.size[0], 3)
+    def _load(self, image_file):
+        return imgutil.get_image_as_array(image_file)
 
     def load_mask(self, mask_dir=None, fget_mask=None, erode=False):
         try:
@@ -42,16 +41,8 @@ class Image:
             mask = np.array(mask.getdata(), np.uint8).reshape(mask.size[1], mask.size[0], 1)[:, :, 0]
 
             if erode:
-                kern = np.array([
-                    [0.0, 0.0, 0.5, 0.0, 0.0],
-                    [0.0, 0.2, 1.0, 0.2, 0.0],
-                    [0.5, 1.0, 1.5, 1.0, 0.5],
-                    [0.0, 0.2, 1.0, 0.2, 0.0],
-                    [0.0, 0.0, 0.5, 0.0, 0.0],
-                ], np.uint8)
-
                 print('Mask loaded: ' + mask_file)
-                self.mask = cv2.erode(mask, kern, iterations=5)
+                self.mask = cv2.erode(mask, kernel=fu.get_chosen_mask_erode_kernel(), iterations=5)
         except:
             print('!!! Mask not found')
             self.mask = np.ones_like(self.working_arr)
@@ -119,8 +110,8 @@ class MatImage(Image):
     def __init__(self, data_dir=None, file_name=None):
         super().__init__(data_dir=data_dir, file_name=file_name)
 
-    def load_rgb(self, file_name=None):
-        file = Mat(mat_file=os.path.join(self.data_dir, file_name))
+    def _load(self, file_name=None):
+        file = Mat(mat_file=file_name)
         orig = file.get_image('I2')
         print('### File loaded: ' + file_name)
         return orig
