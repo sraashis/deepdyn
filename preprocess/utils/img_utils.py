@@ -1,12 +1,62 @@
+import PIL.Image as IMG
 import matplotlib.pyplot as plt
 import numpy as np
 
-import math as mth
 
-import cv2 as ocv
-import commons.constants as const
-import networkx as nx
-import PIL.Image as IMG
+def rgb_scores(arr_2d=None, truth=None, arr_rgb=None):
+    for i in range(0, arr_2d.shape[0]):
+        for j in range(0, arr_2d.shape[1]):
+            if arr_2d[i, j] == 255 and truth[i, j] == 255:
+                arr_rgb[i, j, :] = 255
+            if arr_2d[i, j] == 255 and truth[i, j] == 0:
+                arr_rgb[i, j, 0] = 0
+                arr_rgb[i, j, 1] = 255
+                arr_rgb[i, j, 2] = 0
+            if arr_2d[i, j] == 0 and truth[i, j] == 255:
+                arr_rgb[i, j, 0] = 255
+                arr_rgb[i, j, 1] = 0
+                arr_rgb[i, j, 2] = 0
+
+
+def get_praf1(arr_2d=None, truth=None):
+    tp, fp, fn, tn = 0, 0, 0, 0
+    for i in range(0, arr_2d.shape[0]):
+        for j in range(0, arr_2d.shape[1]):
+            if arr_2d[i, j] == 255 and truth[i, j] == 255:
+                tp += 1
+            if arr_2d[i, j] == 255 and truth[i, j] == 0:
+                fp += 1
+            if arr_2d[i, j] == 0 and truth[i, j] == 255:
+                fn += 1
+            if arr_2d[i, j] == 0 and truth[i, j] == 0:
+                tn += 1
+    p, r, a, f1 = 0, 0, 0, 0
+    try:
+        p = tp / (tp + fp)
+    except ZeroDivisionError:
+        p = 0
+
+    try:
+        r = tp / (tp + fn)
+    except ZeroDivisionError:
+        r = 0
+
+    try:
+        a = (tp + tn) / (tp + fp + fn + tn)
+    except ZeroDivisionError:
+        a = 0
+
+    try:
+        f1 = 2 * p * r / (p + r)
+    except ZeroDivisionError:
+        f1 = 0
+
+    return {
+        'Precision': p,
+        'Recall': r,
+        'Accuracy': a,
+        'F1': f1
+    }
 
 
 def rescale2d_unsigned(arr):
@@ -31,84 +81,6 @@ def histogram(image_arr, bins=32):
     plt.show()
 
 
-def build_filter_bank(k_size, sigma=None, lambd=None, gamma=None, psi=None,
-                      k_type=ocv.CV_32F, orientations=None):
-    filters = []
-    for theta in np.arange(0, np.pi, np.pi / orientations):  # Number of orientations
-        params = {'ksize': (k_size, k_size), 'sigma': sigma, 'theta': theta, 'lambd': lambd,
-                  'gamma': gamma, 'psi': psi, 'ktype': k_type}
-        kern = ocv.getGaborKernel(**params)
-        kern /= 1.5 * kern.sum()
-        filters.append(kern)
-    return filters
-
-
-def get_chosen_gabor_bank():
-    kernels1 = build_filter_bank(k_size=const.GABOR_KERNEL_SIZE1,
-                                 gamma=const.GABOR_KERNEL_GAMMA1,
-                                 lambd=const.GABOR_KERNEL_LAMBDA1,
-                                 sigma=const.GABOR_KERNEL_SIGMA1,
-                                 orientations=const.GABOR_KERNEL_NUM_OF_ORIENTATIONS,
-                                 psi=const.GABOR_KERNEL_PSI)
-
-    kernels2 = build_filter_bank(k_size=const.GABOR_KERNEL_SIZE2,
-                                 gamma=const.GABOR_KERNEL_GAMMA2,
-                                 lambd=const.GABOR_KERNEL_LAMBDA2,
-                                 sigma=const.GABOR_KERNEL_SIGMA2,
-                                 orientations=const.GABOR_KERNEL_NUM_OF_ORIENTATIONS,
-                                 psi=const.GABOR_KERNEL_PSI)
-
-    kernels3 = build_filter_bank(k_size=const.GABOR_KERNEL_SIZE3,
-                                 gamma=const.GABOR_KERNEL_GAMMA3,
-                                 lambd=const.GABOR_KERNEL_LAMBDA3,
-                                 sigma=const.GABOR_KERNEL_SIGMA3,
-                                 orientations=const.GABOR_KERNEL_NUM_OF_ORIENTATIONS,
-                                 psi=const.GABOR_KERNEL_PSI)
-
-    return kernels1 + kernels2 + kernels3
-
-
-def get_chosen_skeleton_filter():
-    kernel = [
-        [0, 0, 0, 0, 0],
-        [0, 0, 1, 0, 0],
-        [0, 1, 1, 1, 0],
-        [0, 0, 1, 0, 0],
-        [0, 0, 0, 0, 0],
-    ]
-    return np.array(kernel)
-
-
-def show_kernels(kernels):
-    grid_size = mth.ceil(mth.sqrt(len(kernels)))
-    for ix, kernel in enumerate(kernels):
-        plt.subplot(grid_size, grid_size, ix + 1)
-        plt.xticks([], [])
-        plt.yticks([], [])
-        plt.imshow(kernel, cmap='gray', aspect='auto')
-    plt.show()
-
-
-def assign_cost(graph=nx.Graph(), images=[()], alpha=1, override=False):
-    for n1 in graph.nodes():
-        for n2 in nx.neighbors(graph, n1):
-            if graph[n1][n2] == {} or override:
-                cost = 0.0
-                for weight, arr in images:
-                    m = max(arr[n1[0], n1[1]], arr[n2[0], n2[1]])
-                    cost += weight * mth.pow(mth.e, alpha * (m / 255))
-                graph[n1][n2]['cost'] = cost
-
-
-def get_seed_node_list(image_array_2d=None):
-    seed = []
-    for i in range(image_array_2d.shape[0]):
-        for j in range(image_array_2d.shape[1]):
-            if image_array_2d[i, j] == 0:
-                seed.append((i, j))
-    return seed
-
-
-def as_array(file_name=None):
-    original = IMG.open(file_name)
-    return np.array(original.getdata(), np.uint8).reshape(original.size[1], original.size[0], 3)
+def get_image_as_array(image_file):
+    img = IMG.open(image_file)
+    return np.array(img.getdata(), np.uint8).reshape(img.size[1], img.size[0], 3)

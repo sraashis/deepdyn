@@ -7,6 +7,7 @@ from PIL import Image as IMG
 
 import preprocess.algorithms.fast_mst as fmst
 import preprocess.utils.img_utils as imgutils
+import preprocess.utils.filter_utils as fu
 from commons.IMAGE import Image
 from commons.accumulator import Accumulator
 from commons.timer import checktime
@@ -29,8 +30,8 @@ class AtureTest:
 
     def _segment_now(self, accumulator_2d=None, image_obj=None, params={}):
         image_obj.create_skeleton(threshold=params['sk_threshold'],
-                                  kernels=imgutils.get_chosen_skeleton_filter())
-        seed_node_list = imgutils.get_seed_node_list(image_obj.img_skeleton)
+                                  kernels=fu.get_chosen_skeleton_filter())
+        seed_node_list = fu.get_seed_node_list(image_obj.img_skeleton)
 
         return fmst.run_segmentation(accumulator_2d=accumulator_2d, image_obj=image_obj, seed_list=seed_node_list,
                                      params=params)
@@ -38,65 +39,9 @@ class AtureTest:
     def _initialize(self, img_obj=None):
         img_obj.working_arr = cv2.bitwise_and(img_obj.working_arr, img_obj.working_arr, mask=img_obj.mask)
         img_obj.apply_bilateral()
-        img_obj.apply_gabor(kernel_bank=imgutils.get_chosen_gabor_bank())
+        img_obj.apply_gabor(kernel_bank=fu.get_chosen_gabor_bank())
         img_obj.generate_lattice_graph()
         return Accumulator(img_obj=img_obj)
-
-    @checktime
-    def _rgb_scores(self, arr_2d=None, truth=None, arr_rgb=None):
-        for i in range(0, arr_2d.shape[0]):
-            for j in range(0, arr_2d.shape[1]):
-                if arr_2d[i, j] == 255 and truth[i, j] == 255:
-                    arr_rgb[i, j, :] = 255
-                if arr_2d[i, j] == 255 and truth[i, j] == 0:
-                    arr_rgb[i, j, 0] = 0
-                    arr_rgb[i, j, 1] = 255
-                    arr_rgb[i, j, 2] = 0
-                if arr_2d[i, j] == 0 and truth[i, j] == 255:
-                    arr_rgb[i, j, 0] = 255
-                    arr_rgb[i, j, 1] = 0
-                    arr_rgb[i, j, 2] = 0
-
-    @checktime
-    def _calculate_scores(self, arr_2d=None, truth=None):
-        tp, fp, fn, tn = 0, 0, 0, 0
-        for i in range(0, arr_2d.shape[0]):
-            for j in range(0, arr_2d.shape[1]):
-                if arr_2d[i, j] == 255 and truth[i, j] == 255:
-                    tp += 1
-                if arr_2d[i, j] == 255 and truth[i, j] == 0:
-                    fp += 1
-                if arr_2d[i, j] == 0 and truth[i, j] == 255:
-                    fn += 1
-                if arr_2d[i, j] == 0 and truth[i, j] == 0:
-                    tn += 1
-        p, r, a, f1 = 0, 0, 0, 0
-        try:
-            p = tp / (tp + fp)
-        except ZeroDivisionError:
-            p = 0
-
-        try:
-            r = tp / (tp + fn)
-        except ZeroDivisionError:
-            r = 0
-
-        try:
-            a = (tp + tn) / (tp + fp + fn + tn)
-        except ZeroDivisionError:
-            a = 0
-
-        try:
-            f1 = 2 * p * r / (p + r)
-        except ZeroDivisionError:
-            f1 = 0
-
-        return {
-            'Precision': p,
-            'Recall': r,
-            'Accuracy': a,
-            'F1': f1
-        }
 
     def _run(self, accumulator=None, params={},
              save_images=False, epoch=0):
@@ -108,18 +53,20 @@ class AtureTest:
         accumulator.res['graph' + str(epoch)] = self._segment_now(accumulator_2d=current_segmented,
                                                                   image_obj=accumulator.img_obj, params=params)
         current_segmented = cv2.bitwise_and(current_segmented, current_segmented, mask=accumulator.img_obj.mask)
+        accumulator.res['segmented' + str(epoch)] = current_segmented
+
+        # save maximum of segmented of all epochs in accumulator to get the correct scores
         accumulator.arr_2d = np.maximum(accumulator.arr_2d, current_segmented)
 
         accumulator.res['skeleton' + str(epoch)] = accumulator.img_obj.img_skeleton.copy()
         accumulator.res['params' + str(epoch)] = params.copy()
-        accumulator.res['scores' + str(epoch)] = self._calculate_scores(arr_2d=accumulator.arr_2d,
-                                                                        truth=accumulator.img_obj.ground_truth)
-        self._rgb_scores(arr_2d=current_segmented, truth=accumulator.img_obj.ground_truth, arr_rgb=current_rgb)
+        accumulator.res['scores' + str(epoch)] = imgutils.get_praf1(arr_2d=accumulator.arr_2d,
+                                                                    truth=accumulator.img_obj.ground_truth)
+        imgutils.rgb_scores(arr_2d=current_segmented, truth=accumulator.img_obj.ground_truth, arr_rgb=current_rgb)
         accumulator.res['segmented_rgb' + str(epoch)] = current_rgb
-        accumulator.res['segmented' + str(epoch)] = current_segmented
 
-        self._rgb_scores(arr_2d=accumulator.arr_2d, truth=accumulator.img_obj.ground_truth,
-                         arr_rgb=accumulator.arr_rgb)
+        imgutils.rgb_scores(arr_2d=accumulator.arr_2d, truth=accumulator.img_obj.ground_truth,
+                            arr_rgb=accumulator.arr_rgb)
         self._save(accumulator=accumulator, params=params, epoch=epoch, save_images=save_images)
 
     def run_for_all_images(self, params_combination=[], save_images=False, epochs=1, alpha_decay=0):
