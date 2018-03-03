@@ -39,12 +39,12 @@ class Image:
             mask_file = fget_mask(self.file_name)
             mask = IMG.open(os.path.join(mask_dir, mask_file))
             mask = np.array(mask.getdata(), np.uint8).reshape(mask.size[1], mask.size[0], 1)[:, :, 0]
-
+            print(mask_file)
             if erode:
                 print('Mask loaded: ' + mask_file)
                 self.mask = cv2.erode(mask, kernel=fu.get_chosen_mask_erode_kernel(), iterations=5)
-        except:
-            print('!!! Mask not found')
+        except Exception as e:
+            print('Fail to load mask: ' + str(e))
             self.mask = np.ones_like(self.working_arr)
 
     def load_ground_truth(self, gt_dir=None, fget_ground_truth=None):
@@ -55,8 +55,8 @@ class Image:
             truth = np.array(truth.getdata(), np.uint8).reshape(truth.size[1], truth.size[0], 1)[:, :, 0]
             print('Ground truth loaded: ' + gt_file)
             self.ground_truth = truth
-        except:
-            print('!!! Ground truth not found')
+        except Exception as e:
+            print('Fail to load ground truth: ' + str(e))
             self.ground_truth = np.zeros_like(self.working_arr)
 
     @checktime
