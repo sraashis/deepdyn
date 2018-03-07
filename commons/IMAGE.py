@@ -39,7 +39,6 @@ class Image:
             mask_file = fget_mask(self.file_name)
             mask = IMG.open(os.path.join(mask_dir, mask_file))
             mask = np.array(mask.getdata(), np.uint8).reshape(mask.size[1], mask.size[0], 1)[:, :, 0]
-            print(mask_file)
             if erode:
                 print('Mask loaded: ' + mask_file)
                 self.mask = cv2.erode(mask, kernel=fu.get_chosen_mask_erode_kernel(), iterations=5)
