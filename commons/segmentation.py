@@ -6,8 +6,8 @@ import numpy as np
 from PIL import Image as IMG
 
 import preprocess.algorithms.fast_mst as fmst
-import preprocess.utils.img_utils as imgutils
 import preprocess.utils.filter_utils as fu
+import preprocess.utils.img_utils as imgutils
 from commons.IMAGE import Image
 from commons.accumulator import Accumulator
 from commons.timer import checktime
@@ -36,11 +36,11 @@ class AtureTest:
         return fmst.run_segmentation(accumulator_2d=accumulator_2d, image_obj=image_obj, seed_list=seed_node_list,
                                      params=params)
 
-    def _initialize(self, img_obj=None):
+    def initialize(self, img_obj=None, gabor_bank=fu.get_chosen_gabor_bank(), lattice8=False):
         img_obj.working_arr = cv2.bitwise_and(img_obj.working_arr, img_obj.working_arr, mask=img_obj.mask)
         img_obj.apply_bilateral()
-        img_obj.apply_gabor(kernel_bank=fu.get_chosen_gabor_bank())
-        img_obj.generate_lattice_graph()
+        img_obj.apply_gabor(kernel_bank=gabor_bank)
+        img_obj.generate_lattice_graph(eight_connected=lattice8)
         return Accumulator(img_obj=img_obj)
 
     def _run(self, accumulator=None, params={},
@@ -82,8 +82,7 @@ class AtureTest:
 
         for file_name in os.listdir(self.data_dir):
             img_obj = Image(data_dir=self.data_dir, file_name=file_name)
-            # Todo load mask and ground truth
-            accumulator = self._initialize(img_obj)
+            accumulator = self.initialize(img_obj)
             for params in params_combination:
                 for i in range(epochs):
                     print('Running epoch: ' + str(i))
@@ -98,9 +97,11 @@ class AtureTest:
 
         self.writer.close()
 
-    def run_for_one_image(self, image_obj=None, params={}, save_images=False, epochs=1, alpha_decay=0):
+    def run_for_one_image(self, image_obj=None, params={}, save_images=False, epochs=1, alpha_decay=0,
+                          accumulator=None):
 
-        accumulator = self._initialize(image_obj)
+        if accumulator is None:
+            accumulator = self.initialize(image_obj)
 
         for i in range(epochs):
             print('Running epoch: ' + str(i))
