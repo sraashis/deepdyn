@@ -44,6 +44,31 @@ def get_chosen_gabor_bank():
     return kernels1 + kernels2 + kernels3
 
 
+def get_chosen_gabor_bank_hd():
+    kernels1 = build_filter_bank(k_size=const.GABOR_KERNEL_SIZE1,
+                                 gamma=const.GABOR_KERNEL_GAMMA1,
+                                 lambd=const.GABOR_KERNEL_LAMBDA1,
+                                 sigma=const.GABOR_KERNEL_SIGMA1,
+                                 orientations=const.GABOR_KERNEL_NUM_OF_ORIENTATIONS,
+                                 psi=const.GABOR_KERNEL_PSI)
+
+    kernels2 = build_filter_bank(k_size=const.GABOR_KERNEL_SIZE2,
+                                 gamma=const.GABOR_KERNEL_GAMMA2,
+                                 lambd=const.GABOR_KERNEL_LAMBDA2,
+                                 sigma=const.GABOR_KERNEL_SIGMA2,
+                                 orientations=const.GABOR_KERNEL_NUM_OF_ORIENTATIONS,
+                                 psi=const.GABOR_KERNEL_PSI)
+
+    kernels3 = build_filter_bank(k_size=const.GABOR_KERNEL_SIZE3,
+                                 gamma=const.GABOR_KERNEL_GAMMA3,
+                                 lambd=const.GABOR_KERNEL_LAMBDA3,
+                                 sigma=const.GABOR_KERNEL_SIGMA3,
+                                 orientations=const.GABOR_KERNEL_NUM_OF_ORIENTATIONS,
+                                 psi=const.GABOR_KERNEL_PSI)
+
+    return kernels1 + kernels2 + kernels3
+
+
 def get_chosen_skeleton_filter():
     kernel = [
         [0, 0, 0, 0, 0],
