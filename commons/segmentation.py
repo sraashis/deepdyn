@@ -54,14 +54,7 @@ class AtureTest:
                             arr_rgb=accumulator.arr_rgb)
         self._save(accumulator=accumulator, params=params, epoch=epoch, save_images=save_images)
 
-    def _initialize(self, img_obj=None, gabor_bank=fu.get_chosen_gabor_bank(), lattice8=False):
-        img_obj.apply_mask()
-        img_obj.apply_bilateral()
-        img_obj.apply_gabor(kernel_bank=gabor_bank)
-        img_obj.generate_lattice_graph(eight_connected=lattice8)
-        return Accumulator(img_obj=img_obj)
-
-    def run_all(self, data_dir=None, params_combination=[], save_images=False, epochs=1, alpha_decay=0):
+    def run_all(self, data_dir=None, mask_path=None, gt_path=None, img_obj=None, params_combination=[], save_images=False, epochs=1, alpha_decay=0):
 
         if os.path.isdir(self.out_dir) is False:
             os.makedirs(self.out_dir)
@@ -75,9 +68,27 @@ class AtureTest:
             'SEG_THRESHOLD\n'
         )
 
+        def get_mask_file(fn):
+            return fn.split('_')[0] + ''
+
+        def get_ground_truth_file(fn):
+            return fn.split('_')[0] + ''
+
         for file_name in os.listdir(data_dir):
-            img_obj = Image(data_dir=data_dir, file_name=file_name)
-            accumulator = self._initialize(img_obj)
+
+            img_obj.load_file(data_dir=data_dir, file_name=file_name)
+            img_obj.load_mask(mask_dir=mask_path, fget_mask=get_mask_file, erode=True)
+            img_obj.load_ground_truth(gt_dir=gt_path, fget_ground_truth=get_ground_truth_file)
+
+            img_obj.working_arr = img_obj.image_arr[:, :, 1]
+            img_obj.apply_mask()
+
+            img_obj.apply_bilateral()
+            img_obj.apply_gabor()
+            img_obj.generate_lattice_graph(eight_connected=False)
+
+            accumulator = Accumulator(img_obj=img_obj)
+
             for params in params_combination:
                 for i in range(epochs):
                     print('Running epoch: ' + str(i))
