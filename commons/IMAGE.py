@@ -46,6 +46,11 @@ class Image:
             print('Fail to load mask: ' + str(e))
             self.mask = np.ones_like(self.working_arr)
 
+    def apply_mask(self, mask=None):
+        if mask is None:
+            mask = self.mask
+        self.working_arr = cv2.bitwise_and(self.working_arr, self.working_arr, mask=mask)
+
     def load_ground_truth(self, gt_dir=None, fget_ground_truth=None):
 
         try:

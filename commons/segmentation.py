@@ -14,19 +14,11 @@ from commons.timer import checktime
 
 
 class AtureTest:
-    def __init__(self, data_dir=None, out_dir=None):
+    def __init__(self, out_dir=None):
 
-        self.data_dir = data_dir
         self.out_dir = out_dir
         self.writer = None
-        self.mask_dir = None
-        self.ground_truth_dir = None
-        self.fget_mask_file = None
-        self.fget_ground_truth_file = None
-        self.erode_mask = None
         self.c = count(1)
-        if os.path.isdir(self.out_dir) is False:
-            os.makedirs(self.out_dir)
 
     def _segment_now(self, accumulator_2d=None, image_obj=None, params={}):
         image_obj.create_skeleton(threshold=params['sk_threshold'],
@@ -35,13 +27,6 @@ class AtureTest:
 
         return fmst.run_segmentation(accumulator_2d=accumulator_2d, image_obj=image_obj, seed_list=seed_node_list,
                                      params=params)
-
-    def initialize(self, img_obj=None, gabor_bank=fu.get_chosen_gabor_bank(), lattice8=False):
-        img_obj.working_arr = cv2.bitwise_and(img_obj.working_arr, img_obj.working_arr, mask=img_obj.mask)
-        img_obj.apply_bilateral()
-        img_obj.apply_gabor(kernel_bank=gabor_bank)
-        img_obj.generate_lattice_graph(eight_connected=lattice8)
-        return Accumulator(img_obj=img_obj)
 
     def _run(self, accumulator=None, params={},
              save_images=False, epoch=0):
@@ -69,7 +54,17 @@ class AtureTest:
                             arr_rgb=accumulator.arr_rgb)
         self._save(accumulator=accumulator, params=params, epoch=epoch, save_images=save_images)
 
-    def run_for_all_images(self, params_combination=[], save_images=False, epochs=1, alpha_decay=0):
+    def _initialize(self, img_obj=None, gabor_bank=fu.get_chosen_gabor_bank(), lattice8=False):
+        img_obj.apply_mask()
+        img_obj.apply_bilateral()
+        img_obj.apply_gabor(kernel_bank=gabor_bank)
+        img_obj.generate_lattice_graph(eight_connected=lattice8)
+        return Accumulator(img_obj=img_obj)
+
+    def run_all(self, data_dir=None, params_combination=[], save_images=False, epochs=1, alpha_decay=0):
+
+        if os.path.isdir(self.out_dir) is False:
+            os.makedirs(self.out_dir)
 
         self.writer = open(self.out_dir + os.sep + "segmentation_result.csv", 'w')
         self.writer.write(
@@ -80,9 +75,9 @@ class AtureTest:
             'SEG_THRESHOLD\n'
         )
 
-        for file_name in os.listdir(self.data_dir):
-            img_obj = Image(data_dir=self.data_dir, file_name=file_name)
-            accumulator = self.initialize(img_obj)
+        for file_name in os.listdir(data_dir):
+            img_obj = Image(data_dir=data_dir, file_name=file_name)
+            accumulator = self._initialize(img_obj)
             for params in params_combination:
                 for i in range(epochs):
                     print('Running epoch: ' + str(i))
@@ -97,11 +92,7 @@ class AtureTest:
 
         self.writer.close()
 
-    def run_for_one_image(self, image_obj=None, params={}, save_images=False, epochs=1, alpha_decay=0,
-                          accumulator=None):
-
-        if accumulator is None:
-            accumulator = self.initialize(image_obj)
+    def run(self, params={}, save_images=False, epochs=1, alpha_decay=0, accumulator=None):
 
         for i in range(epochs):
             print('Running epoch: ' + str(i))
@@ -142,7 +133,3 @@ class AtureTest:
         if save_images:
             IMG.fromarray(accumulator.arr_rgb).save(
                 os.path.join(self.out_dir, accumulator.img_obj.file_name + '_[' + line + ']' + '.JPEG'))
-            IMG.fromarray(accumulator.img_obj.img_gabor).save(
-                os.path.join(self.out_dir, accumulator.img_obj.file_name + '_[' + line + ']GABOR' + '.JPEG'))
-            IMG.fromarray(accumulator.img_obj.working_arr).save(
-                os.path.join(self.out_dir, accumulator.img_obj.file_name + '_[' + line + ']ORIG' + '.JPEG'))
