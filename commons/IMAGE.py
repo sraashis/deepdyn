@@ -111,11 +111,11 @@ class MatImage(Image):
     def __init__(self):
         super().__init__()
 
-    def _load(self, file_name=None):
-        file = Mat(mat_file=file_name)
-        orig = file.get_image('I2')
-        print('### File loaded: ' + file_name)
-        return orig
+    def load_file(self, data_dir, file_name):
+        self.data_dir = data_dir
+        self.file_name = file_name
+        file = Mat(mat_file=os.path.join(self.data_dir, self.file_name))
+        self.image_arr = file.get_image('I2')
 
 
 class GlaucomaImage(Image):
