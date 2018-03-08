@@ -7,21 +7,18 @@ import numpy as np
 from PIL import Image as IMG
 
 import commons.constants as const
-import preprocess.utils.img_utils as imgutil
+import preprocess.utils.filter_utils as filutils
 import preprocess.utils.filter_utils as fu
+import preprocess.utils.img_utils as imgutil
 from commons.MAT import Mat
 from commons.timer import checktime
 
-__all__ = [
-    'Image'
-]
-
 
 class Image:
-    def __init__(self, data_dir="", file_name=None):
-        self.data_dir = data_dir
-        self.file_name = file_name
-        self.image_arr = self._load(os.path.join(data_dir, file_name))
+    def __init__(self):
+        self.data_dir = None
+        self.file_name = None
+        self.image_arr = None
         self.working_arr = None
         self.diff_bilateral = None
         self.img_bilateral = None
@@ -31,8 +28,10 @@ class Image:
         self.mask = None
         self.ground_truth = None
 
-    def _load(self, image_file):
-        return imgutil.get_image_as_array(image_file)
+    def load_file(self, data_dir, file_name):
+        self.data_dir = data_dir
+        self.file_name = file_name
+        self.image_arr = imgutil.get_image_as_array(os.path.join(self.data_dir, self.file_name))
 
     def load_mask(self, mask_dir=None, fget_mask=None, erode=False):
         try:
@@ -46,10 +45,8 @@ class Image:
             print('Fail to load mask: ' + str(e))
             self.mask = np.ones_like(self.working_arr)
 
-    def apply_mask(self, mask=None):
-        if mask is None:
-            mask = self.mask
-        self.working_arr = cv2.bitwise_and(self.working_arr, self.working_arr, mask=mask)
+    def apply_mask(self):
+        self.working_arr = cv2.bitwise_and(self.working_arr, self.working_arr, mask=self.mask)
 
     def load_ground_truth(self, gt_dir=None, fget_ground_truth=None):
 
@@ -71,9 +68,9 @@ class Image:
         self.diff_bilateral = imgutil.get_signed_diff_int8(self.working_arr, self.img_bilateral)
 
     @checktime
-    def apply_gabor(self, kernel_bank):
+    def apply_gabor(self):
         self.img_gabor = np.zeros_like(self.diff_bilateral)
-        for kern in kernel_bank:
+        for kern in filutils.get_chosen_gabor_bank():
             final_image = ocv.filter2D(255 - self.diff_bilateral, ocv.CV_8UC3, kern)
             np.maximum(self.img_gabor, final_image, self.img_gabor)
         self.img_gabor = 255 - self.img_gabor
@@ -111,11 +108,43 @@ class Image:
 
 
 class MatImage(Image):
-    def __init__(self, data_dir=None, file_name=None):
-        super().__init__(data_dir=data_dir, file_name=file_name)
+    def __init__(self):
+        super().__init__()
 
     def _load(self, file_name=None):
         file = Mat(mat_file=file_name)
         orig = file.get_image('I2')
         print('### File loaded: ' + file_name)
         return orig
+
+
+class GlaucomaImage(Image):
+    def __init__(self):
+        super().__init__()
+
+    def load_mask(self, mask_dir=None, fget_mask=None, erode=False):
+        try:
+            mask_file = fget_mask(self.file_name)
+            mask = IMG.open(os.path.join(mask_dir, mask_file))
+            mask = np.array(mask.getdata(), np.uint8).reshape(mask.size[1], mask.size[0], 3)[:, :, 0]
+            if erode:
+                print('Mask loaded: ' + mask_file)
+                self.mask = cv2.erode(mask, kernel=fu.get_chosen_mask_erode_kernel(), iterations=5)
+        except Exception as e:
+            print('Fail to load mask: ' + str(e))
+            self.mask = np.ones_like(self.working_arr)
+
+    @checktime
+    def apply_bilateral(self):
+        self.img_bilateral = ocv.bilateralFilter(self.working_arr, 81,
+                                                 sigmaColor=60,
+                                                 sigmaSpace=60)
+        self.diff_bilateral = imgutil.get_signed_diff_int8(self.working_arr, self.img_bilateral)
+
+    @checktime
+    def apply_gabor(self):
+        self.img_gabor = np.zeros_like(self.diff_bilateral)
+        for kern in filutils.get_chosen_gabor_bank_hd():
+            final_image = ocv.filter2D(255 - self.diff_bilateral, ocv.CV_8UC3, kern)
+            np.maximum(self.img_gabor, final_image, self.img_gabor)
+        self.img_gabor = 255 - self.img_gabor
