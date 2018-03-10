@@ -20,13 +20,9 @@ class Image:
         self.file_name = None
         self.image_arr = None
         self.working_arr = None
-        self.diff_bilateral = None
-        self.img_bilateral = None
-        self.img_gabor = None
-        self.img_skeleton = None
-        self.graph = None
         self.mask = None
         self.ground_truth = None
+        self.res = {}
 
     def load_file(self, data_dir, file_name):
         self.data_dir = data_dir
@@ -60,29 +56,28 @@ class Image:
             print('Fail to load ground truth: ' + str(e))
             self.ground_truth = np.zeros_like(self.working_arr)
 
-    @checktime
-    def apply_bilateral(self):
-        self.img_bilateral = ocv.bilateralFilter(self.working_arr, const.BILATERAL_KERNEL_SIZE,
-                                                 sigmaColor=const.BILATERAL_SIGMA_COLOR,
-                                                 sigmaSpace=const.BILATERAL_SIGMA_SPACE)
-        self.diff_bilateral = imgutil.get_signed_diff_int8(self.working_arr, self.img_bilateral)
+
+class SegmentedImage(Image):
+    def __init__(self):
+        super().__init__()
 
     @checktime
-    def apply_gabor(self):
-        self.img_gabor = np.zeros_like(self.diff_bilateral)
-        for kern in filutils.get_chosen_gabor_bank():
-            final_image = ocv.filter2D(255 - self.diff_bilateral, ocv.CV_8UC3, kern)
-            np.maximum(self.img_gabor, final_image, self.img_gabor)
-        self.img_gabor = 255 - self.img_gabor
+    def apply_bilateral(self, k_size=const.BILATERAL_KERNEL_SIZE, sig_color=const.BILATERAL_SIGMA_COLOR,
+                        sig_space=const.BILATERAL_SIGMA_SPACE):
+        self.res['bilateral'] = ocv.bilateralFilter(self.working_arr, k_size,
+                                                    sigmaColor=sig_color,
+                                                    sigmaSpace=sig_space)
+        self.res['diff_bilateral'] = imgutil.get_signed_diff_int8(self.working_arr, self.res['bilateral'])
+        self.working_arr = self.res['diff_bilateral'].copy()
 
     @checktime
-    def create_skeleton(self, threshold=const.SKELETONIZE_THRESHOLD, kernels=None):
-        array_2d = self.img_gabor
-        self.img_skeleton = np.copy(array_2d)
-        self.img_skeleton[self.img_skeleton > threshold] = 255
-        self.img_skeleton[self.img_skeleton <= threshold] = 0
-        if kernels is not None:
-            self.img_skeleton = ocv.filter2D(self.img_skeleton, ocv.CV_8UC3, kernels)
+    def apply_gabor(self, filter_bank=filutils.get_chosen_gabor_bank()):
+        self.res['gabor'] = np.zeros_like(self.working_arr)
+        for kern in filter_bank:
+            final_image = ocv.filter2D(255 - self.working_arr, ocv.CV_8UC3, kern)
+            np.maximum(self.res['gabor'], final_image, self.res['gabor'])
+        self.res['gabor'] = 255 - self.res['gabor']
+        self.working_arr = self.res['gabor'].copy()
 
     def _connect_8(self, graph):
         for i, j in graph:
@@ -102,12 +97,24 @@ class Image:
 
     @checktime
     def generate_lattice_graph(self, eight_connected=const.IMG_LATTICE_EIGHT_CONNECTED):
-        self.graph = nx.grid_2d_graph(self.working_arr.shape[0], self.working_arr.shape[1])
+        self.res['lattice'] = nx.grid_2d_graph(self.working_arr.shape[0], self.working_arr.shape[1])
         if eight_connected:
-            Image._connect_8(graph=self.graph)
+            self._connect_8(graph=self.res['lattice'])
+
+    @checktime
+    def generate_skeleton(self, threshold=100):
+        kernel1 = cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (1, 3))
+        dilated1 = cv2.dilate(cv2.inRange(self.working_arr, threshold, 255), np.array(kernel1, dtype=np.uint8),
+                              iterations=1)
+        kernel2 = cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (3, 3))
+        dilated2 = cv2.dilate(cv2.inRange(self.working_arr, threshold, 255), np.array(kernel2, dtype=np.uint8),
+                              iterations=1)
+        self.res['skeleton'] = 255 - np.minimum(dilated1, dilated2)
+        self.res['skeleton'] = cv2.bitwise_and(self.res['skeleton'], self.res['skeleton'],
+                                               mask=self.mask)
 
 
-class MatImage(Image):
+class MatImage(SegmentedImage):
     def __init__(self):
         super().__init__()
 
@@ -118,7 +125,7 @@ class MatImage(Image):
         self.image_arr = file.get_image('I2')
 
 
-class GlaucomaImage(Image):
+class GlaucomaImage(SegmentedImage):
     def __init__(self):
         super().__init__()
 
@@ -133,18 +140,3 @@ class GlaucomaImage(Image):
         except Exception as e:
             print('Fail to load mask: ' + str(e))
             self.mask = np.ones_like(self.working_arr)
-
-    @checktime
-    def apply_bilateral(self):
-        self.img_bilateral = ocv.bilateralFilter(self.working_arr, 81,
-                                                 sigmaColor=60,
-                                                 sigmaSpace=60)
-        self.diff_bilateral = imgutil.get_signed_diff_int8(self.working_arr, self.img_bilateral)
-
-    @checktime
-    def apply_gabor(self):
-        self.img_gabor = np.zeros_like(self.diff_bilateral)
-        for kern in filutils.get_chosen_gabor_bank_hd():
-            final_image = ocv.filter2D(255 - self.diff_bilateral, ocv.CV_8UC3, kern)
-            np.maximum(self.img_gabor, final_image, self.img_gabor)
-        self.img_gabor = 255 - self.img_gabor

@@ -105,6 +105,6 @@ def get_seed_node_list(image_array_2d=None):
     seed = []
     for i in range(image_array_2d.shape[0]):
         for j in range(image_array_2d.shape[1]):
-            if image_array_2d[i, j] == 0:
+            if image_array_2d[i, j] == 255:
                 seed.append((i, j))
     return seed
