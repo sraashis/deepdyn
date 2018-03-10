@@ -8,8 +8,6 @@ from PIL import Image as IMG
 import preprocess.algorithms.fast_mst as fmst
 import preprocess.utils.filter_utils as fu
 import preprocess.utils.img_utils as imgutils
-from commons.IMAGE import Image
-from commons.accumulator import Accumulator
 from commons.timer import checktime
 
 
@@ -21,50 +19,51 @@ class AtureTest:
         self.c = count(1)
 
     def _segment_now(self, accumulator_2d=None, image_obj=None, params={}):
-        image_obj.create_skeleton(threshold=params['sk_threshold'],
-                                  kernels=fu.get_chosen_skeleton_filter())
-        seed_node_list = fu.get_seed_node_list(image_obj.img_skeleton)
 
-        return fmst.run_segmentation(accumulator_2d=accumulator_2d, image_obj=image_obj, seed_list=seed_node_list,
-                                     params=params)
+        image_obj.generate_skeleton(params['sk_threshold'])
+        seed_node_list = fu.get_seed_node_list(image_obj.res['skeleton'])
 
-    def _run(self, accumulator=None, params={},
-             save_images=False, epoch=0):
+        img_used = [(params['orig_contrib'], image_obj.res['orig']),
+                    (1 - params['orig_contrib'], image_obj.working_arr)]
 
-        current_segmented = np.zeros_like(accumulator.img_obj.working_arr)
-        current_rgb = np.zeros([accumulator.x_size, accumulator.y_size, 3], dtype=np.uint8)
+        segmented_graph = image_obj.res['lattice'].copy()
+        fmst.run_segmentation(accumulator_2d=accumulator_2d, images_used=img_used, seed_list=seed_node_list,
+                              params=params, graph=segmented_graph)
 
-        # Todo implement logic to disable previous connected component in _run() method:
-        accumulator.res['graph' + str(epoch)] = self._segment_now(accumulator_2d=current_segmented,
-                                                                  image_obj=accumulator.img_obj, params=params)
-        current_segmented = cv2.bitwise_and(current_segmented, current_segmented, mask=accumulator.img_obj.mask)
-        accumulator.res['segmented' + str(epoch)] = current_segmented
+        return segmented_graph
 
-        # save maximum of segmented of all epochs in accumulator to get the correct scores
-        accumulator.arr_2d = np.maximum(accumulator.arr_2d, current_segmented)
+    def _run(self, img_obj=None, params={},
+             save_images=False):
 
-        accumulator.res['skeleton' + str(epoch)] = accumulator.img_obj.img_skeleton.copy()
-        accumulator.res['params' + str(epoch)] = params.copy()
-        accumulator.res['scores' + str(epoch)] = imgutils.get_praf1(arr_2d=accumulator.arr_2d,
-                                                                    truth=accumulator.img_obj.ground_truth)
-        imgutils.rgb_scores(arr_2d=current_segmented, truth=accumulator.img_obj.ground_truth, arr_rgb=current_rgb)
-        accumulator.res['segmented_rgb' + str(epoch)] = current_rgb
+        img_obj.res['segmented'] = np.zeros_like(img_obj.working_arr)
+        img_obj.res['segmented_rgb'] = np.zeros([img_obj.working_arr.shape[0], img_obj.working_arr.shape[1], 3],
+                                                dtype=np.uint8)
 
-        imgutils.rgb_scores(arr_2d=accumulator.arr_2d, truth=accumulator.img_obj.ground_truth,
-                            arr_rgb=accumulator.arr_rgb)
-        self._save(accumulator=accumulator, params=params, epoch=epoch, save_images=save_images)
+        img_obj.res['graph'] = self._segment_now(accumulator_2d=img_obj.res['segmented'], image_obj=img_obj,
+                                                 params=params)
+        img_obj.res['segmented'] = cv2.bitwise_and(img_obj.res['segmented'], img_obj.res['segmented'],
+                                                   mask=img_obj.mask)
+        img_obj.res['skeleton'] = img_obj.res['skeleton'].copy()
+        img_obj.res['params'] = params.copy()
+        img_obj.res['scores'] = imgutils.get_praf1(arr_2d=img_obj.res['segmented'], truth=img_obj.ground_truth)
 
-    def run_all(self, data_dir=None, mask_path=None, gt_path=None, img_obj=None, params_combination=[], save_images=False, epochs=1, alpha_decay=0):
+        imgutils.rgb_scores(arr_2d=img_obj.res['segmented'], truth=img_obj.ground_truth,
+                            arr_rgb=img_obj.res['segmented_rgb'])
+
+        self._save(img_obj=img_obj, params=params, save_images=save_images)
+
+    def run_all(self, data_dir=None, mask_path=None, gt_path=None, img_obj=None, params_combination=[],
+                save_images=False, epochs=1, alpha_decay=0):
 
         if os.path.isdir(self.out_dir) is False:
             os.makedirs(self.out_dir)
 
         self.writer = open(self.out_dir + os.sep + "segmentation_result.csv", 'w')
         self.writer.write(
-            'ITR,EPOCH,FILE_NAME,FSCORE,PRECISION,RECALL,ACCURACY,'
+            'ITR,FILE_NAME,FSCORE,PRECISION,RECALL,ACCURACY,'
             'SK_THRESHOLD,'
             'ALPHA,'
-            'GABOR_CONTRIB,'
+            'ORIG_CONTRIB,'
             'SEG_THRESHOLD\n'
         )
 
@@ -87,53 +86,32 @@ class AtureTest:
             img_obj.apply_gabor()
             img_obj.generate_lattice_graph(eight_connected=False)
 
-            accumulator = Accumulator(img_obj=img_obj)
-
             for params in params_combination:
-                for i in range(epochs):
-                    print('Running epoch: ' + str(i))
-                    if i > 0:
-                        self._disable_segmented_vessels(accumulator=accumulator, params=params, alpha_decay=alpha_decay)
-                    self._run(accumulator=accumulator, params=params, save_images=save_images, epoch=i)
-
-                # Reset for new parameter combination
-                accumulator.arr_2d = np.zeros_like(accumulator.img_obj.working_arr)
-                accumulator.arr_rgb = np.zeros([accumulator.x_size, accumulator.y_size, 3], dtype=np.uint8)
-                accumulator.img_obj.working_arr = accumulator.res['image0']
+                self._run(img_obj=img_obj, params=params, save_images=save_images)
 
         self.writer.close()
 
-    def run(self, params={}, save_images=False, epochs=1, alpha_decay=0, accumulator=None):
-
-        for i in range(epochs):
-            print('Running epoch: ' + str(i))
-
-            if i > 0:
-                self._disable_segmented_vessels(accumulator=accumulator, params=params, alpha_decay=alpha_decay)
-
-            self._run(accumulator=accumulator, params=params, save_images=save_images, epoch=i)
-
-        return accumulator
+    def run(self, params={}, save_images=False, img_obj=None):
+        self._run(img_obj=img_obj, params=params, save_images=save_images)
 
     @checktime
-    def _disable_segmented_vessels(self, accumulator=None, params=None, alpha_decay=None):
+    def _disable_segmented_vessels(self, img_obj=None, params=None, alpha_decay=None):
         # todo something with previous accumulator.img_obj.graph to disable the connectivity
         params['alpha'] -= alpha_decay
         params['sk_threshold'] = 100
 
-    def _save(self, accumulator=None, params=None, epoch=None, save_images=False):
+    def _save(self, img_obj=None, params=None, epoch=None, save_images=False):
         i = next(self.c)
-        base = 'scores' + str(epoch)
+        base = 'scores'
         line = str(i) + ',' + \
-               'EP' + str(epoch) + ',' + \
-               str(accumulator.img_obj.file_name) + ',' + \
-               str(round(accumulator.res[base]['F1'], 3)) + ',' + \
-               str(round(accumulator.res[base]['Precision'], 3)) + ',' + \
-               str(round(accumulator.res[base]['Recall'], 3)) + ',' + \
-               str(round(accumulator.res[base]['Accuracy'], 3)) + ',' + \
+               str(img_obj.file_name) + ',' + \
+               str(round(img_obj.res[base]['F1'], 3)) + ',' + \
+               str(round(img_obj.res[base]['Precision'], 3)) + ',' + \
+               str(round(img_obj.res[base]['Recall'], 3)) + ',' + \
+               str(round(img_obj.res[base]['Accuracy'], 3)) + ',' + \
                str(round(params['sk_threshold'], 3)) + ',' + \
                str(round(params['alpha'], 3)) + ',' + \
-               str(round(params['gabor_contrib'], 3)) + ',' + \
+               str(round(params['orig_contrib'], 3)) + ',' + \
                str(round(params['seg_threshold'], 3))
         if self.writer is not None:
             self.writer.write(line + '\n')
@@ -142,5 +120,5 @@ class AtureTest:
         print('Number of params combination tried: ' + str(i))
 
         if save_images:
-            IMG.fromarray(accumulator.arr_rgb).save(
-                os.path.join(self.out_dir, accumulator.img_obj.file_name + '_[' + line + ']' + '.JPEG'))
+            IMG.fromarray(img_obj.res['segmented']).save(
+                os.path.join(self.out_dir, img_obj.file_name + '_[' + line + ']' + '.JPEG'))
