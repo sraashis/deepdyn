@@ -109,7 +109,7 @@ class SegmentedImage(Image):
         kernel2 = cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (3, 3))
         dilated2 = cv2.dilate(cv2.inRange(self.working_arr, threshold, 255), np.array(kernel2, dtype=np.uint8),
                               iterations=1)
-        self.res['skeleton'] = np.minimum(dilated1, dilated2)
+        self.res['skeleton'] = 255 - np.minimum(dilated1, dilated2)
         self.res['skeleton'] = cv2.bitwise_and(self.res['skeleton'], self.res['skeleton'],
                                                mask=self.mask)
 
