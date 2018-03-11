@@ -20,7 +20,6 @@ class AtureTest:
 
     def _segment_now(self, accumulator_2d=None, image_obj=None, params={}):
 
-        image_obj.generate_skeleton(params['sk_threshold'])
         seed_node_list = fu.get_seed_node_list(image_obj.res['skeleton'])
 
         img_used = [(params['orig_contrib'], image_obj.res['orig']),

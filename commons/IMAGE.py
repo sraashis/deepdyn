@@ -103,15 +103,17 @@ class SegmentedImage(Image):
 
     @checktime
     def generate_skeleton(self, threshold=100):
-        kernel1 = cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (1, 3))
-        dilated1 = cv2.dilate(cv2.inRange(self.working_arr, threshold, 255), np.array(kernel1, dtype=np.uint8),
-                              iterations=1)
-        kernel2 = cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (3, 3))
-        dilated2 = cv2.dilate(cv2.inRange(self.working_arr, threshold, 255), np.array(kernel2, dtype=np.uint8),
-                              iterations=1)
-        self.res['skeleton'] = 255 - np.minimum(dilated1, dilated2)
-        self.res['skeleton'] = cv2.bitwise_and(self.res['skeleton'], self.res['skeleton'],
-                                               mask=self.mask)
+        k1 = np.array([[0., 0., 0.],
+                       [1., 1., 1.],
+                       [0., 0., 0.]], dtype=np.uint8)
+        k2 = np.array([[0., 1., 0.],
+                       [0., 1., 0.],
+                       [0., 1., 0.]], dtype=np.uint8)
+        binary = 255 - cv2.inRange(self.working_arr, threshold, 255)
+        filtered = cv2.erode(binary, k1, iterations=1)
+        filtered1 = cv2.erode(binary, k2, iterations=1)
+        final = np.maximum(filtered, filtered1)
+        self.res['skeleton'] = cv2.bitwise_and(final, final, mask=self.mask)
 
 
 class MatImage(SegmentedImage):
