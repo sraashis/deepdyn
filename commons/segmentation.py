@@ -67,12 +67,6 @@ class AtureTest:
             'SEG_THRESHOLD\n'
         )
 
-        def get_mask_file(fn):
-            return fn.split('_')[0] + ''
-
-        def get_ground_truth_file(fn):
-            return fn.split('_')[0] + ''
-
         for file_name in os.listdir(data_dir):
             print('File: ' + file_name)
 
