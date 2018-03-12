@@ -52,7 +52,7 @@ class AtureTest:
 
         self._save(img_obj=img_obj, params=params, save_images=save_images)
 
-    def run_all(self, data_dir=None, mask_path=None, gt_path=None, params_combination=[],
+    def run_all(self, data_dir=None, mask_path=None, gt_path=None, fget_mask=None, fget_gt=None, params_combination=[],
                 save_images=False):
 
         if os.path.isdir(self.out_dir) is False:
@@ -76,17 +76,11 @@ class AtureTest:
         for file_name in os.listdir(data_dir):
             print('File: ' + file_name)
 
-            def get_mask_file(file_name):
-                return file_name.split('_')[0] + '_test_mask.gif'
-
-            def get_ground_truth_file(file_name):
-                return file_name.split('_')[0] + '_manual1.gif'
-
             img_obj = SegmentedImage()
 
             img_obj.load_file(data_dir=data_dir, file_name=file_name)
-            img_obj.load_mask(mask_dir=mask_path, fget_mask=get_mask_file, erode=True)
-            img_obj.load_ground_truth(gt_dir=gt_path, fget_ground_truth=get_ground_truth_file)
+            img_obj.load_mask(mask_dir=mask_path, fget_mask=fget_mask, erode=True)
+            img_obj.load_ground_truth(gt_dir=gt_path, fget_ground_truth=fget_gt)
 
             img_obj.res['orig'] = img_obj.image_arr[:, :, 1]
             img_obj.working_arr = img_obj.image_arr[:, :, 1]
@@ -135,5 +129,5 @@ class AtureTest:
         print('Number of params combination tried: ' + str(i))
 
         if save_images:
-            IMG.fromarray(img_obj.res['segmented']).save(
+            IMG.fromarray(img_obj.res['segmented_rgb']).save(
                 os.path.join(self.out_dir, img_obj.file_name + '_[' + line + ']' + '.JPEG'))
