@@ -8,6 +8,7 @@ from PIL import Image as IMG
 import preprocess.algorithms.fast_mst as fmst
 import preprocess.utils.filter_utils as fu
 import preprocess.utils.img_utils as imgutils
+from commons.IMAGE import SegmentedImage
 from commons.timer import checktime
 
 
@@ -51,8 +52,8 @@ class AtureTest:
 
         self._save(img_obj=img_obj, params=params, save_images=save_images)
 
-    def run_all(self, data_dir=None, mask_path=None, gt_path=None, img_obj=None, params_combination=[],
-                save_images=False, epochs=1, alpha_decay=0):
+    def run_all(self, data_dir=None, mask_path=None, gt_path=None, params_combination=[],
+                save_images=False):
 
         if os.path.isdir(self.out_dir) is False:
             os.makedirs(self.out_dir)
@@ -73,19 +74,34 @@ class AtureTest:
             return fn.split('_')[0] + ''
 
         for file_name in os.listdir(data_dir):
+            print('File: ' + file_name)
+
+            def get_mask_file(file_name):
+                return file_name.split('_')[0] + '_test_mask.gif'
+
+            def get_ground_truth_file(file_name):
+                return file_name.split('_')[0] + '_manual1.gif'
+
+            img_obj = SegmentedImage()
 
             img_obj.load_file(data_dir=data_dir, file_name=file_name)
             img_obj.load_mask(mask_dir=mask_path, fget_mask=get_mask_file, erode=True)
             img_obj.load_ground_truth(gt_dir=gt_path, fget_ground_truth=get_ground_truth_file)
 
+            img_obj.res['orig'] = img_obj.image_arr[:, :, 1]
             img_obj.working_arr = img_obj.image_arr[:, :, 1]
-            img_obj.apply_mask()
 
+            img_obj.apply_mask()
             img_obj.apply_bilateral()
             img_obj.apply_gabor()
-            img_obj.generate_lattice_graph(eight_connected=False)
+
+            img_obj.apply_bilateral()
+            img_obj.working_arr = img_obj.res['bilateral']
+
+            img_obj.generate_lattice_graph()
 
             for params in params_combination:
+                img_obj.generate_skeleton(threshold=int(params['sk_threshold']))
                 self._run(img_obj=img_obj, params=params, save_images=save_images)
 
         self.writer.close()
