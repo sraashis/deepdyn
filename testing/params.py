@@ -18,3 +18,6 @@ def get_param_combinations():
     keys = ('sk_threshold', 'alpha', 'orig_contrib', 'seg_threshold')
 
     return list(dict(zip(keys, param)) for param in PARAMS_COMBINATION)
+
+
+print(len(get_param_combinations()))
