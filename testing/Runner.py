@@ -9,14 +9,14 @@ os.chdir(base_dir)
 data_file_path = 'data\\DRIVE\\test\\images'
 mask_path = 'data\\DRIVE\\test\\mask'
 ground_truth_path = 'data\\DRIVE\\test\\1st_manual'
-mask_suffix = '_test_mask.gif'
-ground_truth_suffix = '_manual1.gif'
 
 
-def get_mask_file(file_name): return file_name.split('_')[0] + mask_suffix
+def get_mask_file(file_name):
+    return file_name.split('_')[0] + '_test_mask.gif'
 
 
-def get_ground_truth_file(file_name): return file_name.split('_')[0] + ground_truth_suffix
+def get_ground_truth_file(file_name):
+    return file_name.split('_')[0] + '_manual1.gif'
 
 
 tester = AtureTest(out_dir='out')
