@@ -127,7 +127,7 @@ class MatImage(SegmentedImage):
         self.image_arr = file.get_image('I2')
 
 
-class GlaucomaImage(SegmentedImage):
+class HighResolutionFundusImage(SegmentedImage):
     def __init__(self):
         super().__init__()
 
