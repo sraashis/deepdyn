@@ -124,4 +124,4 @@ class AtureTest:
 
         if save_images:
             IMG.fromarray(img_obj.res['segmented_rgb']).save(
-                os.path.join(self.out_dir, img_obj.file_name + '_[' + line + ']' + '.JPEG'))
+                os.path.join(self.out_dir, img_obj.file_name + '_[' + line + ']' + '.PNG'))
