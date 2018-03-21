@@ -83,9 +83,6 @@ class AtureTest:
             img_obj.apply_bilateral()
             img_obj.apply_gabor()
 
-            img_obj.apply_bilateral()
-            img_obj.working_arr = img_obj.res['bilateral']
-
             img_obj.generate_lattice_graph()
 
             for params in params_combination:
@@ -124,4 +121,6 @@ class AtureTest:
 
         if save_images:
             IMG.fromarray(img_obj.res['segmented_rgb']).save(
-                os.path.join(self.out_dir, img_obj.file_name + '_[' + line + ']' + '.PNG'))
+                os.path.join(self.out_dir, img_obj.file_name + '.PNG'))
+            IMG.fromarray(img_obj.res['orig']).save(
+                os.path.join(self.out_dir, img_obj.file_name + '_ORIG.PNG'))
