@@ -3,7 +3,8 @@ import matplotlib.pyplot as plt
 import numpy as np
 
 
-def rgb_scores(arr_2d=None, truth=None, arr_rgb=None):
+def get_rgb_scores(arr_2d=None, truth=None):
+    arr_rgb = np.zeros([arr_2d.shape[0], arr_2d.shape[1], 3], dtype=np.uint8)
     for i in range(0, arr_2d.shape[0]):
         for j in range(0, arr_2d.shape[1]):
             if arr_2d[i, j] == 255 and truth[i, j] == 255:
@@ -16,6 +17,7 @@ def rgb_scores(arr_2d=None, truth=None, arr_rgb=None):
                 arr_rgb[i, j, 0] = 255
                 arr_rgb[i, j, 1] = 0
                 arr_rgb[i, j, 2] = 0
+    return arr_rgb
 
 
 def get_praf1(arr_2d=None, truth=None):

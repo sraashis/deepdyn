@@ -3,11 +3,11 @@ from itertools import count
 
 import cv2
 import numpy as np
+import utils.img_utils as imgutils
 from PIL import Image as IMG
 
-import preprocess.algorithms.fast_mst as fmst
-import preprocess.utils.filter_utils as fu
-import preprocess.utils.img_utils as imgutils
+import commons.fast_mst as fmst
+import utils.filter_utils as fu
 from commons.IMAGE import SegmentedImage
 from commons.timer import checktime
 
@@ -36,8 +36,6 @@ class AtureTest:
              save_images=False):
 
         img_obj.res['segmented'] = np.zeros_like(img_obj.working_arr)
-        img_obj.res['segmented_rgb'] = np.zeros([img_obj.working_arr.shape[0], img_obj.working_arr.shape[1], 3],
-                                                dtype=np.uint8)
 
         img_obj.res['graph'] = self._segment_now(accumulator_2d=img_obj.res['segmented'], image_obj=img_obj,
                                                  params=params)
@@ -46,9 +44,6 @@ class AtureTest:
         img_obj.res['skeleton'] = img_obj.res['skeleton'].copy()
         img_obj.res['params'] = params.copy()
         img_obj.res['scores'] = imgutils.get_praf1(arr_2d=img_obj.res['segmented'], truth=img_obj.ground_truth)
-
-        imgutils.rgb_scores(arr_2d=img_obj.res['segmented'], truth=img_obj.ground_truth,
-                            arr_rgb=img_obj.res['segmented_rgb'])
 
         self._save(img_obj=img_obj, params=params, save_images=save_images)
 
@@ -120,7 +115,5 @@ class AtureTest:
         print('Number of params combination tried: ' + str(i))
 
         if save_images:
-            IMG.fromarray(img_obj.res['segmented_rgb']).save(
+            IMG.fromarray(img_obj.res['segmented']).save(
                 os.path.join(self.out_dir, img_obj.file_name + '.PNG'))
-            IMG.fromarray(img_obj.res['orig']).save(
-                os.path.join(self.out_dir, img_obj.file_name + '_ORIG.PNG'))
