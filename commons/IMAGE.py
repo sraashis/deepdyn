@@ -4,7 +4,7 @@ import cv2
 import cv2 as ocv
 import networkx as nx
 import numpy as np
-import preprocess.utils.img_utils as imgutil
+import utils.img_utils as imgutil
 from PIL import Image as IMG
 
 import commons.constants as const

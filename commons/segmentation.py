@@ -3,7 +3,7 @@ from itertools import count
 
 import cv2
 import numpy as np
-import preprocess.utils.img_utils as imgutils
+import utils.img_utils as imgutils
 from PIL import Image as IMG
 
 import commons.fast_mst as fmst
