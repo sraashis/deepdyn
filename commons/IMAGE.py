@@ -116,7 +116,7 @@ class SegmentedImage(Image):
         self.res['skeleton'] = cv2.bitwise_and(final, final, mask=self.mask)
 
 
-class MatImage(SegmentedImage):
+class MatSegmentedImage(SegmentedImage):
     def __init__(self):
         super().__init__()
 
