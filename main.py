@@ -1,17 +1,47 @@
-from commons.IMAGE import Image
-import preprocess.av.image_filters as fil
+print(__doc__)
 
-if __name__ == '__main__':
-    img = Image('wide_image_13.mat')
-    # img.show_image(image_array=img.img_array)
-    img.load_kernel_bank()
-    img.apply_bilateral(img.image_arr[:, :, 1])
-    # img.show_image(img.img_bilateral)
-    img_temp = img.image_arr[:, :, 1] - img.img_bilateral
-    img.apply_gabor(arr=img_temp, filter_bank=fil.get_chosen_gabor_bank())
-    # img.histogram(255 - img.img_gabor)
-    # img.img_gabor[img.img_gabor<250] = 0
-    img.show_image(255-img.img_gabor)
-    # img.show_image(img.img_array)
-    # img.show_kernel(fil.get_chosen_gabor_bank())
-    # img.show_av_graph(mat_file=img.mat, image_arr=img.img_gabor, av_only=False)
+
+# Code source: Gaël Varoquaux
+# License: BSD 3 clause
+
+import numpy as np
+import matplotlib.pyplot as plt
+from mpl_toolkits.mplot3d import Axes3D
+
+
+from sklearn import decomposition
+from sklearn import datasets
+
+np.random.seed(5)
+
+centers = [[1, 1], [-1, -1], [1, -1]]
+iris = datasets.load_iris()
+X = iris.data
+y = iris.target
+
+fig = plt.figure(1, figsize=(4, 3))
+plt.clf()
+ax = Axes3D(fig, rect=[0, 0, .95, 1], elev=48, azim=134)
+print(y[0:100])
+
+plt.cla()
+pca = decomposition.PCA(n_components=3)
+pca.fit(X)
+X = pca.transform(X)
+
+for name, label in [('Setosa', 0), ('Versicolour', 1), ('Virginica', 2)]:
+    ax.text3D(X[y == label, 0].mean(),
+              X[y == label, 1].mean() + 1.5,
+              X[y == label, 2].mean(), name,
+              horizontalalignment='center',
+              bbox=dict(alpha=.5, edgecolor='w', facecolor='w'))
+# Reorder the labels to have colors matching the cluster results
+y = np.choose(y, [1, 2, 0]).astype(np.float)
+ax.scatter(X[:, 0], X[:, 1], X[:, 2], c=y, cmap=plt.cm.spectral,
+           edgecolor='k')
+
+ax.w_xaxis.set_ticklabels([])
+ax.w_yaxis.set_ticklabels([])
+ax.w_zaxis.set_ticklabels([])
+
+plt.show()
