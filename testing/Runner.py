@@ -18,7 +18,11 @@ def get_mask_file(file_name):
 def get_ground_truth_file(file_name):
     return file_name.split('_')[0] + '_manual1.gif'
 
+params = {'sk_threshold': 60,
+          'alpha': 7.5,
+          'orig_contrib': 0.3,
+          'seg_threshold': 24}
 
-tester = AtureTest(out_dir='out')
-tester.run_all(data_dir=data_file_path, mask_path=mask_path, gt_path=ground_truth_path, save_images=False,
-               params_combination=pms.get_param_combinations(), fget_mask=get_mask_file, fget_gt=get_ground_truth_file)
+tester = AtureTest(out_dir='data\\drive_segmented')
+tester.run_all(data_dir=data_file_path, mask_path=mask_path, gt_path=ground_truth_path, save_images=True,
+               params_combination=[params], fget_mask=get_mask_file, fget_gt=get_ground_truth_file)
