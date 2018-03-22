@@ -83,6 +83,9 @@ class AtureTest:
             img_obj.apply_bilateral()
             img_obj.apply_gabor()
 
+            img_obj.apply_bilateral()
+            img_obj.working_arr = img_obj.res['bilateral']
+
             img_obj.generate_lattice_graph()
 
             for params in params_combination:
