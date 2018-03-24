@@ -116,4 +116,6 @@ class AtureTest:
 
         if save_images:
             IMG.fromarray(img_obj.res['segmented']).save(
-                os.path.join(self.out_dir, img_obj.file_name + '.PNG'))
+                os.path.join(self.out_dir, img_obj.file_name + '_SEG.PNG'))
+            IMG.fromarray(imgutils.get_rgb_scores(img_obj.res['segmented'], img_obj.ground_truth)).save(
+                os.path.join(self.out_dir, img_obj.file_name + '_RGB.PNG'))
