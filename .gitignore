@@ -9,4 +9,4 @@ preprocess/image/__pycache__/
 .idea
 out/
 data/
-notebook/SMALL_VESSEL_CONV.ipynb
+notebook/.ipynb_checkpoints/
