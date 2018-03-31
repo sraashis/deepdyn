@@ -95,7 +95,7 @@ class AtureTest:
         params['alpha'] -= alpha_decay
         params['sk_threshold'] = 100
 
-    def _save(self, img_obj=None, params=None, epoch=None, save_images=False):
+    def _save(self, img_obj=None, params=None, save_images=False):
         i = next(self.c)
         base = 'scores'
         line = str(i) + ',' + \

@@ -7,21 +7,18 @@ import numpy as np
 
 def get_lable(i, j, arr_2d, truth):
     if arr_2d[i, j] == 255 and truth[i, j] == 255:
-        return 'w'
+        return 'white'
     if arr_2d[i, j] == 255 and truth[i, j] == 0:
-        return 'g'
+        return 'green'
     if arr_2d[i, j] == 0 and truth[i, j] == 255:
-        return 'r'
+        return 'red'
     if arr_2d[i, j] == 0 and truth[i, j] == 0:
-        return 'b'
+        return 'black'
 
 
 def generate_patches(base_path=None, img_obj=None, k_size=51):
     out_dir = os.path.join(base_path, img_obj.file_name.split('.')[0])
-
-    if os.path.isdir(out_dir) is False:
-        os.mkdir(out_dir)
-
+    os.makedirs(out_dir, exist_ok=True)
     img = img_obj.working_arr.copy()
     k_half = math.floor(k_size / 2)
     for i in range(img.shape[0]):
