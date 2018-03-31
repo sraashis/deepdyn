@@ -7,20 +7,25 @@ import numpy as np
 
 def get_lable(i, j, arr_2d, truth):
     if arr_2d[i, j] == 255 and truth[i, j] == 255:
-        return 'white'
+        return 0  # TP White
     if arr_2d[i, j] == 255 and truth[i, j] == 0:
-        return 'green'
-    if arr_2d[i, j] == 0 and truth[i, j] == 255:
-        return 'red'
+        return 1  # FP Green
     if arr_2d[i, j] == 0 and truth[i, j] == 0:
-        return 'black'
+        return 2  # TN Black
+    if arr_2d[i, j] == 0 and truth[i, j] == 255:
+        return 3  # FN Red
 
 
-def generate_patches(base_path=None, img_obj=None, k_size=51):
-    out_dir = os.path.join(base_path, img_obj.file_name.split('.')[0])
+# Generates patches of images and save in folder with lable in name
+# Save the images in array and pickle the array. Lable is the last element of an array
+
+def generate_patches(base_path=None, img_obj=None, k_size=51, save_images=False, pickle=True):
+    file_base = img_obj.file_name.split('.')[0]
+    out_dir = os.path.join(base_path, file_base)
     os.makedirs(out_dir, exist_ok=True)
     img = img_obj.working_arr.copy()
     k_half = math.floor(k_size / 2)
+    data = []
     for i in range(img.shape[0]):
         for j in range(img.shape[1]):
 
@@ -44,7 +49,10 @@ def generate_patches(base_path=None, img_obj=None, k_size=51):
                         patch[k_half + k, k_half + l] = img[patch_i, patch_j]
 
             if not patch_exceeds_mask:
-                IMG.fromarray(patch).save(os.path.join(out_dir,
-                                                       str(i) + '_' + str(j) + '_' + get_lable(i, j,
-                                                                                               img_obj.res['segmented'],
-                                                                                               img_obj.ground_truth) + '.PNG'))
+                label = get_lable(i, j, img_obj.res['segmented'], img_obj.ground_truth)
+                if save_images:
+                    IMG.fromarray(patch).save(os.path.join(out_dir, str(i) + '_' + str(j) + '_' + str(label) + '.PNG'))
+                if pickle:
+                    data.append(np.append(patch.reshape(1, -1), label))
+
+    np.save(os.path.join(base_path, file_base), np.array(data, dtype=np.uint8))
