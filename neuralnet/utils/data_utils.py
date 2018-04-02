@@ -38,17 +38,20 @@ def generate_patches(base_path=None, img_obj=None, k_size=51, save_images=False,
             patch_exceeds_mask = False
 
             for k in range(-k_half, k_half + 1, 1):
+
+                if patch_exceeds_mask:
+                    break
+
                 for l in range(-k_half, k_half + 1, 1):
 
                     if patch_exceeds_mask:
-                        continue
+                        break
 
                     patch_i = i + k
                     patch_j = j + l
 
-                    if patch_i >= 0 and patch_j >= 0 and patch_i < img.shape[0] and patch_j < img.shape[1]:
-
-                        if img_obj.mask[patch_i, patch_j] == 0:
+                    if img.shape[0] > patch_i >= 0 and img.shape[1] > patch_j >= 0:
+                        if img_obj.mask is not None and img_obj.mask[patch_i, patch_j] == 0:
                             patch_exceeds_mask = True
 
                         patch[k_half + k, k_half + l] = img[patch_i, patch_j]
@@ -60,4 +63,4 @@ def generate_patches(base_path=None, img_obj=None, k_size=51, save_images=False,
                 if pickle:
                     data.append(np.append(patch.reshape(1, -1), label))
 
-    np.save(os.path.join(base_path, file_base), np.array(data))
+    np.save(os.path.join(base_path, file_base), np.array(data, dtype=np.uint8))
