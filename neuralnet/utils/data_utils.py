@@ -3,6 +3,7 @@ import os
 
 import PIL.Image as IMG
 import numpy as np
+from commons.timer import checktime
 
 
 def get_lable(i, j, arr_2d, truth):
@@ -16,11 +17,11 @@ def get_lable(i, j, arr_2d, truth):
         return 3  # FN Red
 
 
-# Generates patches of images and save in folder with lable in name
-# Save the images in array and pickle the array. Lable is the last element of an array
+# Generates patches of images and save in folder with label in name
+# Save the images in array and pickle the array. Label is the last element of an array
 
+@checktime
 def generate_patches(base_path=None, img_obj=None, k_size=51, save_images=False, pickle=True):
-
     file_base = img_obj.file_name.split('.')[0]
     out_dir = os.path.join(base_path, file_base)
 
@@ -59,4 +60,4 @@ def generate_patches(base_path=None, img_obj=None, k_size=51, save_images=False,
                 if pickle:
                     data.append(np.append(patch.reshape(1, -1), label))
 
-    np.save(os.path.join(base_path, file_base), np.array(data, dtype=np.uint8))
+    np.save(os.path.join(base_path, file_base), np.array(data))
