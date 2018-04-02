@@ -61,6 +61,6 @@ def generate_patches(base_path=None, img_obj=None, k_size=51, save_images=False,
                 if save_images:
                     IMG.fromarray(patch).save(os.path.join(out_dir, str(i) + '_' + str(j) + '_' + str(label) + '.PNG'))
                 if pickle:
-                    data.append(np.append(patch.reshape(1, -1), label))
+                    data.append(np.append(patch.reshape(-1), label))
 
     np.save(os.path.join(base_path, file_base), np.array(data, dtype=np.uint8))
