@@ -20,9 +20,13 @@ def get_lable(i, j, arr_2d, truth):
 # Save the images in array and pickle the array. Lable is the last element of an array
 
 def generate_patches(base_path=None, img_obj=None, k_size=51, save_images=False, pickle=True):
+
     file_base = img_obj.file_name.split('.')[0]
     out_dir = os.path.join(base_path, file_base)
-    os.makedirs(out_dir, exist_ok=True)
+
+    if save_images:
+        os.makedirs(out_dir, exist_ok=True)
+
     img = img_obj.working_arr.copy()
     k_half = math.floor(k_size / 2)
     data = []
