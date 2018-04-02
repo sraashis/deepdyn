@@ -83,6 +83,8 @@ def histogram(image_arr, bins=32):
     plt.show()
 
 
-def get_image_as_array(image_file):
+def get_image_as_array(image_file, channels=3):
     img = IMG.open(image_file)
-    return np.array(img.getdata(), np.uint8).reshape(img.size[1], img.size[0], 3)
+    if channels == 1:
+        return np.array(img.getdata(), np.uint8).reshape(img.size[1], img.size[0])
+    return np.array(img.getdata(), np.uint8).reshape(img.size[1], img.size[0], channels)
