@@ -2,7 +2,6 @@ import os
 
 os.chdir('/home/ak/Spring2018/ature')
 from commons.segmentation import AtureTest
-import utils.filter_utils as filutils
 from commons.IMAGE import Image
 import utils.img_utils as imgutil
 import neuralnet.utils.data_utils as nndutil
@@ -30,11 +29,6 @@ def get_mask_file(file_name):
 def get_ground_truth_file(file_name):
     return file_name.split('_')[0] + '_manual1.gif'
 
-
-kernels1 = filutils.build_filter_bank(k_size=31, gamma=0.7, lambd=5, sigma=2, orientations=64, psi=0)
-kernels2 = filutils.build_filter_bank(k_size=31, gamma=0.7, lambd=8, sigma=3, orientations=64, psi=0)
-kernels3 = filutils.build_filter_bank(k_size=31, gamma=0.7, lambd=11, sigma=4, orientations=64, psi=0)
-kernels = kernels1 + kernels2 + kernels3
 
 params = {'sk_threshold': 60,
           'alpha': 7.5,
