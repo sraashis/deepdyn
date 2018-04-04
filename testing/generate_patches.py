@@ -1,11 +1,10 @@
 import os
 
-os.chdir('/home/ak/Spring2018/ature')
 from commons.segmentation import AtureTest
 from commons.IMAGE import Image
 import utils.img_utils as imgutil
 import neuralnet.utils.data_utils as nndutil
-
+os.chdir('/home/akhanal1/Spring2018/ature')
 sep = os.sep
 
 Dirs = {}
@@ -23,7 +22,7 @@ for k, folder in Dirs.items():
 
 
 def get_mask_file(file_name):
-    return file_name.split('_')[0] + '_test_mask.gif'
+    return file_name.split('_')[0] + '_training_mask.gif'
 
 
 def get_ground_truth_file(file_name):
@@ -36,7 +35,7 @@ params = {'sk_threshold': 60,
           'seg_threshold': 24}
 
 tester = AtureTest(out_dir=Dirs['segmented'])
-tester.run_all(data_dir=Dirs['data'], mask_path=Dirs['mask'], gt_path=Dirs['truth'], save_images=True,
+tester.run_all(data_dir=Dirs['images'], mask_path=Dirs['mask'], gt_path=Dirs['truth'], save_images=True,
                params_combination=[params], fget_mask=get_mask_file, fget_gt=get_ground_truth_file)
 
 
