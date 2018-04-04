@@ -40,14 +40,6 @@ tester.run_all(data_dir=Dirs['images'], mask_path=Dirs['mask'], gt_path=Dirs['tr
 
 
 # Generate patches
-def get_mask_file(file_name):
-    return file_name.split('_')[0] + '_test_mask.gif'
-
-
-def get_ground_truth_file(file_name):
-    return file_name.split('_')[0] + '_manual1.gif'
-
-
 def get_segmented_file(file_name):
     return file_name + '_SEG.PNG'
 
