@@ -46,7 +46,7 @@ class DriveDatasetFromFile(Dataset):
     def __getitem__(self, index):
 
         img_arr = self.data[index].reshape(self.height, self.width)
-        img = IMG.fromarray(imgutil.whiten_image2d(img_arr))
+        img = IMG.fromarray(img_arr)
 
         if self.transform is not None:
             img_tensor = self.transform(img)
