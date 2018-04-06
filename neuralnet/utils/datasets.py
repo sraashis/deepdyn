@@ -8,7 +8,7 @@ import torch
 from torch.utils.data.dataset import Dataset
 
 import neuralnet.utils.data_utils as datautils
-from utils import img_utils as imgutil
+import utils.img_utils as imgutil
 
 
 class DriveDatasetFromFile(Dataset):
@@ -75,7 +75,7 @@ class DriveDatasetFromImageObj(Dataset):
                 self.data.append((i, j))
 
         self.data = np.array(self.data)
-        self.labels = np.zeros(self.data.shape[0])
+        self.labels = np.zeros(self.data.shape[0], dtype=np.uint8)
         for ix, ij in enumerate(self.data, 0):
 
             i, j = ij
@@ -103,7 +103,7 @@ class DriveDatasetFromImageObj(Dataset):
                     1] > patch_j >= 0:
                     patch[self.k_half + k, self.k_half + l] = self.img_obj.working_arr[patch_i, patch_j]
 
-        img = IMG.fromarray(imgutil.whiten_image2d(patch))
+        img = IMG.fromarray(patch)
 
         if self.transform is not None:
             img_tensor = self.transform(img)
