@@ -25,13 +25,16 @@ class DriveDatasetFromFile(Dataset):
 
         self.data = None
         for data_file in os.listdir(data_path):
-
-            data_file = os.path.join(data_path, data_file)
-            print('Data file: ' + data_file)
-            if self.data is None:
-                self.data = np.load(data_file)
-            else:
-                self.data = np.concatenate((self.data, np.load(data_file)), axis=0)
+            try:
+                data_file = os.path.join(data_path, data_file)
+                if self.data is None:
+                    self.data = np.load(data_file)
+                else:
+                    self.data = np.concatenate((self.data, np.load(data_file)), axis=0)
+                print('Data file loaded: ' + data_file)
+            except Exception as e:
+                print('ERROR loading ' + data_file + ' : ' + str(e))
+                continue
 
         self.labels = self.data[:, self.height * self.width]
         if self.num_classes == 2:
@@ -58,6 +61,9 @@ class DriveDatasetFromFile(Dataset):
 
 
 class DriveDatasetFromImageObj(Dataset):
+
+    # Loads dataset directly from the image object in commons package.
+    # returns "i, j, dataset, label" of the patch for further use during __next_item__ iteration
 
     def __init__(self, img_obj=None, patch_size=None, num_classes=None, transform=None):
 
