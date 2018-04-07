@@ -20,7 +20,7 @@ class NNTrainer:
         if use_gpu:
             self.model.cuda()
 
-        log_frequency = max(int(2000 / self.trainloader.batch_size), 1)
+        log_frequency = max(int(4000 / self.trainloader.batch_size), 1)
         self.model.train()
         for epoch in range(self.checkpoint['epochs'], self.checkpoint['epochs'] + epochs):
             running_loss = 0.0
