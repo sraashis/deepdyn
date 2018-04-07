@@ -13,7 +13,7 @@ class NNTrainer:
         self.testloader = testloader
         self.checkpoint_dir = checkpoint_dir
         self.checkpoint_file = checkpoint_file
-        self.checkpoint = {'epochs': 0, 'state': None, 'accuracy': 0.0}
+        self.checkpoint = NNTrainer._empty_checkpoint()
 
     def train(self, optimizer=None, epochs=None, use_gpu=False, override_checkpoint=False):
         print('Starting training...')
@@ -47,14 +47,14 @@ class NNTrainer:
         print('Done with training.')
 
         accuracy = self.test(use_gpu)
-        self.resume_latest_model()
-        if accuracy > self.checkpoint['accuracy']:
-            self._checkpoint(self.checkpoint['epochs'] + epochs, accuracy)
-        elif override_checkpoint:
-            self._checkpoint(self.checkpoint['epochs'] + epochs, accuracy)
-            print('Checkpoint overridden.')
-        else:
-            print('Last checkpoint was better.')
+        if override_checkpoint:
+            self._checkpoint(epochs, accuracy)
+            print('Checkpoint OVERRIDDEN.')
+
+        last_checkpoint = self._last_checkpoint()
+        if accuracy > last_checkpoint['accuracy']:
+            self._checkpoint(last_checkpoint['epochs'] + epochs, accuracy)
+            print('Checkpoint saved:' + self.checkpoint_file)
 
     def test(self, use_gpu=False):
         if use_gpu:
@@ -84,13 +84,21 @@ class NNTrainer:
                            'epochs': epochs,
                            'accuracy': accuracy}
         torch.save(self.checkpoint, os.path.join(self.checkpoint_dir, self.checkpoint_file))
-        print('Checkpoint created: ' + self.checkpoint_file)
 
-    def resume_latest_model(self):
+    def resume_from_checkpoint(self):
         try:
             self.checkpoint = torch.load(os.path.join(self.checkpoint_dir, self.checkpoint_file))
             self.model.load_state_dict(self.checkpoint['state'])
-            print('Last checkpoint: ' + self.checkpoint_file)
+            print('Resumed: ' + self.checkpoint_file)
         except Exception as e:
-            print('Checkpoint not found.')
-            pass
+            print('ERROR: ' + str(e))
+
+    def _last_checkpoint(self):
+        try:
+            return torch.load(os.path.join(self.checkpoint_dir, self.checkpoint_file))
+        except Exception as e:
+            return NNTrainer._empty_checkpoint()
+
+    @staticmethod
+    def _empty_checkpoint():
+        return {'epochs': 0, 'state': None, 'accuracy': 0.0}
