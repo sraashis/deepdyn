@@ -54,4 +54,5 @@ for input_image in os.listdir(Dirs['images']):
     img_obj.res['segmented'] = imgutil.get_image_as_array(segmented_file, channels=1)
 
     img_obj.working_arr = img_obj.image_arr[:, :, 1]
+    img_obj.working_arr = imgutil.whiten_image2d(img_obj.working_arr)
     nndutil.generate_patches(base_path=Dirs['patches'], img_obj=img_obj, k_size=31, save_images=False)

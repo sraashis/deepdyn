@@ -70,6 +70,7 @@ class AtureTest:
             img_obj.load_file(data_dir=data_dir, file_name=file_name)
             img_obj.res['orig'] = img_obj.image_arr[:, :, 1]
             img_obj.working_arr = img_obj.image_arr[:, :, 1]
+            img_obj.working_arr = imgutils.whiten_image2d(img_obj.working_arr)
 
             img_obj.load_mask(mask_dir=mask_path, fget_mask=fget_mask, erode=True)
             img_obj.load_ground_truth(gt_dir=gt_path, fget_ground_truth=fget_gt)
