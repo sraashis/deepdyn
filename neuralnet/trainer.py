@@ -20,6 +20,7 @@ class NNTrainer:
         if use_gpu:
             self.model.cuda()
 
+        log_frequency = max(int(2000 / self.trainloader.batch_size), 1)
         self.model.train()
         for epoch in range(self.checkpoint['epochs'], self.checkpoint['epochs'] + epochs):
             running_loss = 0.0
@@ -40,8 +41,8 @@ class NNTrainer:
                 optimizer.step()
 
                 running_loss += loss.data[0]
-                if i % 500 == 499:
-                    print('[epoch: %d, batches: %5d] loss: %.3f' % (epoch + 1, i + 1, running_loss / 500))
+                if i % log_frequency == log_frequency - 1:
+                    print('[epoch: %d, batches: %d] loss: %.3f' % (epoch + 1, i + 1, running_loss / log_frequency))
                     running_loss = 0.0
         print('Done with training.')
 
@@ -61,6 +62,7 @@ class NNTrainer:
         self.model.eval()
         correct = 0
         total = 0
+        log_frequency = max(int(2000 / self.testloader.batch_size), 1)
         for i, data in enumerate(self.testloader, 0):
             images, labels = data
 
@@ -73,7 +75,7 @@ class NNTrainer:
             total += labels.size(0)
             correct += (predicted == labels).sum()
             acc = 100 * correct / total
-            if i % 500 == 499:
+            if i % log_frequency == log_frequency - 1:
                 print('Accuracy of %d batches: %d %%' % (i + 1, acc))
         return int(acc)
 
