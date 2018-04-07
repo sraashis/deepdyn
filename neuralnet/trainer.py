@@ -42,7 +42,7 @@ class NNTrainer:
                 if i % log_frequency == log_frequency - 1:
                     print('[epoch: %d, batches: %d] loss: %.3f' % (epoch + 1, i + 1, running_loss / log_frequency))
                     running_loss = 0.0
-        self.checkpoint['epochs'] = epochs
+        self.checkpoint['epochs'] = self.checkpoint['epochs'] + epochs
         print('Done with training.')
 
     def test(self, dataloader=None, use_gpu=False, force_checkpoint=False):
