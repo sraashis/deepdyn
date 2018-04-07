@@ -37,11 +37,12 @@ class DriveDatasetFromFile(Dataset):
                 continue
 
         self.labels = self.data[:, self.height * self.width]
-        if self.num_classes == 2:
-            self.labels[self.labels == 0] = 1  # White (TP)
-            self.labels[self.labels == 1] = 0  # Green (FP)
-            self.labels[self.labels == 2] = 0  # Black (TN)
-            self.labels[self.labels == 3] = 1  # Red (FN)
+
+        for i, y in enumerate(self.labels):
+            if y == 0 or y == 3:
+                self.labels[i] = 1
+            elif y == 1 or y == 2:
+                self.labels[i] = 0
 
         self.labels = torch.from_numpy(self.labels)
         self.data = self.data[:, 0:self.height * self.width]
