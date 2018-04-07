@@ -38,11 +38,12 @@ class DriveDatasetFromFile(Dataset):
 
         self.labels = self.data[:, self.height * self.width]
 
-        for i, y in enumerate(self.labels):
-            if y == 0 or y == 3:
-                self.labels[i] = 1
-            elif y == 1 or y == 2:
-                self.labels[i] = 0
+        if num_classes == 2:
+            for i, y in enumerate(self.labels):
+                if y == 0 or y == 3:
+                    self.labels[i] = 1
+                elif y == 1 or y == 2:
+                    self.labels[i] = 0
 
         self.labels = torch.from_numpy(self.labels)
         self.data = self.data[:, 0:self.height * self.width]
