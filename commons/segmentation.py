@@ -8,7 +8,7 @@ from PIL import Image as IMG
 
 import commons.fast_mst as fmst
 import utils.filter_utils as fu
-from commons.IMAGE import SegmentedImage
+from commons.IMAGE import SegmentedImage, MatSegmentedImage
 from commons.timer import checktime
 
 
@@ -70,6 +70,7 @@ class AtureTest:
             img_obj.load_file(data_dir=data_dir, file_name=file_name)
             img_obj.res['orig'] = img_obj.image_arr[:, :, 1]
             img_obj.working_arr = img_obj.image_arr[:, :, 1]
+            img_obj.working_arr = imgutils.whiten_image2d(img_obj.working_arr)
 
             img_obj.load_mask(mask_dir=mask_path, fget_mask=fget_mask, erode=True)
             img_obj.load_ground_truth(gt_dir=gt_path, fget_ground_truth=fget_gt)
@@ -119,3 +120,44 @@ class AtureTest:
                 os.path.join(self.out_dir, img_obj.file_name + '_SEG.PNG'))
             IMG.fromarray(imgutils.get_rgb_scores(img_obj.res['segmented'], img_obj.ground_truth)).save(
                 os.path.join(self.out_dir, img_obj.file_name + '_RGB.PNG'))
+
+
+class AtureTestMat(AtureTest):
+    def run_all(self, data_dir=None, mask_path=None, gt_path=None, fget_mask=None, fget_gt=None, params_combination=[],
+                save_images=False):
+
+        if os.path.isdir(self.out_dir) is False:
+            os.makedirs(self.out_dir)
+
+        self.writer = open(self.out_dir + os.sep + "segmentation_result.csv", 'w')
+        self.writer.write(
+            'ITR,FILE_NAME,FSCORE,PRECISION,RECALL,ACCURACY,'
+            'SK_THRESHOLD,'
+            'ALPHA,'
+            'ORIG_CONTRIB,'
+            'SEG_THRESHOLD\n'
+        )
+
+        for file_name in os.listdir(data_dir):
+            print('File: ' + file_name)
+
+            img_obj = MatSegmentedImage()
+
+            img_obj.load_file(data_dir=data_dir, file_name=file_name)
+            img_obj.res['orig'] = img_obj.image_arr[:, :, 1]
+            img_obj.working_arr = img_obj.image_arr[:, :, 1]
+
+            img_obj.load_mask(mask_dir=mask_path, fget_mask=fget_mask, erode=True)
+            img_obj.load_ground_truth(gt_dir=gt_path, fget_ground_truth=fget_gt)
+
+            img_obj.apply_mask()
+            img_obj.apply_bilateral()
+            img_obj.apply_gabor()
+
+            img_obj.generate_lattice_graph()
+
+            for params in params_combination:
+                img_obj.generate_skeleton(threshold=int(params['sk_threshold']))
+                self._run(img_obj=img_obj, params=params, save_images=save_images)
+
+        self.writer.close()

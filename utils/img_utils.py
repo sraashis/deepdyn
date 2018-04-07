@@ -78,6 +78,14 @@ def get_signed_diff_int8(image_arr1=None, image_arr2=None):
     return np.array(fx * 255, np.uint8)
 
 
+def whiten_image2d(img_arr2d=None):
+    h, w = img_arr2d.shape
+    img_arr2d = img_arr2d.reshape(-1)
+    img_arr2d = (img_arr2d - img_arr2d.mean()) / img_arr2d.std()
+    img_arr2d = rescale2d_unsigned(img_arr2d) * 255
+    return img_arr2d.reshape(h, w).astype(np.uint8)
+
+
 def histogram(image_arr, bins=32):
     plt.hist(image_arr.ravel(), bins)
     plt.show()
