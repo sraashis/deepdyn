@@ -3,6 +3,7 @@ import os
 
 import PIL.Image as IMG
 import numpy as np
+
 from commons.timer import checktime
 
 
@@ -64,3 +65,36 @@ def generate_patches(base_path=None, img_obj=None, k_size=51, save_images=False,
                     data.append(np.append(patch.reshape(-1), label))
 
     np.save(os.path.join(base_path, file_base), np.array(data, dtype=np.uint8))
+
+
+def load_dataset(data_path=None, img_shape=None, num_classes=None):
+    data = None
+    for data_file in os.listdir(data_path):
+        try:
+            data_file = os.path.join(data_path, data_file)
+            if data is None:
+                data = np.load(data_file)
+            else:
+                data = np.concatenate((data, np.load(data_file)), axis=0)
+            print('Data file loaded: ' + data_file)
+        except Exception as e:
+            print('ERROR loading ' + data_file + ' : ' + str(e))
+            continue
+
+    labels = data[:, np.prod(img_shape)]
+
+    if num_classes == 2:
+        for i, y in enumerate(labels):
+            if y == 0 or y == 3:
+                labels[i] = 1
+            elif y == 1 or y == 2:
+                labels[i] = 0
+    data = data[:, 0:np.prod(img_shape)]
+    return data.reshape(data.shape[0], *img_shape), labels
+
+
+def get_class_weights(y):
+    cls, count = np.unique(y, return_counts=True)
+    counter = dict(zip(cls, count))
+    majority = max(counter.values())
+    return {cls: round(majority / count) for cls, count in counter.items()}
