@@ -30,7 +30,8 @@ def get_lable(i, j, arr_2d, truth):
 
 
 @checktime
-def generate_patches(base_path=None, img_obj=None, k_size=31, save_images=False, pickle=True):
+def generate_patches(base_path=None, img_obj=None, k_size=31, save_images=False, pickle=True, can_exceed_mask=False,
+                     folder_per_class=True):
     """
     :param base_path:
     :param img_obj:
@@ -38,6 +39,8 @@ def generate_patches(base_path=None, img_obj=None, k_size=31, save_images=False,
     :param save_images: if True, save patches to specific class folder(Will create folder inside base_path)
     :param pickle: if true, save each patch as flat numpy array pickled file.
             Last element of the array is the label(0,1,2,3)
+    :param can_exceed_mask: Generate patch that exceeds mask.
+    :param folder_per_class: If true, put patches in respective class else put in same folder.
     :return: None
     """
 
@@ -64,17 +67,22 @@ def generate_patches(base_path=None, img_obj=None, k_size=31, save_images=False,
                     patch_j = j + l
 
                     if img.shape[0] > patch_i >= 0 and img.shape[1] > patch_j >= 0:
-                        if img_obj.mask is not None and img_obj.mask[patch_i, patch_j] == 0:
+                        if not can_exceed_mask and img_obj.mask is not None and img_obj.mask[patch_i, patch_j] == 0:
                             patch_exceeds_mask = True
 
                         patch[k_half + k, k_half + l] = img[patch_i, patch_j]
 
-            if not patch_exceeds_mask:
+            if not patch_exceeds_mask or can_exceed_mask:
                 if save_images:
-                    out_path = os.path.join(base_path, get_dir(i, j, img_obj.res['segmented'], img_obj.ground_truth))
+                    out_path = os.path.join(base_path, img_obj.file_name.split('.')[0])
+                    if folder_per_class:
+                        out_path = os.path.join(base_path,
+                                                get_dir(i, j, img_obj.res['segmented'], img_obj.ground_truth))
+
                     os.makedirs(out_path, exist_ok=True)
                     patch_name = os.path.join(out_path, img_obj.file_name + ' ' + str(i) + '_' + str(j) + '.PNG')
                     IMG.fromarray(patch).save(patch_name)
+
                 if pickle:
                     data.append(
                         np.append(patch.reshape(-1), get_lable(i, j, img_obj.res['segmented'], img_obj.ground_truth)))
