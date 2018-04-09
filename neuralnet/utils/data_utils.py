@@ -29,11 +29,21 @@ def get_lable(i, j, arr_2d, truth):
         return 3  # FN Red
 
 
-# Generates patches of images and save in respective class
-# Save the images in array and pickle the array. Label is the last element of an array
-
 @checktime
-def generate_patches(base_path=None, img_obj=None, k_size=51, save_images=False, pickle=True):
+def generate_patches(base_path=None, img_obj=None, k_size=31, save_images=False, pickle=True, can_exceed_mask=False,
+                     folder_per_class=True):
+    """
+    :param base_path:
+    :param img_obj:
+    :param k_size: size of patch
+    :param save_images: if True, save patches to specific class folder(Will create folder inside base_path)
+    :param pickle: if true, save each patch as flat numpy array pickled file.
+            Last element of the array is the label(0,1,2,3)
+    :param can_exceed_mask: Generate patch that exceeds mask.
+    :param folder_per_class: If true, put patches in respective class else put in same folder.
+    :return: None
+    """
+
     img = img_obj.working_arr.copy()
     k_half = math.floor(k_size / 2)
     data = []
@@ -57,16 +67,22 @@ def generate_patches(base_path=None, img_obj=None, k_size=51, save_images=False,
                     patch_j = j + l
 
                     if img.shape[0] > patch_i >= 0 and img.shape[1] > patch_j >= 0:
-                        if img_obj.mask is not None and img_obj.mask[patch_i, patch_j] == 0:
+                        if not can_exceed_mask and img_obj.mask is not None and img_obj.mask[patch_i, patch_j] == 0:
                             patch_exceeds_mask = True
 
                         patch[k_half + k, k_half + l] = img[patch_i, patch_j]
 
-            if not patch_exceeds_mask:
+            if not patch_exceeds_mask or can_exceed_mask:
                 if save_images:
-                    out_path = os.path.join(base_path, get_dir(i, j, img_obj.res['segmented'], img_obj.ground_truth))
+                    out_path = os.path.join(base_path, img_obj.file_name.split('.')[0])
+                    if folder_per_class:
+                        out_path = os.path.join(base_path,
+                                                get_dir(i, j, img_obj.res['segmented'], img_obj.ground_truth))
+
                     os.makedirs(out_path, exist_ok=True)
-                    IMG.fromarray(patch).save(os.path.join(out_path, str(i * img.shape[1] + j) + '.PNG'))
+                    patch_name = os.path.join(out_path, img_obj.file_name + ' ' + str(i) + '_' + str(j) + '.PNG')
+                    IMG.fromarray(patch).save(patch_name)
+
                 if pickle:
                     data.append(
                         np.append(patch.reshape(-1), get_lable(i, j, img_obj.res['segmented'], img_obj.ground_truth)))
@@ -75,6 +91,12 @@ def generate_patches(base_path=None, img_obj=None, k_size=51, save_images=False,
 
 
 def load_dataset(data_path=None, img_shape=None, num_classes=None):
+    """
+    :param data_path:path to pickled .npy files
+    :param img_shape:shape of each patch
+    :param num_classes:number of classes
+    :return: array of shape(N, *shpae), labels
+    """
     data = None
     for data_file in os.listdir(data_path):
         try:
@@ -101,6 +123,10 @@ def load_dataset(data_path=None, img_shape=None, num_classes=None):
 
 
 def get_class_weights(y):
+    """
+    :param y: labels
+    :return: correct weights of each classes for balanced training
+    """
     cls, count = np.unique(y, return_counts=True)
     counter = dict(zip(cls, count))
     majority = max(counter.values())
