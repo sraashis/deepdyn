@@ -35,26 +35,23 @@ class Image:
             mask = IMG.open(os.path.join(mask_dir, mask_file))
             mask = np.array(mask.getdata(), np.uint8).reshape(mask.size[1], mask.size[0], 1)[:, :, 0]
             if erode:
-                print('Mask loaded: ' + mask_file)
                 self.mask = cv2.erode(mask, kernel=fu.get_chosen_mask_erode_kernel(), iterations=5)
         except Exception as e:
-            print('Fail to load mask: ' + str(e))
             self.mask = np.ones_like(self.working_arr)
+            print('Fail to load mask: ' + str(e))
 
     def apply_mask(self):
         self.working_arr = cv2.bitwise_and(self.working_arr, self.working_arr, mask=self.mask)
 
     def load_ground_truth(self, gt_dir=None, fget_ground_truth=None):
-
         try:
             gt_file = fget_ground_truth(self.file_name)
             truth = IMG.open(os.path.join(gt_dir, gt_file))
             truth = np.array(truth.getdata(), np.uint8).reshape(truth.size[1], truth.size[0], 1)[:, :, 0]
-            print('Ground truth loaded: ' + gt_file)
             self.ground_truth = truth
         except Exception as e:
-            print('Fail to load ground truth: ' + str(e))
             self.ground_truth = np.zeros_like(self.working_arr)
+            print('Fail to load ground truth: ' + str(e))
 
 
 class SegmentedImage(Image):

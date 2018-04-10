@@ -81,7 +81,7 @@ def get_signed_diff_int8(image_arr1=None, image_arr2=None):
 def whiten_image2d(img_arr2d=None):
     img_arr2d = img_arr2d.copy()
     img_arr2d = (img_arr2d - img_arr2d.mean()) / img_arr2d.std()
-    return rescale2d_unsigned(img_arr2d) * 255
+    return np.array(rescale2d_unsigned(img_arr2d) * 255, dtype=np.uint8)
 
 
 def histogram(image_arr, bins=32):

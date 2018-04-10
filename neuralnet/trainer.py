@@ -40,7 +40,7 @@ class NNTrainer:
 
                 running_loss += loss.data[0]
                 if i % log_frequency == log_frequency - 1:
-                    print('[epoch: %d, batches: %d] loss: %.3f' % (epoch + 1, i + 1, running_loss / log_frequency))
+                    print('[epoch:%3d/%3d, batches:%5d] LOSS:%.3f' % (epoch + 1, epochs, i + 1, running_loss / log_frequency))
                     running_loss = 0.0
         self.checkpoint['epochs'] = self.checkpoint['epochs'] + epochs
         print('Done with training.')
@@ -73,8 +73,7 @@ class NNTrainer:
             accuracy = 100 * correct / total
 
             if i % log_frequency == log_frequency - 1:
-                print('Accuracy of %d batches: %d %%' % (i + 1, accuracy))
-
+                print('Accuracy of %5d batches: %3d %%' % (i + 1, accuracy), end='\r')
         if force_checkpoint:
             self._save_checkpoint(
                 NNTrainer._checkpoint(epochs=self.checkpoint['epochs'], model=self.model, accuracy=accuracy))
