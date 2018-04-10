@@ -63,10 +63,9 @@ class DriveDatasetFromFile(Dataset):
         return self.data.shape[0]
 
 
-class DriveDatasetFromImageObj(Dataset):
+class DatasetFromImageObj(Dataset):
     # Loads dataset directly from the image object in commons package.
     # returns "i, j, dataset, label" of the patch for further use during __next_item__ iteration
-
     def __init__(self, img_obj=None, patch_size=None, num_classes=None, transform=None):
 
         self.img_obj = img_obj
@@ -185,7 +184,7 @@ class PatchesGenerator(Dataset):
         if self.transform is not None:
             img_tensor = self.transform(img_tensor)
 
-        return i, j, img_tensor, self.labels[index]
+        return img_tensor, self.labels[index]
 
     def __len__(self):
         return len(self.data)
