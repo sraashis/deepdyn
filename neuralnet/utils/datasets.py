@@ -94,7 +94,7 @@ class PatchesGenerator(Dataset):
             img_tensor = self.transform(img_tensor)
 
         if self.segment_mode:
-            return self.data[ID], img_tensor, self.labels[index]
+            return self.data[index], img_tensor, self.labels[index]
 
         return img_tensor, self.labels[index]
 
