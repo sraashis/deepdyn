@@ -30,8 +30,8 @@ def get_lable(i, j, arr_2d, truth):
 
 
 @checktime
-def generate_patches(base_path=None, img_obj=None, k_size=31, save_images=False, pickle=True, can_exceed_mask=False,
-                     folder_per_class=True):
+def generate_patches(base_path=None, img_obj=None, k_size=31, save_images=False, pickle=True, folder_per_class=True,
+                     can_exceed_mask=False):
     """
     :param base_path:
     :param img_obj:
@@ -39,7 +39,6 @@ def generate_patches(base_path=None, img_obj=None, k_size=31, save_images=False,
     :param save_images: if True, save patches to specific class folder(Will create folder inside base_path)
     :param pickle: if true, save each patch as flat numpy array pickled file.
             Last element of the array is the label(0,1,2,3)
-    :param can_exceed_mask: Generate patch that exceeds mask.
     :param folder_per_class: If true, put patches in respective class else put in same folder.
     :return: None
     """
@@ -50,29 +49,22 @@ def generate_patches(base_path=None, img_obj=None, k_size=31, save_images=False,
     for i in range(img.shape[0]):
         for j in range(img.shape[1]):
 
+            if img_obj.mask[i, j] == 0:
+                continue
             patch = np.full((k_size, k_size), 0, dtype=np.uint8)
-            patch_exceeds_mask = False
+            exceeds_mask = False
 
             for k in range(-k_half, k_half + 1, 1):
 
-                if patch_exceeds_mask:
-                    break
-
                 for l in range(-k_half, k_half + 1, 1):
-
-                    if patch_exceeds_mask:
-                        break
-
                     patch_i = i + k
                     patch_j = j + l
-
                     if img.shape[0] > patch_i >= 0 and img.shape[1] > patch_j >= 0:
-                        if not can_exceed_mask and img_obj.mask is not None and img_obj.mask[patch_i, patch_j] == 0:
-                            patch_exceeds_mask = True
-
                         patch[k_half + k, k_half + l] = img[patch_i, patch_j]
+                    if img_obj.mask[patch_i, patch_j] == 0:
+                        exceeds_mask = True
 
-            if not patch_exceeds_mask or can_exceed_mask:
+            if not exceeds_mask or can_exceed_mask:
                 if save_images:
                     out_path = os.path.join(base_path, img_obj.file_name.split('.')[0])
                     if folder_per_class:
