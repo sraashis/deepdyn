@@ -3,7 +3,6 @@ import math
 import os
 from random import shuffle
 
-import PIL.Image as IMG
 import numpy as np
 import torch
 from torch.utils.data.dataset import Dataset
@@ -13,8 +12,7 @@ import utils.img_utils as imgutil
 from commons.IMAGE import Image
 
 
-class PatchesGenerator(Dataset):
-
+class TorchPatchesGenerator(Dataset):
     def __init__(self, Dirs=None, patch_size=None, num_classes=None, transform=None,
                  fget_mask=None, fget_truth=None, fget_segmented=None, segment_mode=False):
 
