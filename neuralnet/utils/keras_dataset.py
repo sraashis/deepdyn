@@ -80,7 +80,6 @@ class KerasPatchesGenerator(keras.utils.Sequence):
         IDs_Xes_Yes = self.IDs[index * self.batch_size:(index + 1) * self.batch_size]
         IDlabels = self.labels[index * self.batch_size:(index + 1) * self.batch_size]
         X = np.empty((self.batch_size, self.patch_size, self.patch_size, 1))
-        y = np.empty(self.batch_size, dtype=int)
 
         # Generate data
         for ix, (ID, i, j) in enumerate(IDs_Xes_Yes):
@@ -95,7 +94,7 @@ class KerasPatchesGenerator(keras.utils.Sequence):
                         1] > patch_j >= 0:
                         patch[k_half + k, k_half + l] = self.images[ID].working_arr[patch_i, patch_j]
 
-            X[ix,] = patch[..., None]
+            X[ix, ] = patch[..., None]
         return X, keras.utils.to_categorical(IDlabels, num_classes=self.num_classes)
 
     def on_epoch_end(self):
