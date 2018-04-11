@@ -13,7 +13,7 @@ from commons.IMAGE import Image
 
 class KerasPatchesGenerator(keras.utils.Sequence):
     def __init__(self, Dirs=None, batch_size=None, patch_size=None, num_classes=None,
-                 fget_mask=None, fget_truth=None, fget_segmented=None, transform=None):
+                 fget_mask=None, fget_truth=None, fget_segmented=None, transformation=None):
 
         """
             :param Dirs: Should contain images, mask, truth, and seegmented path.(segmented only for 4 way classification)
@@ -31,8 +31,7 @@ class KerasPatchesGenerator(keras.utils.Sequence):
         self.IDs = []
         self.file_names = os.listdir(Dirs['images'])
         self.images = {}
-        self.indexes = None
-        self.transform = transform
+        self.transformation = transformation
         for ID, img_file in enumerate(self.file_names):
 
             img_obj = Image()
@@ -50,25 +49,14 @@ class KerasPatchesGenerator(keras.utils.Sequence):
             for i, j in itertools.product(np.arange(img_obj.working_arr.shape[0]),
                                           np.arange(img_obj.working_arr.shape[1])):
                 if img_obj.mask[i, j] == 255:
-                    self.IDs.append([ID, i, j])
+                    y = None
+                    if self.num_classes == 2:
+                        y = 1 if img_obj.ground_truth[i, j] == 255 else 0
+                    elif self.num_classes == 4:
+                        y = datautils.get_lable(i, j, img_obj.res['segmented'], img_obj.ground_truth)
+                    self.IDs.append([ID, i, j, y])
 
             self.images[ID] = img_obj
-
-        shuffle(self.IDs)
-        self.labels = np.zeros(len(self.IDs), dtype=np.uint8)
-
-        for i, IDXY in enumerate(self.IDs, 0):
-            ID, x, y = IDXY
-            if self.num_classes == 2:
-                if self.images[ID].ground_truth[x, y] == 255:
-                    self.labels[i] = 1
-                else:
-                    self.labels[i] = 0
-
-            elif self.num_classes == 4:
-                self.labels[i] = datautils.get_lable(x, y, self.images[ID].res['segmented'],
-                                                     self.images[ID].ground_truth)
-
         print('### ' + str(self.__len__()) + ' batches found.')
 
     def __len__(self):
@@ -77,12 +65,12 @@ class KerasPatchesGenerator(keras.utils.Sequence):
 
     def __getitem__(self, index):
         # Generate batches of the data
-        IDs_Xes_Yes = self.IDs[index * self.batch_size:(index + 1) * self.batch_size]
-        IDlabels = self.labels[index * self.batch_size:(index + 1) * self.batch_size]
-        X = np.empty((self.batch_size, self.patch_size, self.patch_size, 1))
 
+        IDs_Xes_Yes = self.IDs[index * self.batch_size:(index + 1) * self.batch_size]
+        batch = np.empty((self.batch_size, self.patch_size, self.patch_size, 1))
+        batch_y = np.empty(self.batch_size)
         # Generate data
-        for ix, (ID, i, j) in enumerate(IDs_Xes_Yes):
+        for ix, (ID, i, j, y) in enumerate(IDs_Xes_Yes):
             k_half = int(math.floor(self.patch_size / 2))
             patch = np.full((self.patch_size, self.patch_size), 0, dtype=np.uint8)
 
@@ -94,8 +82,12 @@ class KerasPatchesGenerator(keras.utils.Sequence):
                         1] > patch_j >= 0:
                         patch[k_half + k, k_half + l] = self.images[ID].working_arr[patch_i, patch_j]
 
-            X[ix, ] = patch[..., None]
-        return X, keras.utils.to_categorical(IDlabels, num_classes=self.num_classes)
+            if self.transformation is not None:
+                patch = self.transformation(patch)
+
+            batch[ix, ] = patch[..., None]
+            batch_y[ix] = y
+        return batch, keras.utils.to_categorical(batch_y, num_classes=self.num_classes)
 
     def on_epoch_end(self):
-        pass
+        shuffle(self.IDs)

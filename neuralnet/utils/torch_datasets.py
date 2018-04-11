@@ -52,30 +52,21 @@ class TorchPatchesGenerator(Dataset):
             for i, j in itertools.product(np.arange(img_obj.working_arr.shape[0]),
                                           np.arange(img_obj.working_arr.shape[1])):
                 if img_obj.mask[i, j] == 255:
-                    self.data.append([ID, i, j])
+                    y = None
+                    if self.num_classes == 2:
+                        y = 1 if img_obj.ground_truth[i, j] == 255 else 0
+                    elif self.num_classes == 4:
+                        y = datautils.get_lable(i, j, img_obj.res['segmented'], img_obj.ground_truth)
+
+                    self.data.append([ID, i, j, y])
 
             self.images[ID] = img_obj
 
         shuffle(self.data)
-        self.labels = np.zeros(self.__len__(), dtype=np.uint8)
-
-        for i, IDXY in enumerate(self.data, 0):
-            ID, x, y = IDXY
-            if self.num_classes == 2:
-                if self.images[ID].ground_truth[x, y] == 255:
-                    self.labels[i] = 1
-                else:
-                    self.labels[i] = 0
-
-            elif self.num_classes == 4:
-                self.labels[i] = datautils.get_lable(x, y, self.images[ID].res['segmented'],
-                                                     self.images[ID].ground_truth)
-
-        self.labels = torch.from_numpy(self.labels)
         print('### ' + str(self.__len__()) + ' data items found.')
 
     def __getitem__(self, index):
-        ID, i, j = self.data[index]
+        ID, i, j, y = self.data[index]
         k_half = int(math.floor(self.patch_size / 2))
         patch = np.full((self.patch_size, self.patch_size), 0, dtype=np.uint8)
 
@@ -92,9 +83,9 @@ class TorchPatchesGenerator(Dataset):
             img_tensor = self.transform(img_tensor)
 
         if self.segment_mode:
-            return self.data[index], img_tensor, self.labels[index]
+            return self.data[index], img_tensor, y
 
-        return img_tensor, self.labels[index]
+        return img_tensor, y
 
     def __len__(self):
         return len(self.data)
