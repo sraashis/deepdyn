@@ -90,7 +90,7 @@ class NNTrainer:
         else:
             last_checkpoint['epochs'] = self.checkpoint['epochs']
             self._save_checkpoint(last_checkpoint)
-            print('Accuracy did not improve.')
+            print('Accuracy did not improve which was: ' + last_checkpoint['accuracy'])
 
         return int(accuracy), all_predictions, all_labels
 
