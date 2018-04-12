@@ -85,12 +85,12 @@ class NNTrainer:
         if accuracy > last_checkpoint['accuracy']:
             self._save_checkpoint(
                 NNTrainer._checkpoint(epochs=self.checkpoint['epochs'], model=self.model, accuracy=accuracy))
-            print('Accuracy improved which was:' + str(self.checkpoint['accuracy']) + ' [ Checkpoint saved. ]')
+            print('Accuracy improved which was ' + str(last_checkpoint['accuracy']) + ' [ <CHECKPOINT> saved. ]')
 
         else:
             last_checkpoint['epochs'] = self.checkpoint['epochs']
             self._save_checkpoint(last_checkpoint)
-            print('Accuracy did not improve which was: ' + str(last_checkpoint['accuracy']))
+            print('Accuracy did not improve which was ' + str(last_checkpoint['accuracy']))
 
         return int(accuracy), all_predictions, all_labels
 
