@@ -41,7 +41,7 @@ class NNTrainer:
                 running_loss += loss.data[0]
                 current_loss = loss.data[0]
                 if (i + 1) % log_frequency == 0:  # Inspect the loss of every log_frequency batches
-                    current_loss = running_loss / log_frequency
+                    current_loss = running_loss / log_frequency if (i+1) % log_frequency == 0 else (i+1) % log_frequency
                     running_loss = 0.0
 
                 print('epoch:[%d/%d] batches:[%d/%d]   Loss = %.3f' %
@@ -74,8 +74,9 @@ class NNTrainer:
             total += labels.size(0)
             correct += (predicted == labels).sum()
             accuracy = 100 * correct / total
-            print('_________ACCURACY___of___[%d/%d]_batches: %.2f%%' % (i + 1, dataloader.__len__(), accuracy), end='\r')
+            print('_________ACCURACY___of___[%d/%d]batches: %.2f%%' % (i + 1, dataloader.__len__(), accuracy), end='\r')
         print()
+        accuracy = round(accuracy, 3)
         if force_checkpoint:
             self._save_checkpoint(
                 NNTrainer._checkpoint(epochs=self.checkpoint['epochs'], model=self.model, accuracy=accuracy))
@@ -85,12 +86,12 @@ class NNTrainer:
         if accuracy > last_checkpoint['accuracy']:
             self._save_checkpoint(
                 NNTrainer._checkpoint(epochs=self.checkpoint['epochs'], model=self.model, accuracy=accuracy))
-            print('Accuracy improved which was ' + str(last_checkpoint['accuracy']) + ' [ <CHECKPOINT> saved. ]')
+            print('Accuracy improved. __was ' + str(last_checkpoint['accuracy']) + ' [ <CHECKPOINT> saved. ]')
 
         else:
             last_checkpoint['epochs'] = self.checkpoint['epochs']
             self._save_checkpoint(last_checkpoint)
-            print('Accuracy did not improve which was ' + str(last_checkpoint['accuracy']))
+            print('Accuracy did not improve. __was ' + str(last_checkpoint['accuracy']))
 
         return int(accuracy), all_predictions, all_labels
 
