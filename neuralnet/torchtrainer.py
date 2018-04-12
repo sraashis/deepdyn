@@ -79,13 +79,13 @@ class NNTrainer:
         if force_checkpoint:
             self._save_checkpoint(
                 NNTrainer._checkpoint(epochs=self.checkpoint['epochs'], model=self.model, accuracy=accuracy))
-            print('FORCED checkpoint saved: ' + self.checkpoint_file)
+            print('FORCED checkpoint saved. ')
 
         last_checkpoint = self._get_last_checkpoint()
         if accuracy > last_checkpoint['accuracy']:
             self._save_checkpoint(
                 NNTrainer._checkpoint(epochs=self.checkpoint['epochs'], model=self.model, accuracy=accuracy))
-            print('Accuracy improved. Checkpoint saved:' + self.checkpoint_file)
+            print('Accuracy improved which was:' + self.checkpoint['acccuracy'] + ' [ Checkpoint saved. ]')
 
         else:
             last_checkpoint['epochs'] = self.checkpoint['epochs']
