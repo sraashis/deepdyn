@@ -5,6 +5,7 @@ from random import shuffle
 
 import keras
 import numpy as np
+from keras.preprocessing.image import ImageDataGenerator
 
 import neuralnet.utils.data_utils as datautils
 import utils.img_utils as imgutil
@@ -13,7 +14,7 @@ from commons.IMAGE import Image
 
 class KerasPatchesGenerator(keras.utils.Sequence):
     def __init__(self, Dirs=None, batch_size=None, patch_size=None, num_classes=None,
-                 fget_mask=None, fget_truth=None, fget_segmented=None, transformation=None):
+                 fget_mask=None, fget_truth=None, fget_segmented=None, img_generator=ImageDataGenerator(), shuffle= False):
 
         """
             :param Dirs: Should contain images, mask, truth, and seegmented path.(segmented only for 4 way classification)
@@ -31,7 +32,8 @@ class KerasPatchesGenerator(keras.utils.Sequence):
         self.IDs = []
         self.file_names = os.listdir(Dirs['images'])
         self.images = {}
-        self.transformation = transformation
+        self.img_generator = img_generator
+        self.shuffle = False
         for ID, img_file in enumerate(self.file_names):
 
             img_obj = Image()
@@ -82,12 +84,13 @@ class KerasPatchesGenerator(keras.utils.Sequence):
                         1] > patch_j >= 0:
                         patch[k_half + k, k_half + l] = self.images[ID].working_arr[patch_i, patch_j]
 
-            if self.transformation is not None:
-                patch = self.transformation(patch)
-
             batch[ix, ] = patch[..., None]
             batch_y[ix] = y
-        return batch, keras.utils.to_categorical(batch_y, num_classes=self.num_classes)
+
+        self.img_generator.fit(batch)
+        for generated_batch in self.img_generator.flow(batch, batch_size=self.batch_size):
+            return generated_batch, keras.utils.to_categorical(batch_y, num_classes=self.num_classes)
 
     def on_epoch_end(self):
-        shuffle(self.IDs)
+        if self.shuffle:
+            shuffle(self.IDs)
