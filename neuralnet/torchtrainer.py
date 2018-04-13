@@ -6,7 +6,7 @@ import torch.nn.functional as F
 from torch.autograd import Variable
 
 from neuralnet.utils.tensorboard_logger import Logger
-
+from time import time
 
 class NNTrainer:
     def __init__(self, model=None, checkpoint_dir=None, checkpoint_file=None, to_tensorboard=True):
@@ -15,7 +15,7 @@ class NNTrainer:
         self.checkpoint_file = checkpoint_file
         self.checkpoint = NNTrainer._empty_checkpoint()
         self.to_tenserboard = to_tensorboard
-        self.logger = Logger('./logs')
+        self.logger = Logger(log_dir="./logs/{}".format(time()))
         self.res = {'val_counter': 0, 'train_counter': 0}
 
     def train(self, optimizer=None, dataloader=None, epochs=None, use_gpu=False, log_frequency=200,
