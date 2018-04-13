@@ -1,19 +1,22 @@
-import math
 import os
 
 import numpy as np
 import torch
 import torch.nn.functional as F
 from torch.autograd import Variable
-from torch.utils.data.sampler import WeightedRandomSampler
+
+from neuralnet.utils.tensorboard_logger import Logger
 
 
 class NNTrainer:
-    def __init__(self, model=None, checkpoint_dir=None, checkpoint_file=None):
+    def __init__(self, model=None, checkpoint_dir=None, checkpoint_file=None, to_tensorboard=True):
         self.model = model
         self.checkpoint_dir = checkpoint_dir
         self.checkpoint_file = checkpoint_file
         self.checkpoint = NNTrainer._empty_checkpoint()
+        self.to_tenserboard = to_tensorboard
+        self.logger = Logger('./logs')
+        self.acc_counter = 0
 
     def train(self, optimizer=None, dataloader=None, epochs=None, use_gpu=False, log_frequency=200,
               validationloader=None):
@@ -24,6 +27,7 @@ class NNTrainer:
         self.model.train()
         self.model.cuda() if use_gpu else self.model.cpu()
 
+        k = 0
         for epoch in range(self.checkpoint['epochs'], self.checkpoint['epochs'] + epochs):
             running_loss = 0.0
             for i, data in enumerate(dataloader, 0):
@@ -40,14 +44,47 @@ class NNTrainer:
 
                 running_loss += loss.data[0]
                 current_loss = loss.data[0]
+
+                _, argmax = torch.max(outputs, 1)
+                accuracy = (labels == argmax.squeeze()).float().mean()
                 if (i + 1) % log_frequency == 0:  # Inspect the loss of every log_frequency batches
-                    current_loss = running_loss / log_frequency if (i+1) % log_frequency == 0 else (i+1) % log_frequency
+                    current_loss = running_loss / log_frequency if (i + 1) % log_frequency == 0 \
+                        else (i + 1) % log_frequency
                     running_loss = 0.0
 
-                print('epoch:[%d/%d] batches:[%d/%d]   Loss = %.3f' %
-                      (epoch + 1, epochs, i + 1, dataloader.__len__(), current_loss),
+                print('Epoch:[%d/%d] Batches:[%d/%d]   Loss: %.3f Accuracy: %.3f' %
+                      (epoch + 1, epochs, i + 1, dataloader.__len__(), current_loss, accuracy),
                       end='\r' if running_loss > 0 else '\n')
-            print()
+
+                ################## Tensorboard logger setup ###############
+                ###########################################################
+                if self.to_tenserboard:
+                    k = k + 1
+                    info = {
+                        'training_loss': current_loss,
+                        'training_accuracy': accuracy.data[0]
+                    }
+
+                    for tag, value in info.items():
+                        self.logger.scalar_summary(tag, value, k)
+
+                    for tag, value in self.model.named_parameters():
+                        tag = tag.replace('.', '/')
+                        self.logger.histo_summary(tag, value.data.cpu().numpy(), k)
+                        self.logger.histo_summary(tag, value.grad.data.cpu().numpy(), k)
+
+                    info = {
+                        'training_images': inputs.view(-1, dataloader.dataset.patch_size,
+                                                       dataloader.dataset.patch_size)[
+                                           :100].data.cpu().numpy()
+                    }
+
+                    for tag, images in info.items():
+                        self.logger.image_summary(tag, images, k)
+                ###### Tensorboard logger END ##############################
+                ############################################################
+
+            print('Running validation.')
             self.test(dataloader=validationloader, use_gpu=use_gpu, force_checkpoint=False)
         self.checkpoint['epochs'] = self.checkpoint['epochs'] + epochs
 
@@ -75,6 +112,19 @@ class NNTrainer:
             correct += (predicted == labels).sum()
             accuracy = 100 * correct / total
             print('_________ACCURACY___of___[%d/%d]batches: %.2f%%' % (i + 1, dataloader.__len__(), accuracy), end='\r')
+
+            ########## Feeding to tensorboard starts here...#####################
+            ####################################################################
+            self.acc_counter = self.acc_counter + 1
+            if self.to_tenserboard:
+                info = {
+                    'validation_accuracy': accuracy
+                }
+                for tag, value in info.items():
+                    self.logger.scalar_summary(tag, value, self.acc_counter)
+            #### Tensorfeed stops here# #########################################
+            #####################################################################
+
         print()
         accuracy = round(accuracy, 3)
         if force_checkpoint:
@@ -102,13 +152,15 @@ class NNTrainer:
     def _checkpoint(epochs=None, model=None, accuracy=None):
         return {'state': model.state_dict(),
                 'epochs': epochs,
-                'accuracy': accuracy}
+                'accuracy': accuracy,
+                'model': str(model)}
 
     def resume_from_checkpoint(self):
         try:
             self.checkpoint = torch.load(os.path.join(self.checkpoint_dir, self.checkpoint_file))
             self.model.load_state_dict(self.checkpoint['state'])
             print('Resumed from last checkpoint: ' + self.checkpoint_file)
+            print(self.checkpoint['model'])
         except Exception as e:
             print('ERROR: ' + str(e))
 
@@ -120,4 +172,4 @@ class NNTrainer:
 
     @staticmethod
     def _empty_checkpoint():
-        return {'epochs': 0, 'state': None, 'accuracy': 0.0}
+        return {'epochs': 0, 'state': None, 'accuracy': 0.0, 'model': 'EMPTY'}
