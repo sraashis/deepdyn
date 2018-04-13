@@ -74,11 +74,11 @@ class NNTrainer:
                     info = {
                         'training_images': inputs.view(-1, dataloader.dataset.patch_size,
                                                        dataloader.dataset.patch_size)[
-                                           :100].data.cpu().numpy()
+                                           :10].data.cpu().numpy()
                     }
 
                     for tag, images in info.items():
-                        self.logger.image_summary(tag, images, k)
+                        self.logger.image_summary(tag, images, self.res['train_counter'])
                 ###### Tensorboard logger END ##############################
                 ############################################################
 
