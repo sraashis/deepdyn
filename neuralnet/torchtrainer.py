@@ -16,7 +16,7 @@ class NNTrainer:
         self.checkpoint = NNTrainer._empty_checkpoint()
         self.to_tenserboard = to_tensorboard
         self.logger = Logger('./logs')
-        self.acc_counter = 0
+        self.res = {'val_counter': 0, 'train_counter': 0}
 
     def train(self, optimizer=None, dataloader=None, epochs=None, use_gpu=False, log_frequency=200,
               validationloader=None):
@@ -26,8 +26,6 @@ class NNTrainer:
 
         self.model.train()
         self.model.cuda() if use_gpu else self.model.cpu()
-
-        k = 0
         for epoch in range(self.checkpoint['epochs'], self.checkpoint['epochs'] + epochs):
             running_loss = 0.0
             for i, data in enumerate(dataloader, 0):
@@ -59,19 +57,19 @@ class NNTrainer:
                 ################## Tensorboard logger setup ###############
                 ###########################################################
                 if self.to_tenserboard:
-                    k = k + 1
+                    self.res['train_counter'] += 1
                     info = {
                         'training_loss': current_loss,
                         'training_accuracy': accuracy.data[0]
                     }
 
                     for tag, value in info.items():
-                        self.logger.scalar_summary(tag, value, k)
+                        self.logger.scalar_summary(tag, value, self.res['train_counter'])
 
                     for tag, value in self.model.named_parameters():
                         tag = tag.replace('.', '/')
-                        self.logger.histo_summary(tag, value.data.cpu().numpy(), k)
-                        self.logger.histo_summary(tag, value.grad.data.cpu().numpy(), k)
+                        self.logger.histo_summary(tag, value.data.cpu().numpy(), self.res['train_counter'])
+                        self.logger.histo_summary(tag, value.grad.data.cpu().numpy(), self.res['train_counter'])
 
                     info = {
                         'training_images': inputs.view(-1, dataloader.dataset.patch_size,
@@ -85,10 +83,10 @@ class NNTrainer:
                 ############################################################
 
             print('\nRunning validation.')
-            self.test(dataloader=validationloader, use_gpu=use_gpu, force_checkpoint=False)
+            self.test(dataloader=validationloader, use_gpu=use_gpu, force_checkpoint=False, save_best=True)
         self.checkpoint['epochs'] = self.checkpoint['epochs'] + epochs
 
-    def test(self, dataloader=None, use_gpu=False, force_checkpoint=False):
+    def test(self, dataloader=None, use_gpu=False, force_checkpoint=False, save_best=False):
 
         self.model.eval()
         self.model.cuda() if use_gpu else self.model.cpu()
@@ -115,15 +113,18 @@ class NNTrainer:
 
             ########## Feeding to tensorboard starts here...#####################
             ####################################################################
-            self.acc_counter = self.acc_counter + 1
             if self.to_tenserboard:
+                self.res['val_counter'] += 1
                 info = {
                     'validation_accuracy': accuracy
                 }
                 for tag, value in info.items():
-                    self.logger.scalar_summary(tag, value, self.acc_counter)
+                    self.logger.scalar_summary(tag, value, self.res['val_counter'])
             #### Tensorfeed stops here# #########################################
             #####################################################################
+
+        if not save_best:
+            return int(accuracy), all_predictions, all_labels
 
         print()
         accuracy = round(accuracy, 3)
