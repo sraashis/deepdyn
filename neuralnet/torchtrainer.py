@@ -84,7 +84,7 @@ class NNTrainer:
                 ###### Tensorboard logger END ##############################
                 ############################################################
 
-            print('Running validation.')
+            print('\nRunning validation.')
             self.test(dataloader=validationloader, use_gpu=use_gpu, force_checkpoint=False)
         self.checkpoint['epochs'] = self.checkpoint['epochs'] + epochs
 
