@@ -1,4 +1,6 @@
 import os
+from itertools import count
+from time import time
 
 import numpy as np
 import torch
@@ -15,8 +17,8 @@ class NNTrainer:
         self.checkpoint_file = checkpoint_file
         self.checkpoint = NNTrainer._empty_checkpoint()
         self.to_tenserboard = to_tensorboard
-        self.logger = Logger('./logs')
-        self.res = {'val_counter': 0, 'train_counter': 0}
+        self.logger = Logger(log_dir="./logs/{}".format(time()))
+        self.res = {'val_counter': count(), 'train_counter': count()}
 
     def train(self, optimizer=None, dataloader=None, epochs=None, use_gpu=False, log_frequency=200,
               validationloader=None):
@@ -57,32 +59,22 @@ class NNTrainer:
                 ################## Tensorboard logger setup ###############
                 ###########################################################
                 if self.to_tenserboard:
-                    self.res['train_counter'] += 1
-                    info = {
-                        'training_loss': current_loss,
-                        'training_accuracy': accuracy.data[0]
-                    }
-
-                    for tag, value in info.items():
-                        self.logger.scalar_summary(tag, value, self.res['train_counter'])
+                    step = next(self.res['train_counter'])
+                    self.logger.scalar_summary('loss/training', current_loss, step)
+                    self.logger.scalar_summary('accuracy/training', accuracy.data[0], step)
 
                     for tag, value in self.model.named_parameters():
                         tag = tag.replace('.', '/')
-                        self.logger.histo_summary(tag, value.data.cpu().numpy(), self.res['train_counter'])
-                        self.logger.histo_summary(tag, value.grad.data.cpu().numpy(), self.res['train_counter'])
+                        self.logger.histo_summary(tag, value.data.cpu().numpy(), step)
+                        self.logger.histo_summary(tag, value.grad.data.cpu().numpy(), step)
 
-                    info = {
-                        'training_images': inputs.view(-1, dataloader.dataset.patch_size,
-                                                       dataloader.dataset.patch_size)[
-                                           :10].data.cpu().numpy()
-                    }
-
-                    for tag, images in info.items():
-                        self.logger.image_summary(tag, images, self.res['train_counter'])
+                images_to_tb = inputs.view(-1, dataloader.dataset.patch_size, dataloader.dataset.patch_size)[
+                               :12].data.cpu().numpy()
+                self.logger.image_summary('images/training', images_to_tb, step)
                 ###### Tensorboard logger END ##############################
                 ############################################################
 
-            print('\nRunning validation.')
+            print('\nRunning validation...')
             self.test(dataloader=validationloader, use_gpu=use_gpu, force_checkpoint=False, save_best=True)
         self.checkpoint['epochs'] = self.checkpoint['epochs'] + epochs
 
@@ -114,12 +106,8 @@ class NNTrainer:
             ########## Feeding to tensorboard starts here...#####################
             ####################################################################
             if self.to_tenserboard:
-                self.res['val_counter'] += 1
-                info = {
-                    'validation_accuracy': accuracy
-                }
-                for tag, value in info.items():
-                    self.logger.scalar_summary(tag, value, self.res['val_counter'])
+                step = next(self.res['val_counter'])
+                self.logger.scalar_summary('accuracy/validation', accuracy, step)
             #### Tensorfeed stops here# #########################################
             #####################################################################
 
