@@ -68,7 +68,7 @@ class TorchPatchesGenerator(Dataset):
             img_tensor = self.transform(img_tensor)
 
         if self.segment_mode:
-            return self.IDs[index], img_tensor, y
+            return ID, i, j, img_tensor, y
 
         return img_tensor, y
 
