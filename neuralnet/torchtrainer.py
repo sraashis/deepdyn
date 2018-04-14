@@ -15,7 +15,7 @@ class NNTrainer:
         self.model = model
         self.checkpoint_dir = checkpoint_dir
         self.checkpoint_file = checkpoint_file
-        self.checkpoint = NNTrainer._empty_checkpoint()
+        self.checkpoint = {'epochs': 0, 'state': None, 'accuracy': 0.0, 'model': 'EMPTY'}
         self.to_tenserboard = to_tensorboard
         self.logger = Logger(log_dir="./logs/{}".format(time()))
         self.res = {'val_counter': count(), 'train_counter': count()}
@@ -27,7 +27,9 @@ class NNTrainer:
             raise ValueError('Please provide validation loader.')
 
         self.model.train()
+        dataloader.dataset.segment_mode = False
         self.model.cuda() if use_gpu else self.model.cpu()
+        print('Training...')
         for epoch in range(self.checkpoint['epochs'], self.checkpoint['epochs'] + epochs):
             running_loss = 0.0
             for i, data in enumerate(dataloader, 0):
@@ -68,17 +70,16 @@ class NNTrainer:
                         self.logger.histo_summary(tag, value.data.cpu().numpy(), step)
                         self.logger.histo_summary(tag, value.grad.data.cpu().numpy(), step)
 
-                images_to_tb = inputs.view(-1, dataloader.dataset.patch_size, dataloader.dataset.patch_size)[
-                               :12].data.cpu().numpy()
-                self.logger.image_summary('images/training', images_to_tb, step)
+                    images_to_tb = inputs.view(-1, dataloader.dataset.patch_size, dataloader.dataset.patch_size)[
+                                   :12].data.cpu().numpy()
+                    self.logger.image_summary('images/training', images_to_tb, step)
                 ###### Tensorboard logger END ##############################
                 ############################################################
 
-            print('\nRunning validation...')
-            self.test(dataloader=validationloader, use_gpu=use_gpu, force_checkpoint=False, save_best=True)
-        self.checkpoint['epochs'] = self.checkpoint['epochs'] + epochs
+            self.evaluate(dataloader=validationloader, use_gpu=use_gpu, force_checkpoint=False, save_best=True,
+                          epoch_begin=self.checkpoint['epochs'] + epoch)
 
-    def test(self, dataloader=None, use_gpu=False, force_checkpoint=False, save_best=False):
+    def evaluate(self, dataloader=None, use_gpu=False, force_checkpoint=False, save_best=False, epoch_begin=0):
 
         self.model.eval()
         self.model.cuda() if use_gpu else self.model.cpu()
@@ -88,7 +89,20 @@ class NNTrainer:
         accuracy = 0.0
         all_predictions = np.array([])
         all_labels = np.array([])
-        for i, (inputs, labels) in enumerate(dataloader, 0):
+        all_IDs = np.array([])
+        all_patchIs = np.array([])
+        all_patchJs = np.array([])
+        print('\nEvaluating...')
+
+        ##### Segment Mode ####
+        #### In segment mode, we return image_id, and (i, j) index of the pixel.
+        #### This helps to generate the segmented image.
+        segment_mode = dataloader.dataset.segment_mode
+        for i, data in enumerate(dataloader, 0):
+            if segment_mode:
+                IDs, Is, Js, inputs, labels = data
+            else:
+                inputs, labels = data
             inputs = inputs.cuda() if use_gpu else inputs.cpu()
             labels = labels.cuda() if use_gpu else labels.cpu()
 
@@ -98,9 +112,17 @@ class NNTrainer:
             # Save scores
             all_predictions = np.append(all_predictions, predicted.numpy())
             all_labels = np.append(all_labels, labels.numpy())
+
+            ###### For segment mode only ##########
+            if segment_mode:
+                all_IDs = np.append(all_IDs, IDs.numpy())
+                all_patchIs = np.append(all_patchIs, Is.numpy())
+                all_patchJs = np.append(all_patchJs, Js.numpy())
+            ##### Segment mode End ###############
+
             total += labels.size(0)
             correct += (predicted == labels).sum()
-            accuracy = 100 * correct / total
+            accuracy = round(100 * correct / total, 2)
             print('_________ACCURACY___of___[%d/%d]batches: %.2f%%' % (i + 1, dataloader.__len__(), accuracy), end='\r')
 
             ########## Feeding to tensorboard starts here...#####################
@@ -112,30 +134,34 @@ class NNTrainer:
             #####################################################################
 
         if not save_best:
-            return int(accuracy), all_predictions, all_labels
+            if segment_mode:
+                return all_IDs.astype(np.int), all_patchIs.astype(np.int), all_patchJs.astype(
+                    np.int), accuracy, all_predictions, all_labels
+            return accuracy, all_predictions, all_labels
 
-        print()
-        accuracy = round(accuracy, 3)
         if force_checkpoint:
             self._save_checkpoint(
-                NNTrainer._checkpoint(epochs=self.checkpoint['epochs'], model=self.model, accuracy=accuracy))
+                NNTrainer._checkpoint(epochs=epoch_begin, model=self.model, accuracy=accuracy))
             print('FORCED checkpoint saved. ')
 
-        last_checkpoint = self._get_last_checkpoint()
-        if accuracy > last_checkpoint['accuracy']:
+        if accuracy > self.checkpoint['accuracy']:
+            print('Accuracy improved from ',
+                  str(self.checkpoint['accuracy']) + ' to ' + str(accuracy) + '. Saving model..')
             self._save_checkpoint(
-                NNTrainer._checkpoint(epochs=self.checkpoint['epochs'], model=self.model, accuracy=accuracy))
-            print('Accuracy improved. __was ' + str(last_checkpoint['accuracy']) + ' [ <CHECKPOINT> saved. ]')
-
+                NNTrainer._checkpoint(epochs=epoch_begin, model=self.model, accuracy=accuracy))
         else:
-            last_checkpoint['epochs'] = self.checkpoint['epochs']
-            self._save_checkpoint(last_checkpoint)
-            print('Accuracy did not improve. __was ' + str(last_checkpoint['accuracy']))
+            self.checkpoint['epochs'] = epoch_begin
+            self._save_checkpoint(self.checkpoint)
+            print('Accuracy did not improve. _was:' + str(self.checkpoint['accuracy']))
 
-        return int(accuracy), all_predictions, all_labels
+        if segment_mode:
+            return all_IDs.astype(np.int), all_patchIs.astype(np.int), all_patchJs.astype(
+                np.int), accuracy, all_predictions, all_labels
+        return accuracy, all_predictions, all_labels
 
     def _save_checkpoint(self, checkpoint):
         torch.save(checkpoint, os.path.join(self.checkpoint_dir, self.checkpoint_file))
+        self.checkpoint = checkpoint
 
     @staticmethod
     def _checkpoint(epochs=None, model=None, accuracy=None):
@@ -149,16 +175,5 @@ class NNTrainer:
             self.checkpoint = torch.load(os.path.join(self.checkpoint_dir, self.checkpoint_file))
             self.model.load_state_dict(self.checkpoint['state'])
             print('Resumed from last checkpoint: ' + self.checkpoint_file)
-            print(self.checkpoint['model'])
         except Exception as e:
             print('ERROR: ' + str(e))
-
-    def _get_last_checkpoint(self):
-        try:
-            return torch.load(os.path.join(self.checkpoint_dir, self.checkpoint_file))
-        except Exception as e:
-            return NNTrainer._empty_checkpoint()
-
-    @staticmethod
-    def _empty_checkpoint():
-        return {'epochs': 0, 'state': None, 'accuracy': 0.0, 'model': 'EMPTY'}
