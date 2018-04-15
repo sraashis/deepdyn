@@ -68,7 +68,7 @@ class NNTrainer:
                     for tag, value in self.model.named_parameters():
                         tag = tag.replace('.', '/')
                         self.logger.histo_summary(tag, value.data.cpu().numpy(), step)
-                        self.logger.histo_summary(tag, value.grad.data.cpu().numpy(), step)
+                        self.logger.histo_summary(tag + '/gradients', value.grad.data.cpu().numpy(), step)
 
                     images_to_tb = inputs.view(-1, dataloader.dataset.patch_size, dataloader.dataset.patch_size)[
                                    :12].data.cpu().numpy()
@@ -94,7 +94,7 @@ class NNTrainer:
         all_patchJs = np.array([])
         print('\nEvaluating...')
 
-        ##### Segment Mode ####
+        ##### Segment Mode onlu to use while testing####
         #### In segment mode, we return image_id, and (i, j) index of the pixel.
         #### This helps to generate the segmented image.
         segment_mode = dataloader.dataset.segment_mode
