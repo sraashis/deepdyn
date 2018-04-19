@@ -87,20 +87,19 @@ class NNTrainer:
         correct = 0
         total = 0
         accuracy = 0.0
-        all_predictions = np.array([])
-        all_labels = np.array([])
-        all_IDs = np.array([])
-        all_patchIs = np.array([])
-        all_patchJs = np.array([])
+
+        all_predictions = []
+        all_scores = []
+        all_labels = []
+        all_IDs = []
+        all_patchIJs = []
         print('\nEvaluating...')
 
-        ##### Segment Mode onlu to use while testing####
-        #### In segment mode, we return image_id, and (i, j) index of the pixel.
-        #### This helps to generate the segmented image.
+        ##### Segment Mode only to use while testing####
         segment_mode = dataloader.dataset.segment_mode
         for i, data in enumerate(dataloader, 0):
             if segment_mode:
-                IDs, Is, Js, inputs, labels = data
+                IDs, IJs, inputs, labels = data
             else:
                 inputs, labels = data
             inputs = inputs.cuda() if use_gpu else inputs.cpu()
@@ -110,14 +109,14 @@ class NNTrainer:
             _, predicted = torch.max(outputs.data, 1)
 
             # Save scores
-            all_predictions = np.append(all_predictions, predicted.numpy())
-            all_labels = np.append(all_labels, labels.numpy())
+            all_predictions += predicted.numpy().tolist()
+            all_scores += outputs.data.numpy().tolist()
+            all_labels += labels.numpy().tolist()
 
             ###### For segment mode only ##########
             if segment_mode:
-                all_IDs = np.append(all_IDs, IDs.numpy())
-                all_patchIs = np.append(all_patchIs, Is.numpy())
-                all_patchJs = np.append(all_patchJs, Js.numpy())
+                all_IDs += IDs.numpy().tolist()
+                all_patchIJs += IJs.numpy().tolist()
             ##### Segment mode End ###############
 
             total += labels.size(0)
@@ -133,11 +132,17 @@ class NNTrainer:
             #### Tensorfeed stops here# #########################################
             #####################################################################
 
+        print()
+        all_IDs = np.array(all_IDs, dtype=np.int)
+        all_patchIJs = np.array(all_patchIJs, dtype=np.int)
+        all_scores = np.array(all_scores)
+        all_predictions = np.array(all_predictions)
+        all_labels = np.array(all_labels)
+
         if not save_best:
             if segment_mode:
-                return all_IDs.astype(np.int), all_patchIs.astype(np.int), all_patchJs.astype(
-                    np.int), accuracy, all_predictions, all_labels
-            return accuracy, all_predictions, all_labels
+                return all_IDs, all_patchIJs, all_scores, all_predictions, all_labels
+            return all_predictions, all_labels
 
         if force_checkpoint:
             self._save_checkpoint(
@@ -155,9 +160,8 @@ class NNTrainer:
             print('Accuracy did not improve. _was:' + str(self.checkpoint['accuracy']))
 
         if segment_mode:
-            return all_IDs.astype(np.int), all_patchIs.astype(np.int), all_patchJs.astype(
-                np.int), accuracy, all_predictions, all_labels
-        return accuracy, all_predictions, all_labels
+            return all_IDs, all_patchIJs, all_scores, all_predictions, all_labels
+        return all_predictions, all_labels
 
     def _save_checkpoint(self, checkpoint):
         torch.save(checkpoint, os.path.join(self.checkpoint_dir, self.checkpoint_file))
