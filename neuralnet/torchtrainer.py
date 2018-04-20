@@ -30,7 +30,7 @@ class NNTrainer:
         dataloader.dataset.segment_mode = False
         self.model.cuda() if use_gpu else self.model.cpu()
         print('Training...')
-        for epoch in range(self.checkpoint['epochs'], self.checkpoint['epochs'] + epochs):
+        for epoch in range(0, epochs):
             running_loss = 0.0
             for i, data in enumerate(dataloader, 0):
                 inputs, labels = data
@@ -54,7 +54,7 @@ class NNTrainer:
                         else (i + 1) % log_frequency
                     running_loss = 0.0
 
-                print('Epoch:[%d/%d] Batches:[%d/%d]   Loss: %.3f Accuracy: %.3f' %
+                print('Epochs:[%d/%d] Batches:[%d/%d]   Loss: %.3f accuracy: %.3f' %
                       (epoch + 1, epochs, i + 1, dataloader.__len__(), current_loss, accuracy),
                       end='\r' if running_loss > 0 else '\n')
 
@@ -71,15 +71,14 @@ class NNTrainer:
                         self.logger.histo_summary(tag + '/gradients', value.grad.data.cpu().numpy(), step)
 
                     images_to_tb = inputs.view(-1, dataloader.dataset.patch_size, dataloader.dataset.patch_size)[
-                                   :12].data.cpu().numpy()
+                                   :10].data.cpu().numpy()
                     self.logger.image_summary('images/training', images_to_tb, step)
                 ###### Tensorboard logger END ##############################
                 ############################################################
+            self.checkpoint['epochs'] += 1
+            self.evaluate(dataloader=validationloader, use_gpu=use_gpu, force_checkpoint=False, save_best=True)
 
-            self.evaluate(dataloader=validationloader, use_gpu=use_gpu, force_checkpoint=False, save_best=True,
-                          epoch_begin=self.checkpoint['epochs'] + epoch)
-
-    def evaluate(self, dataloader=None, use_gpu=False, force_checkpoint=False, save_best=False, epoch_begin=0):
+    def evaluate(self, dataloader=None, use_gpu=False, force_checkpoint=False, save_best=False):
 
         self.model.eval()
         self.model.cuda() if use_gpu else self.model.cpu()
@@ -146,16 +145,17 @@ class NNTrainer:
 
         if force_checkpoint:
             self._save_checkpoint(
-                NNTrainer._checkpoint(epochs=epoch_begin, model=self.model, accuracy=accuracy))
+                NNTrainer._checkpoint(epochs=self.checkpoint['epochs'], model=self.model,
+                                      accuracy=accuracy))
             print('FORCED checkpoint saved. ')
 
         if accuracy > self.checkpoint['accuracy']:
             print('Accuracy improved from ',
                   str(self.checkpoint['accuracy']) + ' to ' + str(accuracy) + '. Saving model..')
             self._save_checkpoint(
-                NNTrainer._checkpoint(epochs=epoch_begin, model=self.model, accuracy=accuracy))
+                NNTrainer._checkpoint(epochs=self.checkpoint['epochs'], model=self.model,
+                                      accuracy=accuracy))
         else:
-            self.checkpoint['epochs'] = epoch_begin
             self._save_checkpoint(self.checkpoint)
             print('Accuracy did not improve. _was:' + str(self.checkpoint['accuracy']))
 
@@ -178,6 +178,6 @@ class NNTrainer:
         try:
             self.checkpoint = torch.load(os.path.join(self.checkpoint_dir, self.checkpoint_file))
             self.model.load_state_dict(self.checkpoint['state'])
-            print('Resumed from last checkpoint: ' + self.checkpoint_file)
+            print('Resumed last checkpoint: ' + self.checkpoint_file)
         except Exception as e:
             print('ERROR: ' + str(e))
