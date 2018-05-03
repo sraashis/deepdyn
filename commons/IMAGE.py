@@ -24,10 +24,11 @@ class Image:
         self.ground_truth = None
         self.res = {}
 
-    def load_file(self, data_dir, file_name):
+    def load_file(self, data_dir, file_name, num_channels=3):
         self.data_dir = data_dir
         self.file_name = file_name
-        self.image_arr = imgutil.get_image_as_array(os.path.join(self.data_dir, self.file_name))
+        self.image_arr = imgutil.get_image_as_array(os.path.join(self.data_dir, self.file_name), channels=num_channels)
+        print('File loaded: ' + self.file_name)
 
     def load_mask(self, mask_dir=None, fget_mask=None, erode=False):
         try:
@@ -37,7 +38,6 @@ class Image:
             if erode:
                 self.mask = cv2.erode(mask, kernel=fu.get_chosen_mask_erode_kernel(), iterations=5)
         except Exception as e:
-            self.mask = np.ones_like(self.working_arr)
             print('Fail to load mask: ' + str(e))
 
     def apply_mask(self):
@@ -50,7 +50,6 @@ class Image:
             truth = np.array(truth.getdata(), np.uint8).reshape(truth.size[1], truth.size[0], 1)[:, :, 0]
             self.ground_truth = truth
         except Exception as e:
-            self.ground_truth = np.zeros_like(self.working_arr)
             print('Fail to load ground truth: ' + str(e))
 
 
@@ -138,4 +137,3 @@ class HighResolutionFundusImage(SegmentedImage):
                 self.mask = cv2.erode(mask, kernel=fu.get_chosen_mask_erode_kernel(), iterations=5)
         except Exception as e:
             print('Fail to load mask: ' + str(e))
-            self.mask = np.ones_like(self.working_arr)

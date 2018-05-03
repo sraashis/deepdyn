@@ -91,6 +91,4 @@ def histogram(image_arr, bins=32):
 
 def get_image_as_array(image_file, channels=3):
     img = IMG.open(image_file)
-    if channels == 1:
-        return np.array(img.getdata(), np.uint8).reshape(img.size[1], img.size[0])
     return np.array(img.getdata(), np.uint8).reshape(img.size[1], img.size[0], channels)

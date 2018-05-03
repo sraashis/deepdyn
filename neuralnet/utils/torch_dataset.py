@@ -30,6 +30,7 @@ class TorchPatchesGenerator(Dataset):
         self.file_names = os.listdir(Dirs['images'])
         self.images = {}
         self.segment_mode = segment_mode
+        self.k_half = int(math.floor(self.patch_size / 2))
         for ID, img_file in enumerate(self.file_names):
 
             img_obj = Image()
@@ -42,8 +43,21 @@ class TorchPatchesGenerator(Dataset):
 
             for i, j in itertools.product(np.arange(img_obj.working_arr.shape[0]),
                                           np.arange(img_obj.working_arr.shape[1])):
-                if img_obj.mask[i, j] == 255:
-                    self.IDs.append([ID, i, j, 1 if img_obj.ground_truth[i, j] == 255 else 0])
+                row_from, row_to = i - self.k_half, i + self.k_half + 1
+                col_from, col_to = j - self.k_half, j + self.k_half + 1
+
+                #### Discard all indices that exceeds the image boundary ####
+                if row_from < 0 or col_from < 0:
+                    continue
+
+                if row_to >= img_obj.working_arr.shape[0] or col_to >= img_obj.working_arr.shape[1]:
+                    continue
+
+                #### Discard if the pixel (i, j) is not within the mask ###
+                if img_obj.mask[i, j] != 255:
+                    continue
+
+                self.IDs.append([ID, i, j, 1 if img_obj.ground_truth[i, j] == 255 else 0])
 
             self.images[ID] = img_obj
 
@@ -52,18 +66,12 @@ class TorchPatchesGenerator(Dataset):
 
     def __getitem__(self, index):
         ID, i, j, y = self.IDs[index]
-        k_half = int(math.floor(self.patch_size / 2))
-        patch = np.full((self.patch_size, self.patch_size), 0, dtype=np.uint8)
 
-        for k in range(-k_half, k_half + 1, 1):
-            for l in range(-k_half, k_half + 1, 1):
-                patch_i = i + k
-                patch_j = j + l
-                if self.images[ID].working_arr.shape[0] > patch_i >= 0 and self.images[ID].working_arr.shape[
-                    1] > patch_j >= 0:
-                    patch[k_half + k, k_half + l] = self.images[ID].working_arr[patch_i, patch_j]
+        row_from, row_to = i - self.k_half, i + self.k_half + 1
+        col_from, col_to = j - self.k_half, j + self.k_half + 1
 
-        img_tensor = patch[..., None]
+        img_tensor = self.images[ID].working_arr[row_from:row_to, col_from:col_to][..., None]
+
         if self.transform is not None:
             img_tensor = self.transform(img_tensor)
 
