@@ -10,7 +10,7 @@ import utils.img_utils as imgutil
 from commons.IMAGE import Image
 
 
-class TorchPatchesGenerator(Dataset):
+class PatchesGenerator(Dataset):
     def __init__(self, Dirs=None, patch_size=None, transform=None,
                  fget_mask=None, fget_truth=None, segment_mode=False):
 
