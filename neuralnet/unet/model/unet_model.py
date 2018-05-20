@@ -4,10 +4,12 @@
 
 # python 3 confusing imports :(
 from neuralnet.unet.model.unet_parts import *
+import warnings
 
 
 class UNet(nn.Module):
     def __init__(self, n_channels, n_classes):
+        warnings.warn('Deprecated. Use unet.py UNet mode instead.')
         super(UNet, self).__init__()
         self.inc = inconv(n_channels, 64)
         self.down1 = down(64, 128)
