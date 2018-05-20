@@ -1,19 +1,14 @@
-import itertools
-import math
 import os
-from random import shuffle
 
-import numpy as np
+import torch
 from torch.utils.data.dataset import Dataset
 
 import utils.img_utils as imgutil
 from commons.IMAGE import Image
-import torchvision.transforms as transforms
 
 
 class ImageGenerator(Dataset):
     def __init__(self, Dirs=None, transform=None, fget_mask=None, fget_truth=None, segment_mode=False):
-
         """
         :param Dirs: Should contain paths to directories images, mask, and truth by the same name.
         :param transform:
@@ -35,20 +30,21 @@ class ImageGenerator(Dataset):
         img_obj = Image()
 
         img_obj.load_file(data_dir=self.Dirs['images'], file_name=self.file_names[index])
-        img_obj.working_arr = imgutil.whiten_image2d(img_obj.image_arr[:, :, 1])
+        img_obj.working_arr = imgutil.whiten_image2d(img_obj.image_arr[:, :, 1])[100:480, 100:480]
 
         img_obj.load_mask(mask_dir=self.Dirs['mask'], fget_mask=self.fget_mask, erode=True)
         img_obj.load_ground_truth(gt_dir=self.Dirs['truth'], fget_ground_truth=self.fget_truth)
-        img_obj.apply_mask()
+        img_obj.ground_truth = img_obj.ground_truth[100:480, 100:480]
+        # img_obj.apply_mask()
 
         img_tensor = img_obj.working_arr[..., None]
-        img_obj.ground_truth[img_obj.ground_truth==255] = 1
+        img_obj.ground_truth[img_obj.ground_truth == 255] = 1
 
         y_tensor = img_obj.ground_truth[..., None]
         if self.transform is not None:
             img_tensor = self.transform(img_tensor)
 
-        return img_tensor, transforms.ToTensor(y_tensor)
+        return img_tensor, torch.from_numpy(y_tensor)
 
     def __len__(self):
         return len(self.file_names)
