@@ -11,7 +11,7 @@ from neuralnet.utils.tensorboard_logger import Logger
 
 
 class NNTrainer:
-    def __init__(self, model=None, checkpoint_dir=None, checkpoint_file=None, to_tensorboard=True):
+    def __init__(self, model=None, checkpoint_dir=None, checkpoint_file=None, to_tensorboard=False):
         self.model = model
         self.checkpoint_dir = checkpoint_dir
         self.checkpoint_file = checkpoint_file
@@ -70,7 +70,7 @@ class NNTrainer:
                         self.logger.histo_summary(tag, value.data.cpu().numpy(), step)
                         self.logger.histo_summary(tag + '/gradients', value.grad.data.cpu().numpy(), step)
 
-                    images_to_tb = inputs.view(-1, dataloader.dataset.patch_size, dataloader.dataset.patch_size)[
+                    images_to_tb = inputs.view(-1, dataloader.dataset.img_width, dataloader.dataset.img_height)[
                                    :10].data.cpu().numpy()
                     self.logger.image_summary('images/training', images_to_tb, step)
                 ###### Tensorboard logger END ##############################
@@ -121,24 +121,7 @@ class NNTrainer:
         all_predictions = np.array(all_predictions)
         all_labels = np.array(all_labels)
 
-        if not save_best:
-            return all_predictions, all_labels
-
-        if force_checkpoint:
-            self._save_checkpoint(
-                NNTrainer._checkpoint(epochs=self.checkpoint['epochs'], model=self.model,
-                                      accuracy=accuracy))
-            print('FORCED checkpoint saved. ')
-
-        if accuracy > self.checkpoint['accuracy']:
-            print('Accuracy improved from ',
-                  str(self.checkpoint['accuracy']) + ' to ' + str(accuracy) + '. Saving model..')
-            self._save_checkpoint(
-                NNTrainer._checkpoint(epochs=self.checkpoint['epochs'], model=self.model,
-                                      accuracy=accuracy))
-        else:
-            self._save_checkpoint(self.checkpoint)
-            print('Accuracy did not improve. _was:' + str(self.checkpoint['accuracy']))
+        self._save_if_better(save_best=save_best, force_checkpoint=force_checkpoint, accuracy=accuracy)
 
         return all_predictions, all_labels
 
@@ -160,3 +143,24 @@ class NNTrainer:
             print('Resumed last checkpoint: ' + self.checkpoint_file)
         except Exception as e:
             print('ERROR: ' + str(e))
+
+    def _save_if_better(self, save_best=None, force_checkpoint=None, accuracy=None):
+
+        if not save_best:
+            return
+
+        if force_checkpoint:
+            self._save_checkpoint(
+                NNTrainer._checkpoint(epochs=self.checkpoint['epochs'], model=self.model,
+                                      accuracy=accuracy))
+            print('FORCED checkpoint saved. ')
+
+        if accuracy > self.checkpoint['accuracy']:
+            print('Accuracy improved from ',
+                  str(self.checkpoint['accuracy']) + ' to ' + str(accuracy) + '. Saving model..')
+            self._save_checkpoint(
+                NNTrainer._checkpoint(epochs=self.checkpoint['epochs'], model=self.model,
+                                      accuracy=accuracy))
+        else:
+            self._save_checkpoint(self.checkpoint)
+            print('Accuracy did not improve. _was:' + str(self.checkpoint['accuracy']))

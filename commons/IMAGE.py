@@ -4,12 +4,12 @@ import cv2
 import cv2 as ocv
 import networkx as nx
 import numpy as np
-import utils.img_utils as imgutil
 from PIL import Image as IMG
 
 import commons.constants as const
 import utils.filter_utils as filutils
 import utils.filter_utils as fu
+import utils.img_utils as imgutil
 from commons.MAT import Mat
 from commons.timer import checktime
 
@@ -25,10 +25,14 @@ class Image:
         self.res = {}
 
     def load_file(self, data_dir, file_name, num_channels=3):
-        self.data_dir = data_dir
-        self.file_name = file_name
-        self.image_arr = imgutil.get_image_as_array(os.path.join(self.data_dir, self.file_name), channels=num_channels)
-        print('File loaded: ' + self.file_name)
+        try:
+            self.data_dir = data_dir
+            self.file_name = file_name
+            self.image_arr = imgutil.get_image_as_array(os.path.join(self.data_dir, self.file_name),
+                                                        channels=num_channels)
+        except Exception as e:
+            print('Error Loading file: ' + self.file_name)
+            print(str(e))
 
     def load_mask(self, mask_dir=None, fget_mask=None, erode=False):
         try:

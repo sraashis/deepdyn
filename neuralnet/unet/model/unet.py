@@ -2,6 +2,8 @@ import torch
 import torch.nn.functional as F
 from torch import nn
 
+# https://github.com/ZijunDeng/pytorch-semantic-segmentation
+
 from neuralnet.utils.weights_utils import initialize_weights
 
 
@@ -75,5 +77,5 @@ class UNet(nn.Module):
         dec2 = self.dec2(torch.cat([dec3, F.upsample(enc2, dec3.size()[2:], mode='bilinear')], 1))
         dec1 = self.dec1(torch.cat([dec2, F.upsample(enc1, dec2.size()[2:], mode='bilinear')], 1))
         final = self.final(dec1)
-        final =  F.upsample(final, x.size()[2:], mode='bilinear')
+        final = F.upsample(final, x.size()[2:], mode='bilinear')
         return F.log_softmax(final, dim=1)
