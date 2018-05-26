@@ -11,12 +11,12 @@ from commons.IMAGE import Image
 
 
 class PatchesGenerator(Dataset):
-    def __init__(self, Dirs=None, patch_size=None, transform=None,
-                 fget_mask=None, fget_truth=None, segment_mode=False):
+    def __init__(self, Dirs=None, transform=None,
+                 fget_mask=None, fget_truth=None, segment_mode=False, train_image_size=None):
 
         """
         :param Dirs: Should contain paths to directories images, mask, and truth by the same name.
-        :param patch_size:
+        :param :train_image_size (w, h)
         :param transform:
         :param fget_mask: mask file getter
         :param fget_truth: ground truth file getter
@@ -25,12 +25,12 @@ class PatchesGenerator(Dataset):
         """
 
         self.transform = transform
-        self.patch_size = patch_size
+        self.img_width, self.img_height = train_image_size
         self.IDs = []
         self.file_names = os.listdir(Dirs['images'])
         self.images = {}
         self.segment_mode = segment_mode
-        self.k_half = int(math.floor(self.patch_size / 2))
+        self.k_half = int(math.floor(self.img_width / 2))
         for ID, img_file in enumerate(self.file_names):
 
             img_obj = Image()

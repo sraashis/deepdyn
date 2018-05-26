@@ -8,7 +8,8 @@ from commons.IMAGE import Image
 
 
 class ImageGenerator(Dataset):
-    def __init__(self, Dirs=None, transform=None, fget_mask=None, fget_truth=None, segment_mode=False):
+    def __init__(self, Dirs=None, transform=None, fget_mask=None, fget_truth=None, segment_mode=False,
+                 train_image_size=None):
         """
         :param Dirs: Should contain paths to directories images, mask, and truth by the same name.
         :param transform:
@@ -24,6 +25,7 @@ class ImageGenerator(Dataset):
         self.fget_mask = fget_mask
         self.fget_truth = fget_truth
         self.Dirs = Dirs
+        self.img_width, self.img_height = train_image_size
         print('### ' + str(self.__len__()) + ' images found.')
 
     def __getitem__(self, index):
@@ -40,11 +42,11 @@ class ImageGenerator(Dataset):
         img_tensor = img_obj.working_arr[..., None]
         img_obj.ground_truth[img_obj.ground_truth == 255] = 1
 
-        y_tensor = img_obj.ground_truth[..., None]
+        y_tensor = img_obj.ground_truth
         if self.transform is not None:
             img_tensor = self.transform(img_tensor)
 
-        return img_tensor, torch.from_numpy(y_tensor)
+        return img_tensor, torch.LongTensor(y_tensor)
 
     def __len__(self):
         return len(self.file_names)

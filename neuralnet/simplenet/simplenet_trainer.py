@@ -1,25 +1,14 @@
-import os
-from itertools import count
-from time import time
-
 import numpy as np
 import torch
-import torch.nn.functional as F
 from torch.autograd import Variable
-from neuralnet.torchtrainer import NNTrainer
 
-from neuralnet.utils.tensorboard_logger import Logger
+from neuralnet.torchtrainer import NNTrainer
 
 
 class SimpleNNTrainer(NNTrainer):
-    def __init__(self, model=None, checkpoint_dir=None, checkpoint_file=None, to_tensorboard=True):
-        self.model = model
-        self.checkpoint_dir = checkpoint_dir
-        self.checkpoint_file = checkpoint_file
-        self.checkpoint = {'epochs': 0, 'state': None, 'accuracy': 0.0, 'model': 'EMPTY'}
-        self.to_tenserboard = to_tensorboard
-        self.logger = Logger(log_dir="./logs/{}".format(time()))
-        self.res = {'val_counter': count(), 'train_counter': count()}
+    def __init__(self, model=None, checkpoint_dir=None, checkpoint_file=None, to_tensorboard=False):
+        NNTrainer.__init__(self, model=model, checkpoint_dir=checkpoint_dir, checkpoint_file=checkpoint_file,
+                           to_tensorboard=to_tensorboard)
 
     def evaluate(self, dataloader=None, use_gpu=False, force_checkpoint=False, save_best=False):
 
@@ -81,26 +70,7 @@ class SimpleNNTrainer(NNTrainer):
         all_predictions = np.array(all_predictions)
         all_labels = np.array(all_labels)
 
-        if not save_best:
-            if segment_mode:
-                return all_IDs, all_patchIJs, all_scores, all_predictions, all_labels
-            return all_predictions, all_labels
-
-        if force_checkpoint:
-            self._save_checkpoint(
-                NNTrainer._checkpoint(epochs=self.checkpoint['epochs'], model=self.model,
-                                      accuracy=accuracy))
-            print('FORCED checkpoint saved. ')
-
-        if accuracy > self.checkpoint['accuracy']:
-            print('Accuracy improved from ',
-                  str(self.checkpoint['accuracy']) + ' to ' + str(accuracy) + '. Saving model..')
-            self._save_checkpoint(
-                NNTrainer._checkpoint(epochs=self.checkpoint['epochs'], model=self.model,
-                                      accuracy=accuracy))
-        else:
-            self._save_checkpoint(self.checkpoint)
-            print('Accuracy did not improve. _was:' + str(self.checkpoint['accuracy']))
+        self._save_if_better(save_best=save_best, force_checkpoint=force_checkpoint, accuracy=accuracy)
 
         if segment_mode:
             return all_IDs, all_patchIJs, all_scores, all_predictions, all_labels
