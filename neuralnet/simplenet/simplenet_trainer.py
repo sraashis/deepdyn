@@ -105,22 +105,3 @@ class SimpleNNTrainer(NNTrainer):
         if segment_mode:
             return all_IDs, all_patchIJs, all_scores, all_predictions, all_labels
         return all_predictions, all_labels
-
-    def _save_checkpoint(self, checkpoint):
-        torch.save(checkpoint, os.path.join(self.checkpoint_dir, self.checkpoint_file))
-        self.checkpoint = checkpoint
-
-    @staticmethod
-    def _checkpoint(epochs=None, model=None, accuracy=None):
-        return {'state': model.state_dict(),
-                'epochs': epochs,
-                'accuracy': accuracy,
-                'model': str(model)}
-
-    def resume_from_checkpoint(self):
-        try:
-            self.checkpoint = torch.load(os.path.join(self.checkpoint_dir, self.checkpoint_file))
-            self.model.load_state_dict(self.checkpoint['state'])
-            print('Resumed last checkpoint: ' + self.checkpoint_file)
-        except Exception as e:
-            print('ERROR: ' + str(e))
