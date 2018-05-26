@@ -5,7 +5,7 @@ from time import time
 import numpy as np
 import torch
 import torch.nn.functional as F
-from sklearn.metrics import f1_score
+from sklearn.metrics import precision_recall_fscore_support
 from torch.autograd import Variable
 
 from neuralnet.utils.tensorboard_logger import Logger
@@ -51,7 +51,7 @@ class NNTrainer:
                 current_loss = loss.item()
 
                 _, predicted = torch.max(outputs, 1)
-                current_score = self.get_score(labels.numpy().squeeze().ravel(), predicted.numpy().squeeze().ravel())
+                p, r, f1, s = self.get_score(labels.numpy().squeeze().ravel(), predicted.numpy().squeeze().ravel())
 
                 # Accumulate to calculate score of log frequency batches for better logging
                 accumulated_predictions += predicted.numpy().tolist()
@@ -62,7 +62,9 @@ class NNTrainer:
                 if self.to_tenserboard:
                     step = next(self.res['train_counter'])
                     self.logger.scalar_summary('loss/training', current_loss, step)
-                    self.logger.scalar_summary('Score/training', current_score, step)
+                    self.logger.scalar_summary('F1/training', f1, step)
+                    self.logger.scalar_summary('precision-recall/training', r, p)
+                    self.logger.scalar_summary('Support/training', s, step)
 
                     for tag, value in self.model.named_parameters():
                         tag = tag.replace('.', '/')
@@ -78,14 +80,14 @@ class NNTrainer:
                 if (i + 1) % log_frequency == 0:  # Inspect the loss of every log_frequency batches
                     current_loss = running_loss / log_frequency if (i + 1) % log_frequency == 0 \
                         else (i + 1) % log_frequency
-                    current_score = self.get_score(np.array(accumulated_labels).ravel(),
+                    p, r, f1, s = self.get_score(np.array(accumulated_labels).ravel(),
                                                    np.array(accumulated_predictions).ravel())
                     running_loss = 0.0
                     accumulated_labels = []
                     accumulated_predictions = []
 
-                print('Epochs:[%d/%d] Batches:[%d/%d]   Loss: %.3f Score: %.3f' %
-                      (epoch + 1, epochs, i + 1, dataloader.__len__(), current_loss, current_score),
+                print('Epochs:[%d/%d] Batches:[%d/%d]  LOSS:%.3f precision:%.3f recall:%.3f f1:%.3f supp:%.3f' %
+                      (epoch + 1, epochs, i + 1, dataloader.__len__(), current_loss, p, r, f1, s),
                       end='\r' if running_loss > 0 else '\n')
 
             self.checkpoint['epochs'] += 1
@@ -113,24 +115,28 @@ class NNTrainer:
             all_predictions += predicted.numpy().tolist()
             all_labels += labels.numpy().tolist()
 
-            score = self.get_score(labels, predicted)
-            print('________Score___of___batch[%d/%d]: %.2f' % (i + 1, dataloader.__len__(), score),
+            p, r, f1, s = self.get_score(labels.numpy().squeeze().ravel(), predicted.numpy().squeeze().ravel())
+            print('Batch[%d/%d] Precision:%.3f Recall:%.3f F1:%.3f Supp:%.3f' % (
+                i + 1, dataloader.__len__(), p, r, f1, s),
                   end='\r')
 
             ########## Feeding to tensorboard starts here...#####################
             ####################################################################
             if self.to_tenserboard:
                 step = next(self.res['val_counter'])
-                self.logger.scalar_summary('Score/validation', score, step)
+                self.logger.scalar_summary('F1/validation', f1, step)
+                self.logger.scalar_summary('precision-recall/validation', r, p)
+                self.logger.scalar_summary('Support/validation', s, step)
             #### Tensorfeed stops here# #########################################
             #####################################################################
 
         print()
         all_predictions = np.array(all_predictions)
         all_labels = np.array(all_labels)
-        final_score = self.get_score(all_labels.ravel(), all_predictions.ravel())
-        print('Final Score: ' + str(final_score))
-        self._save_if_better(save_best=save_best, force_checkpoint=force_checkpoint, score=final_score)
+
+        p, r, f1, s = self.get_score(all_labels.ravel(), all_predictions.ravel())
+        print('Final  #Precision:%.3f #Recall:%.3f #F1:%.3f #Supp:%.3f' % (p, r, f1, s))
+        self._save_if_better(save_best=save_best, force_checkpoint=force_checkpoint, score=f1)
 
         return all_predictions, all_labels
 
@@ -175,4 +181,9 @@ class NNTrainer:
             print('Score did not improve. _was:' + str(self.checkpoint['score']))
 
     def get_score(self, y_true, y_pred):
-        return round(f1_score(y_true, y_pred, average='binary'), 3)
+        p, r, f1, s = precision_recall_fscore_support(y_true, y_pred, average='binary')
+        p = 0.0 if p is None else p
+        r = 0.0 if r is None else r
+        f1 = 0.0 if f1 is None else f1
+        s = 0.0 if s is None else s
+        return round(p, 3), round(r, 3), round(f1, 3), round(s, 3)
