@@ -15,10 +15,6 @@ class SimpleNNTrainer(NNTrainer):
         self.model.eval()
         self.model.cuda() if use_gpu else self.model.cpu()
 
-        correct = 0
-        total = 0
-        accuracy = 0.0
-
         all_predictions = []
         all_scores = []
         all_labels = []
@@ -50,16 +46,18 @@ class SimpleNNTrainer(NNTrainer):
                 all_patchIJs += IJs.numpy().tolist()
             ##### Segment mode End ###############
 
-            total += labels.size(0)
-            correct += (predicted == labels).sum()
-            accuracy = round(100 * correct / total, 2)
-            print('_________ACCURACY___of___[%d/%d]batches: %.2f%%' % (i + 1, dataloader.__len__(), accuracy), end='\r')
+            p, r, f1, s = self.get_score(labels.numpy().squeeze().ravel(), predicted.numpy().squeeze().ravel())
+            print('Batch[%d/%d] Precision:%.3f Recall:%.3f F1:%.3f Supp:%.3f' % (
+                i + 1, dataloader.__len__(), p, r, f1, s),
+                  end='\r')
 
             ########## Feeding to tensorboard starts here...#####################
             ####################################################################
             if self.to_tenserboard:
                 step = next(self.res['val_counter'])
-                self.logger.scalar_summary('accuracy/validation', accuracy, step)
+                self.logger.scalar_summary('F1/validation', f1, step)
+                self.logger.scalar_summary('precision-recall/validation', r, p)
+                self.logger.scalar_summary('Support/validation', s, step)
             #### Tensorfeed stops here# #########################################
             #####################################################################
 
@@ -70,7 +68,9 @@ class SimpleNNTrainer(NNTrainer):
         all_predictions = np.array(all_predictions)
         all_labels = np.array(all_labels)
 
-        self._save_if_better(save_best=save_best, force_checkpoint=force_checkpoint, accuracy=accuracy)
+        p, r, f1, s = self.get_score(all_labels.ravel(), all_predictions.ravel())
+        print('Final  #Precision:%.3f #Recall:%.3f #F1:%.3f #Supp:%.3f' % (p, r, f1, s))
+        self._save_if_better(save_best=save_best, force_checkpoint=force_checkpoint, score=f1)
 
         if segment_mode:
             return all_IDs, all_patchIJs, all_scores, all_predictions, all_labels
