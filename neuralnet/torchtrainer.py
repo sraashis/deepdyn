@@ -5,7 +5,7 @@ from time import time
 import numpy as np
 import torch
 import torch.nn.functional as F
-from sklearn.metrics import precision_recall_fscore_support
+from sklearn.metrics import precision_recall_fscore_support, accuracy_score
 from torch.autograd import Variable
 
 from neuralnet.utils.tensorboard_logger import Logger
@@ -86,7 +86,7 @@ class NNTrainer:
                     accumulated_labels = []
                     accumulated_predictions = []
 
-                print('Epochs:[%d/%d] Batches:[%d/%d]  LOSS:%.3f precision:%.3f recall:%.3f f1:%.3f supp:%.3f' %
+                print('Epochs:[%d/%d] Batches:[%d/%d], loss:%.3f, pre:%.3f rec:%.3f f1:%.3f acc:%.3f' %
                       (epoch + 1, epochs, i + 1, dataloader.__len__(), current_loss, p, r, f1, s),
                       end='\r' if running_loss > 0 else '\n')
 
@@ -116,7 +116,7 @@ class NNTrainer:
             all_labels += labels.numpy().tolist()
 
             p, r, f1, s = self.get_score(labels.numpy().squeeze().ravel(), predicted.numpy().squeeze().ravel())
-            print('Batch[%d/%d] Precision:%.3f Recall:%.3f F1:%.3f Supp:%.3f' % (
+            print('Batch[%d/%d] pre:%.3f rec:%.3f f1:%.3f acc:%.3f' % (
                 i + 1, dataloader.__len__(), p, r, f1, s),
                   end='\r')
 
@@ -126,7 +126,7 @@ class NNTrainer:
                 step = next(self.res['val_counter'])
                 self.logger.scalar_summary('F1/validation', f1, step)
                 self.logger.scalar_summary('precision-recall/validation', r, p)
-                self.logger.scalar_summary('Support/validation', s, step)
+                self.logger.scalar_summary('Acc/validation', s, step)
             #### Tensorfeed stops here# #########################################
             #####################################################################
 
@@ -135,7 +135,7 @@ class NNTrainer:
         all_labels = np.array(all_labels)
 
         p, r, f1, s = self.get_score(all_labels.ravel(), all_predictions.ravel())
-        print('Final  #Precision:%.3f #Recall:%.3f #F1:%.3f #Supp:%.3f' % (p, r, f1, s))
+        print('FINAL::: #Precision:%.3f #Recall:%.3f #F1:%.3f #Acc:%.3f' % (p, r, f1, s))
         self._save_if_better(save_best=save_best, force_checkpoint=force_checkpoint, score=f1)
 
         return all_predictions, all_labels
@@ -185,5 +185,5 @@ class NNTrainer:
         p = 0.0 if p is None else p
         r = 0.0 if r is None else r
         f1 = 0.0 if f1 is None else f1
-        s = 0.0 if s is None else s
+        s = accuracy_score(y_true, y_pred)
         return round(p, 3), round(r, 3), round(f1, 3), round(s, 3)
