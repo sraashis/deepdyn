@@ -47,7 +47,7 @@ class SimpleNNTrainer(NNTrainer):
             ##### Segment mode End ###############
 
             p, r, f1, s = self.get_score(labels.numpy().squeeze().ravel(), predicted.numpy().squeeze().ravel())
-            print('Batch[%d/%d] Precision:%.3f Recall:%.3f F1:%.3f Supp:%.3f' % (
+            print('Batch[%d/%d] pre:%.3f rec:%.3f f1:%.3f acc:%.3f' % (
                 i + 1, dataloader.__len__(), p, r, f1, s),
                   end='\r')
 
@@ -57,7 +57,7 @@ class SimpleNNTrainer(NNTrainer):
                 step = next(self.res['val_counter'])
                 self.logger.scalar_summary('F1/validation', f1, step)
                 self.logger.scalar_summary('precision-recall/validation', r, p)
-                self.logger.scalar_summary('Support/validation', s, step)
+                self.logger.scalar_summary('Acc/validation', s, step)
             #### Tensorfeed stops here# #########################################
             #####################################################################
 
@@ -69,7 +69,7 @@ class SimpleNNTrainer(NNTrainer):
         all_labels = np.array(all_labels)
 
         p, r, f1, s = self.get_score(all_labels.ravel(), all_predictions.ravel())
-        print('Final  #Precision:%.3f #Recall:%.3f #F1:%.3f #Supp:%.3f' % (p, r, f1, s))
+        print('FINAL::: #Precision:%.3f #Recall:%.3f #F1:%.3f #Acc:%.3f' % (p, r, f1, s))
         self._save_if_better(save_best=save_best, force_checkpoint=force_checkpoint, score=f1)
 
         if segment_mode:
