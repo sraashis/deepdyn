@@ -2,9 +2,10 @@ import torch
 import torch.nn.functional as F
 from torch import nn
 
-# https://github.com/ZijunDeng/pytorch-semantic-segmentation
-
 from neuralnet.utils.weights_utils import initialize_weights
+
+
+# https://github.com/ZijunDeng/pytorch-semantic-segmentation
 
 
 class _EncoderBlock(nn.Module):
@@ -72,10 +73,11 @@ class UNet(nn.Module):
         enc3 = self.enc3(enc2)
         enc4 = self.enc4(enc3)
         center = self.center(enc4)
-        dec4 = self.dec4(torch.cat([center, F.upsample(enc4, center.size()[2:], mode='bilinear')], 1))
-        dec3 = self.dec3(torch.cat([dec4, F.upsample(enc3, dec4.size()[2:], mode='bilinear')], 1))
-        dec2 = self.dec2(torch.cat([dec3, F.upsample(enc2, dec3.size()[2:], mode='bilinear')], 1))
-        dec1 = self.dec1(torch.cat([dec2, F.upsample(enc1, dec2.size()[2:], mode='bilinear')], 1))
+        dec4 = self.dec4(
+            torch.cat([center, F.upsample(enc4, center.size()[2:], mode='bilinear', align_corners=True)], 1))
+        dec3 = self.dec3(torch.cat([dec4, F.upsample(enc3, dec4.size()[2:], mode='bilinear', align_corners=True)], 1))
+        dec2 = self.dec2(torch.cat([dec3, F.upsample(enc2, dec3.size()[2:], mode='bilinear', align_corners=True)], 1))
+        dec1 = self.dec1(torch.cat([dec2, F.upsample(enc1, dec2.size()[2:], mode='bilinear', align_corners=True)], 1))
         final = self.final(dec1)
-        final = F.upsample(final, x.size()[2:], mode='bilinear')
+        final = F.upsample(final, x.size()[2:], mode='bilinear', align_corners=True)
         return F.log_softmax(final, dim=1)

@@ -5,6 +5,7 @@ from time import time
 import numpy as np
 import torch
 import torch.nn.functional as F
+from sklearn.metrics import f1_score
 from torch.autograd import Variable
 
 from neuralnet.utils.tensorboard_logger import Logger
@@ -15,7 +16,7 @@ class NNTrainer:
         self.model = model
         self.checkpoint_dir = checkpoint_dir
         self.checkpoint_file = checkpoint_file
-        self.checkpoint = {'epochs': 0, 'state': None, 'accuracy': 0.0, 'model': 'EMPTY'}
+        self.checkpoint = {'epochs': 0, 'state': None, 'score': 0.0, 'model': 'EMPTY'}
         self.to_tenserboard = to_tensorboard
         self.logger = Logger(log_dir="./logs/{}".format(time()))
         self.res = {'val_counter': count(), 'train_counter': count()}
@@ -31,6 +32,8 @@ class NNTrainer:
         print('Training...')
         for epoch in range(0, epochs):
             running_loss = 0.0
+            accumulated_labels = []
+            accumulated_predictions = []
             for i, data in enumerate(dataloader, 0):
                 inputs, labels = data
                 inputs = Variable(inputs.cuda() if use_gpu else inputs.cpu())
@@ -44,26 +47,22 @@ class NNTrainer:
                 loss.backward()
                 optimizer.step()
 
-                running_loss += loss.data[0]
-                current_loss = loss.data[0]
+                running_loss += loss.item()
+                current_loss = loss.item()
 
-                _, argmax = torch.max(outputs, 1)
-                accuracy = (labels == argmax.squeeze()).float().mean()
-                if (i + 1) % log_frequency == 0:  # Inspect the loss of every log_frequency batches
-                    current_loss = running_loss / log_frequency if (i + 1) % log_frequency == 0 \
-                        else (i + 1) % log_frequency
-                    running_loss = 0.0
+                _, predicted = torch.max(outputs, 1)
+                current_score = self.get_score(labels.numpy().squeeze().ravel(), predicted.numpy().squeeze().ravel())
 
-                print('Epochs:[%d/%d] Batches:[%d/%d]   Loss: %.3f accuracy: %.3f' %
-                      (epoch + 1, epochs, i + 1, dataloader.__len__(), current_loss, accuracy),
-                      end='\r' if running_loss > 0 else '\n')
+                # Accumulate to calculate score of log frequency batches for better logging
+                accumulated_predictions += predicted.numpy().tolist()
+                accumulated_labels += labels.numpy().tolist()
 
                 ################## Tensorboard logger setup ###############
                 ###########################################################
                 if self.to_tenserboard:
                     step = next(self.res['train_counter'])
                     self.logger.scalar_summary('loss/training', current_loss, step)
-                    self.logger.scalar_summary('accuracy/training', accuracy.data[0], step)
+                    self.logger.scalar_summary('Score/training', current_score, step)
 
                     for tag, value in self.model.named_parameters():
                         tag = tag.replace('.', '/')
@@ -75,6 +74,20 @@ class NNTrainer:
                     self.logger.image_summary('images/training', images_to_tb, step)
                 ###### Tensorboard logger END ##############################
                 ############################################################
+
+                if (i + 1) % log_frequency == 0:  # Inspect the loss of every log_frequency batches
+                    current_loss = running_loss / log_frequency if (i + 1) % log_frequency == 0 \
+                        else (i + 1) % log_frequency
+                    current_score = self.get_score(np.array(accumulated_labels).ravel(),
+                                                   np.array(accumulated_predictions).ravel())
+                    running_loss = 0.0
+                    accumulated_labels = []
+                    accumulated_predictions = []
+
+                print('Epochs:[%d/%d] Batches:[%d/%d]   Loss: %.3f Score: %.3f' %
+                      (epoch + 1, epochs, i + 1, dataloader.__len__(), current_loss, current_score),
+                      end='\r' if running_loss > 0 else '\n')
+
             self.checkpoint['epochs'] += 1
             self.evaluate(dataloader=validationloader, use_gpu=use_gpu, force_checkpoint=False, save_best=True)
 
@@ -82,10 +95,6 @@ class NNTrainer:
 
         self.model.eval()
         self.model.cuda() if use_gpu else self.model.cpu()
-
-        correct = 0
-        total = 0
-        accuracy = 0.0
 
         all_predictions = []
         all_labels = []
@@ -104,24 +113,24 @@ class NNTrainer:
             all_predictions += predicted.numpy().tolist()
             all_labels += labels.numpy().tolist()
 
-            total += labels.size(0)
-            correct += (predicted == labels).sum()
-            accuracy = round(100 * correct / total, 2)
-            print('_________ACCURACY___of___[%d/%d]batches: %.2f%%' % (i + 1, dataloader.__len__(), accuracy), end='\r')
+            score = self.get_score(labels, predicted)
+            print('________Score___of___batch[%d/%d]: %.2f' % (i + 1, dataloader.__len__(), score),
+                  end='\r')
 
             ########## Feeding to tensorboard starts here...#####################
             ####################################################################
             if self.to_tenserboard:
                 step = next(self.res['val_counter'])
-                self.logger.scalar_summary('accuracy/validation', accuracy, step)
+                self.logger.scalar_summary('Score/validation', score, step)
             #### Tensorfeed stops here# #########################################
             #####################################################################
 
         print()
         all_predictions = np.array(all_predictions)
         all_labels = np.array(all_labels)
-
-        self._save_if_better(save_best=save_best, force_checkpoint=force_checkpoint, accuracy=accuracy)
+        final_score = self.get_score(all_labels.ravel(), all_predictions.ravel())
+        print('Final Score: ' + str(final_score))
+        self._save_if_better(save_best=save_best, force_checkpoint=force_checkpoint, score=final_score)
 
         return all_predictions, all_labels
 
@@ -130,10 +139,10 @@ class NNTrainer:
         self.checkpoint = checkpoint
 
     @staticmethod
-    def _checkpoint(epochs=None, model=None, accuracy=None):
+    def _checkpoint(epochs=None, model=None, score=None):
         return {'state': model.state_dict(),
                 'epochs': epochs,
-                'accuracy': accuracy,
+                'score': score,
                 'model': str(model)}
 
     def resume_from_checkpoint(self):
@@ -144,7 +153,7 @@ class NNTrainer:
         except Exception as e:
             print('ERROR: ' + str(e))
 
-    def _save_if_better(self, save_best=None, force_checkpoint=None, accuracy=None):
+    def _save_if_better(self, save_best=None, force_checkpoint=None, score=None):
 
         if not save_best:
             return
@@ -152,15 +161,18 @@ class NNTrainer:
         if force_checkpoint:
             self._save_checkpoint(
                 NNTrainer._checkpoint(epochs=self.checkpoint['epochs'], model=self.model,
-                                      accuracy=accuracy))
+                                      score=score))
             print('FORCED checkpoint saved. ')
 
-        if accuracy > self.checkpoint['accuracy']:
-            print('Accuracy improved from ',
-                  str(self.checkpoint['accuracy']) + ' to ' + str(accuracy) + '. Saving model..')
+        if score > self.checkpoint['score']:
+            print('Score improved from ',
+                  str(self.checkpoint['score']) + ' to ' + str(score) + '. Saving model..')
             self._save_checkpoint(
                 NNTrainer._checkpoint(epochs=self.checkpoint['epochs'], model=self.model,
-                                      accuracy=accuracy))
+                                      score=score))
         else:
             self._save_checkpoint(self.checkpoint)
-            print('Accuracy did not improve. _was:' + str(self.checkpoint['accuracy']))
+            print('Score did not improve. _was:' + str(self.checkpoint['score']))
+
+    def get_score(self, y_true, y_pred):
+        return round(f1_score(y_true, y_pred, average='binary'), 3)
