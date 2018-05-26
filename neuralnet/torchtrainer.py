@@ -39,8 +39,6 @@ class NNTrainer:
                 optimizer.zero_grad()
                 outputs = self.model(inputs)
 
-                print('***************')
-                print(inputs.shape)
                 loss = F.cross_entropy(outputs, labels)
                 loss.cuda() if use_gpu else loss.cpu()
                 loss.backward()
