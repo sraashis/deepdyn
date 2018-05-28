@@ -76,7 +76,7 @@ class UnetNNTrainer(NNTrainer):
                     accumulated_labels = []
                     accumulated_predictions = []
 
-                print('Epochs:[%d/%d] Batches:[%d/%d], loss:%.3f, pre:%.3f rec:%.3f f1:%.3f acc:%.3f' %
+                print('[Epochs:%d/%d Batches:%d/%d, loss:%.3f] pre:%.3f rec:%.3f f1:%.3f acc:%.3f' %
                       (epoch + 1, epochs, i + 1, dataloader.__len__(), current_loss, p, r, f1, s),
                       end='\r' if running_loss > 0 else '\n')
 
