@@ -79,7 +79,7 @@ class SimpleNNTrainer(NNTrainer):
                     accumulated_labels = []
                     accumulated_predictions = []
 
-                print('Epochs:[%d/%d] Batches:[%d/%d], loss:%.3f, pre:%.3f rec:%.3f f1:%.3f acc:%.3f' %
+                print('[Epochs:%d/%d Batches:%d/%d, loss:%.3f] pre:%.3f rec:%.3f f1:%.3f acc:%.3f' %
                       (epoch + 1, epochs, i + 1, dataloader.__len__(), current_loss, p, r, f1, s),
                       end='\r' if running_loss > 0 else '\n')
 
@@ -94,14 +94,13 @@ class SimpleNNTrainer(NNTrainer):
         all_predictions = []
         all_scores = []
         all_labels = []
-        all_IDs = []
         all_patchIJs = []
         print('\nEvaluating...')
 
         ##### Segment Mode only to use while testing####
-        segment_mode = dataloader.dataset.segment_mode
+        mode = dataloader.dataset.mode
         for i, data in enumerate(dataloader, 0):
-            if segment_mode:
+            if mode == 'eval':
                 IDs, IJs, inputs, labels = data
             else:
                 inputs, labels = data
@@ -117,8 +116,7 @@ class SimpleNNTrainer(NNTrainer):
             all_labels += labels.numpy().tolist()
 
             ###### For segment mode only ##########
-            if segment_mode:
-                all_IDs += IDs.numpy().tolist()
+            if mode == 'eval':
                 all_patchIJs += IJs.numpy().tolist()
             ##### Segment mode End ###############
 
@@ -138,16 +136,15 @@ class SimpleNNTrainer(NNTrainer):
             #####################################################################
 
         print()
-        all_IDs = np.array(all_IDs, dtype=np.int)
         all_patchIJs = np.array(all_patchIJs, dtype=np.int)
         all_scores = np.array(all_scores)
         all_predictions = np.array(all_predictions)
         all_labels = np.array(all_labels)
 
         p, r, f1, s = self.get_score(all_labels.ravel(), all_predictions.ravel())
-        print('FINAL::: #Precision:%.3f #Recall:%.3f #F1:%.3f #Acc:%.3f' % (p, r, f1, s))
+        print('[FINAL ::: Precision:%.3f Recall:%.3f F1:%.3f Acc:%.3f]' % (p, r, f1, s))
         self._save_if_better(save_best=save_best, force_checkpoint=force_checkpoint, score=f1)
 
-        if segment_mode:
-            return all_IDs, all_patchIJs, all_scores, all_predictions, all_labels
+        if mode == 'eval':
+            return all_patchIJs, all_scores, all_predictions, all_labels
         return all_predictions, all_labels

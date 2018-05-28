@@ -7,11 +7,13 @@ from torch.utils.data.dataset import Dataset
 import utils.img_utils as imgutil
 from commons.IMAGE import Image
 import numpy as np
+from random import shuffle
 
 
 class PatchesGenerator(Dataset):
     def __init__(self, Dirs=None, transform=None,
-                 fget_mask=None, fget_truth=None, segment_mode=False, train_image_size=None):
+                 fget_mask=None, fget_truth=None, patch_rows=None, pixel_offset=5,
+                 mode=None):
 
         """
         :param Dirs: Should contain paths to directories images, mask, and truth by the same name.
@@ -19,18 +21,17 @@ class PatchesGenerator(Dataset):
         :param transform:
         :param fget_mask: mask file getter
         :param fget_truth: ground truth file getter
-        :param segment_mode: True only when running a model to segment since it returns the image id and
-               pixel positions for each patches. DO NOT USE segment_mode while training or evaluating the model
+        :param pixel_offset: Offset pixels to increase the train size. Should be equal to img_width while testing.
+        :param mode: Takes value 'train' or 'test'
         """
 
         self.transform = transform
-        self.img_width, self.img_height = train_image_size
+        self.patch_cols = patch_rows
         self.IDs = []
         self.file_names = os.listdir(Dirs['images'])
         self.images = {}
-        self.segment_mode = segment_mode
+        self.mode = mode
         for ID, img_file in enumerate(self.file_names):
-
             img_obj = Image()
 
             img_obj.load_file(data_dir=Dirs['images'], file_name=img_file)
@@ -39,41 +40,44 @@ class PatchesGenerator(Dataset):
             img_obj.load_mask(mask_dir=Dirs['mask'], fget_mask=fget_mask, erode=True)
             img_obj.load_ground_truth(gt_dir=Dirs['truth'], fget_ground_truth=fget_truth)
 
-            for i in range(0, img_obj.working_arr.shape[0], 11):
+            self._initialize_keys(img_obj=img_obj, pixel_offset=pixel_offset, ID=str(ID))
 
-                row_from, row_to = i, min(i + 11, img_obj.working_arr.shape[0])
+        print('### ' + str(self.__len__()) + ' patches found.')
 
-                if abs(row_from - row_to) != 11:
-                    row_from = img_obj.working_arr.shape[0] - 11
-                    row_to = img_obj.working_arr.shape[0]
+    def _initialize_keys(self, img_obj=None, pixel_offset=None, ID=None):
+        for i in range(0, img_obj.working_arr.shape[0], pixel_offset):
 
+            row_from, row_to = i, min(i + self.patch_cols, img_obj.working_arr.shape[1])
+
+            if abs(row_from - row_to) != self.patch_cols:
+                row_from = img_obj.working_arr.shape[0] - self.patch_cols
+                row_to = img_obj.working_arr.shape[0]
+
+            if 255 in img_obj.ground_truth[row_from, :]:
                 self.IDs.append([ID, row_from, row_to])
 
-            # Find the average of background pixels
-            tot = 0.0
-            c = 0
-            for x in range(img_obj.working_arr.shape[0]):
-                for y in range(img_obj.working_arr.shape[1]):
-                    if img_obj.mask[x, y] == 255 and img_obj.ground_truth[x, y] == 255:
-                        tot += img_obj.working_arr[x, y]
-                        c += 1
+        # Find the average of background pixels
+        tot = 0.0
+        c = 0
+        for x in range(img_obj.working_arr.shape[0]):
+            for y in range(img_obj.working_arr.shape[1]):
+                if img_obj.mask[x, y] == 255 and img_obj.ground_truth[x, y] == 255:
+                    tot += img_obj.working_arr[x, y]
+                    c += 1
 
-            img_obj.working_arr[img_obj.mask == 0] = math.ceil(tot / c)
-            self.images[ID] = img_obj
-
-        # shuffle(self.IDs)
-        print('### ' + str(self.__len__()) + ' patches found.')
+        img_obj.working_arr[img_obj.mask == 0] = math.ceil(tot / c)
+        self.images[ID] = img_obj
 
     def __getitem__(self, index):
         ID, row_from, row_to = self.IDs[index]
         img_tensor = self.images[ID].working_arr[row_from:row_to, :][..., None]
-        y = self.images[ID].ground_truth[row_from:row_to, :]
+        y = self.images[str(ID)].ground_truth[row_from:row_to, :]
         y[y == 255] = 1
         y = torch.LongTensor(y)
         if self.transform is not None:
             img_tensor = self.transform(img_tensor)
 
-        if self.segment_mode:
+        if self.mode == 'eval':
             return ID, np.array([row_from, row_to]), img_tensor, y
 
         return img_tensor, y

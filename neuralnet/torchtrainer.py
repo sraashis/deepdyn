@@ -86,7 +86,7 @@ class NNTrainer:
                     accumulated_labels = []
                     accumulated_predictions = []
 
-                print('Epochs:[%d/%d] Batches:[%d/%d], loss:%.3f, pre:%.3f rec:%.3f f1:%.3f acc:%.3f' %
+                print('[Epochs:%d/%d Batches:%d/%d, loss:%.3f] pre:%.3f rec:%.3f f1:%.3f acc:%.3f' %
                       (epoch + 1, epochs, i + 1, dataloader.__len__(), current_loss, p, r, f1, s),
                       end='\r' if running_loss > 0 else '\n')
 
@@ -102,7 +102,6 @@ class NNTrainer:
         all_labels = []
         print('\nEvaluating...')
 
-        ##### Segment Mode only to use while testing####
         for i, data in enumerate(dataloader, 0):
             inputs, labels = data
             inputs = inputs.cuda() if use_gpu else inputs.cpu()
@@ -135,7 +134,7 @@ class NNTrainer:
         all_labels = np.array(all_labels)
 
         p, r, f1, s = self.get_score(all_labels.ravel(), all_predictions.ravel())
-        print('FINAL::: #Precision:%.3f #Recall:%.3f #F1:%.3f #Acc:%.3f' % (p, r, f1, s))
+        print('[FINAL ::: Precision:%.3f Recall:%.3f F1:%.3f Acc:%.3f]' % (p, r, f1, s))
         self._save_if_better(save_best=save_best, force_checkpoint=force_checkpoint, score=f1)
 
         return all_predictions, all_labels

@@ -69,7 +69,7 @@ class SimpleNNTrainer(NNTrainer):
         all_labels = np.array(all_labels)
 
         p, r, f1, s = self.get_score(all_labels.ravel(), all_predictions.ravel())
-        print('FINAL::: #Precision:%.3f #Recall:%.3f #F1:%.3f #Acc:%.3f' % (p, r, f1, s))
+        print('[FINAL ::: Precision:%.3f Recall:%.3f F1:%.3f Acc:%.3f]' % (p, r, f1, s))
         self._save_if_better(save_best=save_best, force_checkpoint=force_checkpoint, score=f1)
 
         if segment_mode:
