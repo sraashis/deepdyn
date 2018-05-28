@@ -12,7 +12,7 @@ class SimpleNNTrainer(NNTrainer):
                            to_tensorboard=to_tensorboard)
 
     def train(self, optimizer=None, dataloader=None, epochs=None, use_gpu=False, log_frequency=200,
-              validationloader=None):
+              validationloader=None, force_checkpoint=False, ):
 
         if validationloader is None:
             raise ValueError('Please provide validation loader.')
@@ -84,7 +84,8 @@ class SimpleNNTrainer(NNTrainer):
                       end='\r' if running_loss > 0 else '\n')
 
             self.checkpoint['epochs'] += 1
-            self.evaluate(dataloader=validationloader, use_gpu=use_gpu, force_checkpoint=False, save_best=True)
+            self.evaluate(dataloader=validationloader, use_gpu=use_gpu, force_checkpoint=force_checkpoint,
+                          save_best=True)
 
     def evaluate(self, dataloader=None, use_gpu=False, force_checkpoint=False, save_best=False):
 

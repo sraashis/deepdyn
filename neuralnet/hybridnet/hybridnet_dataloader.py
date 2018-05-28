@@ -39,6 +39,7 @@ class PatchesGenerator(Dataset):
 
             img_obj.load_mask(mask_dir=Dirs['mask'], fget_mask=fget_mask, erode=True)
             img_obj.load_ground_truth(gt_dir=Dirs['truth'], fget_ground_truth=fget_truth)
+#             img_obj.working_arr = img_obj.ground_truth.copy()
 
             self._initialize_keys(img_obj=img_obj, pixel_offset=pixel_offset, ID=str(ID))
 
@@ -71,7 +72,7 @@ class PatchesGenerator(Dataset):
     def __getitem__(self, index):
         ID, row_from, row_to = self.IDs[index]
         img_tensor = self.images[ID].working_arr[row_from:row_to, :][..., None]
-        y = self.images[str(ID)].ground_truth[row_from:row_to, :]
+        y = self.images[ID].ground_truth[row_from:row_to, :]
         y[y == 255] = 1
         y = torch.LongTensor(y)
         if self.transform is not None:
