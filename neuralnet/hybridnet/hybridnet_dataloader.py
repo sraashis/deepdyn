@@ -8,6 +8,7 @@ import utils.img_utils as imgutil
 from commons.IMAGE import Image
 import numpy as np
 from random import shuffle
+import random
 
 
 class PatchesGenerator(Dataset):
@@ -27,7 +28,7 @@ class PatchesGenerator(Dataset):
 
         self.transform = transform
         self.patch_cols = patch_rows
-        self.IDs = []
+        self.train_images = []
         self.file_names = os.listdir(Dirs['images'])
         self.images = {}
         self.mode = mode
@@ -39,9 +40,15 @@ class PatchesGenerator(Dataset):
 
             img_obj.load_mask(mask_dir=Dirs['mask'], fget_mask=fget_mask, erode=True)
             img_obj.load_ground_truth(gt_dir=Dirs['truth'], fget_ground_truth=fget_truth)
-#             img_obj.working_arr = img_obj.ground_truth.copy()
 
-            self._initialize_keys(img_obj=img_obj, pixel_offset=pixel_offset, ID=str(ID))
+            self._initialize_keys(img_obj=img_obj, pixel_offset=pixel_offset, ID=ID)
+
+#             if mode == 'train' and random.random() <= 0.20:
+#                 img_obj.working_arr = img_obj.ground_truth.copy()
+#                 self._initialize_keys_truth(img_obj=img_obj, pixel_offset=pixel_offset, ID=str(ID) + '-reg')
+
+            if mode == 'train':
+                shuffle(self.train_images)
 
         print('### ' + str(self.__len__()) + ' patches found.')
 
@@ -50,14 +57,16 @@ class PatchesGenerator(Dataset):
 
             row_from, row_to = i, min(i + self.patch_cols, img_obj.working_arr.shape[1])
 
+            # Last patch could be of different size. So we adjust it to make consistent input size.
             if abs(row_from - row_to) != self.patch_cols:
                 row_from = img_obj.working_arr.shape[0] - self.patch_cols
                 row_to = img_obj.working_arr.shape[0]
 
+            # only include patch that has at least one pixel in first row that is inside the mask.
             if 255 in img_obj.ground_truth[row_from, :]:
-                self.IDs.append([ID, row_from, row_to])
+                self.train_images.append([ID, row_from, row_to])
 
-        # Find the average of background pixels
+        # Find the average of background pixels within mask.
         tot = 0.0
         c = 0
         for x in range(img_obj.working_arr.shape[0]):
@@ -69,8 +78,24 @@ class PatchesGenerator(Dataset):
         img_obj.working_arr[img_obj.mask == 0] = math.ceil(tot / c)
         self.images[ID] = img_obj
 
+    def _initialize_keys_truth(self, img_obj=None, pixel_offset=None, ID=None):
+        for i in range(0, img_obj.working_arr.shape[0], pixel_offset):
+
+            row_from, row_to = i, min(i + self.patch_cols, img_obj.working_arr.shape[1])
+
+            # Last patch could be of different size. So we adjust it to make consistent input size.
+            if abs(row_from - row_to) != self.patch_cols:
+                row_from = img_obj.working_arr.shape[0] - self.patch_cols
+                row_to = img_obj.working_arr.shape[0]
+
+            # only include patch that has at least one pixel in first row that is inside the mask.
+            if 255 in img_obj.ground_truth[row_from, :]:
+                self.train_images.append([ID, row_from, row_to])
+
+        self.images[ID] = img_obj
+
     def __getitem__(self, index):
-        ID, row_from, row_to = self.IDs[index]
+        ID, row_from, row_to = self.train_images[index]
         img_tensor = self.images[ID].working_arr[row_from:row_to, :][..., None]
         y = self.images[ID].ground_truth[row_from:row_to, :]
         y[y == 255] = 1
@@ -84,4 +109,4 @@ class PatchesGenerator(Dataset):
         return img_tensor, y
 
     def __len__(self):
-        return len(self.IDs)
+        return len(self.train_images)
