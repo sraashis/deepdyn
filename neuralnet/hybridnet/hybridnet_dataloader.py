@@ -43,9 +43,9 @@ class PatchesGenerator(Dataset):
 
             self._initialize_keys(img_obj=img_obj, pixel_offset=pixel_offset, ID=ID)
 
-#             if mode == 'train' and random.random() <= 0.20:
-#                 img_obj.working_arr = img_obj.ground_truth.copy()
-#                 self._initialize_keys_truth(img_obj=img_obj, pixel_offset=pixel_offset, ID=str(ID) + '-reg')
+            if mode == 'train' and random.random() <= 0.20:
+                img_obj.working_arr = img_obj.ground_truth.copy()
+                self._initialize_keys_truth(img_obj=img_obj, pixel_offset=pixel_offset, ID=str(ID) + '-reg')
 
             if mode == 'train':
                 shuffle(self.train_images)
