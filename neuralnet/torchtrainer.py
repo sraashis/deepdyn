@@ -168,6 +168,7 @@ class NNTrainer:
                 NNTrainer._checkpoint(epochs=self.checkpoint['epochs'], model=self.model,
                                       score=score))
             print('FORCED checkpoint saved. ')
+            return
 
         if score > self.checkpoint['score']:
             print('Score improved from ',
