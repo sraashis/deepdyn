@@ -61,25 +61,13 @@ def flip_4ways():
         IMG.fromarray(img_obj.ground_truth).save(Dirs['truth'] + sep + 'b' + get_ground_truth_file(img_obj.file_name))
         IMG.fromarray(img_obj.mask).save(Dirs['mask'] + sep + 'b' + get_mask_file(img_obj.file_name))
 
-        working_arr = img_obj.working_arr.copy()
-        ground_truth = img_obj.ground_truth.copy()
-        mask = img_obj.mask.copy()
-
-        img_obj.working_arr = np.flip(working_arr.copy(), 0)
-        img_obj.ground_truth = np.flip(ground_truth.copy(), 0)
-        img_obj.mask = np.flip(mask, 0)
+        img_obj.working_arr = np.flip(img_obj.working_arr.copy(), 0)
+        img_obj.ground_truth = np.flip(img_obj.ground_truth.copy(), 0)
+        img_obj.mask = np.flip(img_obj.mask.copy(), 0)
 
         IMG.fromarray(img_obj.working_arr).save(Dirs['images'] + sep + 'c' + img_obj.file_name)
         IMG.fromarray(img_obj.ground_truth).save(Dirs['truth'] + sep + 'c' + get_ground_truth_file(img_obj.file_name))
         IMG.fromarray(img_obj.mask).save(Dirs['mask'] + sep + 'c' + get_mask_file(img_obj.file_name))
-
-        img_obj.working_arr = np.flip(working_arr, 1)
-        img_obj.ground_truth = np.flip(ground_truth.copy(), 1)
-        img_obj.mask = np.flip(mask.copy(), 1)
-
-        IMG.fromarray(img_obj.working_arr).save(Dirs['images'] + sep + 'd' + img_obj.file_name)
-        IMG.fromarray(img_obj.ground_truth).save(Dirs['truth'] + sep + 'd' + get_ground_truth_file(img_obj.file_name))
-        IMG.fromarray(img_obj.mask).save(Dirs['mask'] + sep + 'd' + get_mask_file(img_obj.file_name))
 
 
 if __name__ == '__main__':
