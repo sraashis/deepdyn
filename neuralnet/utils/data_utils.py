@@ -58,7 +58,7 @@ def flip_4ways(Dirs, get_mask_file, get_ground_truth_file):
         print('Done ' + img_obj.file_name)
 
 
-def resize_DRIVE_564by564(Dirs, get_mask_file, get_ground_truth_file):
+def resize_DRIVE_572by572(Dirs, get_mask_file, get_ground_truth_file):
     file_names = os.listdir(Dirs['images']).copy()
     for ID, img_file in enumerate(file_names):
         img_obj = Image()
@@ -68,17 +68,19 @@ def resize_DRIVE_564by564(Dirs, get_mask_file, get_ground_truth_file):
 
         img_obj.load_mask(mask_dir=Dirs['mask'], fget_mask=get_mask_file, erode=True)
         img_obj.load_ground_truth(gt_dir=Dirs['truth'], fget_ground_truth=get_ground_truth_file)
+        img_obj.working_arr = np.pad(img_obj.working_arr, [(0, 0), (4, 3), (0, 0)], 'constant')
+        img_obj.ground_truth = np.pad(img_obj.ground_truth, [(0, 0), (4, 3)], 'constant')
+        img_obj.mask = np.pad(img_obj.mask, [(0, 0), (4, 3)], 'constant')
 
-        IMG.fromarray(img_obj.working_arr[10:574, 1:565, :]).save(Dirs['images'] + sep + img_obj.file_name)
-        IMG.fromarray(img_obj.ground_truth[10:574, 1:565]).save(
+        IMG.fromarray(img_obj.working_arr[7:579, :, :]).save(Dirs['images'] + sep + img_obj.file_name)
+        IMG.fromarray(img_obj.ground_truth[7:579, :]).save(
             Dirs['truth'] + sep + get_ground_truth_file(img_obj.file_name))
-        IMG.fromarray(img_obj.mask[10:574, 1:565]).save(Dirs['mask'] + sep + get_mask_file(img_obj.file_name))
+        IMG.fromarray(img_obj.mask[7:579, :]).save(Dirs['mask'] + sep + get_mask_file(img_obj.file_name))
 
         print('Done ' + img_obj.file_name)
 
 
 if __name__ == '__main__':
-
     os.chdir('/home/ak/PycharmProjects/ature')
 
     sep = os.sep
@@ -98,4 +100,4 @@ if __name__ == '__main__':
 
 
     flip_4ways(Dirs, get_mask_file, get_ground_truth_file)
-    resize_DRIVE_564by564(Dirs, get_mask_file, get_ground_truth_file)
+    resize_DRIVE_572by572(Dirs, get_mask_file, get_ground_truth_file)
