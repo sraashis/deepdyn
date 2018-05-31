@@ -6,7 +6,7 @@ import neuralnet.utils.measurements as mggmt
 from neuralnet.torchtrainer import NNTrainer
 
 
-class UnetNNTrainer(NNTrainer):
+class UNetNNTrainer(NNTrainer):
     def __init__(self, model=None, checkpoint_dir=None, checkpoint_file=None, to_tensorboard=False):
         NNTrainer.__init__(self, model=model, checkpoint_dir=checkpoint_dir, checkpoint_file=checkpoint_file,
                            to_tensorboard=to_tensorboard)
@@ -19,22 +19,32 @@ class UnetNNTrainer(NNTrainer):
         print('\nEvaluating...')
         TP, FP, TN, FN = [0] * 4
         all_predictions = []
-        all_labels = []
         all_scores = []
+        all_labels = []
+        all_patchIJs = []
 
         ##### Segment Mode only to use while testing####
+        mode = dataloader.dataset.mode
         for i, data in enumerate(dataloader, 0):
-            inputs, labels = data
+            if mode == 'eval':
+                IDs, IJs, inputs, labels = data
+            else:
+                inputs, labels = data
             inputs = inputs.cuda() if use_gpu else inputs.cpu()
             labels = labels.cuda() if use_gpu else labels.cpu()
 
             outputs = self.model(Variable(inputs))
             _, predicted = torch.max(outputs.data, 1)
-            all_scores += outputs.data.numpy().tolist()
 
-            # Accumulate scores
+            # Save scores
             all_predictions += predicted.numpy().tolist()
+            all_scores += outputs.data.numpy().tolist()
             all_labels += labels.numpy().tolist()
+
+            ###### For segment mode only ##########
+            if mode == 'eval':
+                all_patchIJs += IJs.numpy().tolist()
+            ##### Segment mode End ###############
 
             _tp, _fp, _tn, _fn = mggmt.get_score(labels.numpy().squeeze().ravel(),
                                                  predicted.numpy().squeeze().ravel())
@@ -58,9 +68,12 @@ class UnetNNTrainer(NNTrainer):
             #####################################################################
 
         print()
+        all_patchIJs = np.array(all_patchIJs, dtype=np.int)
+        all_scores = np.array(all_scores)
         all_predictions = np.array(all_predictions)
         all_labels = np.array(all_labels)
-        all_scores = np.array(all_scores)
         self._save_if_better(save_best=save_best, force_checkpoint=force_checkpoint, score=f1)
 
-        return all_scores, all_predictions, all_labels
+        if mode == 'eval':
+            return all_patchIJs, all_scores, all_predictions, all_labels
+        return all_predictions, all_labels
