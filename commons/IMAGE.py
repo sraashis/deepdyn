@@ -34,11 +34,10 @@ class Image:
             print('Error Loading file: ' + self.file_name)
             print(str(e))
 
-    def load_mask(self, mask_dir=None, fget_mask=None, erode=False):
+    def load_mask(self, mask_dir=None, fget_mask=None, erode=False, channels=1):
         try:
             mask_file = fget_mask(self.file_name)
-            mask = IMG.open(os.path.join(mask_dir, mask_file))
-            mask = np.array(mask.getdata(), np.uint8).reshape(mask.size[1], mask.size[0], 1)[:, :, 0]
+            mask = imgutil.get_image_as_array(os.path.join(mask_dir, mask_file), channels)
             if erode:
                 self.mask = cv2.erode(mask, kernel=fu.get_chosen_mask_erode_kernel(), iterations=5)
         except Exception as e:
@@ -47,12 +46,10 @@ class Image:
     def apply_mask(self):
         self.working_arr = cv2.bitwise_and(self.working_arr, self.working_arr, mask=self.mask)
 
-    def load_ground_truth(self, gt_dir=None, fget_ground_truth=None):
+    def load_ground_truth(self, gt_dir=None, fget_ground_truth=None, channels=1):
         try:
             gt_file = fget_ground_truth(self.file_name)
-            truth = IMG.open(os.path.join(gt_dir, gt_file))
-            truth = np.array(truth.getdata(), np.uint8).reshape(truth.size[1], truth.size[0], 1)[:, :, 0]
-            self.ground_truth = truth
+            self.ground_truth = imgutil.get_image_as_array(os.path.join(gt_dir, gt_file), channels)
         except Exception as e:
             print('Fail to load ground truth: ' + str(e))
 
