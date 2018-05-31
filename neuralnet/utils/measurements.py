@@ -35,3 +35,50 @@ def plot_confusion_matrix(y_pred=None, y_true=None, classes=None, normalize=Fals
     plt.ylabel('True label')
     plt.xlabel('Predicted label')
     plt.show()
+
+
+def get_score(y_true, y_pred):
+    TP = 0
+    FP = 0
+    TN = 0
+    FN = 0
+
+    for i in range(len(y_pred)):
+        if y_true[i] == y_pred[i] == 1:
+            TP += 1
+        if y_pred[i] == 1 and y_true[i] != y_pred[i]:
+            FP += 1
+        if y_true[i] == y_pred[i] == 0:
+            TN += 1
+        if y_pred[i] == 0 and y_true[i] != y_pred[i]:
+            FN += 1
+
+    return TP, FP, TN, FN
+
+
+def get_prf1a(tp, fp, tn, fn):
+    p = 0.0
+    r = 0.0
+    f1 = 0.0
+    a = 0.0
+    try:
+        p = tp / (tp + fp)
+    except ZeroDivisionError:
+        p = 0
+
+    try:
+        r = tp / (tp + fn)
+    except ZeroDivisionError:
+        r = 0
+
+    try:
+        f1 = 2 * p * r / (p + r)
+    except ZeroDivisionError:
+        f1 = 0
+
+    try:
+        a = (tp + tn) / (tp + fp + fn + tn)
+    except ZeroDivisionError:
+        a = 0
+
+    return p, r, f1, a
