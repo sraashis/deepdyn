@@ -10,6 +10,7 @@ import numpy as np
 from random import shuffle
 import random
 import copy
+import cv2
 
 
 class PatchesGenerator(Dataset):
@@ -36,16 +37,19 @@ class PatchesGenerator(Dataset):
             img_obj = Image()
 
             img_obj.load_file(data_dir=Dirs['images'], file_name=img_file)
-            img_obj.working_arr = imgutil.whiten_image2d(img_obj.image_arr[:, :, 1])
+
+            clahe = cv2.createCLAHE(clipLimit=2.0, tileGridSize=(8, 8))
+            img_obj.working_arr = clahe.apply(img_obj.image_arr[:, :, 1])
+
             img_obj.load_mask(mask_dir=Dirs['mask'], fget_mask=fget_mask, erode=True)
             img_obj.load_ground_truth(gt_dir=Dirs['truth'], fget_ground_truth=fget_truth)
 
             self._initialize_keys(img_obj=img_obj, pixel_offset=pixel_offset, ID=str(ID), mode=mode)
 
-            if mode == 'train' and random.random() <= 0.10:
-                img_obj1 = copy.deepcopy(img_obj)
-                img_obj1.working_arr = img_obj.ground_truth.copy()
-                self._initialize_keys_truth(img_obj=img_obj1, pixel_offset=pixel_offset, ID=str(ID) + '-reg')
+            # if mode == 'train' and random.random() <= 0.10:
+            #     img_obj1 = copy.deepcopy(img_obj)
+            #     img_obj1.working_arr = img_obj.ground_truth.copy()
+            #     self._initialize_keys_truth(img_obj=img_obj1, pixel_offset=pixel_offset, ID=str(ID) + '-reg')
 
             if mode == 'train':
                 shuffle(self.train_images)
