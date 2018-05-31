@@ -92,5 +92,7 @@ def histogram(image_arr, bins=32):
 def get_image_as_array(image_file, channels=3):
     img = IMG.open(image_file)
     arr = np.array(img.getdata(), np.uint8).reshape(img.size[1], img.size[0], channels)
+    if channels == 1:
+        arr = arr.squeeze()
     # Sometimes binary image is red as 0 and 1's instead of 255.
     return arr * 255 if np.array_equal(arr, arr.astype(bool)) else arr

@@ -9,6 +9,7 @@ from commons.IMAGE import Image
 import numpy as np
 from random import shuffle
 import random
+import copy
 
 
 class PatchesGenerator(Dataset):
@@ -18,12 +19,11 @@ class PatchesGenerator(Dataset):
 
         """
         :param Dirs: Should contain paths to directories images, mask, and truth by the same name.
-        :param :train_image_size (w, h)
         :param transform:
         :param fget_mask: mask file getter
         :param fget_truth: ground truth file getter
-        :param pixel_offset: Offset pixels to increase the train size. Should be equal to img_width while testing.
-        :param mode: Takes value 'train' or 'test'
+        :param pixel_offset: Offset pixels to increase the train size. Should be equal to the img_width while testing.
+        :param mode: Takes value 'train' or 'eval'
         """
 
         self.transform = transform
@@ -37,22 +37,24 @@ class PatchesGenerator(Dataset):
 
             img_obj.load_file(data_dir=Dirs['images'], file_name=img_file)
             img_obj.working_arr = imgutil.whiten_image2d(img_obj.image_arr[:, :, 1])
-
             img_obj.load_mask(mask_dir=Dirs['mask'], fget_mask=fget_mask, erode=True)
-            img_obj.load_ground_truth(gt_dir=Dirs['truth'], fget_ground_truth=fget_truth)
+
+            if mode == 'train':
+                img_obj.load_ground_truth(gt_dir=Dirs['truth'], fget_ground_truth=fget_truth)
 
             self._initialize_keys(img_obj=img_obj, pixel_offset=pixel_offset, ID=ID)
 
             if mode == 'train' and random.random() <= 0.20:
-                img_obj.working_arr = img_obj.ground_truth.copy()
-                self._initialize_keys_truth(img_obj=img_obj, pixel_offset=pixel_offset, ID=str(ID) + '-reg')
+                img_obj1 = copy.deepcopy(img_obj)
+                img_obj1.working_arr = img_obj.ground_truth.copy()
+                self._initialize_keys_truth(img_obj=img_obj1, pixel_offset=pixel_offset, ID=str(ID) + '-reg')
 
             if mode == 'train':
                 shuffle(self.train_images)
 
         print('### ' + str(self.__len__()) + ' patches found.')
 
-    def _initialize_keys(self, img_obj=None, pixel_offset=None, ID=None):
+    def _initialize_keys(self, img_obj=None, pixel_offset=None, ID=None, mode=None):
         for i in range(0, img_obj.working_arr.shape[0], pixel_offset):
 
             row_from, row_to = i, min(i + self.patch_cols, img_obj.working_arr.shape[1])
@@ -63,22 +65,11 @@ class PatchesGenerator(Dataset):
                 row_to = img_obj.working_arr.shape[0]
 
             # only include patch that has at least one pixel in first row that is inside the mask.
-            if 255 in img_obj.ground_truth[row_from, :]:
+            if 255 in img_obj.ground_truth[row_from, :] or mode == 'eval':
                 self.train_images.append([ID, row_from, row_to])
-
-        # Find the average of background pixels within mask.
-        tot = 0.0
-        c = 0
-        for x in range(img_obj.working_arr.shape[0]):
-            for y in range(img_obj.working_arr.shape[1]):
-                if img_obj.mask[x, y] == 255 and img_obj.ground_truth[x, y] == 255:
-                    tot += img_obj.working_arr[x, y]
-                    c += 1
-
-        img_obj.working_arr[img_obj.mask == 0] = math.ceil(tot / c)
         self.images[ID] = img_obj
 
-    def _initialize_keys_truth(self, img_obj=None, pixel_offset=None, ID=None):
+    def _initialize_keys_truth(self, img_obj=None, pixel_offset=None, ID=None, mode=None):
         for i in range(0, img_obj.working_arr.shape[0], pixel_offset):
 
             row_from, row_to = i, min(i + self.patch_cols, img_obj.working_arr.shape[1])
@@ -89,9 +80,8 @@ class PatchesGenerator(Dataset):
                 row_to = img_obj.working_arr.shape[0]
 
             # only include patch that has at least one pixel in first row that is inside the mask.
-            if 255 in img_obj.ground_truth[row_from, :]:
+            if 255 in img_obj.ground_truth[row_from, :] or mode == 'eval':
                 self.train_images.append([ID, row_from, row_to])
-
         self.images[ID] = img_obj
 
     def __getitem__(self, index):
