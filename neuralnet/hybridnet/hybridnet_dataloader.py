@@ -14,7 +14,7 @@ import copy
 
 class PatchesGenerator(Dataset):
     def __init__(self, Dirs=None, transform=None,
-                 fget_mask=None, fget_truth=None, patch_rows=None, pixel_offset=5,
+                 fget_mask=None, fget_truth=None, train_image_size=None, pixel_offset=5,
                  mode=None):
 
         """
@@ -27,7 +27,7 @@ class PatchesGenerator(Dataset):
         """
 
         self.transform = transform
-        self.patch_cols = patch_rows
+        self.num_rows, self.num_cols = train_image_size
         self.train_images = []
         self.file_names = os.listdir(Dirs['images'])
         self.images = {}
@@ -42,7 +42,7 @@ class PatchesGenerator(Dataset):
             if mode == 'train':
                 img_obj.load_ground_truth(gt_dir=Dirs['truth'], fget_ground_truth=fget_truth)
 
-            self._initialize_keys(img_obj=img_obj, pixel_offset=pixel_offset, ID=ID)
+            self._initialize_keys(img_obj=img_obj, pixel_offset=pixel_offset, ID=str(ID))
 
             if mode == 'train' and random.random() <= 0.20:
                 img_obj1 = copy.deepcopy(img_obj)
@@ -57,11 +57,11 @@ class PatchesGenerator(Dataset):
     def _initialize_keys(self, img_obj=None, pixel_offset=None, ID=None, mode=None):
         for i in range(0, img_obj.working_arr.shape[0], pixel_offset):
 
-            row_from, row_to = i, min(i + self.patch_cols, img_obj.working_arr.shape[1])
+            row_from, row_to = i, min(i + self.num_rows, img_obj.working_arr.shape[0])
 
             # Last patch could be of different size. So we adjust it to make consistent input size.
-            if abs(row_from - row_to) != self.patch_cols:
-                row_from = img_obj.working_arr.shape[0] - self.patch_cols
+            if abs(row_from - row_to) != self.num_rows:
+                row_from = img_obj.working_arr.shape[0] - self.num_rows
                 row_to = img_obj.working_arr.shape[0]
 
             # only include patch that has at least one pixel in first row that is inside the mask.
@@ -72,11 +72,11 @@ class PatchesGenerator(Dataset):
     def _initialize_keys_truth(self, img_obj=None, pixel_offset=None, ID=None, mode=None):
         for i in range(0, img_obj.working_arr.shape[0], pixel_offset):
 
-            row_from, row_to = i, min(i + self.patch_cols, img_obj.working_arr.shape[1])
+            row_from, row_to = i, min(i + self.num_rows, img_obj.working_arr.shape[0])
 
             # Last patch could be of different size. So we adjust it to make consistent input size.
-            if abs(row_from - row_to) != self.patch_cols:
-                row_from = img_obj.working_arr.shape[0] - self.patch_cols
+            if abs(row_from - row_to) != self.num_rows:
+                row_from = img_obj.working_arr.shape[0] - self.num_rows
                 row_to = img_obj.working_arr.shape[0]
 
             # only include patch that has at least one pixel in first row that is inside the mask.
