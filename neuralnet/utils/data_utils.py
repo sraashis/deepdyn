@@ -4,6 +4,7 @@ import PIL.Image as IMG
 from commons.IMAGE import Image
 
 
+# Flip data 4-ways and then crop to fixed 564 * 564
 def get_class_weights(y):
     """
     :param y: labels
@@ -15,22 +16,7 @@ def get_class_weights(y):
     return {cls: round(majority / count) for cls, count in counter.items()}
 
 
-def flip_4ways():
-    os.chdir('/home/ak/PycharmProjects/ature')
-    sep = os.sep
-    Dirs = {}
-    Dirs['checkpoint'] = 'assests' + sep + 'nnet_models'
-    Dirs['data'] = 'data' + sep + 'DRIVE' + sep + 'training'
-    Dirs['images'] = Dirs['data'] + sep + 'images'
-    Dirs['mask'] = Dirs['data'] + sep + 'mask'
-    Dirs['truth'] = Dirs['data'] + sep + '1st_manual'
-
-    def get_mask_file(file_name):
-        return file_name.split('_')[0] + '_training_mask.gif'
-
-    def get_ground_truth_file(file_name):
-        return file_name.split('_')[0] + '_manual1.gif'
-
+def flip_4ways(Dirs, get_mask_file, get_ground_truth_file):
     file_names = os.listdir(Dirs['images']).copy()
     for ID, img_file in enumerate(file_names):
         img_obj = Image()
@@ -69,6 +55,47 @@ def flip_4ways():
         IMG.fromarray(img_obj.ground_truth).save(Dirs['truth'] + sep + 'c' + get_ground_truth_file(img_obj.file_name))
         IMG.fromarray(img_obj.mask).save(Dirs['mask'] + sep + 'c' + get_mask_file(img_obj.file_name))
 
+        print('Done ' + img_obj.file_name)
+
+
+def resize_DRIVE_564by564(Dirs, get_mask_file, get_ground_truth_file):
+    file_names = os.listdir(Dirs['images']).copy()
+    for ID, img_file in enumerate(file_names):
+        img_obj = Image()
+
+        img_obj.load_file(data_dir=Dirs['images'], file_name=img_file)
+        img_obj.working_arr = img_obj.image_arr
+
+        img_obj.load_mask(mask_dir=Dirs['mask'], fget_mask=get_mask_file, erode=True)
+        img_obj.load_ground_truth(gt_dir=Dirs['truth'], fget_ground_truth=get_ground_truth_file)
+
+        IMG.fromarray(img_obj.working_arr[10:574, 1:565, :]).save(Dirs['images'] + sep + img_obj.file_name)
+        IMG.fromarray(img_obj.ground_truth[10:574, 1:565]).save(
+            Dirs['truth'] + sep + get_ground_truth_file(img_obj.file_name))
+        IMG.fromarray(img_obj.mask[10:574, 1:565]).save(Dirs['mask'] + sep + get_mask_file(img_obj.file_name))
+
+        print('Done ' + img_obj.file_name)
+
 
 if __name__ == '__main__':
-    flip_4ways()
+
+    os.chdir('/home/ak/PycharmProjects/ature')
+
+    sep = os.sep
+    Dirs = {}
+    Dirs['data'] = 'data' + sep + 'DRIVE' + sep + 'training'
+    Dirs['images'] = Dirs['data'] + sep + 'images'
+    Dirs['mask'] = Dirs['data'] + sep + 'mask'
+    Dirs['truth'] = Dirs['data'] + sep + '1st_manual'
+
+
+    def get_mask_file(file_name):
+        return file_name.split('_')[0] + '_training_mask.gif'
+
+
+    def get_ground_truth_file(file_name):
+        return file_name.split('_')[0] + '_manual1.gif'
+
+
+    flip_4ways(Dirs, get_mask_file, get_ground_truth_file)
+    resize_DRIVE_564by564(Dirs, get_mask_file, get_ground_truth_file)
