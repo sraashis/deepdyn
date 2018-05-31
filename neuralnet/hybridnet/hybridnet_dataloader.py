@@ -38,13 +38,11 @@ class PatchesGenerator(Dataset):
             img_obj.load_file(data_dir=Dirs['images'], file_name=img_file)
             img_obj.working_arr = imgutil.whiten_image2d(img_obj.image_arr[:, :, 1])
             img_obj.load_mask(mask_dir=Dirs['mask'], fget_mask=fget_mask, erode=True)
+            img_obj.load_ground_truth(gt_dir=Dirs['truth'], fget_ground_truth=fget_truth)
 
-            if mode == 'train':
-                img_obj.load_ground_truth(gt_dir=Dirs['truth'], fget_ground_truth=fget_truth)
+            self._initialize_keys(img_obj=img_obj, pixel_offset=pixel_offset, ID=str(ID), mode=mode)
 
-            self._initialize_keys(img_obj=img_obj, pixel_offset=pixel_offset, ID=str(ID))
-
-            if mode == 'train' and random.random() <= 0.20:
+            if mode == 'train' and random.random() <= 0.10:
                 img_obj1 = copy.deepcopy(img_obj)
                 img_obj1.working_arr = img_obj.ground_truth.copy()
                 self._initialize_keys_truth(img_obj=img_obj1, pixel_offset=pixel_offset, ID=str(ID) + '-reg')
@@ -65,7 +63,7 @@ class PatchesGenerator(Dataset):
                 row_to = img_obj.working_arr.shape[0]
 
             # only include patch that has at least one pixel in first row that is inside the mask.
-            if 255 in img_obj.ground_truth[row_from, :] or mode == 'eval':
+            if mode == 'eval' or 255 in img_obj.ground_truth[row_from, :]:
                 self.train_images.append([ID, row_from, row_to])
         self.images[ID] = img_obj
 
