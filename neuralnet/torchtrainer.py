@@ -85,11 +85,7 @@ class NNTrainer:
                 if (i + 1) % log_frequency == 0:  # Inspect the loss of every log_frequency batches
                     current_loss = running_loss / log_frequency if (i + 1) % log_frequency == 0 \
                         else (i + 1) % log_frequency
-                    p, r, f1, a = mggmt.get_prf1a(TP, FP, TN, FN)
-
                     running_loss = 0.0
-                    accumulated_labels = []
-                    accumulated_predictions = []
 
                 print('[Epochs:%d/%d Batches:%d/%d, loss:%.3f] pre:%.3f rec:%.3f f1:%.3f acc:%.3f' %
                       (epoch + 1, epochs, i + 1, dataloader.__len__(), current_loss, p, r, f1, a),
