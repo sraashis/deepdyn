@@ -1,5 +1,10 @@
-import numpy as np
+#!/home/akhanal1/Spring2018/pl-env/bin/python3.5
+# Torch imports
 import os
+import sys
+sys.path.append('/home/akhanal1/Spring2018/ature')
+os.chdir('/home/akhanal1/Spring2018/ature')
+import numpy as np
 import PIL.Image as IMG
 from commons.IMAGE import Image
 
@@ -81,7 +86,7 @@ def resize_DRIVE_572by572(Dirs, get_mask_file, get_ground_truth_file):
 
 
 if __name__ == '__main__':
-    os.chdir('/home/ak/PycharmProjects/ature')
+    os.chdir('/home/akhanal1/Spring2018/ature')
 
     sep = os.sep
     Dirs = {}
