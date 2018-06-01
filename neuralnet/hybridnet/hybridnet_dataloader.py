@@ -1,16 +1,12 @@
-import math
 import os
+from random import shuffle
 
+import cv2
+import numpy as np
 import torch
 from torch.utils.data.dataset import Dataset
 
-import utils.img_utils as imgutil
 from commons.IMAGE import Image
-import numpy as np
-from random import shuffle
-import random
-import copy
-import cv2
 
 
 class PatchesGenerator(Dataset):
@@ -37,19 +33,16 @@ class PatchesGenerator(Dataset):
             img_obj = Image()
 
             img_obj.load_file(data_dir=Dirs['images'], file_name=img_file)
+            img_obj.load_mask(mask_dir=Dirs['mask'], fget_mask=fget_mask, erode=True)
 
             clahe = cv2.createCLAHE(clipLimit=2.0, tileGridSize=(8, 8))
             img_obj.working_arr = clahe.apply(img_obj.image_arr[:, :, 1])
 
-            img_obj.load_mask(mask_dir=Dirs['mask'], fget_mask=fget_mask, erode=True)
             img_obj.load_ground_truth(gt_dir=Dirs['truth'], fget_ground_truth=fget_truth)
+            if mode == 'train':
+                img_obj.working_arr = np.bitwise_or(img_obj.working_arr.copy(), img_obj.ground_truth.copy())
 
             self._initialize_keys(img_obj=img_obj, pixel_offset=pixel_offset, ID=str(ID), mode=mode)
-
-            # if mode == 'train' and random.random() <= 0.10:
-            #     img_obj1 = copy.deepcopy(img_obj)
-            #     img_obj1.working_arr = img_obj.ground_truth.copy()
-            #     self._initialize_keys_truth(img_obj=img_obj1, pixel_offset=pixel_offset, ID=str(ID) + '-reg')
 
             if mode == 'train':
                 shuffle(self.train_images)
@@ -67,22 +60,7 @@ class PatchesGenerator(Dataset):
                 row_to = img_obj.working_arr.shape[0]
 
             # only include patch that has at least one pixel in first row that is inside the mask.
-            if mode == 'eval' or 255 in img_obj.ground_truth[row_from, :]:
-                self.train_images.append([ID, row_from, row_to])
-        self.images[ID] = img_obj
-
-    def _initialize_keys_truth(self, img_obj=None, pixel_offset=None, ID=None, mode=None):
-        for i in range(0, img_obj.working_arr.shape[0], pixel_offset):
-
-            row_from, row_to = i, min(i + self.num_rows, img_obj.working_arr.shape[0])
-
-            # Last patch could be of different size. So we adjust it to make consistent input size.
-            if abs(row_from - row_to) != self.num_rows:
-                row_from = img_obj.working_arr.shape[0] - self.num_rows
-                row_to = img_obj.working_arr.shape[0]
-
-            # only include patch that has at least one pixel in first row that is inside the mask.
-            if 255 in img_obj.ground_truth[row_from, :] or mode == 'eval':
+            if mode == 'eval' or 255 in img_obj.mask[row_from, :]:
                 self.train_images.append([ID, row_from, row_to])
         self.images[ID] = img_obj
 
