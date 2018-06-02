@@ -27,7 +27,7 @@ class UNetNNTrainer(NNTrainer):
         mode = dataloader.dataset.mode
         for i, data in enumerate(dataloader, 0):
             if mode == 'eval':
-                IDs, IJs, inputs, labels = data
+                inputs, labels = data
             else:
                 inputs, labels = data
             inputs = inputs.cuda() if use_gpu else inputs.cpu()
@@ -42,8 +42,8 @@ class UNetNNTrainer(NNTrainer):
             all_labels += labels.numpy().tolist()
 
             ###### For segment mode only ##########
-            if mode == 'eval':
-                all_patchIJs += IJs.numpy().tolist()
+            # if mode == 'eval':
+            #     all_patchIJs += IJs.numpy().tolist()
             ##### Segment mode End ###############
 
             _tp, _fp, _tn, _fn = mggmt.get_score(labels.numpy().squeeze().ravel(),

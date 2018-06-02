@@ -53,7 +53,7 @@ class PatchesGenerator(Dataset):
         img_tensor = self.images[index].working_arr[..., None].copy()
         y = self.images[index].ground_truth.copy()
         y[y == 255] = 1
-        y = torch.LongTensor(y)
+        y = torch.LongTensor(y[92:480, 92:480])
         if self.transform is not None:
             img_tensor = self.transform(img_tensor)
 
