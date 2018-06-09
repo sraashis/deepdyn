@@ -5,79 +5,73 @@ from torch import nn
 from neuralnet.utils.weights_utils import initialize_weights
 
 
-# https://github.com/ZijunDeng/pytorch-semantic-segmentation
-
-
-class _EncoderBlock(nn.Module):
-    def __init__(self, in_channels, out_channels, dropout=False):
-        super(_EncoderBlock, self).__init__()
+class _DoubleConvolution(nn.Module):
+    def __init__(self, in_channels, middle_channel, out_channels):
+        super(_DoubleConvolution, self).__init__()
         layers = [
-            nn.Conv2d(in_channels, out_channels, kernel_size=3),
-            nn.BatchNorm2d(out_channels),
+            nn.Conv2d(in_channels, middle_channel, kernel_size=3),
+            nn.BatchNorm2d(middle_channel),
             nn.ReLU(inplace=True),
-            nn.Conv2d(out_channels, out_channels, kernel_size=3),
+            nn.Conv2d(middle_channel, out_channels, kernel_size=3),
             nn.BatchNorm2d(out_channels),
             nn.ReLU(inplace=True),
         ]
-        if dropout:
-            layers.append(nn.Dropout())
-        layers.append(nn.MaxPool2d(kernel_size=2, stride=2))
         self.encode = nn.Sequential(*layers)
 
     def forward(self, x):
         return self.encode(x)
 
 
-class _DecoderBlock(nn.Module):
-    def __init__(self, in_channels, middle_channels, out_channels):
-        super(_DecoderBlock, self).__init__()
-        self.decode = nn.Sequential(
-            nn.Conv2d(in_channels, middle_channels, kernel_size=3),
-            nn.BatchNorm2d(middle_channels),
-            nn.ReLU(inplace=True),
-            nn.Conv2d(middle_channels, middle_channels, kernel_size=3),
-            nn.BatchNorm2d(middle_channels),
-            nn.ReLU(inplace=True),
-            nn.ConvTranspose2d(middle_channels, out_channels, kernel_size=2, stride=2),
-        )
-
-    def forward(self, x):
-        return self.decode(x)
-
-
 class UNet(nn.Module):
     def __init__(self, num_channels, num_classes):
         super(UNet, self).__init__()
-        self.enc1 = _EncoderBlock(num_channels, 64)
-        self.enc2 = _EncoderBlock(64, 128)
-        self.enc3 = _EncoderBlock(128, 256)
-        self.enc4 = _EncoderBlock(256, 512, dropout=True)
-        self.center = _DecoderBlock(512, 1024, 512)
-        self.dec4 = _DecoderBlock(1024, 512, 256)
-        self.dec3 = _DecoderBlock(512, 256, 128)
-        self.dec2 = _DecoderBlock(256, 128, 64)
-        self.dec1 = nn.Sequential(
-            nn.Conv2d(128, 64, kernel_size=3),
-            nn.BatchNorm2d(64),
-            nn.ReLU(inplace=True),
-            nn.Conv2d(64, 64, kernel_size=3),
-            nn.BatchNorm2d(64),
-            nn.ReLU(inplace=True),
-        )
-        self.final = nn.Conv2d(64, num_classes, kernel_size=1)
+        self.enc1 = _DoubleConvolution(num_channels, 4, 4)
+        self.enc2 = _DoubleConvolution(4, 8, 8)
+        self.enc3 = _DoubleConvolution(8, 16, 16)
+        self.enc4 = _DoubleConvolution(16, 32, 32)
+
+        self.dec4 = _DoubleConvolution(32, 64, 64)
+        self.dec4_up = nn.ConvTranspose2d(64, 32, kernel_size=2, stride=2)
+
+        self.dec3 = _DoubleConvolution(64, 32, 32)
+        self.dec3_up = nn.ConvTranspose2d(32, 16, kernel_size=2, stride=2)
+
+        self.dec2 = _DoubleConvolution(32, 16, 16)
+        self.dec2_up = nn.ConvTranspose2d(16, 8, kernel_size=2, stride=2)
+
+        self.dec1 = _DoubleConvolution(16, 8, 8)
+        self.dec1_up = nn.ConvTranspose2d(8, 4, kernel_size=2, stride=2)
+
+        self.out = _DoubleConvolution(8, 4, 4)
+        self.final = nn.Conv2d(4, num_classes, kernel_size=1)
+
         initialize_weights(self)
 
     def forward(self, x):
-        enc1 = self.enc1(x)
-        enc2 = self.enc2(enc1)
-        enc3 = self.enc3(enc2)
-        enc4 = self.enc4(enc3)
-        center = self.center(enc4)
-        dec4 = self.dec4(
-            torch.cat([center, F.upsample(enc4, center.size()[2:], mode='bilinear', align_corners=True)], 1))
-        dec3 = self.dec3(torch.cat([dec4, F.upsample(enc3, dec4.size()[2:], mode='bilinear', align_corners=True)], 1))
-        dec2 = self.dec2(torch.cat([dec3, F.upsample(enc2, dec3.size()[2:], mode='bilinear', align_corners=True)], 1))
-        dec1 = self.dec1(torch.cat([dec2, F.upsample(enc1, dec2.size()[2:], mode='bilinear', align_corners=True)], 1))
-        final = self.final(dec1)
-        final = F.upsample(final, x.size()[2:], mode='bilinear', align_corners=True)
+        enc1_ = self.enc1(x)
+        enc1 = F.max_pool2d(enc1_, kernel_size=2, stride=2)
+
+        enc2_ = self.enc2(enc1)
+        enc2 = F.max_pool2d(enc2_, kernel_size=2, stride=2)
+
+        enc3_ = self.enc3(enc2)
+        enc3 = F.max_pool2d(enc3_, kernel_size=2, stride=2)
+
+        enc4_ = self.enc4(enc3)
+        enc4 = F.max_pool2d(enc4_, kernel_size=2, stride=2)
+
+        dec4 = self.dec4(enc4)
+
+        dec3 = self.dec3(UNet.match_and_concat(enc4_, self.dec4_up(dec4)))
+        dec2 = self.dec2(UNet.match_and_concat(enc3_, self.dec3_up(dec3)))
+        dec1 = self.dec1(UNet.match_and_concat(enc2_, self.dec2_up(dec2)))
+        out = self.out(UNet.match_and_concat(enc1_, self.dec1_up(dec1)))
+        final = self.final(out)
         return F.log_softmax(final, dim=1)
+
+    @staticmethod
+    def match_and_concat(bypass, upsampled, crop=True):
+        if crop:
+            c = (bypass.size()[2] - upsampled.size()[2]) // 2
+            bypass = F.pad(bypass, (-c, -c, -c, -c))
+        return torch.cat((upsampled, bypass), 1)

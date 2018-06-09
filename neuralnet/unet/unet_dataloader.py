@@ -1,21 +1,16 @@
-import math
 import os
+import random
 
-import torch
+import cv2
+import numpy as np
 from torch.utils.data.dataset import Dataset
 
-import utils.img_utils as imgutil
 from commons.IMAGE import Image
-import numpy as np
-from random import shuffle
-import random
-import copy
-import cv2
 
 
 class PatchesGenerator(Dataset):
     def __init__(self, Dirs=None, transform=None,
-                 fget_mask=None, fget_truth=None, train_image_size=None, pixel_offset=5,
+                 fget_mask=None, fget_truth=None, train_image_size=None,
                  mode=None):
 
         """
@@ -31,6 +26,7 @@ class PatchesGenerator(Dataset):
         self.num_rows, self.num_cols = train_image_size
         self.file_names = os.listdir(Dirs['images'])
         self.images = []
+        self.labels = []
         self.mode = mode
         for ID, img_file in enumerate(self.file_names):
             img_obj = Image()
@@ -44,21 +40,35 @@ class PatchesGenerator(Dataset):
             img_obj.load_ground_truth(gt_dir=Dirs['truth'], fget_ground_truth=fget_truth)
 
             if mode == 'train':
-                shuffle(self.images)
-            self.images.append( img_obj)
+                x = np.logical_and(img_obj.ground_truth != 255, img_obj.mask == 255)
+                img_obj.working_arr[img_obj.mask == 0] = img_obj.working_arr[x].mean()
+
+            self.images.append(img_obj.working_arr[0:388, 0:388])
+            self.images.append(img_obj.working_arr[0:388, 176:564])
+            self.images.append(img_obj.working_arr[176:564, 0:388])
+            self.images.append(img_obj.working_arr[176:564, 176:564])
+
+            self.labels.append(img_obj.ground_truth[0:388, 0:388])
+            self.labels.append(img_obj.ground_truth[0:388, 176:564])
+            self.labels.append(img_obj.ground_truth[176:564, 0:388])
+            self.labels.append(img_obj.ground_truth[176:564, 176:564])
+
+            if mode == 'train':
+                combined = list(zip(self.images, self.labels))
+                random.shuffle(combined)
+                self.images[:], self.labels[:] = zip(*combined)
 
         print('### ' + str(self.__len__()) + ' patches found.')
 
     def __getitem__(self, index):
-        img_tensor = self.images[index].working_arr[..., None].copy()
-        y = self.images[index].ground_truth.copy()
+        img_tensor = np.pad(self.images[index], [92], 'reflect')
+        y = self.labels[index]
+
+        img_tensor = img_tensor[..., None]
         y[y == 255] = 1
-        y = torch.LongTensor(y)
+
         if self.transform is not None:
             img_tensor = self.transform(img_tensor)
-
-        if self.mode == 'eval':
-            return img_tensor, y
 
         return img_tensor, y
 

@@ -72,7 +72,6 @@ class NNTrainer:
                         tag = tag.replace('.', '/')
                         self.logger.histo_summary(tag, value.data.cpu().numpy(), step)
                         self.logger.histo_summary(tag + '/gradients', value.grad.data.cpu().numpy(), step)
-
                     images_to_tb = inputs.view(-1, dataloader.dataset.num_rows, dataloader.dataset.num_cols)[
                                    :5].data.cpu().numpy()
                     target_to_tb = labels.view(-1, dataloader.dataset.num_rows, dataloader.dataset.num_cols)[

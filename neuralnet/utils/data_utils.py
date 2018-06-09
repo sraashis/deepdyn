@@ -2,8 +2,9 @@
 # Torch imports
 import os
 import sys
-sys.path.append('/home/akhanal1/Spring2018/ature')
-os.chdir('/home/akhanal1/Spring2018/ature')
+
+sys.path.append('/home/ak/PycharmProjects/ature')
+os.chdir('/home/ak/PycharmProjects/ature')
 import numpy as np
 import PIL.Image as IMG
 from commons.IMAGE import Image
@@ -63,38 +64,36 @@ def flip_4ways(Dirs, get_mask_file, get_ground_truth_file):
         print('Done ' + img_obj.file_name)
 
 
-def resize_DRIVE_572by572(Dirs, get_mask_file, get_ground_truth_file):
+def resize_DRIVE_564X564(Dirs, get_mask_file, get_ground_truth_file):
     file_names = os.listdir(Dirs['images']).copy()
     for ID, img_file in enumerate(file_names):
         img_obj = Image()
 
         img_obj.load_file(data_dir=Dirs['images'], file_name=img_file)
         img_obj.working_arr = img_obj.image_arr
-
         img_obj.load_mask(mask_dir=Dirs['mask'], fget_mask=get_mask_file, erode=True)
+        img_obj.load_ground_truth(gt_dir=Dirs['truth'], fget_ground_truth=get_ground_truth_file)
+
+        IMG.fromarray(img_obj.working_arr[10:574, 1:565, :]).save(Dirs['images'] + sep + img_obj.file_name)
+        IMG.fromarray(img_obj.ground_truth[10:574, 1:565]).save(Dirs['truth'] + sep + get_ground_truth_file(img_obj.file_name))
+        IMG.fromarray(img_obj.mask[10:574, 1:565]).save(Dirs['mask'] + sep + get_mask_file(img_obj.file_name))
+
         img_obj.load_ground_truth(gt_dir=Dirs['truth'], fget_ground_truth=get_ground_truth_file)
         img_obj.working_arr = np.pad(img_obj.working_arr, [(0, 0), (4, 3), (0, 0)], 'constant')
         img_obj.ground_truth = np.pad(img_obj.ground_truth, [(0, 0), (4, 3)], 'constant')
         img_obj.mask = np.pad(img_obj.mask, [(0, 0), (4, 3)], 'constant')
 
-        IMG.fromarray(img_obj.working_arr[7:579, :, :]).save(Dirs['images'] + sep + img_obj.file_name)
-        IMG.fromarray(img_obj.ground_truth[7:579, :]).save(
-            Dirs['truth'] + sep + get_ground_truth_file(img_obj.file_name))
-        IMG.fromarray(img_obj.mask[7:579, :]).save(Dirs['mask'] + sep + get_mask_file(img_obj.file_name))
-
         print('Done ' + img_obj.file_name)
 
 
 if __name__ == '__main__':
-    os.chdir('/home/akhanal1/Spring2018/ature')
-
+    os.chdir('//home/ak/PycharmProjects/ature')
     sep = os.sep
-    Dirs = {}
-    Dirs['data'] = 'data' + sep + 'DRIVE' + sep + 'training'
-    Dirs['images'] = Dirs['data'] + sep + 'images'
-    Dirs['mask'] = Dirs['data'] + sep + 'mask'
-    Dirs['truth'] = Dirs['data'] + sep + '1st_manual'
-
+    TestDirs = {}
+    TestDirs['data'] = 'data' + sep + 'DRIVE' + sep + 'test'
+    TestDirs['images'] = TestDirs['data'] + sep + 'images'
+    TestDirs['mask'] = TestDirs['data'] + sep + 'mask'
+    TestDirs['truth'] = TestDirs['data'] + sep + '1st_manual'
 
     def get_mask_file(file_name):
         return file_name.split('_')[0] + '_training_mask.gif'
@@ -104,5 +103,9 @@ if __name__ == '__main__':
         return file_name.split('_')[0] + '_manual1.gif'
 
 
-    flip_4ways(Dirs, get_mask_file, get_ground_truth_file)
-    resize_DRIVE_572by572(Dirs, get_mask_file, get_ground_truth_file)
+    def get_mask_file_test(file_name):
+        return file_name.split('_')[0] + '_test_mask.gif'
+
+
+    flip_4ways(TestDirs, get_mask_file_test, get_ground_truth_file)
+    resize_DRIVE_564X564(TestDirs, get_mask_file_test, get_ground_truth_file)
