@@ -78,6 +78,11 @@ def resize_DRIVE_564X564(Dirs, get_mask_file, get_ground_truth_file):
         IMG.fromarray(img_obj.ground_truth[10:574, 1:565]).save(Dirs['truth'] + sep + get_ground_truth_file(img_obj.file_name))
         IMG.fromarray(img_obj.mask[10:574, 1:565]).save(Dirs['mask'] + sep + get_mask_file(img_obj.file_name))
 
+        img_obj.load_ground_truth(gt_dir=Dirs['truth'], fget_ground_truth=get_ground_truth_file)
+        img_obj.working_arr = np.pad(img_obj.working_arr, [(0, 0), (4, 3), (0, 0)], 'constant')
+        img_obj.ground_truth = np.pad(img_obj.ground_truth, [(0, 0), (4, 3)], 'constant')
+        img_obj.mask = np.pad(img_obj.mask, [(0, 0), (4, 3)], 'constant')
+
         print('Done ' + img_obj.file_name)
 
 
