@@ -4,6 +4,7 @@ import random
 import cv2
 import numpy as np
 from torch.utils.data.dataset import Dataset
+import torch
 
 from commons.IMAGE import Image
 
@@ -39,9 +40,8 @@ class PatchesGenerator(Dataset):
             img_obj.load_mask(mask_dir=Dirs['mask'], fget_mask=fget_mask, erode=True)
             img_obj.load_ground_truth(gt_dir=Dirs['truth'], fget_ground_truth=fget_truth)
 
-            if mode == 'train':
-                x = np.logical_and(img_obj.ground_truth != 255, img_obj.mask == 255)
-                img_obj.working_arr[img_obj.mask == 0] = img_obj.working_arr[x].mean()
+            x = np.logical_and(True, img_obj.mask == 255)
+            img_obj.working_arr[img_obj.mask == 0] = img_obj.working_arr[x].mean()
 
             self.images.append(img_obj.working_arr[0:388, 0:388])
             self.images.append(img_obj.working_arr[0:388, 176:564])
@@ -70,7 +70,7 @@ class PatchesGenerator(Dataset):
         if self.transform is not None:
             img_tensor = self.transform(img_tensor)
 
-        return img_tensor, y
+        return img_tensor, torch.LongTensor(y)
 
     def __len__(self):
         return len(self.images)
