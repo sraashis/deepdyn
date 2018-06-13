@@ -24,8 +24,8 @@ class PatchesGenerator(Dataset):
         """
 
         self.transform = transform
-        self.images = []
-        self.labels = []
+        self.patches_indexes = []
+        self.images = {}
         self.mode = mode
         self.patch_rows, self.patch_cols = train_image_size
         self.file_names = os.listdir(Dirs['images']) if Dirs is not None else []
@@ -38,18 +38,20 @@ class PatchesGenerator(Dataset):
             img_obj.load_mask(mask_dir=Dirs['mask'], fget_mask=fget_mask, erode=True)
             img_obj.load_ground_truth(gt_dir=Dirs['truth'], fget_ground_truth=fget_truth)
 
-            self.load_patches(img_obj)
+            self.load_patches(ID, img_obj)
 
             if mode == 'train':
-                combined = list(zip(self.images, self.labels))
-                random.shuffle(combined)
-                self.images[:], self.labels[:] = zip(*combined)
+                random.shuffle(self.patches_indexes)
+            self.images[ID] = img_obj
 
         print('### ' + str(self.__len__()) + ' patches found.')
 
     def __getitem__(self, index):
-        img_tensor = np.pad(self.images[index], [92], 'reflect')
-        y = self.labels[index]
+
+        ID, row_from, row_to, col_from, col_to = self.patches_indexes[index]
+        img_tensor = self.images[ID].working_arr[row_from:row_to, col_from:col_to]
+        img_tensor = np.pad(img_tensor, [92], 'reflect')
+        y = self.images[ID].ground_truth[row_from:row_to, col_from:col_to]
 
         img_tensor = img_tensor[..., None]
         y[y == 255] = 1
@@ -60,9 +62,9 @@ class PatchesGenerator(Dataset):
         return img_tensor, torch.LongTensor(y)
 
     def __len__(self):
-        return len(self.images)
+        return len(self.patches_indexes)
 
-    def load_patches(self, img_obj):
+    def load_patches(self, ID, img_obj):
 
         # Contrast equalization
         clahe = cv2.createCLAHE(clipLimit=2.0, tileGridSize=(8, 8))
@@ -89,13 +91,12 @@ class PatchesGenerator(Dataset):
                     col_to = img_cols
                     col_from = img_cols - self.patch_cols
                 cols_offset = unet_utils.equalize_offset(img_cols, self.patch_cols)
-
-                self.images.append(img_obj.working_arr[row_from:row_to, col_from:col_to])
-                self.labels.append(img_obj.ground_truth[row_from:row_to, col_from:col_to])
+                self.patches_indexes.append([ID, row_from, row_to, col_from, col_to])
 
 
 class PatchesGeneratorPerImgObj(PatchesGenerator):
     def __init__(self, img_obj=None, train_image_size=(388, 388), transform=None, mode='eval'):
         super().__init__(transform=transform, train_image_size=train_image_size, mode=mode)
-        self.load_patches(img_obj)
+        self.images[0] = img_obj
+        self.load_patches(0, img_obj)
         print('### ' + str(self.__len__()) + ' patches found.')
