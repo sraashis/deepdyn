@@ -6,8 +6,8 @@ import numpy as np
 import torch
 from torch.utils.data.dataset import Dataset
 
-from commons.IMAGE import Image
 import neuralnet.unet.utils as unet_utils
+from commons.IMAGE import Image
 
 
 class PatchesGenerator(Dataset):
@@ -73,7 +73,6 @@ class PatchesGenerator(Dataset):
         img_obj.working_arr[img_obj.mask == 0] = img_obj.working_arr[x].mean()
         img_rows, img_cols = img_obj.working_arr.shape
         rows_offset = 0
-        index = 1
         for i in range(0, img_rows, self.patch_rows):
             row_from = i - rows_offset
             row_to = i - rows_offset + self.patch_rows
@@ -100,5 +99,3 @@ class PatchesGeneratorPerImgObj(PatchesGenerator):
         super().__init__(transform=transform, train_image_size=train_image_size, mode=mode)
         self.load_patches(img_obj)
         print('### ' + str(self.__len__()) + ' patches found.')
-
-
