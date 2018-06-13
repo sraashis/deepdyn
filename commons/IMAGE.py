@@ -117,24 +117,8 @@ class MatSegmentedImage(SegmentedImage):
     def __init__(self):
         super().__init__()
 
-    def load_file(self, data_dir, file_name):
+    def load_file(self, data_dir, file_name, num_channels=3):
         self.data_dir = data_dir
         self.file_name = file_name
         file = Mat(mat_file=os.path.join(self.data_dir, self.file_name))
         self.image_arr = file.get_image('I2')
-
-
-class HighResolutionFundusImage(SegmentedImage):
-    def __init__(self):
-        super().__init__()
-
-    def load_mask(self, mask_dir=None, fget_mask=None, erode=False):
-        try:
-            mask_file = fget_mask(self.file_name)
-            mask = IMG.open(os.path.join(mask_dir, mask_file))
-            mask = np.array(mask.getdata(), np.uint8).reshape(mask.size[1], mask.size[0], 3)[:, :, 0]
-            if erode:
-                print('Mask loaded: ' + mask_file)
-                self.mask = cv2.erode(mask, kernel=fu.get_chosen_mask_erode_kernel(), iterations=5)
-        except Exception as e:
-            print('Fail to load mask: ' + str(e))

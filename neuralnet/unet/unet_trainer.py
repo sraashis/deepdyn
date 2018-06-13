@@ -1,8 +1,8 @@
 import numpy as np
 import torch
 from torch.autograd import Variable
-import neuralnet.utils.measurements as mggmt
 
+import neuralnet.utils.measurements as mggmt
 from neuralnet.torchtrainer import NNTrainer
 
 
@@ -21,18 +21,13 @@ class UNetNNTrainer(NNTrainer):
         all_predictions = []
         all_scores = []
         all_labels = []
-        all_patchIJs = []
 
         ##### Segment Mode only to use while testing####
         mode = dataloader.dataset.mode
         for i, data in enumerate(dataloader, 0):
-            if mode == 'eval':
-                inputs, labels = data
-            else:
-                inputs, labels = data
+            inputs, labels = data
             inputs = inputs.cuda() if use_gpu else inputs.cpu()
             labels = labels.cuda() if use_gpu else labels.cpu()
-
             outputs = self.model(Variable(inputs))
             _, predicted = torch.max(outputs.data, 1)
 
@@ -68,12 +63,11 @@ class UNetNNTrainer(NNTrainer):
             #####################################################################
 
         print()
-        all_patchIJs = np.array(all_patchIJs, dtype=np.int)
         all_scores = np.array(all_scores)
         all_predictions = np.array(all_predictions)
         all_labels = np.array(all_labels)
         self._save_if_better(save_best=save_best, force_checkpoint=force_checkpoint, score=f1)
 
         if mode == 'eval':
-            return all_patchIJs, all_scores, all_predictions, all_labels
+            return all_scores, all_predictions, all_labels
         return all_predictions, all_labels
