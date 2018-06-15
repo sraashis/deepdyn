@@ -35,7 +35,8 @@ class PatchesGenerator(Dataset):
 
             img_obj.load_file(data_dir=Dirs['images'], file_name=img_file)
 
-            img_obj.load_mask(mask_dir=Dirs['mask'], fget_mask=fget_mask, erode=True)
+            img_obj.load_mask(mask_dir=Dirs['mask'], fget_mask=fget_mask, erode=True, channels=3)
+            img_obj.mask = img_obj.mask[:, :, 0]
             img_obj.load_ground_truth(gt_dir=Dirs['truth'], fget_ground_truth=fget_truth)
 
             # Contrast equalization
