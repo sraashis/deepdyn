@@ -29,13 +29,10 @@ class PatchesGenerator(Dataset):
         self.mode = mode
         self.patch_rows, self.patch_cols = train_image_size
         self.file_names = os.listdir(Dirs['images']) if Dirs is not None else []
-
         for ID, img_file in enumerate(self.file_names):
             img_obj = Image()
 
             img_obj.load_file(data_dir=Dirs['images'], file_name=img_file)
-
-            img_obj.load_mask(mask_dir=Dirs['mask'], fget_mask=fget_mask, erode=True)
             img_obj.load_ground_truth(gt_dir=Dirs['truth'], fget_ground_truth=fget_truth)
 
             # Contrast equalization
@@ -54,9 +51,9 @@ class PatchesGenerator(Dataset):
     def __getitem__(self, index):
 
         ID, row_from, row_to, col_from, col_to = self.patches_indexes[index]
-        img_tensor = self.images[ID].working_arr[row_from:row_to, col_from:col_to]
+        img_tensor = self.images[ID].working_arr[row_from:row_to, col_from:col_to].copy()
         img_tensor = np.pad(img_tensor, [92], 'reflect')
-        y = self.images[ID].ground_truth[row_from:row_to, col_from:col_to]
+        y = self.images[ID].ground_truth[row_from:row_to, col_from:col_to].copy()
 
         img_tensor = img_tensor[..., None]
         y[y == 255] = 1
