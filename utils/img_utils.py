@@ -96,3 +96,13 @@ def get_image_as_array(image_file, channels=3):
         arr = arr.squeeze()
     # Sometimes binary image is red as 0 and 1's instead of 255.
     return arr * 255 if np.array_equal(arr, arr.astype(bool)) else arr
+
+
+def get_chunk_indexes(img_shape, chunk_shape):
+    img_rows, img_cols = img_shape
+    chunk_row, chunk_col = chunk_shape
+    for i in range(0, img_rows, chunk_row):
+        row_from, row_to = min(i, img_rows - chunk_row), min(i + chunk_row, img_rows)
+        for j in range(0, img_cols, chunk_col):
+            col_from, col_to = min(j, img_cols - chunk_col), min(j + chunk_col, img_cols)
+            yield [row_from, row_to, col_from, col_to]
