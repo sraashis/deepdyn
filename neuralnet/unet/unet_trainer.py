@@ -13,9 +13,8 @@ class UNetNNTrainer(NNTrainer):
 
     def evaluate(self, dataloader=None, use_gpu=False, force_checkpoint=False, save_best=False):
 
-        self.model.eval()
         self.model.cuda() if use_gpu else self.model.cpu()
-
+        self.model.eval()
         print('\nEvaluating...')
         TP, FP, TN, FN = [0] * 4
         all_predictions = []
@@ -29,7 +28,7 @@ class UNetNNTrainer(NNTrainer):
             inputs = inputs.cuda() if use_gpu else inputs.cpu()
             labels = labels.cuda() if use_gpu else labels.cpu()
 
-            outputs = self.model(Variable(inputs, volatile=True))
+            outputs = self.model(Variable(inputs))
             _, predicted = torch.max(outputs.data, 1)
 
             # Accumulate scores
