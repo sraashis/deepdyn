@@ -76,7 +76,7 @@ class NNTrainer:
                         else (i + 1) % log_frequency
                     running_loss = 0.0
 
-                self._log(','.join(str(x) for x in [0, epoch + 1, i + 1, p, r, a, f1]))
+                self._log(','.join(str(x) for x in [0, epoch + 1, i + 1, p, r, f1, a]))
                 print('Epochs[%d/%d] Batch[%d/%d] loss:%.3f pre:%.3f rec:%.3f f1:%.3f acc:%.3f' %
                       (epoch + 1, epochs, i + 1, dataloader.__len__(), current_loss, p, r, f1, a),
                       end='\r' if running_loss > 0 else '\n')
@@ -115,7 +115,7 @@ class NNTrainer:
             FN += _fn
             p, r, f1, a = mggmt.get_prf1a(TP, FP, TN, FN)
 
-            self._log(','.join(str(x) for x in [1, 0, i + 1, p, r, a, f1]))
+            self._log(','.join(str(x) for x in [1, 0, i + 1, p, r, f1, a]))
             print('Evaluating Batch[%d/%d] pre:%.3f rec:%.3f f1:%.3f acc:%.3f' % (
                 i + 1, dataloader.__len__(), p, r, f1, a),
                   end='\r')
