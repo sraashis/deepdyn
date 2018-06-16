@@ -48,8 +48,8 @@ class NNTrainer:
                 loss.backward()
                 optimizer.step()
 
-                running_loss += loss.item()
-                current_loss = loss.item()
+                running_loss += loss.data[0]
+                current_loss = loss.data[0]
 
                 _, predicted = torch.max(outputs, 1)
 
