@@ -81,6 +81,7 @@ transform = transforms.Compose([
     transforms.ToTensor()
 ])
 
+"""
 # ### Load train data
 trainset = PatchesGenerator(Dirs=Dirs, train_image_size=(patch_rows, patch_cols),
                             transform=transform,
@@ -103,6 +104,7 @@ validationloader = torch.utils.data.DataLoader(validation_set, batch_size=batch_
                                                shuffle=False, num_workers=3,
                                                sampler=WeightedRandomSampler(np.ones(validation_set.__len__()),
                                                                              validation_size, replacement=True))
+"""
 
 # ### Define the network
 net = UNet(num_channels, num_classes)
@@ -128,7 +130,7 @@ for filename in os.listdir(TestDirs['images']):
                                              shuffle=False, num_workers=0, sampler=None)
     scores, y_pred, y_true = trainer.evaluate(dataloader=testloader, use_gpu=use_gpu, force_checkpoint=False)
     ppp = ut.merge_patches(scores, img_obj.working_arr.shape, (patch_rows, patch_cols))
-    IMG.fromarray(ppp).save(TestDirs['segmented'] + filename + '.png').save
+    IMG.fromarray(ppp).save(TestDirs['segmented'] + filename + '.png').save()
 
 # ### FAST MST algorithm
 # params = {'sk_threshold': 150,
