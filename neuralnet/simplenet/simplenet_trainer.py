@@ -7,9 +7,9 @@ from neuralnet.torchtrainer import NNTrainer
 
 
 class SimpleNNTrainer(NNTrainer):
-    def __init__(self, model=None, checkpoint_dir=None, checkpoint_file=None, to_tensorboard=False):
+    def __init__(self, model=None, checkpoint_dir=None, checkpoint_file=None, log_to_file=False):
         NNTrainer.__init__(self, model=model, checkpoint_dir=checkpoint_dir, checkpoint_file=checkpoint_file,
-                           to_tensorboard=to_tensorboard)
+                           log_to_file=log_to_file)
 
     def evaluate(self, dataloader=None, use_gpu=False, force_checkpoint=False, save_best=False):
 
