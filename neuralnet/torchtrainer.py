@@ -64,7 +64,7 @@ class NNTrainer:
 
                 _, predicted = torch.max(outputs, 1)
 
-                _tp, _fp, _tn, _fn = self.get_score(labels.data, predicted)
+                _tp, _fp, _tn, _fn = self.get_score(labels.data, predicted.data)
                 TP += _tp
                 TN += _tn
                 FP += _fp
