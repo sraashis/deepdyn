@@ -31,13 +31,13 @@ Dirs['mask'] = Dirs['data'] + sep + 'mask'
 Dirs['truth'] = Dirs['data'] + sep + '1st_manual'
 
 TestDirs = {}
-TestDirs['data'] = 'data' + sep + 'DRIVE' + sep + 'test'
+TestDirs['data'] = 'data' + sep + 'DRIVE' + sep + 'testing'
 TestDirs['images'] = TestDirs['data'] + sep + 'images'
 TestDirs['mask'] = TestDirs['data'] + sep + 'mask'
 TestDirs['truth'] = TestDirs['data'] + sep + '1st_manual'
 
 ValidationDirs = {}
-ValidationDirs['data'] = 'data' + sep + 'DRIVE' + sep + 'test'
+ValidationDirs['data'] = 'data' + sep + 'DRIVE' + sep + 'testing'
 ValidationDirs['images'] = ValidationDirs['data'] + sep + 'validation_images'
 ValidationDirs['mask'] = ValidationDirs['data'] + sep + 'mask'
 ValidationDirs['truth'] = ValidationDirs['data'] + sep + '1st_manual'
