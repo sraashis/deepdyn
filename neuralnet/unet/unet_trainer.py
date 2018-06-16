@@ -34,8 +34,8 @@ class UNetNNTrainer(NNTrainer):
 
             # Accumulate scores
             all_scores += outputs.data.clone().cpu().numpy().tolist()
-            all_predictions += predicted.data.clone().cpu().numpy().tolist()
-            all_labels += labels.data.clone().cpu().numpy().tolist()
+            all_predictions += predicted.clone().cpu().numpy().tolist()
+            all_labels += labels.clone().cpu().numpy().tolist()
 
             _tp, _fp, _tn, _fn = self.get_score(labels, predicted)
             TP += _tp

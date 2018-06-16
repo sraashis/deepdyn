@@ -64,7 +64,7 @@ class NNTrainer:
 
                 _, predicted = torch.max(outputs, 1)
 
-                _tp, _fp, _tn, _fn = self.get_score(labels, predicted)
+                _tp, _fp, _tn, _fn = self.get_score(labels.data, predicted)
                 TP += _tp
                 TN += _tn
                 FP += _fp
@@ -96,15 +96,15 @@ class NNTrainer:
 
         for i, data in enumerate(dataloader, 0):
             inputs, labels = data
-            inputs = inputs.cuda() if use_gpu else inputs.cpu()
-            labels = labels.cuda() if use_gpu else labels.cpu()
+            inputs = Variable(inputs.cuda() if use_gpu else inputs.cpu())
+            labels = Variable(labels.cuda() if use_gpu else labels.cpu())
 
             outputs = self.model(inputs)
             _, predicted = torch.max(outputs.data, 1)
 
             # Accumulate scores
-            all_predictions += predicted.data.clone().cpu().numpy().tolist()
-            all_labels += labels.data.clone().cpu().numpy().tolist()
+            all_predictions += predicted.clone().cpu().numpy().tolist()
+            all_labels += labels.data.cpu().numpy().tolist()
 
             _tp, _fp, _tn, _fn = self.get_score(labels, predicted)
 
@@ -173,8 +173,8 @@ class NNTrainer:
 
     def get_score(self, y_true_tensor, y_pred_tensor):
         TP, FP, TN, FN = [0] * 4
-        y_true = y_true_tensor.data.clone().cpu().numpy().squeeze().ravel()
-        y_pred = y_pred_tensor.data.clone().cpu().numpy().squeeze().ravel()
+        y_true = y_true_tensor.clone().cpu().numpy().squeeze().ravel()
+        y_pred = y_pred_tensor.clone().cpu().numpy().squeeze().ravel()
         for i in range(len(y_pred)):
             if y_true[i] == y_pred[i] == 1:
                 TP += 1
