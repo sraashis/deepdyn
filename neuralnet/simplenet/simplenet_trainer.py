@@ -55,18 +55,11 @@ class SimpleNNTrainer(NNTrainer):
             FP += _fp
             FN += _fn
             p, r, f1, a = mggmt.get_prf1a(TP, FP, TN, FN)
+
+            self._log(','.join(str(x) for x in [1, 0, i + 1, p, r, a, f1]))
             print('Batch[%d/%d] pre:%.3f rec:%.3f f1:%.3f acc:%.3f' % (
                 i + 1, dataloader.__len__(), p, r, f1, a),
                   end='\r')
-
-            ########## Feeding to tensorboard starts here...#####################
-            ####################################################################
-            if self.to_tenserboard:
-                step = next(self.res['val_counter'])
-                self.logger.scalar_summary('F1/validation', f1, step)
-                self.logger.scalar_summary('Acc/validation', a, step)
-            #### Tensorfeed stops here# #########################################
-            #####################################################################
 
         print()
         all_IDs = np.array(all_IDs, dtype=np.int)
