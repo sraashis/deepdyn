@@ -64,16 +64,16 @@ def get_mask_file_test(file_name):
 
 num_channels = 1
 classes = {'background': 0, 'vessel': 1, }
-batch_size = 2
+batch_size = 8
 num_classes = len(classes)
-epochs = 120
+epochs = 220
 patch_rows, patch_cols = 388, 388  # height by width of training patches
-use_gpu = False
+use_gpu = True
 
 #### Images to train/validate per epoch , None means USE ALL data####
 train_size = None
 validation_size = None
-checkpoint_file = 'PytorchCheckpointUnetMirrored.nn.tar'
+checkpoint_file = 'PytorchCheckpointUnetDRIVE.nn.tar'
 
 
 
@@ -128,7 +128,7 @@ optimizer = optim.Adam(net.parameters(), lr=0.0001)
 
 # sys.stdout = open(checkpoint_file + 'LOG.txt', 'w')
 trainer = UNetNNTrainer(model=net, checkpoint_dir=Dirs['checkpoint'], checkpoint_file=checkpoint_file, log_to_file=True)
-trainer.resume_from_checkpoint()
+# trainer.resume_from_checkpoint()
 trainer.train(optimizer=optimizer, dataloader=trainloader, epochs=epochs, use_gpu=use_gpu,
               validationloader=validationloader, force_checkpoint=False, log_frequency=20)
 
