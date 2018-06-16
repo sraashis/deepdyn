@@ -11,19 +11,14 @@ class SimpleNNTrainer(NNTrainer):
         NNTrainer.__init__(self, model=model, checkpoint_dir=checkpoint_dir, checkpoint_file=checkpoint_file,
                            log_to_file=log_to_file)
 
-    def evaluate(self, dataloader=None, use_gpu=False, force_checkpoint=False, save_best=False):
+    def _evaluate(self, dataloader=None, use_gpu=False, force_checkpoint=False, save_best=False):
 
-        self.model.eval()
-        self.model.cuda() if use_gpu else self.model.cpu()
-
-        print('\nEvaluating...')
         TP, FP, TN, FN = 0, 0, 0, 0
         all_predictions = []
         all_scores = []
         all_labels = []
         all_IDs = []
         all_patchIJs = []
-
         ##### Segment Mode only to use while testing####
         segment_mode = dataloader.dataset.segment_mode
         for i, data in enumerate(dataloader, 0):
@@ -34,11 +29,11 @@ class SimpleNNTrainer(NNTrainer):
             inputs = inputs.cuda() if use_gpu else inputs.cpu()
             labels = labels.cuda() if use_gpu else labels.cpu()
 
-            outputs = self.model(Variable(inputs))
-            _, predicted = torch.max(outputs.data, 1)
+            outputs = self.model(inputs)
+            _, predicted = torch.max(outputs, 1)
 
             # Accumulate scores
-            all_scores += outputs.data.clone().cpu().numpy().tolist()
+            all_scores += outputs.clone().cpu().numpy().tolist()
             all_predictions += predicted.clone().cpu().numpy().tolist()
             all_labels += labels.clone().cpu().numpy().tolist()
 
@@ -48,7 +43,7 @@ class SimpleNNTrainer(NNTrainer):
                 all_patchIJs += IJs.clone().cpu().numpy().tolist()
             ##### Segment mode End ###############
 
-            _tp, _fp, _tn, _fn = self.get_score(labels.data, predicted.data)
+            _tp, _fp, _tn, _fn = self.get_score(labels, predicted)
 
             TP += _tp
             TN += _tn
