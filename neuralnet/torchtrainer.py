@@ -1,10 +1,8 @@
 import os
 from time import time
 
-import numpy as np
 import torch
 import torch.nn.functional as F
-from torch.autograd import Variable
 
 import neuralnet.utils.measurements as mggmt
 
@@ -43,14 +41,13 @@ class NNTrainer:
         self.model.train()
         self.model.cuda() if use_gpu else self.model.cpu()
         print('Training...')
-
         TP, FP, TN, FN = [0] * 4
         for epoch in range(0, epochs):
             running_loss = 0.0
             for i, data in enumerate(dataloader, 0):
                 inputs, labels = data
-                inputs = Variable(inputs.cuda() if use_gpu else inputs.cpu())
-                labels = Variable(labels.cuda() if use_gpu else labels.cpu())
+                inputs = inputs.cuda() if use_gpu else inputs.cpu()
+                labels = labels.cuda() if use_gpu else labels.cpu()
 
                 optimizer.zero_grad()
                 outputs = self.model(inputs)
@@ -59,12 +56,12 @@ class NNTrainer:
                 loss.backward()
                 optimizer.step()
 
-                running_loss += loss.data[0]
-                current_loss = loss.data[0]
+                running_loss += loss.item()
+                current_loss = loss.item()
 
                 _, predicted = torch.max(outputs, 1)
 
-                _tp, _fp, _tn, _fn = self.get_score(labels.data, predicted.data)
+                _tp, _fp, _tn, _fn = self.get_score(labels, predicted)
                 TP += _tp
                 TN += _tn
                 FP += _fp
@@ -84,47 +81,18 @@ class NNTrainer:
             self.checkpoint['epochs'] += 1
             self.evaluate(dataloader=validationloader, use_gpu=use_gpu, force_checkpoint=force_checkpoint,
                           save_best=save_best)
-            self.model.train()
 
     def evaluate(self, dataloader=None, use_gpu=False, force_checkpoint=False, save_best=False):
-
         self.model.eval()
         self.model.cuda() if use_gpu else self.model.cpu()
+        print('\nEvaluating...')
+        with torch.no_grad():
+            self._evaluate(dataloader=dataloader, use_gpu=use_gpu, force_checkpoint=force_checkpoint,
+                           save_best=save_best)
+        self.model.train()
 
-        TP, FP, TN, FN = [0] * 4
-        all_predictions = []
-        all_labels = []
-
-        for i, data in enumerate(dataloader, 0):
-            inputs, labels = data
-            inputs = inputs.cuda() if use_gpu else inputs.cpu()
-            labels = labels.cuda() if use_gpu else labels.cpu()
-
-            outputs = self.model(Variable(inputs))
-            _, predicted = torch.max(outputs.data[0], 1)
-
-            # Accumulate scores
-            all_predictions += predicted.clone().cpu().numpy().tolist()
-            all_labels += labels.data.clone().cpu().numpy().tolist()
-
-            _tp, _fp, _tn, _fn = self.get_score(labels, predicted)
-
-            TP += _tp
-            TN += _tn
-            FP += _fp
-            FN += _fn
-            p, r, f1, a = mggmt.get_prf1a(TP, FP, TN, FN)
-
-            self._log(','.join(str(x) for x in [1, 0, i + 1, p, r, f1, a]))
-            print('Evaluating Batch[%d/%d] pre:%.3f rec:%.3f f1:%.3f acc:%.3f' % (
-                i + 1, dataloader.__len__(), p, r, f1, a),
-                  end='\r')
-
-        all_predictions = np.array(all_predictions)
-        all_labels = np.array(all_labels)
-        self._save_if_better(save_best=save_best, force_checkpoint=force_checkpoint, score=f1)
-
-        return all_predictions, all_labels
+    def _evaluate(self, dataloader=None, use_gpu=False, force_checkpoint=False, save_best=False):
+        raise NotImplementedError('ERROR!!!!! Must be implemented')
 
     def _save_checkpoint(self, checkpoint):
         torch.save(checkpoint, os.path.join(self.checkpoint_dir, self.checkpoint_file))
