@@ -64,7 +64,7 @@ def get_mask_file_test(file_name):
 
 num_channels = 1
 classes = {'background': 0, 'vessel': 1, }
-batch_size = 8
+batch_size = 4
 num_classes = len(classes)
 epochs = 220
 patch_rows, patch_cols = 388, 388  # height by width of training patches
@@ -94,7 +94,7 @@ trainset = PatchesGenerator(Dirs=Dirs, train_image_size=(patch_rows, patch_cols)
 
 train_size = trainset.__len__() if train_size is None else train_size
 trainloader = torch.utils.data.DataLoader(trainset, batch_size=batch_size,
-                                          shuffle=False, num_workers=0,
+                                          shuffle=False, num_workers=3,
                                           sampler=WeightedRandomSampler(np.ones(trainset.__len__()), train_size))
 
 # ### Load Validation Data
@@ -109,7 +109,7 @@ validation_set = PatchesGenerator(Dirs=ValidationDirs, train_image_size=(patch_r
 
 validation_size = validation_set.__len__() if validation_size is None else validation_size
 validationloader = torch.utils.data.DataLoader(validation_set, batch_size=batch_size,
-                                               shuffle=False, num_workers=0,
+                                               shuffle=False, num_workers=3,
                                                sampler=WeightedRandomSampler(np.ones(validation_set.__len__()),
                                                                              validation_size, replacement=True))
 

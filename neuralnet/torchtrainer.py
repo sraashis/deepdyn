@@ -22,8 +22,20 @@ class NNTrainer:
                 os.path.join(self.checkpoint_dir, checkpoint_file + 'LOG-' + "{}".format(time())) + '.csv', 'w')
             self.logger.write('TYPE,EPOCH,BATCH,PRECISION,RECALL,F1,ACCURACY\n')
 
-    def train(self, optimizer=None, dataloader=None, epochs=None, use_gpu=False, log_frequency=200,
+    def train(self, optimizer=None, dataloader=None, epochs=None, use_gpu=None, log_frequency=200,
               validationloader=None, force_checkpoint=False, save_best=True):
+
+        """
+        :param optimizer:
+        :param dataloader:
+        :param epochs:
+        :param use_gpu: (0, 1, None)
+        :param log_frequency:
+        :param validationloader:
+        :param force_checkpoint:
+        :param save_best:
+        :return:
+        """
 
         if validationloader is None:
             raise ValueError('Please provide validation loader.')
@@ -44,7 +56,6 @@ class NNTrainer:
                 outputs = self.model(inputs)
 
                 loss = F.cross_entropy(outputs, labels)
-                loss.cuda() if use_gpu else loss.cpu()
                 loss.backward()
                 optimizer.step()
 
@@ -53,8 +64,7 @@ class NNTrainer:
 
                 _, predicted = torch.max(outputs, 1)
 
-                _tp, _fp, _tn, _fn = mggmt.get_score(labels.numpy().squeeze().ravel(),
-                                                     predicted.numpy().squeeze().ravel())
+                _tp, _fp, _tn, _fn = self.get_score(labels, predicted)
                 TP += _tp
                 TN += _tn
                 FP += _fp
@@ -86,18 +96,18 @@ class NNTrainer:
 
         for i, data in enumerate(dataloader, 0):
             inputs, labels = data
-            inputs = inputs.cuda() if use_gpu else inputs.cpu()
-            labels = labels.cuda() if use_gpu else labels.cpu()
+            inputs = Variable(inputs.cuda() if use_gpu else inputs.cpu())
+            labels = Variable(labels.cuda() if use_gpu else labels.cpu())
 
             outputs = self.model(Variable(inputs))
             _, predicted = torch.max(outputs.data, 1)
 
             # Accumulate scores
-            all_predictions += predicted.numpy().tolist()
-            all_labels += labels.numpy().tolist()
+            all_predictions += predicted.data.clone().cpu().numpy().tolist()
+            all_labels += labels.data.clone().cpu().numpy().tolist()
 
-            _tp, _fp, _tn, _fn = mggmt.get_score(labels.numpy().squeeze().ravel(),
-                                                 predicted.numpy().squeeze().ravel())
+            _tp, _fp, _tn, _fn = self.get_score(labels, predicted)
+
             TP += _tp
             TN += _tn
             FP += _fp
@@ -160,3 +170,18 @@ class NNTrainer:
         if self.logger is not None:
             self.logger.write(msg + '\n')
             self.logger.flush()
+
+    def get_score(self, y_true_tensor, y_pred_tensor):
+        TP, FP, TN, FN = [0] * 4
+        y_true = y_true_tensor.data.clone().cpu().numpy().squeeze().ravel()
+        y_pred = y_pred_tensor.data.clone().cpu().numpy().squeeze().ravel()
+        for i in range(len(y_pred)):
+            if y_true[i] == y_pred[i] == 1:
+                TP += 1
+            if y_pred[i] == 1 and y_true[i] != y_pred[i]:
+                FP += 1
+            if y_true[i] == y_pred[i] == 0:
+                TN += 1
+            if y_pred[i] == 0 and y_true[i] != y_pred[i]:
+                FN += 1
+        return TP, FP, TN, FN

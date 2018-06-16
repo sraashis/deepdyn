@@ -31,25 +31,25 @@ class SimpleNNTrainer(NNTrainer):
                 IDs, IJs, inputs, labels = data
             else:
                 inputs, labels = data
-            inputs = inputs.cuda() if use_gpu else inputs.cpu()
-            labels = labels.cuda() if use_gpu else labels.cpu()
+            inputs = Variable(inputs.cuda() if use_gpu else inputs.cpu())
+            labels = Variable(labels.cuda() if use_gpu else labels.cpu())
 
             outputs = self.model(Variable(inputs))
             _, predicted = torch.max(outputs.data, 1)
 
             # Accumulate scores
-            all_predictions += predicted.numpy().tolist()
-            all_scores += outputs.data.numpy().tolist()
-            all_labels += labels.numpy().tolist()
+            all_scores += outputs.data.clone().cpu().numpy().tolist()
+            all_predictions += predicted.data.clone().cpu().numpy().tolist()
+            all_labels += labels.data.clone().cpu().numpy().tolist()
 
             ###### For segment mode only ##########
             if segment_mode:
-                all_IDs += IDs.numpy().tolist()
-                all_patchIJs += IJs.numpy().tolist()
+                all_IDs += IDs.data.clone().cpu().numpy().tolist()
+                all_patchIJs += IJs.data.clone().cpu().numpy().tolist()
             ##### Segment mode End ###############
 
-            _tp, _fp, _tn, _fn = mggmt.get_score(labels.numpy().squeeze().ravel(),
-                                                 predicted.numpy().squeeze().ravel())
+            _tp, _fp, _tn, _fn = self.get_score(labels, predicted)
+
             TP += _tp
             TN += _tn
             FP += _fp

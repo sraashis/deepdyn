@@ -64,7 +64,7 @@ def get_ground_truth_file(file_name):
 
 num_channels = 1
 classes = {'background': 0, 'vessel': 1, }
-batch_size = 8
+batch_size = 4
 num_classes = len(classes)
 epochs = 220
 patch_rows, patch_cols = 388, 388  # height by width of training patches
@@ -97,7 +97,7 @@ trainset = PatchesGeneratorAV(Dirs=Dirs, train_image_size=(patch_rows, patch_col
 
 train_size = trainset.__len__() if train_size is None else train_size
 trainloader = torch.utils.data.DataLoader(trainset, batch_size=batch_size,
-                                          shuffle=False, num_workers=0,
+                                          shuffle=False, num_workers=3,
                                           sampler=WeightedRandomSampler(np.ones(trainset.__len__()), train_size))
 
 # ### Load Validation Data
@@ -112,7 +112,7 @@ validation_set = PatchesGeneratorAV(Dirs=ValidationDirs, train_image_size=(patch
 
 validation_size = validation_set.__len__() if validation_size is None else validation_size
 validationloader = torch.utils.data.DataLoader(validation_set, batch_size=batch_size,
-                                               shuffle=False, num_workers=0,
+                                               shuffle=False, num_workers=3,
                                                sampler=WeightedRandomSampler(np.ones(validation_set.__len__()),
                                                                              validation_size, replacement=True))
 
@@ -131,7 +131,7 @@ optimizer = optim.Adam(net.parameters(), lr=0.0001)
 
 trainer = UNetNNTrainer(model=net, checkpoint_dir=Dirs['checkpoint'], checkpoint_file=checkpoint_file)
 # trainer.resume_from_checkpoint()
-trainer.train(optimizer=optimizer, dataloader=trainloader, epochs=4, use_gpu=use_gpu,
+trainer.train(optimizer=optimizer, dataloader=trainloader, epochs=epochs, use_gpu=use_gpu,
               validationloader=validationloader, force_checkpoint=False, log_frequency=20)
 
 
@@ -157,7 +157,7 @@ testset = PatchesGeneratorPerImgObj(img_obj=img_obj, train_image_size=(patch_row
                                     transform=transform_test)
 
 testloader = torch.utils.data.DataLoader(testset, batch_size=1,
-                                         shuffle=False, num_workers=0, sampler=None)
+                                         shuffle=False, num_workers=3, sampler=None)
 
 # In[9]:
 
