@@ -7,7 +7,7 @@ from neuralnet.torchtrainer import NNTrainer
 
 
 class UNetNNTrainer(NNTrainer):
-    def __init__(self, model=None, checkpoint_dir=None, checkpoint_file=None, log_to_file=False):
+    def __init__(self, model=None, checkpoint_dir=None, checkpoint_file=None, log_to_file=True):
         NNTrainer.__init__(self, model=model, checkpoint_dir=checkpoint_dir, checkpoint_file=checkpoint_file,
                            log_to_file=log_to_file)
 
