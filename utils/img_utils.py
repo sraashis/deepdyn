@@ -98,11 +98,33 @@ def get_image_as_array(image_file, channels=3):
     return arr * 255 if np.array_equal(arr, arr.astype(bool)) else arr
 
 
-def get_chunk_indexes(img_shape, chunk_shape):
+def get_chunk_indexes(img_shape=(0, 0), chunk_shape=(0, 0), offset_row_col=None):
     img_rows, img_cols = img_shape
     chunk_row, chunk_col = chunk_shape
-    for i in range(0, img_rows, chunk_row):
-        row_from, row_to = min(i, img_rows - chunk_row), min(i + chunk_row, img_rows)
-        for j in range(0, img_cols, chunk_col):
-            col_from, col_to = min(j, img_cols - chunk_col), min(j + chunk_col, img_cols)
+
+    if offset_row_col is None:
+        offset_row = chunk_row // 2
+        offset_col = chunk_col // 2
+    else:
+        offset_row, offset_col = offset_row_col
+
+    row_end = False
+    for i in range(0, img_rows, offset_row):
+        if row_end:
+            continue
+        row_from, row_to = i, i + chunk_row
+        if row_to > img_rows:
+            row_to = img_rows
+            row_from = img_rows - chunk_row
+            row_end = True
+
+        col_end = False
+        for j in range(0, img_cols, offset_col):
+            if col_end:
+                continue
+            col_from, col_to = j, j + chunk_col
+            if col_to > img_cols:
+                col_to = img_cols
+                col_from = img_cols - chunk_col
+                col_end = True
             yield [row_from, row_to, col_from, col_to]
