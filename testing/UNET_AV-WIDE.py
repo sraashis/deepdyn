@@ -12,18 +12,15 @@ import torch.optim as optim
 from torch.utils.data.dataset import Dataset
 import PIL.Image as IMG
 from torch.utils.data.sampler import WeightedRandomSampler
+import neuralnet.unet.utils as ut
 
 import numpy as np
 
 from commons.IMAGE import SegmentedImage
 
-from utils import img_utils as imgutil
 from neuralnet.unet.unet_trainer import UNetNNTrainer
 from neuralnet.unet.unet_dataloader import PatchesGeneratorAV, PatchesGeneratorPerImgObj
 from neuralnet.unet.model.unet import UNet
-
-# In[2]:
-
 
 ### Define folders. Create if needed.
 sep = os.sep
@@ -39,6 +36,7 @@ TestDirs['data'] = 'data' + sep + 'AV-WIDE' + sep + 'testing'
 TestDirs['images'] = TestDirs['data'] + sep + 'images'
 TestDirs['mask'] = TestDirs['data'] + sep + 'mask'
 TestDirs['truth'] = TestDirs['data'] + sep + '1st_manual'
+TestDirs['segmented'] = TestDirs['data'] + sep + 'segmented'
 
 ValidationDirs = {}
 ValidationDirs['data'] = 'data' + sep + 'AV-WIDE' + sep + 'testing'
@@ -76,20 +74,12 @@ validation_size = None
 checkpoint_file = 'PytorchCheckpointUnetAV-WIDE.nn.tar'
 
 # ### Transformations
-
-# In[3]:
-
-
 transform = transforms.Compose([
     transforms.ToPILImage(),
     transforms.ToTensor()
 ])
 
 # ### Load train data
-
-# In[ ]:
-
-
 trainset = PatchesGeneratorAV(Dirs=Dirs, train_image_size=(patch_rows, patch_cols),
                               transform=transform,
                               fget_mask=get_mask_file,
@@ -101,14 +91,10 @@ trainloader = torch.utils.data.DataLoader(trainset, batch_size=batch_size,
                                           sampler=WeightedRandomSampler(np.ones(trainset.__len__()), train_size))
 
 # ### Load Validation Data
-
-# In[66]:
-
-
 validation_set = PatchesGeneratorAV(Dirs=ValidationDirs, train_image_size=(patch_rows, patch_cols),
-                                  transform=transform,
-                                  fget_mask=get_mask_file,
-                                  fget_truth=get_ground_truth_file, mode='train')
+                                    transform=transform,
+                                    fget_mask=get_mask_file,
+                                    fget_truth=get_ground_truth_file, mode='train')
 
 validation_size = validation_set.__len__() if validation_size is None else validation_size
 validationloader = torch.utils.data.DataLoader(validation_set, batch_size=batch_size,
@@ -117,79 +103,27 @@ validationloader = torch.utils.data.DataLoader(validation_set, batch_size=batch_
                                                                              validation_size, replacement=True))
 
 # ### Define the network
-
-# In[5]:
-
-
 net = UNet(num_channels, num_classes)
 optimizer = optim.Adam(net.parameters(), lr=0.0001)
 
 # ### Train and evaluate network
-
-# In[6]:
-
-
 trainer = UNetNNTrainer(model=net, checkpoint_dir=Dirs['checkpoint'], checkpoint_file=checkpoint_file)
-# trainer.resume_from_checkpoint()
-trainer.train(optimizer=optimizer, dataloader=trainloader, epochs=epochs, use_gpu=use_gpu,
-              validationloader=validationloader, force_checkpoint=False, log_frequency=20)
+trainer.resume_from_checkpoint()
+# trainer.train(optimizer=optimizer, dataloader=trainloader, epochs=epochs, use_gpu=use_gpu,
+#               validationloader=validationloader, force_checkpoint=False, log_frequency=20)
 
+# ### Test on images
+for filename in os.listdir(TestDirs['images']):
+    img_obj = SegmentedImage()
+    img_obj.load_file(data_dir=TestDirs['images'], file_name=filename)
+    img_obj.load_mask(mask_dir=TestDirs['mask'], fget_mask=get_mask_file, erode=True)
+    img_obj.load_ground_truth(gt_dir=TestDirs['truth'], fget_ground_truth=get_ground_truth_file)
 
-# ### Test on a image
+    testset = PatchesGeneratorPerImgObj(img_obj=img_obj, train_image_size=(patch_rows, patch_cols),
+                                        transform=transform)
 
-# In[7]:
-
-
-img_obj = SegmentedImage()
-img_obj.load_file(data_dir=TestDirs['images'], file_name='wide_image_16.png')
-img_obj.load_ground_truth(gt_dir=TestDirs['truth'], fget_ground_truth=get_ground_truth_file)
-
-# In[8]:
-
-
-transform_test = transforms.Compose([
-    imgutil.whiten_image2d,
-    transforms.ToPILImage(),
-    transforms.ToTensor()
-])
-
-testset = PatchesGeneratorPerImgObj(img_obj=img_obj, train_image_size=(patch_rows, patch_cols),
-                                    transform=transform_test)
-
-testloader = torch.utils.data.DataLoader(testset, batch_size=1,
-                                         shuffle=False, num_workers=3, sampler=None)
-
-# In[9]:
-
-
-# scores, y_pred, y_true = trainer.evaluate(dataloader=testloader, use_gpu=use_gpu, force_checkpoint=False)
-# # mnt.plot_confusion_matrix(y_pred=y_pred, y_true=y_true, classes=classes)
-#
-#
-# # ### Merge the output to form a single image
-#
-# # In[10]:
-#
-#
-# import neuralnet.unet.utils as ut
-#
-# # In[11]:
-#
-#
-# ppp = ut.merge_patches(scores, img_obj.image_arr[:, :, 1].shape, (patch_rows, patch_cols))
-#
-# # In[12]:
-#
-#
-# # IMG.fromarray(ppp)
-# img_obj.working_arr.shape
-#
-# # In[13]:
-#
-#
-# IMG.fromarray(ppp)
-#
-# # In[22]:
-
-
-
+    testloader = torch.utils.data.DataLoader(testset, batch_size=testset.__len__(),
+                                             shuffle=False, num_workers=0, sampler=None)
+    scores, y_pred, y_true = trainer.evaluate(dataloader=testloader, use_gpu=use_gpu, force_checkpoint=False)
+    ppp = ut.merge_patches(scores, img_obj.working_arr.shape, (patch_rows, patch_cols))
+    IMG.fromarray(ppp).save(TestDirs['segmented'] + filename + '.png').save
