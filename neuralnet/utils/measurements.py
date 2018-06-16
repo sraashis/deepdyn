@@ -81,4 +81,4 @@ def get_prf1a(tp, fp, tn, fn):
     except ZeroDivisionError:
         a = 0
 
-    return p, r, f1, a
+    return round(p, 3), round(r, 3), round(f1, 3), round(a, 3)

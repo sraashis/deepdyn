@@ -6,13 +6,13 @@ import numpy as np
 import torch
 import torch.nn.functional as F
 from torch.autograd import Variable
-import neuralnet.utils.measurements as mggmt
 
+import neuralnet.utils.measurements as mggmt
 from neuralnet.utils.tensorboard_logger import Logger
 
 
 class NNTrainer:
-    def __init__(self, model=None, checkpoint_dir=None, checkpoint_file=None, to_tensorboard=False):
+    def __init__(self, model=None, checkpoint_dir=None, checkpoint_file=None, to_tensorboard=False, to_file=False):
         self.model = model
         self.checkpoint_dir = checkpoint_dir
         self.checkpoint_file = checkpoint_file
@@ -86,7 +86,7 @@ class NNTrainer:
                         else (i + 1) % log_frequency
                     running_loss = 0.0
 
-                print('[Epochs:%d/%d Batches:%d/%d, loss:%.3f] pre:%.3f rec:%.3f f1:%.3f acc:%.3f' %
+                print('Epochs:%d/%d Batches:%d/%d, loss:%.3f | pre:%.3f rec:%.3f f1:%.3f acc:%.3f' %
                       (epoch + 1, epochs, i + 1, dataloader.__len__(), current_loss, p, r, f1, a),
                       end='\r' if running_loss > 0 else '\n')
 
@@ -99,7 +99,7 @@ class NNTrainer:
         self.model.eval()
         self.model.cuda() if use_gpu else self.model.cpu()
 
-        print('\nEvaluating...')
+        print('\n')
         TP, FP, TN, FN = [0] * 4
         all_predictions = []
         all_labels = []
@@ -124,7 +124,7 @@ class NNTrainer:
             FN += _fn
             p, r, f1, a = mggmt.get_prf1a(TP, FP, TN, FN)
 
-            print('Batch[%d/%d] pre:%.3f rec:%.3f f1:%.3f acc:%.3f' % (
+            print('Evaluating Batch[%d/%d] | pre:%.3f rec:%.3f f1:%.3f acc:%.3f' % (
                 i + 1, dataloader.__len__(), p, r, f1, a),
                   end='\r')
 
