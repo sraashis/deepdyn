@@ -129,4 +129,4 @@ for filename in os.listdir(TestDirs['images']):
                                              shuffle=False, num_workers=0, sampler=None)
     scores, y_pred, y_true = trainer.evaluate(dataloader=testloader, use_gpu=use_gpu, force_checkpoint=False)
     ppp = ut.merge_patches(scores, img_obj.working_arr.shape, (patch_rows, patch_cols))
-    IMG.fromarray(ppp).save(TestDirs['segmented'] + sep + filename + '.png').save()
+    IMG.fromarray(ppp).save(TestDirs['segmented'] + sep + filename + '.png')
