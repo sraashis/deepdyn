@@ -84,6 +84,7 @@ class NNTrainer:
             self.checkpoint['epochs'] += 1
             self.evaluate(dataloader=validationloader, use_gpu=use_gpu, force_checkpoint=force_checkpoint,
                           save_best=save_best)
+            self.model.train()
 
     def evaluate(self, dataloader=None, use_gpu=False, force_checkpoint=False, save_best=False):
 
