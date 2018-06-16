@@ -31,10 +31,10 @@ class SimpleNNTrainer(NNTrainer):
                 IDs, IJs, inputs, labels = data
             else:
                 inputs, labels = data
-            inputs = Variable(inputs.cuda() if use_gpu else inputs.cpu())
-            labels = Variable(labels.cuda() if use_gpu else labels.cpu())
+            inputs = inputs.cuda() if use_gpu else inputs.cpu()
+            labels = labels.cuda() if use_gpu else labels.cpu()
 
-            outputs = self.model(Variable(inputs))
+            outputs = self.model(inputs)
             _, predicted = torch.max(outputs.data, 1)
 
             # Accumulate scores
