@@ -30,10 +30,10 @@ class UNetNNTrainer(NNTrainer):
             labels = labels.cuda() if use_gpu else labels.cpu()
 
             outputs = self.model(inputs)
-            _, predicted = torch.max(outputs.data, 1)
+            _, predicted = torch.max(outputs, 1)
 
             # Accumulate scores
-            all_scores += outputs.data.clone().cpu().numpy().tolist()
+            all_scores += outputs.clone().cpu().numpy().tolist()
             all_predictions += predicted.clone().cpu().numpy().tolist()
             all_labels += labels.clone().cpu().numpy().tolist()
 

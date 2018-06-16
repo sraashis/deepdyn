@@ -96,15 +96,15 @@ class NNTrainer:
 
         for i, data in enumerate(dataloader, 0):
             inputs, labels = data
-            inputs = Variable(inputs.cuda() if use_gpu else inputs.cpu())
-            labels = Variable(labels.cuda() if use_gpu else labels.cpu())
+            inputs = inputs.cuda() if use_gpu else inputs.cpu()
+            labels = labels.cuda() if use_gpu else labels.cpu()
 
             outputs = self.model(inputs)
-            _, predicted = torch.max(outputs.data, 1)
+            _, predicted = torch.max(outputs, 1)
 
             # Accumulate scores
             all_predictions += predicted.clone().cpu().numpy().tolist()
-            all_labels += labels.data.cpu().numpy().tolist()
+            all_labels += labels.clone().cpu().numpy().tolist()
 
             _tp, _fp, _tn, _fn = self.get_score(labels, predicted)
 

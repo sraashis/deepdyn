@@ -35,17 +35,17 @@ class SimpleNNTrainer(NNTrainer):
             labels = labels.cuda() if use_gpu else labels.cpu()
 
             outputs = self.model(inputs)
-            _, predicted = torch.max(outputs.data, 1)
+            _, predicted = torch.max(outputs, 1)
 
             # Accumulate scores
-            all_scores += outputs.data.clone().cpu().numpy().tolist()
-            all_predictions += predicted.data.clone().cpu().numpy().tolist()
-            all_labels += labels.data.clone().cpu().numpy().tolist()
+            all_scores += outputs.clone().cpu().numpy().tolist()
+            all_predictions += predicted.clone().cpu().numpy().tolist()
+            all_labels += labels.clone().cpu().numpy().tolist()
 
             ###### For segment mode only ##########
             if segment_mode:
-                all_IDs += IDs.data.clone().cpu().numpy().tolist()
-                all_patchIJs += IJs.data.clone().cpu().numpy().tolist()
+                all_IDs += IDs.clone().cpu().numpy().tolist()
+                all_patchIJs += IJs.clone().cpu().numpy().tolist()
             ##### Segment mode End ###############
 
             _tp, _fp, _tn, _fn = self.get_score(labels, predicted)
