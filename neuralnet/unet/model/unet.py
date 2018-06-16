@@ -25,25 +25,25 @@ class _DoubleConvolution(nn.Module):
 class UNet(nn.Module):
     def __init__(self, num_channels, num_classes):
         super(UNet, self).__init__()
-        self.enc1 = _DoubleConvolution(num_channels, 4, 4)
-        self.enc2 = _DoubleConvolution(4, 8, 8)
-        self.enc3 = _DoubleConvolution(8, 16, 16)
-        self.enc4 = _DoubleConvolution(16, 32, 32)
+        self.enc1 = _DoubleConvolution(num_channels, 4*16, 4*16)
+        self.enc2 = _DoubleConvolution(4*16, 8*16, 8*16)
+        self.enc3 = _DoubleConvolution(8*16, 16*16, 16*16)
+        self.enc4 = _DoubleConvolution(16*16, 32*16, 32*16)
 
-        self.dec4 = _DoubleConvolution(32, 64, 64)
-        self.dec4_up = nn.ConvTranspose2d(64, 32, kernel_size=2, stride=2)
+        self.dec4 = _DoubleConvolution(32*16, 64*16, 64*16)
+        self.dec4_up = nn.ConvTranspose2d(64*16, 32*16, kernel_size=2, stride=2)
 
-        self.dec3 = _DoubleConvolution(64, 32, 32)
-        self.dec3_up = nn.ConvTranspose2d(32, 16, kernel_size=2, stride=2)
+        self.dec3 = _DoubleConvolution(64*16, 32*16, 32*16)
+        self.dec3_up = nn.ConvTranspose2d(32*16, 16*16, kernel_size=2, stride=2)
 
-        self.dec2 = _DoubleConvolution(32, 16, 16)
-        self.dec2_up = nn.ConvTranspose2d(16, 8, kernel_size=2, stride=2)
+        self.dec2 = _DoubleConvolution(32*16, 16*16, 16*16)
+        self.dec2_up = nn.ConvTranspose2d(16*16, 8*16, kernel_size=2, stride=2)
 
-        self.dec1 = _DoubleConvolution(16, 8, 8)
-        self.dec1_up = nn.ConvTranspose2d(8, 4, kernel_size=2, stride=2)
+        self.dec1 = _DoubleConvolution(16*16, 8*16, 8*16)
+        self.dec1_up = nn.ConvTranspose2d(8*16, 4*16, kernel_size=2, stride=2)
 
-        self.out = _DoubleConvolution(8, 4, 4)
-        self.final = nn.Conv2d(4, num_classes, kernel_size=1)
+        self.out = _DoubleConvolution(8*16, 4*16, 4*16)
+        self.final = nn.Conv2d(4*16, num_classes, kernel_size=1)
 
         initialize_weights(self)
 
