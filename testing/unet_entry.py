@@ -3,11 +3,10 @@
 import os
 import sys
 
-from testing.unet_runner import UnetRunner
-
 sys.path.append('/home/akhanal1/ature')
 os.chdir('/home/akhanal1/ature')
 
+from testing.unet_runner import UnetRunner
 import torchvision.transforms as transforms
 
 if __name__ == "__main__":
