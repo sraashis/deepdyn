@@ -121,10 +121,10 @@ if __name__ == "__main__":
     checkpoint_file = 'chkWIDEunet.tar'
     runner.train(Dirs=Dirs, ValidationDirs=ValidationDirs,
                  train_mask_getter=get_mask_file, train_groundtruth_getter=get_ground_truth_file,
-                 val_mask_getter=get_mask_file_test, val_groundtruth_getter=get_ground_truth_file,
+                 val_mask_getter=get_mask_file, val_groundtruth_getter=get_ground_truth_file,
                  checkpoint_file=checkpoint_file)
 
     runner.run_tests(TestDirs=TestDirs,
-                     test_mask_getter=get_mask_file_test,
+                     test_mask_getter=get_mask_file,
                      test_groundtruth_file_getter=get_ground_truth_file, checkpoint_file=checkpoint_file)
     ######################################################################################
