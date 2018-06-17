@@ -13,8 +13,7 @@ from commons.IMAGE import Image
 class PatchesGenerator(Dataset):
 
     def __init__(self, Dirs=None, transform=None,
-                 fget_mask=None, fget_truth=None, train_image_size=(388, 388), pad_row_col=[(92, 92), (92, 92)],
-                 mode=None):
+                 fget_mask=None, fget_truth=None, train_image_size=(388, 388), pad_row_col=[(92, 92), (92, 92)]):
 
         """
         :param Dirs: Should contain paths to directories images, mask, and truth by the same name.
@@ -27,7 +26,6 @@ class PatchesGenerator(Dataset):
         self.transform = transform
         self.patches_indexes = []
         self.images = {}
-        self.mode = mode
         self.train_image_size = train_image_size
         self.pad_row_col = pad_row_col
         self.Dirs = Dirs
@@ -40,9 +38,7 @@ class PatchesGenerator(Dataset):
                 self.patches_indexes.append([ID] + chunk_ix)
             self.images[ID] = img_obj
 
-        if mode == 'train':
-            random.shuffle(self.patches_indexes)
-
+        random.shuffle(self.patches_indexes)
         print('### ' + str(self.__len__()) + ' patches found.')
 
     def _get_image_obj(self, img_file=None):
@@ -86,7 +82,7 @@ class PatchesGeneratorAV(PatchesGenerator):
 
 class PatchesGeneratorPerImgObj(PatchesGenerator):
     def __init__(self, img_obj=None, train_image_size=(388, 388), pad_row_col=[(92, 92), (92, 92)], transform=None):
-        super().__init__(transform=transform, train_image_size=train_image_size, pad_row_col=pad_row_col, mode='eval')
+        super().__init__(transform=transform, train_image_size=train_image_size, pad_row_col=pad_row_col)
         self.images[0] = img_obj
         clahe = cv2.createCLAHE(clipLimit=2.0, tileGridSize=(8, 8))
         img_obj.working_arr = clahe.apply(img_obj.image_arr[:, :, 1])

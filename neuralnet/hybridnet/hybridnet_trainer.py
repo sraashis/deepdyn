@@ -1,15 +1,14 @@
 import numpy as np
 import torch
-from torch.autograd import Variable
-import neuralnet.utils.measurements as mggmt
 
+import neuralnet.utils.measurements as mggmt
 from neuralnet.torchtrainer import NNTrainer
 
 
 class HybridNNTrainer(NNTrainer):
-    def __init__(self, model=None, checkpoint_dir=None, checkpoint_file=None, to_tensorboard=False):
+    def __init__(self, model=None, checkpoint_dir=None, checkpoint_file=None, log_to_file=True):
         NNTrainer.__init__(self, model=model, checkpoint_dir=checkpoint_dir, checkpoint_file=checkpoint_file,
-                           to_tensorboard=to_tensorboard)
+                           log_to_file=log_to_file)
 
     def evaluate(self, dataloader=None, use_gpu=False, force_checkpoint=False, save_best=False):
 
@@ -33,21 +32,20 @@ class HybridNNTrainer(NNTrainer):
             inputs = inputs.cuda() if use_gpu else inputs.cpu()
             labels = labels.cuda() if use_gpu else labels.cpu()
 
-            outputs = self.model(Variable(inputs))
+            outputs = self.model(inputs)
             _, predicted = torch.max(outputs.data, 1)
 
-            # Save scores
-            all_predictions += predicted.numpy().tolist()
-            all_scores += outputs.data.numpy().tolist()
-            all_labels += labels.numpy().tolist()
+            # Accumulate scores
+            all_scores += outputs.data.clone().cpu().numpy().tolist()
+            all_predictions += predicted.data.clone().cpu().numpy().tolist()
+            all_labels += labels.data.clone().cpu().numpy().tolist()
 
             ###### For segment mode only ##########
             if mode == 'eval':
                 all_patchIJs += IJs.numpy().tolist()
             ##### Segment mode End ###############
 
-            _tp, _fp, _tn, _fn = mggmt.get_score(labels.numpy().squeeze().ravel(),
-                                                 predicted.numpy().squeeze().ravel())
+            _tp, _fp, _tn, _fn = self.get_score(labels, predicted)
             TP += _tp
             TN += _tn
             FP += _fp

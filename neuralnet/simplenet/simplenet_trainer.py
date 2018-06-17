@@ -7,23 +7,18 @@ from neuralnet.torchtrainer import NNTrainer
 
 
 class SimpleNNTrainer(NNTrainer):
-    def __init__(self, model=None, checkpoint_dir=None, checkpoint_file=None, log_to_file=False):
+    def __init__(self, model=None, checkpoint_dir=None, checkpoint_file=None, log_to_file=True):
         NNTrainer.__init__(self, model=model, checkpoint_dir=checkpoint_dir, checkpoint_file=checkpoint_file,
                            log_to_file=log_to_file)
 
-    def evaluate(self, dataloader=None, use_gpu=False, force_checkpoint=False, save_best=False):
+    def _evaluate(self, dataloader=None, use_gpu=False, force_checkpoint=False, save_best=False):
 
-        self.model.eval()
-        self.model.cuda() if use_gpu else self.model.cpu()
-
-        print('\nEvaluating...')
         TP, FP, TN, FN = 0, 0, 0, 0
         all_predictions = []
         all_scores = []
         all_labels = []
         all_IDs = []
         all_patchIJs = []
-
         ##### Segment Mode only to use while testing####
         segment_mode = dataloader.dataset.segment_mode
         for i, data in enumerate(dataloader, 0):
@@ -34,29 +29,29 @@ class SimpleNNTrainer(NNTrainer):
             inputs = inputs.cuda() if use_gpu else inputs.cpu()
             labels = labels.cuda() if use_gpu else labels.cpu()
 
-            outputs = self.model(Variable(inputs))
-            _, predicted = torch.max(outputs.data, 1)
+            outputs = self.model(inputs)
+            _, predicted = torch.max(outputs, 1)
 
             # Accumulate scores
-            all_predictions += predicted.numpy().tolist()
-            all_scores += outputs.data.numpy().tolist()
-            all_labels += labels.numpy().tolist()
+            all_scores += outputs.clone().cpu().numpy().tolist()
+            all_predictions += predicted.clone().cpu().numpy().tolist()
+            all_labels += labels.clone().cpu().numpy().tolist()
 
             ###### For segment mode only ##########
             if segment_mode:
-                all_IDs += IDs.numpy().tolist()
-                all_patchIJs += IJs.numpy().tolist()
+                all_IDs += IDs.clone().cpu().numpy().tolist()
+                all_patchIJs += IJs.clone().cpu().numpy().tolist()
             ##### Segment mode End ###############
 
-            _tp, _fp, _tn, _fn = mggmt.get_score(labels.numpy().squeeze().ravel(),
-                                                 predicted.numpy().squeeze().ravel())
+            _tp, _fp, _tn, _fn = self.get_score(labels, predicted)
+
             TP += _tp
             TN += _tn
             FP += _fp
             FN += _fn
             p, r, f1, a = mggmt.get_prf1a(TP, FP, TN, FN)
 
-            self._log(','.join(str(x) for x in [1, 0, i + 1, p, r, a, f1]))
+            self._log(','.join(str(x) for x in [1, 0, i + 1, p, r, f1, a]))
             print('Batch[%d/%d] pre:%.3f rec:%.3f f1:%.3f acc:%.3f' % (
                 i + 1, dataloader.__len__(), p, r, f1, a),
                   end='\r')

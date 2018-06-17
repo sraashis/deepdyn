@@ -14,6 +14,7 @@ def merge_patches(scores, image_size=(0, 0), training_patch_size=(0, 0)):
                         'constant')
         padded_sum = padded + padded_sum
         non_zero_count = non_zero_count + np.array(padded > 0).astype(int)
+    non_zero_count[non_zero_count == 0] = 1
     return np.array(padded_sum / non_zero_count, dtype=np.uint8)
 
 

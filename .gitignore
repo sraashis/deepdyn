@@ -9,4 +9,5 @@ preprocess/image/__pycache__/
 .idea
 out/
 data/
+logs/
 notebook/.ipynb_checkpoints/
