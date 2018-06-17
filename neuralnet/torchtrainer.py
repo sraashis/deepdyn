@@ -10,7 +10,7 @@ import neuralnet.utils.measurements as mggmt
 class NNTrainer:
     def __init__(self, model=None, checkpoint_dir=None, checkpoint_file=None, log_to_file=True, use_gpu=True):
         self.checkpoint_dir = checkpoint_dir
-        self.checkpoint_file = checkpoint_file
+        self.checkpoint_file = "{}-".format(time()) + checkpoint_file
         self.checkpoint = {'epochs': 0, 'state': None, 'score': 0.0, 'model': 'EMPTY'}
         self.logger = None
         if torch.cuda.is_available():
@@ -22,8 +22,8 @@ class NNTrainer:
 
         if log_to_file:
             self.logger = open(
-                os.path.join(self.checkpoint_dir, checkpoint_file + 'LOG-' + "{}".format(time())) + '.csv', 'w')
-            self.logger.write('TYPE,EPOCH,BATCH,PRECISION,RECALL,F1,ACCURACY\n')
+                os.path.join(self.checkpoint_dir, self.checkpoint_file + '-LOG' + '.csv'), 'w')
+            self.logger.write('TYPE,EPOCH,BATCH,PRECISION,RECALL,F1,ACCURACY,LOSS\n')
 
     def train(self, optimizer=None, dataloader=None, epochs=None, log_frequency=200,
               validationloader=None, force_checkpoint=False, save_best=True):
@@ -73,8 +73,8 @@ class NNTrainer:
                         else (i + 1) % log_frequency
                     running_loss = 0.0
 
-                self._log(','.join(str(x) for x in [0, epoch + 1, i + 1, p, r, f1, a]))
-                print('Epochs[%d/%d] Batch[%d/%d] loss:%.4f pre:%.3f rec:%.3f f1:%.3f acc:%.3f' %
+                self._log(','.join(str(x) for x in [0, epoch + 1, i + 1, p, r, f1, a, current_loss]))
+                print('Epochs[%d/%d] Batch[%d/%d] loss:%.5f pre:%.3f rec:%.3f f1:%.3f acc:%.3f' %
                       (epoch + 1, epochs, i + 1, dataloader.__len__(), current_loss, p, r, f1, a),
                       end='\r' if running_loss > 0 else '\n')
 
@@ -87,7 +87,7 @@ class NNTrainer:
         print('\nEvaluating...')
         with torch.no_grad():
             return self._evaluate(dataloader=dataloader, force_checkpoint=force_checkpoint,
-                           save_best=save_best)
+                                  save_best=save_best)
 
     def _evaluate(self, dataloader=None, force_checkpoint=False, save_best=False):
         raise NotImplementedError('ERROR!!!!! Must be implemented')
