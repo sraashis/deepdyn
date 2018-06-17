@@ -22,7 +22,7 @@ class NNTrainer:
 
         if log_to_file:
             self.logger = open(
-                os.path.join(self.checkpoint_dir, checkpoint_file + '-LOG' + '.csv', 'w'))
+                os.path.join(self.checkpoint_dir, self.checkpoint_file + '-LOG' + '.csv'), 'w')
             self.logger.write('TYPE,EPOCH,BATCH,PRECISION,RECALL,F1,ACCURACY,LOSS\n')
 
     def train(self, optimizer=None, dataloader=None, epochs=None, log_frequency=200,
