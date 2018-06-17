@@ -10,4 +10,5 @@ preprocess/image/__pycache__/
 out/
 data/
 logs/
+net_logs
 notebook/.ipynb_checkpoints/
