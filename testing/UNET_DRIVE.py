@@ -81,12 +81,12 @@ transform = transforms.Compose([
     transforms.ToTensor()
 ])
 
-"""
+#
 # ### Load train data
 trainset = PatchesGenerator(Dirs=Dirs, train_image_size=(patch_rows, patch_cols),
                             transform=transform,
                             fget_mask=get_mask_file,
-                            fget_truth=get_ground_truth_file, mode='train')
+                            fget_truth=get_ground_truth_file)
 
 train_size = trainset.__len__() if train_size is None else train_size
 trainloader = torch.utils.data.DataLoader(trainset, batch_size=batch_size,
@@ -97,24 +97,25 @@ trainloader = torch.utils.data.DataLoader(trainset, batch_size=batch_size,
 validation_set = PatchesGenerator(Dirs=ValidationDirs, train_image_size=(patch_rows, patch_cols),
                                   transform=transform,
                                   fget_mask=get_mask_file_test,
-                                  fget_truth=get_ground_truth_file, mode='train')
+                                  fget_truth=get_ground_truth_file)
 
 validation_size = validation_set.__len__() if validation_size is None else validation_size
 validationloader = torch.utils.data.DataLoader(validation_set, batch_size=batch_size,
                                                shuffle=False, num_workers=3,
                                                sampler=WeightedRandomSampler(np.ones(validation_set.__len__()),
                                                                              validation_size, replacement=True))
-"""
+# """
 
 # ### Define the network
 net = UNet(num_channels, num_classes)
 optimizer = optim.Adam(net.parameters(), lr=0.0001)
 
 # ### Train and evaluate network
-trainer = UNetNNTrainer(model=net, checkpoint_dir=Dirs['checkpoint'], checkpoint_file=checkpoint_file, log_to_file=True)
-trainer.resume_from_checkpoint()
-# trainer.train(optimizer=optimizer, dataloader=trainloader, epochs=epochs, use_gpu=use_gpu,
-#               validationloader=validationloader, force_checkpoint=False, log_frequency=20)
+trainer = UNetNNTrainer(model=net, checkpoint_dir=Dirs['checkpoint'], checkpoint_file=checkpoint_file, log_to_file=True,
+                        use_gpu=use_gpu)
+# trainer.resume_from_checkpoint()
+trainer.train(optimizer=optimizer, dataloader=trainloader, epochs=epochs,
+              validationloader=validationloader, force_checkpoint=False, log_frequency=20)
 
 # ### Test on images
 for filename in os.listdir(TestDirs['images']):
@@ -128,7 +129,7 @@ for filename in os.listdir(TestDirs['images']):
 
     testloader = torch.utils.data.DataLoader(testset, batch_size=testset.__len__(),
                                              shuffle=False, num_workers=0, sampler=None)
-    scores, y_pred, y_true = trainer.evaluate(dataloader=testloader, use_gpu=use_gpu, force_checkpoint=False)
+    scores, y_pred, y_true = trainer.evaluate(dataloader=testloader, force_checkpoint=False)
     ppp = ut.merge_patches(scores, img_obj.working_arr.shape, (patch_rows, patch_cols))
     IMG.fromarray(ppp).save(TestDirs['segmented'] + sep + filename + '.png')
 
