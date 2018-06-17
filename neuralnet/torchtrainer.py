@@ -74,7 +74,7 @@ class NNTrainer:
                     running_loss = 0.0
 
                 self._log(','.join(str(x) for x in [0, epoch + 1, i + 1, p, r, f1, a, current_loss]))
-                print('Epochs[%d/%d] Batch[%d/%d] loss:%.4f pre:%.3f rec:%.3f f1:%.3f acc:%.3f' %
+                print('Epochs[%d/%d] Batch[%d/%d] loss:%.5f pre:%.3f rec:%.3f f1:%.3f acc:%.3f' %
                       (epoch + 1, epochs, i + 1, dataloader.__len__(), current_loss, p, r, f1, a),
                       end='\r' if running_loss > 0 else '\n')
 
