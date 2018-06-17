@@ -3,7 +3,7 @@
 import os
 import sys
 
-from .unet_runner import UnetRunner
+from testing.unet_runner import UnetRunner
 
 sys.path.append('/home/akhanal1/ature')
 os.chdir('/home/akhanal1/ature')
