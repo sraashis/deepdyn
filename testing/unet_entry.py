@@ -5,8 +5,8 @@ import sys
 
 from testing.unet_runner import UnetRunner
 
-sys.path.append('/home/ak/PycharmProjects/ature')
-os.chdir('/home/ak/PycharmProjects/ature')
+sys.path.append('/home/akhanal1/ature')
+os.chdir('/home/akhanal1/ature')
 
 import torchvision.transforms as transforms
 
@@ -116,6 +116,7 @@ if __name__ == "__main__":
 
     def get_ground_truth_file(file_name):
         return file_name.split('.')[0] + '_vessels.png'
+
 
     checkpoint_file = 'chkWIDEunet.tar'
     runner.train(Dirs=Dirs, ValidationDirs=ValidationDirs,
