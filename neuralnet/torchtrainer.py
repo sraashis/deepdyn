@@ -1,5 +1,4 @@
 import os
-from time import time
 
 import torch
 import torch.nn.functional as F
@@ -10,7 +9,7 @@ import neuralnet.utils.measurements as mggmt
 class NNTrainer:
     def __init__(self, model=None, checkpoint_dir=None, checkpoint_file=None, log_to_file=True, use_gpu=True):
         self.checkpoint_dir = checkpoint_dir
-        self.checkpoint_file = "{}-".format(time()) + checkpoint_file
+        self.checkpoint_file = checkpoint_file
         self.checkpoint = {'epochs': 0, 'state': None, 'score': 0.0, 'model': 'EMPTY'}
         self.logger = None
         if torch.cuda.is_available():
