@@ -6,9 +6,9 @@ from neuralnet.torchtrainer import NNTrainer
 
 
 class UNetNNTrainer(NNTrainer):
-    def __init__(self, model=None, checkpoint_dir=None, checkpoint_file=None, log_to_file=True, use_gpu=True):
-        NNTrainer.__init__(self, model=model, checkpoint_dir=checkpoint_dir, checkpoint_file=checkpoint_file,
-                           log_to_file=log_to_file, use_gpu=use_gpu)
+    def __init__(self, model=None, checkpoint_file=None, log_file=None, use_gpu=True):
+        NNTrainer.__init__(self, model=model, checkpoint_file=checkpoint_file,
+                           log_file=log_file, use_gpu=use_gpu)
 
     def _evaluate(self, dataloader=None, force_checkpoint=False, save_best=False):
         TP, FP, TN, FN = [0] * 4

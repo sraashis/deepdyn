@@ -15,14 +15,12 @@ sep = os.sep
 
 
 class UnetRunner():
-    def __init__(self, Params, transform, checkpoint_file):
+    def __init__(self, Params, transform):
         self.Params = Params
         self.transform = transform
-        self.checkpoint_file = checkpoint_file
-        self.model = UNet(self.Params['num_channels'], self.Params['num_classes'])
 
-    def train(self, Dirs, ValidationDirs, transform, train_mask_getter, train_groundtruth_getter,
-              val_mask_getter, val_groundtruth_getter):
+    def train(self, Dirs, ValidationDirs, train_mask_getter, train_groundtruth_getter,
+              val_mask_getter, val_groundtruth_getter, checkpoint_file):
         try:
             torch.cuda.empty_cache()
         except Exception:
@@ -30,7 +28,7 @@ class UnetRunner():
 
         # ### Load train data
         trainset = PatchesGenerator(Dirs=Dirs, train_image_size=self.Params['patch_size'],
-                                    transform=transform,
+                                    transform=self.transform,
                                     fget_mask=train_mask_getter,
                                     fget_truth=train_groundtruth_getter)
 
@@ -39,7 +37,7 @@ class UnetRunner():
 
         # ### Load Validation Data
         validation_set = PatchesGenerator(Dirs=ValidationDirs, train_image_size=self.Params['patch_size'],
-                                          transform=transform,
+                                          transform=self.transform,
                                           fget_mask=val_mask_getter,
                                           fget_truth=val_groundtruth_getter)
 
@@ -48,27 +46,29 @@ class UnetRunner():
                                                        num_workers=3)
 
         # ### Define the network
-        optimizer = optim.Adam(self.model.parameters(), lr=self.Params['learning_rate'])
+        model = UNet(self.Params['num_channels'], self.Params['num_classes'])
+        optimizer = optim.Adam(model.parameters(), lr=self.Params['learning_rate'])
 
         # ### Train and evaluate network
-        trainer = UNetNNTrainer(model=self.model, checkpoint_dir=self.Params['checkpoint_dir'],
-                                checkpoint_file='TRAIN-' + self.checkpoint_file,
-                                log_to_file=True,
+        trainer = UNetNNTrainer(model=model,
+                                checkpoint_file=checkpoint_file,
+                                log_file=checkpoint_file + '-TRAIN.csv',
                                 use_gpu=self.Params['use_gpu'])
         trainer.train(optimizer=optimizer, dataloader=trainloader, epochs=self.Params['epochs'],
                       validationloader=validationloader, force_checkpoint=False, log_frequency=20)
 
         with open(
-                os.path.join(self.Params['checkpoint_dir']) + sep + 'PARAMS-' + self.checkpoint_file + '.txt', 'w') as pfile:
+                self.Params['checkpoint_dir'] + sep + checkpoint_file + '.params', 'w') as pfile:
             pfile.write(str(self.Params))
 
-    def run_tests(self, TestDirs, transform, test_mask_getter, test_groundtruth_file_getter):
+    def run_tests(self, TestDirs, test_mask_getter, test_groundtruth_file_getter, checkpoint_file):
         # ### Define the network
-        trainer = UNetNNTrainer(model=self.model, checkpoint_dir=self.Params['checkpoint_dir'],
-                                checkpoint_file='TEST-' + self.checkpoint_file,
-                                log_to_file=True,
+        trainer = UNetNNTrainer(model=UNet(self.Params['num_channels'], self.Params['num_classes']),
+                                checkpoint_file=checkpoint_file,
+                                log_file=checkpoint_file + '-TEST.csv',
                                 use_gpu=self.Params['use_gpu'])
         trainer.resume_from_checkpoint()
+
         for filename in os.listdir(TestDirs['images']):
             img_obj = SegmentedImage()
             img_obj.load_file(data_dir=TestDirs['images'], file_name=filename)
@@ -76,7 +76,7 @@ class UnetRunner():
             img_obj.load_ground_truth(gt_dir=TestDirs['truth'], fget_ground_truth=test_groundtruth_file_getter)
 
             testset = PatchesGeneratorPerImgObj(img_obj=img_obj, train_image_size=self.Params['patch_size'],
-                                                transform=transform)
+                                                transform=self.transform)
 
             testloader = torch.utils.data.DataLoader(testset, batch_size=4,
                                                      shuffle=False, num_workers=0, sampler=None)

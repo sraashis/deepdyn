@@ -1,4 +1,5 @@
 import os
+from time import time
 
 import torch
 import torch.nn.functional as F
@@ -7,22 +8,21 @@ import neuralnet.utils.measurements as mggmt
 
 
 class NNTrainer:
-    def __init__(self, model=None, checkpoint_dir=None, checkpoint_file=None, log_to_file=True, use_gpu=True):
-        self.checkpoint_dir = checkpoint_dir
-        self.checkpoint_file = checkpoint_file
-        self.checkpoint = {'epochs': 0, 'state': None, 'score': 0.0, 'model': 'EMPTY'}
-        self.logger = None
+    def __init__(self, model=None, checkpoint_file='{}'.format(time()) + '.tar',
+                 log_file='{}'.format(time()) + '.csv',
+                 use_gpu=True):
         if torch.cuda.is_available():
             self.device = torch.device("cuda" if use_gpu else "cpu")
         else:
             print('### GPU not found.')
             self.device = torch.device("cpu")
         self.model = model.to(self.device)
-
-        if log_to_file:
-            self.logger = open(
-                os.path.join(self.checkpoint_dir, self.checkpoint_file + '-LOG' + '.csv'), 'w')
-            self.logger.write('TYPE,EPOCH,BATCH,PRECISION,RECALL,F1,ACCURACY,LOSS\n')
+        self.checkpoint = {'epochs': 0, 'state': None, 'score': 0.0, 'model': 'EMPTY'}
+        self.logger = None
+        os.makedirs('net_logs', exist_ok=True)
+        self.checkpoint_file = os.path.join('net_logs', checkpoint_file)
+        self.logger = open(os.path.join('net_logs', log_file), 'w')
+        self.logger.write('TYPE,EPOCH,BATCH,PRECISION,RECALL,F1,ACCURACY,LOSS\n')
 
     def train(self, optimizer=None, dataloader=None, epochs=None, log_frequency=200,
               validationloader=None, force_checkpoint=False, save_best=True):
@@ -92,7 +92,7 @@ class NNTrainer:
         raise NotImplementedError('ERROR!!!!! Must be implemented')
 
     def _save_checkpoint(self, checkpoint):
-        torch.save(checkpoint, os.path.join(self.checkpoint_dir, self.checkpoint_file))
+        torch.save(checkpoint, self.checkpoint_file)
         self.checkpoint = checkpoint
 
     @staticmethod
@@ -104,7 +104,7 @@ class NNTrainer:
 
     def resume_from_checkpoint(self):
         try:
-            self.checkpoint = torch.load(os.path.join(self.checkpoint_dir, self.checkpoint_file))
+            self.checkpoint = torch.load(self.checkpoint_file)
             self.model.load_state_dict(self.checkpoint['state'])
             print('Resumed last checkpoint: ' + self.checkpoint_file)
         except Exception as e:

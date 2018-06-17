@@ -5,29 +5,30 @@ import sys
 
 from testing.unet_runner import UnetRunner
 
-sys.path.append('/home/akhanal1/ature')
-os.chdir('/home/akhanal1/ature')
+sys.path.append('/home/ak/PycharmProjects/ature')
+os.chdir('/home/ak/PycharmProjects/ature')
 
 import torchvision.transforms as transforms
-from time import time
 
 if __name__ == "__main__":
     sep = os.sep
     Params = {}
     Params['num_channels'] = 1
     Params['classes'] = {'background': 0, 'vessel': 1, }
-    Params['batch_size'] = 4
+    Params['batch_size'] = 1
     Params['num_classes'] = len(Params['classes'])
     Params['epochs'] = 1000
     Params['patch_size'] = (388, 388)  # rows X cols
     Params['use_gpu'] = True
-    Params['learning_rate'] = 0.0005
-    Params['checkpoint_dir'] = 'assests' + sep + 'nnet_models'
+    Params['learning_rate'] = 0.0001
 
     transform = transforms.Compose([
         transforms.ToPILImage(),
         transforms.ToTensor()
     ])
+
+    runner = UnetRunner(Params=Params,
+                        transform=transform)
 
     ##################### DRIVE DATASET ########################
     Dirs = {}
@@ -69,16 +70,15 @@ if __name__ == "__main__":
         return file_name.split('_')[0] + '_test_mask.gif'
 
 
-    runner = UnetRunner(Params=Params,
-                        transform=transform,
-                        checkpoint_file="{}-".format(time()) + 'chkDRIVEunet.tar')
-
-    runner.train(Dirs=Dirs, ValidationDirs=ValidationDirs, transform=transforms,
+    checkpoint_file = 'chkDRIVEunet.tar'
+    runner.train(Dirs=Dirs, ValidationDirs=ValidationDirs,
                  train_mask_getter=get_mask_file, train_groundtruth_getter=get_ground_truth_file,
-                 val_mask_getter=get_mask_file_test, val_groundtruth_getter=get_ground_truth_file)
+                 val_mask_getter=get_mask_file_test, val_groundtruth_getter=get_ground_truth_file,
+                 checkpoint_file=checkpoint_file)
 
-    runner.run_tests(TestDirs=TestDirs, transform=transform, test_mask_getter=get_mask_file_test,
-                     test_groundtruth_file_getter=get_ground_truth_file)
+    runner.run_tests(TestDirs=TestDirs,
+                     test_mask_getter=get_mask_file_test,
+                     test_groundtruth_file_getter=get_ground_truth_file, checkpoint_file=checkpoint_file)
     #################################################################################
 
     ############## AV-WIDE Dataset ##################################################
@@ -117,15 +117,13 @@ if __name__ == "__main__":
     def get_ground_truth_file(file_name):
         return file_name.split('.')[0] + '_vessels.png'
 
-
-    runner = UnetRunner(Params=Params,
-                        transform=transform,
-                        checkpoint_file="{}-".format(time()) + 'chkWIDEunet.tar')
-
-    runner.train(Dirs=Dirs, ValidationDirs=ValidationDirs, transform=transforms,
+    checkpoint_file = 'chkWIDEunet.tar'
+    runner.train(Dirs=Dirs, ValidationDirs=ValidationDirs,
                  train_mask_getter=get_mask_file, train_groundtruth_getter=get_ground_truth_file,
-                 val_mask_getter=get_mask_file_test, val_groundtruth_getter=get_ground_truth_file)
+                 val_mask_getter=get_mask_file_test, val_groundtruth_getter=get_ground_truth_file,
+                 checkpoint_file=checkpoint_file)
 
-    runner.run_tests(TestDirs=TestDirs, transform=transform, test_mask_getter=get_mask_file_test,
-                     test_groundtruth_file_getter=get_ground_truth_file)
+    runner.run_tests(TestDirs=TestDirs,
+                     test_mask_getter=get_mask_file_test,
+                     test_groundtruth_file_getter=get_ground_truth_file, checkpoint_file=checkpoint_file)
     ######################################################################################
