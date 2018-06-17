@@ -3,7 +3,7 @@
 import os
 import sys
 
-import testing.unet_runner as urunner
+from .unet_runner import train, run_tests
 
 sys.path.append('/home/akhanal1/ature')
 os.chdir('/home/akhanal1/ature')
@@ -69,13 +69,13 @@ def get_mask_file_test(file_name):
 
 
 check_point_file = "{}-".format(time()) + 'chkDRIVEunet.tar'
-urunner.train(Params=Params, Dirs=Dirs, ValidationDirs=ValidationDirs, transform=transforms,
-              train_mask_getter=get_mask_file, train_groundtruth_getter=get_ground_truth_file,
-              val_mask_getter=get_mask_file_test, val_groundtruth_getter=get_ground_truth_file,
-              check_point_file=check_point_file)
+train(Params=Params, Dirs=Dirs, ValidationDirs=ValidationDirs, transform=transforms,
+      train_mask_getter=get_mask_file, train_groundtruth_getter=get_ground_truth_file,
+      val_mask_getter=get_mask_file_test, val_groundtruth_getter=get_ground_truth_file,
+      check_point_file=check_point_file)
 
-urunner.run_tests(TestDirs=TestDirs, Params=Params, transform=transform, test_mask_getter=get_mask_file_test,
-                  test_groundtruth_file_getter=get_ground_truth_file, checkpoint_file=check_point_file)
+run_tests(TestDirs=TestDirs, Params=Params, transform=transform, test_mask_getter=get_mask_file_test,
+          test_groundtruth_file_getter=get_ground_truth_file, checkpoint_file=check_point_file)
 #################################################################################
 
 
@@ -117,11 +117,11 @@ def get_ground_truth_file(file_name):
 
 
 check_point_file = "{}-".format(time()) + 'chkWIDEunet.tar'
-urunner.train(Params=Params, Dirs=Dirs, ValidationDirs=ValidationDirs, transform=transforms,
-              train_mask_getter=get_mask_file, train_groundtruth_getter=get_ground_truth_file,
-              val_mask_getter=get_mask_file_test, val_groundtruth_getter=get_ground_truth_file,
-              check_point_file=check_point_file)
+train(Params=Params, Dirs=Dirs, ValidationDirs=ValidationDirs, transform=transforms,
+      train_mask_getter=get_mask_file, train_groundtruth_getter=get_ground_truth_file,
+      val_mask_getter=get_mask_file_test, val_groundtruth_getter=get_ground_truth_file,
+      check_point_file=check_point_file)
 
-urunner.run_tests(TestDirs=TestDirs, Params=Params, transform=transform, test_mask_getter=get_mask_file_test,
-                  test_groundtruth_file_getter=get_ground_truth_file, checkpoint_file=check_point_file)
+run_tests(TestDirs=TestDirs, Params=Params, transform=transform, test_mask_getter=get_mask_file_test,
+          test_groundtruth_file_getter=get_ground_truth_file, checkpoint_file=check_point_file)
 ######################################################################################

@@ -58,6 +58,8 @@ def train(Params, Dirs, ValidationDirs, transform, train_mask_getter, train_grou
 
 
 def run_tests(TestDirs, Params, transform, test_mask_getter, test_groundtruth_file_getter, checkpoint_file):
+    # ### Define the network
+    net = UNet(Params['num_channels'], Params['num_classes'])
     trainer = UNetNNTrainer(model=net, checkpoint_dir=Params['checkpoint_dir'],
                             checkpoint_file='TEST-' + checkpoint_file,
                             log_to_file=True,
