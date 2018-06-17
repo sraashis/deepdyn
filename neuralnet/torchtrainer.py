@@ -8,19 +8,24 @@ import neuralnet.utils.measurements as mggmt
 
 
 class NNTrainer:
-    def __init__(self, model=None, checkpoint_dir=None, checkpoint_file=None, log_to_file=True):
-        self.model = model
+    def __init__(self, model=None, checkpoint_dir=None, checkpoint_file=None, log_to_file=True, use_gpu=True):
         self.checkpoint_dir = checkpoint_dir
         self.checkpoint_file = checkpoint_file
         self.checkpoint = {'epochs': 0, 'state': None, 'score': 0.0, 'model': 'EMPTY'}
         self.logger = None
+        if torch.cuda.is_available():
+            self.device = torch.device("cuda" if use_gpu else "cpu")
+        else:
+            print('### GPU not found.')
+            self.device = torch.device("cpu")
+        self.model = model.to(self.device)
 
         if log_to_file:
             self.logger = open(
                 os.path.join(self.checkpoint_dir, checkpoint_file + 'LOG-' + "{}".format(time())) + '.csv', 'w')
             self.logger.write('TYPE,EPOCH,BATCH,PRECISION,RECALL,F1,ACCURACY\n')
 
-    def train(self, optimizer=None, dataloader=None, epochs=None, use_gpu=None, log_frequency=200,
+    def train(self, optimizer=None, dataloader=None, epochs=None, log_frequency=200,
               validationloader=None, force_checkpoint=False, save_best=True):
 
         """
@@ -38,27 +43,22 @@ class NNTrainer:
         if validationloader is None:
             raise ValueError('Please provide validation loader.')
 
-        self.model.train()
-        self.model.cuda() if use_gpu else self.model.cpu()
         print('Training...')
         TP, FP, TN, FN = [0] * 4
         for epoch in range(0, epochs):
             running_loss = 0.0
+            self.model.train()
             for i, data in enumerate(dataloader, 0):
-                inputs, labels = data
-                inputs = inputs.cuda() if use_gpu else inputs.cpu()
-                labels = labels.cuda() if use_gpu else labels.cpu()
+                inputs, labels = data[0].to(self.device), data[1].to(self.device)
 
                 optimizer.zero_grad()
                 outputs = self.model(inputs)
-
                 loss = F.cross_entropy(outputs, labels)
                 loss.backward()
                 optimizer.step()
 
                 running_loss += loss.item()
                 current_loss = loss.item()
-
                 _, predicted = torch.max(outputs, 1)
 
                 _tp, _fp, _tn, _fn = self.get_score(labels, predicted)
@@ -79,19 +79,17 @@ class NNTrainer:
                       end='\r' if running_loss > 0 else '\n')
 
             self.checkpoint['epochs'] += 1
-            self.evaluate(dataloader=validationloader, use_gpu=use_gpu, force_checkpoint=force_checkpoint,
+            self.evaluate(dataloader=validationloader, force_checkpoint=force_checkpoint,
                           save_best=save_best)
 
-    def evaluate(self, dataloader=None, use_gpu=False, force_checkpoint=False, save_best=False):
+    def evaluate(self, dataloader=None, force_checkpoint=False, save_best=False):
         self.model.eval()
-        self.model.cuda() if use_gpu else self.model.cpu()
         print('\nEvaluating...')
         with torch.no_grad():
-            self._evaluate(dataloader=dataloader, use_gpu=use_gpu, force_checkpoint=force_checkpoint,
+            return self._evaluate(dataloader=dataloader, force_checkpoint=force_checkpoint,
                            save_best=save_best)
-        self.model.train()
 
-    def _evaluate(self, dataloader=None, use_gpu=False, force_checkpoint=False, save_best=False):
+    def _evaluate(self, dataloader=None, force_checkpoint=False, save_best=False):
         raise NotImplementedError('ERROR!!!!! Must be implemented')
 
     def _save_checkpoint(self, checkpoint):
