@@ -101,28 +101,20 @@ class ScoreAccumulator:
         self.tn, self.fp, self.fn, self.tp = [0] * 4
 
     def get_prf1a(self):
-        p = 0.0
-        r = 0.0
-        f1 = 0.0
-        a = 0.0
         try:
             p = self.tp / (self.tp + self.fp)
         except ZeroDivisionError:
             p = 0
-
         try:
             r = self.tp / (self.tp + self.fn)
         except ZeroDivisionError:
             r = 0
-
         try:
             f1 = 2 * p * r / (p + r)
         except ZeroDivisionError:
             f1 = 0
-
         try:
             a = (self.tp + self.tn) / (self.tp + self.fp + self.fn + self.tn)
         except ZeroDivisionError:
             a = 0
-
         return round(p, 3), round(r, 3), round(f1, 3), round(a, 3)
