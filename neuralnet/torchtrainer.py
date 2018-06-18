@@ -3,8 +3,9 @@ from time import time
 
 import torch
 import torch.nn.functional as F
-from sklearn.metrics import confusion_matrix
+
 from neuralnet.utils.measurements import ScoreAccumulator
+
 
 class NNTrainer:
     def __init__(self, model=None, checkpoint_file='{}'.format(time()) + '.tar',
