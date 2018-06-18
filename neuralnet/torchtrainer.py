@@ -25,7 +25,7 @@ class NNTrainer:
         self.logger.write('TYPE,EPOCH,BATCH,PRECISION,RECALL,F1,ACCURACY,LOSS\n')
 
     def train(self, optimizer=None, dataloader=None, epochs=None, log_frequency=200,
-              validationloader=None, force_checkpoint=False, save_best=True):
+              validationloader=None, force_checkpoint=False):
 
         """
         :param optimizer:
@@ -35,7 +35,6 @@ class NNTrainer:
         :param log_frequency:
         :param validationloader:
         :param force_checkpoint:
-        :param save_best:
         :return:
         """
 
@@ -78,17 +77,15 @@ class NNTrainer:
                       end='\r' if running_loss > 0 else '\n')
 
             self.checkpoint['epochs'] += 1
-            self.evaluate(dataloader=validationloader, force_checkpoint=force_checkpoint,
-                          save_best=save_best)
+            self.evaluate(dataloader=validationloader, force_checkpoint=force_checkpoint)
 
-    def evaluate(self, dataloader=None, force_checkpoint=False, save_best=False):
+    def evaluate(self, dataloader=None, force_checkpoint=False):
         self.model.eval()
         print('\nEvaluating...')
         with torch.no_grad():
-            return self._evaluate(dataloader=dataloader, force_checkpoint=force_checkpoint,
-                                  save_best=save_best)
+            return self._evaluate(dataloader=dataloader, force_checkpoint=force_checkpoint)
 
-    def _evaluate(self, dataloader=None, force_checkpoint=False, save_best=False):
+    def _evaluate(self, dataloader=None, force_checkpoint=False):
         raise NotImplementedError('ERROR!!!!! Must be implemented')
 
     def _save_checkpoint(self, checkpoint):
@@ -110,10 +107,7 @@ class NNTrainer:
         except Exception as e:
             print('ERROR: ' + str(e))
 
-    def _save_if_better(self, save_best=None, force_checkpoint=None, score=None):
-
-        if not save_best:
-            return
+    def _save_if_better(self, force_checkpoint=None, score=None):
 
         if force_checkpoint:
             self._save_checkpoint(
@@ -129,7 +123,6 @@ class NNTrainer:
                 NNTrainer._checkpoint(epochs=self.checkpoint['epochs'], model=self.model,
                                       score=score))
         else:
-            self._save_checkpoint(self.checkpoint)
             print('Score did not improve. _was:' + str(self.checkpoint['score']))
 
     def _log(self, msg):

@@ -34,7 +34,6 @@ class UnetRunner():
 
         trainloader = torch.utils.data.DataLoader(trainset, batch_size=self.Params['batch_size'], shuffle=False,
                                                   num_workers=3)
-
         # ### Load Validation Data
         validation_set = PatchesGenerator(Dirs=ValidationDirs, train_image_size=self.Params['patch_size'],
                                           transform=self.transform,
@@ -55,10 +54,11 @@ class UnetRunner():
                                 log_file=checkpoint_file + '-TRAIN.csv',
                                 use_gpu=self.Params['use_gpu'])
         trainer.train(optimizer=optimizer, dataloader=trainloader, epochs=self.Params['epochs'],
-                      validationloader=validationloader, force_checkpoint=False, log_frequency=20)
+                      validationloader=validationloader, force_checkpoint=True, log_frequency=20)
 
         with open(
-                self.Params['checkpoint_dir'] + sep + checkpoint_file + '.params', 'w') as pfile:
+                                        self.Params['checkpoint_dir'] + sep + checkpoint_file + '.params',
+                'w') as pfile:
             pfile.write(str(self.Params))
 
     def run_tests(self, TestDirs, test_mask_getter, test_groundtruth_file_getter, checkpoint_file):
@@ -84,12 +84,12 @@ class UnetRunner():
             ppp = ut.merge_patches(scores, img_obj.working_arr.shape, self.Params['patch_size'])
             IMG.fromarray(ppp).save(TestDirs['segmented'] + sep + filename + '.png')
 
-    # ### FAST MST algorithm
-    # params = {'sk_threshold': 150,
-    #           'alpha': 7.0,
-    #           'orig_contrib': 0.3,
-    #           'seg_threshold': 24}
-    #
-    # img_obj.working_arr = None  # todo
-    # img_obj.generate_skeleton(threshold=params['sk_threshold'])
-    # img_obj.generate_lattice_graph()
+            # ### FAST MST algorithm
+            # params = {'sk_threshold': 150,
+            #           'alpha': 7.0,
+            #           'orig_contrib': 0.3,
+            #           'seg_threshold': 24}
+            #
+            # img_obj.working_arr = None  # todo
+            # img_obj.generate_skeleton(threshold=params['sk_threshold'])
+            # img_obj.generate_lattice_graph()

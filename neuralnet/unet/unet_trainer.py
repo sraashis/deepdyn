@@ -10,7 +10,7 @@ class UNetNNTrainer(NNTrainer):
         NNTrainer.__init__(self, model=model, checkpoint_file=checkpoint_file,
                            log_file=log_file, use_gpu=use_gpu)
 
-    def _evaluate(self, dataloader=None, force_checkpoint=False, save_best=False):
+    def _evaluate(self, dataloader=None, force_checkpoint=False):
         TP, FP, TN, FN = [0] * 4
         all_predictions = []
         all_scores = []
@@ -40,6 +40,6 @@ class UNetNNTrainer(NNTrainer):
         all_scores = np.array(all_scores)
         all_predictions = np.array(all_predictions)
         all_labels = np.array(all_labels)
-        self._save_if_better(save_best=save_best, force_checkpoint=force_checkpoint, score=f1)
+        self._save_if_better(force_checkpoint=force_checkpoint, score=f1)
 
         return all_scores, all_predictions, all_labels
