@@ -16,7 +16,7 @@ if __name__ == "__main__":
     Params['classes'] = {'background': 0, 'vessel': 1, }
     Params['batch_size'] = 4
     Params['num_classes'] = len(Params['classes'])
-    Params['epochs'] = 1000
+    Params['epochs'] = 250
     Params['patch_size'] = (388, 388)  # rows X cols
     Params['use_gpu'] = True
     Params['learning_rate'] = 0.0001
@@ -108,19 +108,13 @@ if __name__ == "__main__":
     for k, folder in ValidationDirs.items():
         os.makedirs(folder, exist_ok=True)
 
-
-    def get_mask_file(file_name):
-        return file_name.split('_')[0] + '_training_mask.gif'
-
-
     def get_ground_truth_file(file_name):
         return file_name.split('.')[0] + '_vessels.png'
 
-
     checkpoint_file = 'chkWIDEunet.tar'
     runner.train(Dirs=Dirs, ValidationDirs=ValidationDirs,
-                 train_mask_getter=get_mask_file, train_groundtruth_getter=get_ground_truth_file,
-                 val_mask_getter=get_mask_file, val_groundtruth_getter=get_ground_truth_file,
+                 train_mask_getter=None, train_groundtruth_getter=get_ground_truth_file,
+                 val_mask_getter=None, val_groundtruth_getter=get_ground_truth_file,
                  checkpoint_file=checkpoint_file)
 
     runner.run_tests(TestDirs=TestDirs,

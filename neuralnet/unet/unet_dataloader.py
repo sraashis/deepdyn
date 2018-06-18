@@ -11,7 +11,6 @@ from commons.IMAGE import Image
 
 
 class PatchesGenerator(Dataset):
-
     def __init__(self, Dirs=None, transform=None,
                  fget_mask=None, fget_truth=None, train_image_size=(388, 388), pad_row_col=[(92, 92), (92, 92)]):
 
@@ -48,8 +47,9 @@ class PatchesGenerator(Dataset):
         img_obj.load_ground_truth(gt_dir=self.Dirs['truth'], fget_ground_truth=self.fget_truth)
         clahe = cv2.createCLAHE(clipLimit=2.0, tileGridSize=(8, 8))
         img_obj.working_arr = clahe.apply(img_obj.image_arr[:, :, 1])
-        x = np.logical_and(True, img_obj.mask == 255)
-        img_obj.working_arr[img_obj.mask == 0] = img_obj.working_arr[x].mean()
+        if img_obj.mask is not None:
+            x = np.logical_and(True, img_obj.mask == 255)
+            img_obj.working_arr[img_obj.mask == 0] = img_obj.working_arr[x].mean()
         return img_obj
 
     def __getitem__(self, index):
@@ -68,16 +68,6 @@ class PatchesGenerator(Dataset):
 
     def __len__(self):
         return len(self.patches_indexes)
-
-
-class PatchesGeneratorAV(PatchesGenerator):
-    def _get_image_obj(self, img_file=None):
-        img_obj = Image()
-        img_obj.load_file(data_dir=self.Dirs['images'], file_name=img_file)
-        img_obj.load_ground_truth(gt_dir=self.Dirs['truth'], fget_ground_truth=self.fget_truth)
-        clahe = cv2.createCLAHE(clipLimit=2.0, tileGridSize=(8, 8))
-        img_obj.working_arr = clahe.apply(img_obj.image_arr[:, :, 1])
-        return img_obj
 
 
 class PatchesGeneratorPerImgObj(PatchesGenerator):
