@@ -124,7 +124,8 @@ class NNTrainer:
             self.logger.write(msg + '\n')
             self.logger.flush()
 
-    def adjust_learning_rate(self, optimizer, epoch):
-        if epoch % 1 == 20:
+    @staticmethod
+    def adjust_learning_rate(optimizer, epoch):
+        if epoch % 20 == 0:
             for param_group in optimizer.param_groups:
                 param_group['lr'] = param_group['lr'] * 0.5
