@@ -88,9 +88,9 @@ class ScoreAccumulator:
     def __init__(self):
         self.tn, self.fp, self.fn, self.tp = [0] * 4
 
-    def add(self, y_true_tensor, y_pred_tensor):
+    def add(self, y_true_tensor, y_pred_tensor, labels=[0, 1]):
         _tn, _fp, _fn, _tp = confusion_matrix(y_true_tensor.view(1, -1).squeeze(),
-                                              y_pred_tensor.view(1, -1).squeeze()).ravel()
+                                              y_pred_tensor.view(1, -1).squeeze(), labels=labels).ravel()
         self.tn += _tn
         self.fp += _fp
         self.fn += _fn
