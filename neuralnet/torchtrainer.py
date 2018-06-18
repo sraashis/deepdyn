@@ -128,8 +128,3 @@ class NNTrainer:
         if epoch % 1 == 20:
             for param_group in optimizer.param_groups:
                 param_group['lr'] = param_group['lr'] * 0.5
-
-    def get_score(self, y_true_tensor, y_pred_tensor):
-        tn, fp, fn, tp = confusion_matrix(y_true_tensor.view(1, -1).squeeze(),
-                                          y_pred_tensor.view(1, -1).squeeze(), labels=[0, 1]).ravel()
-        return tp, fp, tn, fn
