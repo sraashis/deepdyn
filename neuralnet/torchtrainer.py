@@ -55,7 +55,7 @@ class NNTrainer:
                 loss.backward()
                 optimizer.step()
 
-                running_loss += loss.item()
+                running_loss += float(loss.item())
                 current_loss = loss.item()
                 _, predicted = torch.max(outputs, 1)
 
