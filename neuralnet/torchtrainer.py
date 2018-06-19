@@ -4,7 +4,7 @@ from time import time
 import torch
 import torch.nn.functional as F
 
-import neuralnet.utils.measurements as mggmt
+from neuralnet.utils.measurements import ScoreAccumulator
 
 
 class NNTrainer:
@@ -42,10 +42,11 @@ class NNTrainer:
             raise ValueError('Please provide validation loader.')
 
         print('Training...')
-        TP, FP, TN, FN = [0] * 4
         for epoch in range(0, epochs):
-            running_loss = 0.0
             self.model.train()
+            score_acc = ScoreAccumulator()
+            running_loss = 0.0
+            self.adjust_learning_rate(optimizer=optimizer, epoch=epoch+1)
             for i, data in enumerate(dataloader, 0):
                 inputs, labels = data[0].to(self.device), data[1].to(self.device)
 
@@ -55,17 +56,11 @@ class NNTrainer:
                 loss.backward()
                 optimizer.step()
 
-                running_loss += loss.item()
+                running_loss += float(loss.item())
                 current_loss = loss.item()
                 _, predicted = torch.max(outputs, 1)
 
-                _tp, _fp, _tn, _fn = self.get_score(labels, predicted)
-                TP += _tp
-                TN += _tn
-                FP += _fp
-                FN += _fn
-                p, r, f1, a = mggmt.get_prf1a(TP, FP, TN, FN)
-
+                p, r, f1, a = score_acc.add(labels, predicted).get_prf1a()
                 if (i + 1) % log_frequency == 0:  # Inspect the loss of every log_frequency batches
                     current_loss = running_loss / log_frequency if (i + 1) % log_frequency == 0 \
                         else (i + 1) % log_frequency
@@ -130,17 +125,8 @@ class NNTrainer:
             self.logger.write(msg + '\n')
             self.logger.flush()
 
-    def get_score(self, y_true_tensor, y_pred_tensor):
-        TP, FP, TN, FN = [0] * 4
-        y_true = y_true_tensor.clone().cpu().numpy().squeeze().ravel()
-        y_pred = y_pred_tensor.clone().cpu().numpy().squeeze().ravel()
-        for i in range(len(y_pred)):
-            if y_true[i] == y_pred[i] == 1:
-                TP += 1
-            if y_pred[i] == 1 and y_true[i] != y_pred[i]:
-                FP += 1
-            if y_true[i] == y_pred[i] == 0:
-                TN += 1
-            if y_pred[i] == 0 and y_true[i] != y_pred[i]:
-                FN += 1
-        return TP, FP, TN, FN
+    @staticmethod
+    def adjust_learning_rate(optimizer, epoch):
+        if epoch % 20 == 0:
+            for param_group in optimizer.param_groups:
+                param_group['lr'] = param_group['lr'] * 0.5

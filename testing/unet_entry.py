@@ -16,10 +16,10 @@ if __name__ == "__main__":
     Params['classes'] = {'background': 0, 'vessel': 1, }
     Params['batch_size'] = 4
     Params['num_classes'] = len(Params['classes'])
-    Params['epochs'] = 250
+    Params['epochs'] = 219
     Params['patch_size'] = (388, 388)  # rows X cols
     Params['use_gpu'] = True
-    Params['learning_rate'] = 0.0001
+    Params['learning_rate'] = 0.001
 
     transform = transforms.Compose([
         transforms.ToPILImage(),

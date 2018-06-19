@@ -82,3 +82,39 @@ def get_prf1a(tp, fp, tn, fn):
         a = 0
 
     return round(p, 3), round(r, 3), round(f1, 3), round(a, 3)
+
+
+class ScoreAccumulator:
+    def __init__(self):
+        self.tn, self.fp, self.fn, self.tp = [0] * 4
+
+    def add(self, y_true_tensor, y_pred_tensor, labels=[0, 1]):
+        _tn, _fp, _fn, _tp = confusion_matrix(y_true_tensor.view(1, -1).squeeze(),
+                                              y_pred_tensor.view(1, -1).squeeze(), labels=labels).ravel()
+        self.tn += _tn
+        self.fp += _fp
+        self.fn += _fn
+        self.tp += _tp
+        return self
+
+    def reset(self):
+        self.tn, self.fp, self.fn, self.tp = [0] * 4
+
+    def get_prf1a(self):
+        try:
+            p = self.tp / (self.tp + self.fp)
+        except ZeroDivisionError:
+            p = 0
+        try:
+            r = self.tp / (self.tp + self.fn)
+        except ZeroDivisionError:
+            r = 0
+        try:
+            f1 = 2 * p * r / (p + r)
+        except ZeroDivisionError:
+            f1 = 0
+        try:
+            a = (self.tp + self.tn) / (self.tp + self.fp + self.fn + self.tn)
+        except ZeroDivisionError:
+            a = 0
+        return round(p, 3), round(r, 3), round(f1, 3), round(a, 3)
