@@ -99,6 +99,7 @@ class ScoreAccumulator:
 
     def reset(self):
         self.tn, self.fp, self.fn, self.tp = [0] * 4
+        return self
 
     def get_prf1a(self):
         try:

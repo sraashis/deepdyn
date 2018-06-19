@@ -19,7 +19,7 @@ if __name__ == "__main__":
     Params['epochs'] = 219
     Params['patch_size'] = (388, 388)  # rows X cols
     Params['use_gpu'] = True
-    Params['learning_rate'] = 0.001
+    Params['learning_rate'] = 0.0001
 
     transform = transforms.Compose([
         transforms.ToPILImage(),
