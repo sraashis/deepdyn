@@ -46,7 +46,7 @@ class NNTrainer:
             self.model.train()
             score_acc = ScoreAccumulator()
             running_loss = 0.0
-            self.adjust_learning_rate(optimizer=optimizer, epoch=epoch)
+            self.adjust_learning_rate(optimizer=optimizer, epoch=epoch+1)
             for i, data in enumerate(dataloader, 0):
                 inputs, labels = data[0].to(self.device), data[1].to(self.device)
 

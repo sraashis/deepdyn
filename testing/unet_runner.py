@@ -54,12 +54,7 @@ class UnetRunner():
                                 log_file=checkpoint_file + '-TRAIN.csv',
                                 use_gpu=self.Params['use_gpu'])
         trainer.train(optimizer=optimizer, dataloader=trainloader, epochs=self.Params['epochs'],
-                      validationloader=validationloader, force_checkpoint=True, log_frequency=20)
-
-        with open(
-                                        self.Params['checkpoint_dir'] + sep + checkpoint_file + '.params',
-                'w') as pfile:
-            pfile.write(str(self.Params))
+                      validationloader=validationloader, force_checkpoint=False, log_frequency=20)
 
     def run_tests(self, TestDirs, test_mask_getter, test_groundtruth_file_getter, checkpoint_file):
         # ### Define the network
