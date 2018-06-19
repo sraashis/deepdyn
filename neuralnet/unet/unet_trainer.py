@@ -26,7 +26,8 @@ class UNetNNTrainer(NNTrainer):
             all_predictions += predicted.clone().cpu().numpy().tolist()
             all_labels += labels.clone().cpu().numpy().tolist()
 
-            p, r, f1, a = score_acc.reset().add(labels, predicted).get_prf1a()
+            score_acc.add(labels, predicted)
+            p, r, f1, a = ScoreAccumulator().add(labels, predicted).get_prf1a()
             self._log(','.join(str(x) for x in [1, self.checkpoint['epochs'], i + 1, p, r, f1, a]))
             print('Batch[%d/%d] pre:%.3f rec:%.3f f1:%.3f acc:%.3f' % (
                 i + 1, dataloader.__len__(), p, r, f1, a),
@@ -36,6 +37,6 @@ class UNetNNTrainer(NNTrainer):
         all_scores = np.array(all_scores)
         all_predictions = np.array(all_predictions)
         all_labels = np.array(all_labels)
-        self._save_if_better(force_checkpoint=force_checkpoint, score=f1)
+        self._save_if_better(force_checkpoint=force_checkpoint, score=score_acc.get_prf1a()[2])
 
         return all_scores, all_predictions, all_labels
