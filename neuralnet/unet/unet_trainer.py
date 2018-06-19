@@ -27,7 +27,7 @@ class UNetNNTrainer(NNTrainer):
             all_labels += labels.clone().cpu().numpy().tolist()
 
             p, r, f1, a = score_acc.add(labels, predicted).get_prf1a()
-            self._log(','.join(str(x) for x in [1, 0, i + 1, p, r, f1, a]))
+            self._log(','.join(str(x) for x in [1, self.checkpoint['epochs'], i + 1, p, r, f1, a]))
             print('Batch[%d/%d] pre:%.3f rec:%.3f f1:%.3f acc:%.3f' % (
                 i + 1, dataloader.__len__(), p, r, f1, a),
                   end='\r')
