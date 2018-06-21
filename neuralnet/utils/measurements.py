@@ -1,4 +1,3 @@
-##The credit for this module goes to http://scikit-learn.org/stable/about.html#citing-scikit-learn
 import itertools
 
 import matplotlib.pyplot as plt
@@ -58,10 +57,6 @@ def get_score(y_true, y_pred):
 
 
 def get_prf1a(tp, fp, tn, fn):
-    p = 0.0
-    r = 0.0
-    f1 = 0.0
-    a = 0.0
     try:
         p = tp / (tp + fp)
     except ZeroDivisionError:
@@ -121,4 +116,4 @@ class ScoreAccumulator:
             a = (self.tp + self.tn) / (self.tp + self.fp + self.fn + self.tn)
         except ZeroDivisionError:
             a = 0
-        return round(p, 3), round(r, 3), round(f1, 3), round(a, 3)
+        return [round(p, 3), round(r, 3), round(f1, 3), round(a, 3)]
