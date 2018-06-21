@@ -46,6 +46,8 @@ class UnetRunner():
 
         # ### Define the network
         model = UNet(self.Params['num_channels'], self.Params['num_classes'])
+        if self.Params['distribute']:
+            model = torch.nn.DataParallel(model)
         optimizer = optim.Adam(model.parameters(), lr=self.Params['learning_rate'])
 
         # ### Train and evaluate network
@@ -54,7 +56,7 @@ class UnetRunner():
                                 log_file=checkpoint_file + '-TRAIN.csv',
                                 use_gpu=self.Params['use_gpu'])
         trainer.train(optimizer=optimizer, dataloader=trainloader, epochs=self.Params['epochs'],
-                      validationloader=validationloader, force_checkpoint=False, log_frequency=20)
+                      validationloader=validationloader, force_checkpoint=True, log_frequency=20)
 
     def run_tests(self, TestDirs, test_mask_getter, test_groundtruth_file_getter, checkpoint_file):
         # ### Define the network
