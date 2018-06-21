@@ -3,6 +3,7 @@ import itertools
 
 import matplotlib.pyplot as plt
 import numpy as np
+import torch
 from sklearn.metrics import confusion_matrix
 
 
@@ -88,13 +89,15 @@ class ScoreAccumulator:
     def __init__(self):
         self.tn, self.fp, self.fn, self.tp = [0] * 4
 
-    def add(self, y_true_tensor, y_pred_tensor, labels=[0, 1]):
-        _tn, _fp, _fn, _tp = confusion_matrix(y_true_tensor.view(1, -1).squeeze(),
-                                              y_pred_tensor.view(1, -1).squeeze(), labels=labels).ravel()
-        self.tn += _tn
-        self.fp += _fp
-        self.fn += _fn
-        self.tp += _tp
+    def add(self, y_true_tensor, y_pred_tensor):
+        y_true = y_true_tensor.view(1, -1).squeeze()
+        y_pred = y_pred_tensor.view(1, -1).squeeze()
+        y_true = y_true * 2
+        y_cases = y_true + y_pred
+        self.tp += torch.sum(y_cases == 3).item()
+        self.fp += torch.sum(y_cases == 1).item()
+        self.tn += torch.sum(y_cases == 0).item()
+        self.fn += torch.sum(y_cases == 2).item()
         return self
 
     def reset(self):
