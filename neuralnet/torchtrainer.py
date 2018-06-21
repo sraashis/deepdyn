@@ -46,7 +46,7 @@ class NNTrainer:
             self.model.train()
             score_acc = ScoreAccumulator()
             running_loss = 0.0
-            self.adjust_learning_rate(optimizer=optimizer, epoch=epoch+1)
+            self.adjust_learning_rate(optimizer=optimizer, epoch=epoch + 1)
             for i, data in enumerate(dataloader, 0):
                 inputs, labels = data[0].to(self.device), data[1].to(self.device)
 
@@ -60,7 +60,7 @@ class NNTrainer:
                 current_loss = loss.item()
                 _, predicted = torch.max(outputs, 1)
 
-                p, r, f1, a = score_acc.add(labels, predicted).get_prf1a()
+                p, r, f1, a = score_acc.reset().add(labels, predicted).get_prf1a()
                 if (i + 1) % log_frequency == 0:  # Inspect the loss of every log_frequency batches
                     current_loss = running_loss / log_frequency if (i + 1) % log_frequency == 0 \
                         else (i + 1) % log_frequency
@@ -127,6 +127,6 @@ class NNTrainer:
 
     @staticmethod
     def adjust_learning_rate(optimizer, epoch):
-        if epoch % 20 == 0:
+        if epoch % 30 == 0:
             for param_group in optimizer.param_groups:
                 param_group['lr'] = param_group['lr'] * 0.5
