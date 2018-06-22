@@ -32,7 +32,7 @@ class UnetRunner():
                                     fget_mask=train_mask_getter,
                                     fget_truth=train_groundtruth_getter)
 
-        trainloader = torch.utils.data.DataLoader(trainset, batch_size=self.Params['batch_size'], shuffle=False,
+        trainloader = torch.utils.data.DataLoader(trainset, batch_size=self.Params['batch_size'], shuffle=True,
                                                   num_workers=3)
         # ### Load Validation Data
         validation_set = PatchesGenerator(Dirs=ValidationDirs, train_image_size=self.Params['patch_size'],
@@ -46,6 +46,8 @@ class UnetRunner():
 
         # ### Define the network
         model = UNet(self.Params['num_channels'], self.Params['num_classes'])
+        if self.Params['distribute']:
+            model = torch.nn.DataParallel(model)
         optimizer = optim.Adam(model.parameters(), lr=self.Params['learning_rate'])
 
         # ### Train and evaluate network
