@@ -94,10 +94,20 @@ class NNTrainer:
                 'score': score,
                 'model': str(model)}
 
-    def resume_from_checkpoint(self):
+    def resume_from_checkpoint(self, parallel_trained=False):
         try:
             self.checkpoint = torch.load(self.checkpoint_file)
-            self.model.load_state_dict(self.checkpoint['state'])
+            if load_parallel_trained:
+                print('######################################')
+                from collections import OrderedDict
+                new_state_dict = OrderedDict()
+                for k, v in self.checkpoint['state'].items():
+                    name = k[7:]  # remove `module.`
+                    new_state_dict[name] = v
+                # load params
+                self.model.load_state_dict(new_state_dict)
+            else:
+                self.model.load_state_dict(self.checkpoint['state'])
             print('Resumed last checkpoint: ' + self.checkpoint_file)
         except Exception as e:
             print('ERROR: ' + str(e))

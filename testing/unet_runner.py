@@ -46,9 +46,10 @@ class UnetRunner():
 
         # ### Define the network
         model = UNet(self.Params['num_channels'], self.Params['num_classes'])
+        optimizer = optim.Adam(model.parameters(), lr=self.Params['learning_rate'])
         if self.Params['distribute']:
             model = torch.nn.DataParallel(model)
-        optimizer = optim.Adam(model.parameters(), lr=self.Params['learning_rate'])
+            optimizer = optim.Adam(model.module.parameters(), lr=self.Params['learning_rate'])
 
         # ### Train and evaluate network
         trainer = UNetNNTrainer(model=model,
@@ -60,11 +61,13 @@ class UnetRunner():
 
     def run_tests(self, TestDirs, test_mask_getter, test_groundtruth_file_getter, checkpoint_file):
         # ### Define the network
-        trainer = UNetNNTrainer(model=UNet(self.Params['num_channels'], self.Params['num_classes']),
+        model = UNet(self.Params['num_channels'], self.Params['num_classes'])
+        trainer = UNetNNTrainer(model=model,
                                 checkpoint_file=checkpoint_file,
                                 log_file=checkpoint_file + '-TEST.csv',
                                 use_gpu=self.Params['use_gpu'])
-        trainer.resume_from_checkpoint()
+        trainer.resume_from_checkpoint(parallel_trained=True)
+        # print(trainer.checkpoint['epochs'], trainer.checkpoint['score'])
 
         for filename in os.listdir(TestDirs['images']):
             img_obj = SegmentedImage()
