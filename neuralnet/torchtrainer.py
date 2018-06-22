@@ -97,7 +97,7 @@ class NNTrainer:
     def resume_from_checkpoint(self, parallel_trained=False):
         try:
             self.checkpoint = torch.load(self.checkpoint_file)
-            if load_parallel_trained:
+            if parallel_trained:
                 print('######################################')
                 from collections import OrderedDict
                 new_state_dict = OrderedDict()
