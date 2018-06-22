@@ -138,4 +138,4 @@ class NNTrainer:
     def adjust_learning_rate(optimizer, epoch):
         if epoch % 40 == 0:
             for param_group in optimizer.param_groups:
-                param_group['lr'] = param_group['lr'] * 0.5
+                param_group['lr'] = param_group['lr'] * 0.70
