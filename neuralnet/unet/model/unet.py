@@ -12,9 +12,11 @@ class _DoubleConvolution(nn.Module):
             nn.Conv2d(in_channels, middle_channel, kernel_size=3),
             nn.BatchNorm2d(middle_channel),
             nn.ReLU(inplace=True),
+            nn.Dropout2d(p=middle_channel / 2048),
             nn.Conv2d(middle_channel, out_channels, kernel_size=3),
             nn.BatchNorm2d(out_channels),
             nn.ReLU(inplace=True),
+            nn.Dropout2d(p=out_channels / 2048),
         ]
         self.encode = nn.Sequential(*layers)
 
