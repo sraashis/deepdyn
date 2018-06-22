@@ -16,10 +16,10 @@ if __name__ == "__main__":
     Params['classes'] = {'background': 0, 'vessel': 1, }
     Params['batch_size'] = 4
     Params['num_classes'] = len(Params['classes'])
-    Params['epochs'] = 119
+    Params['epochs'] = 199
     Params['patch_size'] = (388, 388)  # rows X cols
     Params['use_gpu'] = True
-    Params['learning_rate'] = 0.0001
+    Params['learning_rate'] = 0.001
     Params['distribute'] = True
 
     transform = transforms.Compose([
@@ -70,7 +70,7 @@ if __name__ == "__main__":
         return file_name.split('_')[0] + '_test_mask.gif'
 
 
-    checkpoint_file = 'chkDRIVEunet.tar'
+    checkpoint_file = 'unet-drive.chk.tar'
     runner.train(Dirs=Dirs, ValidationDirs=ValidationDirs,
                  train_mask_getter=get_mask_file, train_groundtruth_getter=get_ground_truth_file,
                  val_mask_getter=get_mask_file_test, val_groundtruth_getter=get_ground_truth_file,
@@ -112,7 +112,7 @@ if __name__ == "__main__":
     def get_ground_truth_file(file_name):
         return file_name.split('.')[0] + '_vessels.png'
 
-    checkpoint_file = 'chkWIDEunet.tar'
+    checkpoint_file = 'unet-wide.chk.tar'
     runner.train(Dirs=Dirs, ValidationDirs=ValidationDirs,
                  train_mask_getter=None, train_groundtruth_getter=get_ground_truth_file,
                  val_mask_getter=None, val_groundtruth_getter=get_ground_truth_file,
