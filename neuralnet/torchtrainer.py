@@ -18,10 +18,9 @@ class NNTrainer:
             self.device = torch.device("cpu")
         self.model = model.to(self.device)
         self.checkpoint = {'epochs': 0, 'state': None, 'score': 0.0, 'model': 'EMPTY'}
-        self.logger = None
         os.makedirs('net_logs', exist_ok=True)
-        self.checkpoint_file = os.path.join('net_logs', checkpoint_file)
         self.logger = open(os.path.join('net_logs', log_file), 'w')
+        self.checkpoint_file = os.path.join('net_logs', checkpoint_file)
         self.logger.write('TYPE,EPOCH,BATCH,PRECISION,RECALL,F1,ACCURACY,LOSS\n')
 
     def train(self, optimizer=None, dataloader=None, epochs=None, log_frequency=200,
