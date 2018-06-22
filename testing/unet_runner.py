@@ -32,7 +32,7 @@ class UnetRunner():
                                     fget_mask=train_mask_getter,
                                     fget_truth=train_groundtruth_getter)
 
-        trainloader = torch.utils.data.DataLoader(trainset, batch_size=self.Params['batch_size'], shuffle=False,
+        trainloader = torch.utils.data.DataLoader(trainset, batch_size=self.Params['batch_size'], shuffle=True,
                                                   num_workers=3)
         # ### Load Validation Data
         validation_set = PatchesGenerator(Dirs=ValidationDirs, train_image_size=self.Params['patch_size'],
@@ -56,7 +56,7 @@ class UnetRunner():
                                 log_file=checkpoint_file + '-TRAIN.csv',
                                 use_gpu=self.Params['use_gpu'])
         trainer.train(optimizer=optimizer, dataloader=trainloader, epochs=self.Params['epochs'],
-                      validationloader=validationloader, force_checkpoint=True, log_frequency=20)
+                      validationloader=validationloader, force_checkpoint=False, log_frequency=20)
 
     def run_tests(self, TestDirs, test_mask_getter, test_groundtruth_file_getter, checkpoint_file):
         # ### Define the network
