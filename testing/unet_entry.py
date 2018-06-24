@@ -36,18 +36,28 @@ if __name__ == "__main__":
         model = torch.nn.DataParallel(model)
         optimizer = optim.Adam(model.module.parameters(), lr=Params['learning_rate'])
 
-    # Drive Data set
-    checkpoint = 'unet-wide.chk.tar'
+    """
+    ################## Drive Data set ################
+    """
+    Dirs = {}
+    Dirs['train'] = 'data' + sep + 'DRIVE' + sep + 'training'
+    Dirs['test'] = 'data' + sep + 'DRIVE' + sep + 'testing'
+    Dirs['segmented'] = 'data' + sep + 'DRIVE' + sep + 'testing' + sep + 'segmented'
+
+    checkpoint = 'unet-drive.chk.tar'
     drive_trainer = UNetNNTrainer(model=model,
                                   checkpoint_file=checkpoint,
-                                  log_file=checkpoint + '.csv',
+                                  log_file=checkpoint + '-TEST.csv',
                                   use_gpu=Params['use_gpu'])
-    train_loader, val_loader, test_loader = split_drive_dataset(transform=transform)
-    drive_trainer.train(optimizer=optimizer,
-                        data_loader=train_loader,
-                        epochs=Params['epochs'],
-                        validation_loader=val_loader,
-                        force_checkpoint=False, log_frequency=20)
+    train_loader, val_loader, test_loader = split_drive_dataset(Dirs=Dirs, transform=transform)
+    # drive_trainer.train(optimizer=optimizer,
+    #                     data_loader=train_loader,
+    #                     epochs=Params['epochs'],
+    #                     validation_loader=val_loader,
+    #                     force_checkpoint=False, log_frequency=20)
     drive_trainer.resume_from_checkpoint(parallel_trained=False)
-    drive_trainer.evaluate(data_loader=test_loader, mode='eval', patch_size=(388, 388), segmented_out='drive_segmented')
+    logger = drive_trainer.get_logger(checkpoint + 'TEST.csv')
+    drive_trainer.evaluate(data_loader=test_loader, mode='eval', patch_size=(388, 388), segmented_out=Dirs['segmented'],
+                           logger=logger)
+    logger.close()
     # End

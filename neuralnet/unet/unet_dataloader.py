@@ -56,12 +56,7 @@ def get_loaders(images_dir=None, mask_dir=None, manual_dir=None,
     return loaders
 
 
-def split_drive_dataset(transform=None):
-    Dirs = {}
-    Dirs['train'] = 'data' + sep + 'DRIVE' + sep + 'training'
-    Dirs['test'] = 'data' + sep + 'DRIVE' + sep + 'testing'
-    Dirs['segmented'] = 'data' + sep + 'DRIVE' + sep + 'testing' + sep + 'segmented'
-
+def split_drive_dataset(Dirs=None, transform=None):
     for k, folder in Dirs.items():
         os.makedirs(folder, exist_ok=True)
 

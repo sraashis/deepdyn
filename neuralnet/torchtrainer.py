@@ -17,11 +17,11 @@ class NNTrainer:
             print('### GPU not found.')
             self.device = torch.device("cpu")
         self.model = model.to(self.device)
-        self.checkpoint = {'epochs': 0, 'state': None, 'score': 0.0, 'model': 'EMPTY'}
+
         os.makedirs('net_logs', exist_ok=True)
-        self.logger = open(os.path.join('net_logs', log_file), 'w')
+        self.logger = self.get_logger(log_file)
         self.checkpoint_file = os.path.join('net_logs', checkpoint_file)
-        self.logger.write('ID,TYPE,EPOCH,BATCH,PRECISION,RECALL,F1,ACCURACY,LOSS\n')
+        self.checkpoint = {'epochs': 0, 'state': None, 'score': 0.0, 'model': 'EMPTY'}
 
     def train(self, optimizer=None, data_loader=None, epochs=None, log_frequency=200,
               validation_loader=None, force_checkpoint=False):
@@ -54,23 +54,29 @@ class NNTrainer:
                         else (i + 1) % log_frequency
                     running_loss = 0.0
 
-                self._log(','.join(str(x) for x in [0, 0, epoch + 1, i + 1, p, r, f1, a, current_loss]))
+                self.flush(self.logger, ','.join(str(x) for x in [0, 0, epoch + 1, i + 1, p, r, f1, a, current_loss]))
                 print('Epochs[%d/%d] Batch[%d/%d] loss:%.5f pre:%.3f rec:%.3f f1:%.3f acc:%.3f' %
                       (epoch + 1, epochs, i + 1, data_loader.__len__(), current_loss, p, r, f1, a),
                       end='\r' if running_loss > 0 else '\n')
 
             self.checkpoint['epochs'] += 1
-            self.evaluate(data_loader=validation_loader, force_checkpoint=force_checkpoint, mode='train')
+            self.evaluate(data_loader=validation_loader, force_checkpoint=force_checkpoint,
+                          mode='train', logger=self.logger)
+        try:
+            self.logger.close()
+        except IOError:
+            pass
 
-    def evaluate(self, data_loader=None, force_checkpoint=False, mode='val', **kwargs):
+    def evaluate(self, data_loader=None, force_checkpoint=False, mode='val', logger=None, **kwargs):
 
+        assert (logger is not None), 'Please Provide a logger'
         assert (mode == 'val' or mode == 'train'), 'Mode can either be val or train'
         self.model.eval()
         print('\nEvaluating...')
         with torch.no_grad():
-            return self._evaluate(data_loader=data_loader, force_checkpoint=force_checkpoint, mode=mode)
+            return self._evaluate(data_loader=data_loader, force_checkpoint=force_checkpoint, mode=mode, logger=logger)
 
-    def _evaluate(self, data_loader=None, force_checkpoint=None, mode=None):
+    def _evaluate(self, data_loader=None, force_checkpoint=None, mode=None, logger=None):
         raise NotImplementedError('ERROR!!!!! Must be implemented')
 
     def _save_checkpoint(self, checkpoint):
@@ -118,10 +124,17 @@ class NNTrainer:
         else:
             print('Score did not improve. _was:' + str(self.checkpoint['score']))
 
-    def _log(self, msg):
-        if self.logger is not None:
-            self.logger.write(msg + '\n')
-            self.logger.flush()
+    @staticmethod
+    def get_logger(log_file):
+        file = open(os.path.join('net_logs', log_file), 'w')
+        NNTrainer.flush(file, 'ID,TYPE,EPOCH,BATCH,PRECISION,RECALL,F1,ACCURACY,LOSS')
+        return file
+
+    @staticmethod
+    def flush(logger, msg):
+        if logger is not None:
+            logger.write(msg + '\n')
+            logger.flush()
 
     @staticmethod
     def adjust_learning_rate(optimizer, epoch):
