@@ -112,8 +112,8 @@ optimizer = optim.Adam(net.parameters(), lr=0.0001)
 # ### Train and evaluate network
 trainer = UNetNNTrainer(model=net, checkpoint_dir=Dirs['checkpoint'], checkpoint_file=checkpoint_file)
 trainer.resume_from_checkpoint()
-trainer.train(optimizer=optimizer, dataloader=trainloader, epochs=epochs,
-              validationloader=validationloader, force_checkpoint=False, log_frequency=20)
+trainer.train(optimizer=optimizer, data_loader=trainloader, epochs=epochs,
+              validation_loader=validationloader, force_checkpoint=False, log_frequency=20)
 
 # ### Test on images
 for filename in os.listdir(TestDirs['images']):

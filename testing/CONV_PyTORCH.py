@@ -237,8 +237,8 @@ validationloader = torch.utils.data.DataLoader(validation_set, batch_size=batch_
 
 trainer = NNTrainer(model=net, checkpoint_dir=Dirs['checkpoint'], checkpoint_file=checkpoint_file)
 # trainer.resume_from_checkpoint()
-trainer.train(optimizer=optimizer, dataloader=trainloader, epochs=epochs, use_gpu=use_gpu,
-              validationloader=validationloader)
+trainer.train(optimizer=optimizer, data_loader=trainloader, epochs=epochs, use_gpu=use_gpu,
+              validation_loader=validationloader)
 # trainer.resume_from_checkpoint()
 
 
