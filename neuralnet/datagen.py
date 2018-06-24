@@ -47,8 +47,8 @@ class Generator(Dataset):
 
         img_obj.load_ground_truth(gt_dir=self.manual_dir,
                                   fget_ground_truth=self.get_truth)
-        enhancer = cv2.createCLAHE(clipLimit=2.0, tileGridSize=(8, 8))
-        img_obj.working_arr = enhancer.apply(img_obj.image_arr[:, :, 1])
+        img_obj.working_arr = img_obj.image_arr[:, :, 1]
+        img_obj.apply_clahe()
         if img_obj.mask is not None:
             x = np.logical_and(True, img_obj.mask == 255)
             img_obj.working_arr[img_obj.mask == 0] = img_obj.working_arr[x].mean()
