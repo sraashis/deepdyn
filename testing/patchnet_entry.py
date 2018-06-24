@@ -6,9 +6,9 @@ os.chdir('/home/akhanal1/ature')
 
 import torch
 import torch.optim as optim
-from neuralnet.unet.model.unet import UNet
-from neuralnet.unet.unet_dataloader import split_drive_dataset
-from neuralnet.unet.unet_trainer import UNetNNTrainer
+from neuralnet.simplenet.model import PatchNet
+from neuralnet.simplenet.simplenet_dataloader import split_drive_dataset
+from neuralnet.simplenet.simplenet_trainer import PatchNetTrainer
 import torchvision.transforms as transforms
 
 if __name__ == "__main__":
@@ -16,10 +16,10 @@ if __name__ == "__main__":
     Params = {}
     Params['num_channels'] = 1
     Params['classes'] = {'background': 0, 'vessel': 1, }
-    Params['batch_size'] = 4
+    Params['batch_size'] = 256
     Params['num_classes'] = len(Params['classes'])
-    Params['epochs'] = 500
-    Params['patch_size'] = (388, 388)  # rows X cols
+    Params['epochs'] = 100
+    Params['patch_size'] = (51, 51)  # rows X cols
     Params['use_gpu'] = True
     Params['learning_rate'] = 0.001
     Params['distribute'] = True
@@ -30,38 +30,34 @@ if __name__ == "__main__":
     ])
 
     # Define the network
-    model = UNet(Params['num_channels'], Params['num_classes'])
+    model = PatchNet(Params['patch_size'][0], Params['num_channels'], Params['num_classes'])
     optimizer = optim.Adam(model.parameters(), lr=Params['learning_rate'])
     if Params['distribute']:
         model = torch.nn.DataParallel(model)
         optimizer = optim.Adam(model.module.parameters(), lr=Params['learning_rate'])
 
     """
-    ################## UNET Drive Data set ################
+    ################## Patchnet Drive Data set ################
     """
     Dirs = {}
     Dirs['train'] = 'data' + sep + 'DRIVE' + sep + 'training'
     Dirs['test'] = 'data' + sep + 'DRIVE' + sep + 'testing'
-    Dirs['segmented'] = 'data' + sep + 'DRIVE' + sep + 'testing' + sep + 'segmented'
+    Dirs['segmented'] = 'data' + sep + 'DRIVE' + sep + 'testing' + sep + 'segmented_patch'
 
-    checkpoint = 'unet-drive.chk.tar'
-    drive_trainer = UNetNNTrainer(model=model,
-                                  checkpoint_file=checkpoint,
-                                  log_file=checkpoint + '.csv',
-                                  use_gpu=Params['use_gpu'])
+    checkpoint = 'patchnet-drive.chk.tar'
+    drive_trainer = PatchNetTrainer(model=model,
+                                    checkpoint_file=checkpoint,
+                                    log_file=checkpoint + '.csv',
+                                    use_gpu=Params['use_gpu'])
     train_loader, val_loader, test_loader = split_drive_dataset(Dirs=Dirs, transform=transform)
     drive_trainer.train(optimizer=optimizer,
                         data_loader=train_loader,
                         epochs=Params['epochs'],
                         validation_loader=val_loader,
-                        force_checkpoint=False, log_frequency=20)
+                        force_checkpoint=False, log_frequency=500)
     drive_trainer.resume_from_checkpoint(parallel_trained=False)
     logger = drive_trainer.get_logger(checkpoint + 'TEST.csv')
-    drive_trainer.evaluate(data_loader=test_loader, mode='eval', patch_size=(388, 388), segmented_out=Dirs['segmented'],
+    drive_trainer.evaluate(data_loader=test_loader, mode='eval', segmented_out=Dirs['segmented'],
                            logger=logger)
     logger.close()
     # End
-
-    """
-    ############### PATCH BASED DRIVE ###################
-    """

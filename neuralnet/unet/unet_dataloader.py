@@ -15,7 +15,7 @@ class PatchesGenerator(Generator):
         self.shape = shape
         self.pad = pad
         self._load_indices()
-        print(self.__len__(), end='\r')
+        print('Patches:', self.__len__())
 
     def _load_indices(self):
         for ID, img_file in enumerate(self.images):
