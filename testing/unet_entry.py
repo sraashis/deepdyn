@@ -18,7 +18,7 @@ if __name__ == "__main__":
     Params['classes'] = {'background': 0, 'vessel': 1, }
     Params['batch_size'] = 4
     Params['num_classes'] = len(Params['classes'])
-    Params['epochs'] = 5
+    Params['epochs'] = 250
     Params['patch_size'] = (388, 388)  # rows X cols
     Params['use_gpu'] = True
     Params['learning_rate'] = 0.001
@@ -44,10 +44,10 @@ if __name__ == "__main__":
     Dirs['test'] = 'data' + sep + 'DRIVE' + sep + 'testing'
     Dirs['segmented'] = 'data' + sep + 'DRIVE' + sep + 'testing' + sep + 'segmented'
 
-    checkpoint = 'unet-driveFAKE.chk.tar'
+    checkpoint = 'unet-drive.chk.tar'
     drive_trainer = UNetNNTrainer(model=model,
                                   checkpoint_file=checkpoint,
-                                  log_file=checkpoint + '-TEST.csv',
+                                  log_file=checkpoint + '.csv',
                                   use_gpu=Params['use_gpu'])
     train_loader, val_loader, test_loader = split_drive_dataset(Dirs=Dirs, transform=transform)
     drive_trainer.train(optimizer=optimizer,

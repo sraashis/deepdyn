@@ -33,7 +33,7 @@ class UNetNNTrainer(NNTrainer):
 
                 optimizer.zero_grad()
                 outputs = self.model(inputs)
-                loss = F.nll_loss(outputs, labels, torch.Tensor([1, 3]).to(self.device))
+                loss = F.nll_loss(outputs, labels, torch.Tensor([1, 8]).to(self.device))
                 loss.backward()
                 optimizer.step()
 
@@ -75,7 +75,7 @@ class UNetNNTrainer(NNTrainer):
             for loader in data_loader:
                 if mode is 'train':
                     score_acc.accumulate(self._evaluate(data_loader=loader,
-                                                        force_checkpoint=force_checkpoint, mode=mode))
+                                                        force_checkpoint=force_checkpoint, mode=mode, logger=logger))
                 if mode is 'eval' and to_dir is not None:
                     scores, predictions, labels = self._evaluate(data_loader=loader,
                                                                  force_checkpoint=force_checkpoint, mode=mode,
@@ -90,6 +90,7 @@ class UNetNNTrainer(NNTrainer):
     def _evaluate(self, data_loader=None, force_checkpoint=False, mode=None, logger=None):
 
         assert (mode == 'eval' or mode == 'train'), 'Mode can either be eval or train'
+        assert (logger is not None), 'Please Provide a logger'
         score_acc = ScoreAccumulator()
         all_predictions = []
         all_scores = []
