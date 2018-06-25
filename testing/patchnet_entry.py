@@ -16,7 +16,7 @@ if __name__ == "__main__":
     Params = {}
     Params['num_channels'] = 1
     Params['classes'] = {'background': 0, 'vessel': 1, }
-    Params['batch_size'] = 256
+    Params['batch_size'] = 512
     Params['num_classes'] = len(Params['classes'])
     Params['epochs'] = 100
     Params['patch_size'] = (51, 51)  # rows X cols
@@ -49,14 +49,15 @@ if __name__ == "__main__":
                                     checkpoint_file=checkpoint,
                                     log_file=checkpoint + '.csv',
                                     use_gpu=Params['use_gpu'])
-    train_loader, val_loader, test_loader = split_drive_dataset(Dirs=Dirs, transform=transform)
+    train_loader, val_loader, test_loader = split_drive_dataset(Dirs=Dirs, transform=transform,
+                                                                batch_size=Params['batch_size'])
     drive_trainer.train(optimizer=optimizer,
                         data_loader=train_loader,
                         epochs=Params['epochs'],
                         validation_loader=val_loader,
                         force_checkpoint=False, log_frequency=500)
     drive_trainer.resume_from_checkpoint(parallel_trained=False)
-    logger = drive_trainer.get_logger(checkpoint + 'TEST.csv')
+    logger = drive_trainer.get_logger(checkpoint + '-TEST.csv')
     drive_trainer.evaluate(data_loader=test_loader, mode='eval', segmented_out=Dirs['segmented'],
                            logger=logger)
     logger.close()

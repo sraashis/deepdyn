@@ -20,7 +20,7 @@ class PatchNetTrainer(NNTrainer):
 
         if validation_loader is None:
             raise ValueError('Please provide validation loader.')
-
+        logger = self.get_logger(self.log_file)
         print('Training...')
         for epoch in range(0, epochs):
             self.model.train()
@@ -46,16 +46,16 @@ class PatchNetTrainer(NNTrainer):
                         else (i + 1) % log_frequency
                     running_loss = 0.0
 
-                self.flush(self.logger, ','.join(str(x) for x in [0, 0, epoch + 1, i + 1, p, r, f1, a, current_loss]))
+                self.flush(logger, ','.join(str(x) for x in [0, 0, epoch + 1, i + 1, p, r, f1, a, current_loss]))
                 print('Epochs[%d/%d] Batch[%d/%d] loss:%.5f pre:%.3f rec:%.3f f1:%.3f acc:%.3f' %
                       (epoch + 1, epochs, i + 1, data_loader.__len__(), current_loss, p, r, f1, a),
                       end='\r' if running_loss > 0 else '\n')
 
             self.checkpoint['epochs'] += 1
             self.evaluate(data_loader=validation_loader, force_checkpoint=force_checkpoint,
-                          mode='train', logger=self.logger)
+                          mode='train', logger=logger)
         try:
-            self.logger.close()
+            logger.close()
         except IOError:
             pass
 

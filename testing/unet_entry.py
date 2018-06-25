@@ -16,9 +16,9 @@ if __name__ == "__main__":
     Params = {}
     Params['num_channels'] = 1
     Params['classes'] = {'background': 0, 'vessel': 1, }
-    Params['batch_size'] = 4
+    Params['batch_size'] = 8
     Params['num_classes'] = len(Params['classes'])
-    Params['epochs'] = 500
+    Params['epochs'] = 250
     Params['patch_size'] = (388, 388)  # rows X cols
     Params['use_gpu'] = True
     Params['learning_rate'] = 0.001
@@ -49,14 +49,15 @@ if __name__ == "__main__":
                                   checkpoint_file=checkpoint,
                                   log_file=checkpoint + '.csv',
                                   use_gpu=Params['use_gpu'])
-    train_loader, val_loader, test_loader = split_drive_dataset(Dirs=Dirs, transform=transform)
+    train_loader, val_loader, test_loader = split_drive_dataset(Dirs=Dirs, transform=transform,
+                                                                batch_size=Params['batch_size'])
     drive_trainer.train(optimizer=optimizer,
                         data_loader=train_loader,
                         epochs=Params['epochs'],
                         validation_loader=val_loader,
                         force_checkpoint=False, log_frequency=20)
     drive_trainer.resume_from_checkpoint(parallel_trained=False)
-    logger = drive_trainer.get_logger(checkpoint + 'TEST.csv')
+    logger = drive_trainer.get_logger(checkpoint + '-TEST.csv')
     drive_trainer.evaluate(data_loader=test_loader, mode='eval', patch_size=(388, 388), segmented_out=Dirs['segmented'],
                            logger=logger)
     logger.close()

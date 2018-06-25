@@ -70,7 +70,7 @@ def get_loaders(images_dir=None, mask_dir=None, manual_dir=None,
     return loaders
 
 
-def split_drive_dataset(Dirs=None, transform=None):
+def split_drive_dataset(Dirs=None, transform=None, batch_size=None):
     for k, folder in Dirs.items():
         os.makedirs(folder, exist_ok=True)
 
@@ -90,7 +90,7 @@ def split_drive_dataset(Dirs=None, transform=None):
         transforms=transform,
         get_mask=get_mask_file,
         get_truth=get_ground_truth_file
-    ).get_loader()
+    ).get_loader(batch_size=batch_size)
 
     val_loaders = get_loaders(
         images_dir=Dirs['test'] + sep + 'validation_images',
