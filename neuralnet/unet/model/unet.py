@@ -63,7 +63,7 @@ class UNet(nn.Module):
         enc4 = F.dropout2d(enc4, p=0.2)
 
         dec4 = self.dec4(enc4)
-        dec4 = F.dropout2d(dec4, p=0.3)
+        dec4 = F.dropout2d(dec4, p=0.5)
 
         dec3 = self.dec3(UNet.match_and_concat(enc4_, self.dec4_up(dec4)))
         dec3 = F.dropout2d(dec3, p=0.2)
