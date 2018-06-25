@@ -95,6 +95,13 @@ class ScoreAccumulator:
         self.fn += torch.sum(y_cases == 2).item()
         return self
 
+    def accumulate(self, other):
+        self.tp += other.tp
+        self.fp += other.fp
+        self.tn += other.tn
+        self.fn += other.fn
+        return self
+
     def reset(self):
         self.tn, self.fp, self.fn, self.tp = [0] * 4
         return self

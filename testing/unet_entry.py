@@ -1,12 +1,13 @@
-# !/home/akhanal1/miniconda3//bin/python3.5
-# Torch imports
 import os
 import sys
-
 sys.path.append('/home/akhanal1/ature')
 os.chdir('/home/akhanal1/ature')
 
-from testing.unet_runner import UnetRunner
+import torch
+import torch.optim as optim
+from neuralnet.unet.model.unet import UNet
+from neuralnet.unet.unet_dataloader import split_drive_dataset
+from neuralnet.unet.unet_trainer import UNetNNTrainerFish, UNetNNTrainer, UNetNNTrainerWeighted
 import torchvision.transforms as transforms
 
 if __name__ == "__main__":
@@ -16,7 +17,7 @@ if __name__ == "__main__":
     Params['classes'] = {'background': 0, 'vessel': 1, }
     Params['batch_size'] = 4
     Params['num_classes'] = len(Params['classes'])
-    Params['epochs'] = 199
+    Params['epochs'] = 250
     Params['patch_size'] = (388, 388)  # rows X cols
     Params['use_gpu'] = True
     Params['learning_rate'] = 0.001
@@ -26,99 +27,105 @@ if __name__ == "__main__":
         transforms.ToPILImage(),
         transforms.ToTensor()
     ])
+# ---------------------------------------------------------------------------------------------------------
+    # Define the network
+    model = UNet(Params['num_channels'], Params['num_classes'])
+    optimizer = optim.Adam(model.parameters(), lr=Params['learning_rate'])
+    if Params['distribute']:
+        model = torch.nn.DataParallel(model)
+        optimizer = optim.Adam(model.module.parameters(), lr=Params['learning_rate'])
 
-    runner = UnetRunner(Params=Params,
-                        transform=transform)
-
-    ##################### DRIVE DATASET ########################
+    """
+    ################## UNET Drive Data set ################
+    """
     Dirs = {}
-    Dirs['data'] = 'data' + sep + 'DRIVE' + sep + 'training'
-    Dirs['images'] = Dirs['data'] + sep + 'images'
-    Dirs['mask'] = Dirs['data'] + sep + 'mask'
-    Dirs['truth'] = Dirs['data'] + sep + '1st_manual'
+    Dirs['train'] = 'data' + sep + 'DRIVE' + sep + 'training'
+    Dirs['test'] = 'data' + sep + 'DRIVE' + sep + 'testing'
+    Dirs['segmented'] = 'data' + sep + 'DRIVE' + sep + 'testing' + sep + 'segmented_unweighted'
 
-    TestDirs = {}
-    TestDirs['data'] = 'data' + sep + 'DRIVE' + sep + 'testing'
-    TestDirs['images'] = TestDirs['data'] + sep + 'images'
-    TestDirs['mask'] = TestDirs['data'] + sep + 'mask'
-    TestDirs['truth'] = TestDirs['data'] + sep + '1st_manual'
-    TestDirs['segmented'] = TestDirs['data'] + sep + 'segmented'
+    checkpoint = 'unet-drive.UNWEIGHTED.chk.tar'
+    drive_trainer = UNetNNTrainer(model=model,
+                                      checkpoint_file=checkpoint,
+                                      log_file=checkpoint + '.csv',
+                                      use_gpu=Params['use_gpu'])
+    train_loader, val_loader, test_loader = split_drive_dataset(Dirs=Dirs, transform=transform,
+                                                                batch_size=Params['batch_size'])
+    drive_trainer.train(optimizer=optimizer,
+                        data_loader=train_loader,
+                        epochs=Params['epochs'],
+                        validation_loader=val_loader,
+                        force_checkpoint=False, log_frequency=20)
+    drive_trainer.resume_from_checkpoint(parallel_trained=False)
+    logger = drive_trainer.get_logger(checkpoint + '-TEST.csv')
+    drive_trainer.evaluate(data_loader=test_loader, mode='eval', patch_size=(388, 388), segmented_out=Dirs['segmented'],
+                           logger=logger)
+    logger.close()
+    # End
+# -------------------------------------------------------------------------------------------------------------
+    # Define the network
+    model = UNet(Params['num_channels'], Params['num_classes'])
+    optimizer = optim.Adam(model.parameters(), lr=Params['learning_rate'])
+    if Params['distribute']:
+        model = torch.nn.DataParallel(model)
+        optimizer = optim.Adam(model.module.parameters(), lr=Params['learning_rate'])
 
-    ValidationDirs = {}
-    ValidationDirs['data'] = 'data' + sep + 'DRIVE' + sep + 'testing'
-    ValidationDirs['images'] = ValidationDirs['data'] + sep + 'validation_images'
-    ValidationDirs['mask'] = ValidationDirs['data'] + sep + 'mask'
-    ValidationDirs['truth'] = ValidationDirs['data'] + sep + '1st_manual'
-
-    for k, folder in Dirs.items():
-        os.makedirs(folder, exist_ok=True)
-    for k, folder in TestDirs.items():
-        os.makedirs(folder, exist_ok=True)
-    for k, folder in ValidationDirs.items():
-        os.makedirs(folder, exist_ok=True)
-
-
-    def get_mask_file(file_name):
-        return file_name.split('_')[0] + '_training_mask.gif'
-
-
-    def get_ground_truth_file(file_name):
-        return file_name.split('_')[0] + '_manual1.gif'
-
-
-    def get_mask_file_test(file_name):
-        return file_name.split('_')[0] + '_test_mask.gif'
-
-
-    checkpoint_file = 'unet-drive.chk.tar'
-    runner.train(Dirs=Dirs, ValidationDirs=ValidationDirs,
-                 train_mask_getter=get_mask_file, train_groundtruth_getter=get_ground_truth_file,
-                 val_mask_getter=get_mask_file_test, val_groundtruth_getter=get_ground_truth_file,
-                 checkpoint_file=checkpoint_file)
-
-    runner.run_tests(TestDirs=TestDirs,
-                     test_mask_getter=get_mask_file_test,
-                     test_groundtruth_file_getter=get_ground_truth_file, checkpoint_file=checkpoint_file)
-    #################################################################################
-
-    ############## AV-WIDE Dataset ##################################################
+    """
+    ################## UNET Drive Data set ################
+    """
     Dirs = {}
-    Dirs['checkpoint'] = 'assests' + sep + 'nnet_models'
-    Dirs['data'] = 'data' + sep + 'AV-WIDE' + sep + 'training'
-    Dirs['images'] = Dirs['data'] + sep + 'images'
-    Dirs['mask'] = Dirs['data'] + sep + 'mask'
-    Dirs['truth'] = Dirs['data'] + sep + '1st_manual'
+    Dirs['train'] = 'data' + sep + 'DRIVE' + sep + 'training'
+    Dirs['test'] = 'data' + sep + 'DRIVE' + sep + 'testing'
+    Dirs['segmented'] = 'data' + sep + 'DRIVE' + sep + 'testing' + sep + 'segmented_weighted'
 
-    TestDirs = {}
-    TestDirs['data'] = 'data' + sep + 'AV-WIDE' + sep + 'testing'
-    TestDirs['images'] = TestDirs['data'] + sep + 'images'
-    TestDirs['mask'] = TestDirs['data'] + sep + 'mask'
-    TestDirs['truth'] = TestDirs['data'] + sep + '1st_manual'
-    TestDirs['segmented'] = TestDirs['data'] + sep + 'segmented'
+    checkpoint = 'unet-drive.WEIGHTED.chk.tar'
+    drive_trainer = UNetNNTrainerWeighted(model=model,
+                                      checkpoint_file=checkpoint,
+                                      log_file=checkpoint + '.csv',
+                                      use_gpu=Params['use_gpu'])
+    train_loader, val_loader, test_loader = split_drive_dataset(Dirs=Dirs, transform=transform,
+                                                                batch_size=Params['batch_size'])
+    drive_trainer.train(optimizer=optimizer,
+                        data_loader=train_loader,
+                        epochs=Params['epochs'],
+                        validation_loader=val_loader,
+                        force_checkpoint=False, log_frequency=20)
+    drive_trainer.resume_from_checkpoint(parallel_trained=False)
+    logger = drive_trainer.get_logger(checkpoint + '-TEST.csv')
+    drive_trainer.evaluate(data_loader=test_loader, mode='eval', patch_size=(388, 388), segmented_out=Dirs['segmented'],
+                           logger=logger)
+    logger.close()
+    # End
+# ------------------------------------------------------------------------------------------------------------
+    # Define the network
+    model = UNet(Params['num_channels'], Params['num_classes'])
+    optimizer = optim.Adam(model.parameters(), lr=Params['learning_rate'])
+    if Params['distribute']:
+        model = torch.nn.DataParallel(model)
+        optimizer = optim.Adam(model.module.parameters(), lr=Params['learning_rate'])
 
-    ValidationDirs = {}
-    ValidationDirs['data'] = 'data' + sep + 'AV-WIDE' + sep + 'testing'
-    ValidationDirs['images'] = ValidationDirs['data'] + sep + 'validation_images'
-    ValidationDirs['mask'] = ValidationDirs['data'] + sep + 'mask'
-    ValidationDirs['truth'] = ValidationDirs['data'] + sep + '1st_manual'
+    """
+    ################## UNET Drive Data set ################
+    """
+    Dirs = {}
+    Dirs['train'] = 'data' + sep + 'DRIVE' + sep + 'training'
+    Dirs['test'] = 'data' + sep + 'DRIVE' + sep + 'testing'
+    Dirs['segmented'] = 'data' + sep + 'DRIVE' + sep + 'testing' + sep + 'segmented_fishing'
 
-    for k, folder in Dirs.items():
-        os.makedirs(folder, exist_ok=True)
-    for k, folder in TestDirs.items():
-        os.makedirs(folder, exist_ok=True)
-    for k, folder in ValidationDirs.items():
-        os.makedirs(folder, exist_ok=True)
-
-    def get_ground_truth_file(file_name):
-        return file_name.split('.')[0] + '_vessels.png'
-
-    checkpoint_file = 'unet-wide.chk.tar'
-    runner.train(Dirs=Dirs, ValidationDirs=ValidationDirs,
-                 train_mask_getter=None, train_groundtruth_getter=get_ground_truth_file,
-                 val_mask_getter=None, val_groundtruth_getter=get_ground_truth_file,
-                 checkpoint_file=checkpoint_file)
-
-    runner.run_tests(TestDirs=TestDirs,
-                     test_mask_getter=get_mask_file,
-                     test_groundtruth_file_getter=get_ground_truth_file, checkpoint_file=checkpoint_file)
-    ######################################################################################
+    checkpoint = 'unet-drive.FISHING.chk.tar'
+    drive_trainer = UNetNNTrainerFish(model=model,
+                                      checkpoint_file=checkpoint,
+                                      log_file=checkpoint + '.csv',
+                                      use_gpu=Params['use_gpu'])
+    train_loader, val_loader, test_loader = split_drive_dataset(Dirs=Dirs, transform=transform,
+                                                                batch_size=Params['batch_size'])
+    drive_trainer.train(optimizer=optimizer,
+                        data_loader=train_loader,
+                        epochs=Params['epochs'],
+                        validation_loader=val_loader,
+                        force_checkpoint=False, log_frequency=20)
+    drive_trainer.resume_from_checkpoint(parallel_trained=False)
+    logger = drive_trainer.get_logger(checkpoint + '-TEST.csv')
+    drive_trainer.evaluate(data_loader=test_loader, mode='eval', patch_size=(388, 388), segmented_out=Dirs['segmented'],
+                           logger=logger)
+    logger.close()
+    # End

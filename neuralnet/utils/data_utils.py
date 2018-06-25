@@ -3,8 +3,8 @@
 import os
 import sys
 
-sys.path.append('/home/ak/PycharmProjects/ature')
-os.chdir('/home/ak/PycharmProjects/ature')
+# sys.path.append('/home/ak/PycharmProjects/ature')
+# os.chdir('/home/ak/PycharmProjects/ature')
 import numpy as np
 import PIL.Image as IMG
 from commons.IMAGE import Image
@@ -87,21 +87,22 @@ def resize_DRIVE_564X564(Dirs, get_mask_file, get_ground_truth_file):
 
 
 if __name__ == '__main__':
-    os.chdir('//home/ak/PycharmProjects/ature')
-    sep = os.sep
-    Dirs = {}
-    Dirs['checkpoint'] = 'assests' + sep + 'nnet_models'
-    Dirs['data'] = 'data' + sep + 'AV-WIDE' + sep + 'training'
-    Dirs['images'] = Dirs['data'] + sep + 'images'
-    Dirs['mask'] = Dirs['data'] + sep + 'mask'
-    Dirs['truth'] = Dirs['data'] + sep + '1st_manual'
-
-
-    def get_mask_file(file_name):
-        return file_name.split('_')[0] + '_training_mask.gif'
-
-
-    def get_ground_truth_file(file_name):
-        return file_name.split('.')[0] + '_vessels.png'
-
-    flip_4ways(Dirs, get_mask_file, get_ground_truth_file)
+    # os.chdir('//home/ak/PycharmProjects/ature')
+    # sep = os.sep
+    # Dirs = {}
+    # Dirs['checkpoint'] = 'assests' + sep + 'nnet_models'
+    # Dirs['data'] = 'data' + sep + 'AV-WIDE' + sep + 'training'
+    # Dirs['images'] = Dirs['data'] + sep + 'images'
+    # Dirs['mask'] = Dirs['data'] + sep + 'mask'
+    # Dirs['truth'] = Dirs['data'] + sep + '1st_manual'
+    #
+    #
+    # def get_mask_file(file_name):
+    #     return file_name.split('_')[0] + '_training_mask.gif'
+    #
+    #
+    # def get_ground_truth_file(file_name):
+    #     return file_name.split('.')[0] + '_vessels.png'
+    #
+    # flip_4ways(Dirs, get_mask_file, get_ground_truth_file)
+    pass

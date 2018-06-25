@@ -4,7 +4,6 @@ import cv2
 import cv2 as ocv
 import networkx as nx
 import numpy as np
-from PIL import Image as IMG
 
 import commons.constants as const
 import utils.filter_utils as filutils
@@ -52,6 +51,10 @@ class Image:
             self.ground_truth = imgutil.get_image_as_array(os.path.join(gt_dir, gt_file), channels)
         except Exception as e:
             print('Fail to load ground truth: ' + str(e))
+
+    def apply_clahe(self, clip_limit=2.0, tile_shape=(8, 8)):
+        enhancer = cv2.createCLAHE(clipLimit=clip_limit, tileGridSize=tile_shape)
+        self.working_arr = enhancer.apply(self.working_arr)
 
 
 class SegmentedImage(Image):

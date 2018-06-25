@@ -14,7 +14,7 @@ class _DoubleConvolution(nn.Module):
             nn.ReLU(inplace=True),
             nn.Conv2d(middle_channel, out_channels, kernel_size=3),
             nn.BatchNorm2d(out_channels),
-            nn.ReLU(inplace=True),
+            nn.ReLU(inplace=True)
         ]
         self.encode = nn.Sequential(*layers)
 
@@ -23,29 +23,28 @@ class _DoubleConvolution(nn.Module):
 
 
 class UNet(nn.Module):
-
     def __init__(self, num_channels, num_classes):
         super(UNet, self).__init__()
         mul = 16 if torch.cuda.is_available() else 1
-        self.enc1 = _DoubleConvolution(num_channels, 4*mul, 4*mul)
-        self.enc2 = _DoubleConvolution(4*mul, 8*mul, 8*mul)
-        self.enc3 = _DoubleConvolution(8*mul, 16*mul, 16*mul)
-        self.enc4 = _DoubleConvolution(16*mul, 32*mul, 32*mul)
+        self.enc1 = _DoubleConvolution(num_channels, 4 * mul, 4 * mul)
+        self.enc2 = _DoubleConvolution(4 * mul, 8 * mul, 8 * mul)
+        self.enc3 = _DoubleConvolution(8 * mul, 16 * mul, 16 * mul)
+        self.enc4 = _DoubleConvolution(16 * mul, 32 * mul, 32 * mul)
 
-        self.dec4 = _DoubleConvolution(32*mul, 64*mul, 64*mul)
-        self.dec4_up = nn.ConvTranspose2d(64*mul, 32*mul, kernel_size=2, stride=2)
+        self.dec4 = _DoubleConvolution(32 * mul, 64 * mul, 64 * mul)
+        self.dec4_up = nn.ConvTranspose2d(64 * mul, 32 * mul, kernel_size=2, stride=2)
 
-        self.dec3 = _DoubleConvolution(64*mul, 32*mul, 32*mul)
-        self.dec3_up = nn.ConvTranspose2d(32*mul, 16*mul, kernel_size=2, stride=2)
+        self.dec3 = _DoubleConvolution(64 * mul, 32 * mul, 32 * mul)
+        self.dec3_up = nn.ConvTranspose2d(32 * mul, 16 * mul, kernel_size=2, stride=2)
 
-        self.dec2 = _DoubleConvolution(32*mul, 16*mul, 16*mul)
-        self.dec2_up = nn.ConvTranspose2d(16*mul, 8*mul, kernel_size=2, stride=2)
+        self.dec2 = _DoubleConvolution(32 * mul, 16 * mul, 16 * mul)
+        self.dec2_up = nn.ConvTranspose2d(16 * mul, 8 * mul, kernel_size=2, stride=2)
 
-        self.dec1 = _DoubleConvolution(16*mul, 8*mul, 8*mul)
-        self.dec1_up = nn.ConvTranspose2d(8*mul, 4*mul, kernel_size=2, stride=2)
+        self.dec1 = _DoubleConvolution(16 * mul, 8 * mul, 8 * mul)
+        self.dec1_up = nn.ConvTranspose2d(8 * mul, 4 * mul, kernel_size=2, stride=2)
 
-        self.out = _DoubleConvolution(8*mul, 4*mul, 4*mul)
-        self.final = nn.Conv2d(4*mul, num_classes, kernel_size=1)
+        self.out = _DoubleConvolution(8 * mul, 4 * mul, 4 * mul)
+        self.final = nn.Conv2d(4 * mul, num_classes, kernel_size=1)
 
         initialize_weights(self)
 
@@ -61,10 +60,14 @@ class UNet(nn.Module):
 
         enc4_ = self.enc4(enc3)
         enc4 = F.max_pool2d(enc4_, kernel_size=2, stride=2)
+        enc4 = F.dropout2d(enc4, p=0.2)
 
         dec4 = self.dec4(enc4)
+        dec4 = F.dropout2d(dec4, p=0.5)
 
         dec3 = self.dec3(UNet.match_and_concat(enc4_, self.dec4_up(dec4)))
+        dec3 = F.dropout2d(dec3, p=0.2)
+
         dec2 = self.dec2(UNet.match_and_concat(enc3_, self.dec3_up(dec3)))
         dec1 = self.dec1(UNet.match_and_concat(enc2_, self.dec2_up(dec2)))
         out = self.out(UNet.match_and_concat(enc1_, self.dec1_up(dec1)))
