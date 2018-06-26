@@ -78,7 +78,7 @@ class PatchNetTrainer(NNTrainer):
                     IJs, scores, predictions, labels = self._evaluate(data_loader=loader,
                                                                       logger=logger)
                     sc = np.exp(scores.copy)
-                    segmented = np.zeros(loader.dataset.image_objects[0])
+                    segmented = np.zeros_like(loader.dataset.image_objects[0].working_array)
                     for val in zip(IJs, sc):
                         (i, j), (b_prob, v_prob) = val
                         segmented[i, j] = 255 * v_prob
