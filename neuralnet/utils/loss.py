@@ -1,21 +1,22 @@
-import torch
+import torch.nn as nn
+import torch.nn.functional as F
 
 
-def dice_loss(input, target):
-    smooth = 1.
-    iflat = input.view(-1).cuda()
-    tflat = target.view(-1).cuda()
-    intersection = (iflat * tflat).sum()
+class SoftDiceLoss(nn.Module):
+    def __init__(self, weight=None, size_average=True):
+        super(SoftDiceLoss, self).__init__()
 
-    # print(intersection, iflat.sum(), tflat.sum())
-    return 1 - ((5. * intersection + smooth) /
-                (4. * iflat.sum() + tflat.sum() + smooth))
+    def forward(self, logits, targets):
+        smooth = 1
+        num = targets.size(0)
+        probs = F.sigmoid(logits)
+        m1 = probs.view(num, -1)
+        m2 = targets.view(num, -1)
+        intersection = (m1 * m2)
+
+        score = (5. * intersection.sum(1) + smooth) / (4 * (m1.sum(1) + m2.sum(1)) + smooth)
+        score = 1 - score.sum() / num
+        return score
 
 
-def shift_loss(input):
-    r = torch.cat((input[:, 0:1], input[:, :-1]), 1)  ### Right
-    l = torch.cat((input[:, 1:], input[:, -1:]), 1)  ### Left
-    d = torch.cat((input[0:1, :], input[:-1, :]), 0)  ### Down
-    u = torch.cat((input[1:, :], input[-1:, :]), 0)  ### Left
-    shifted = l + r + d + u + input
-    return shifted / 5
+dice_loss = SoftDiceLoss()
