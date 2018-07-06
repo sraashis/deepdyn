@@ -3,11 +3,14 @@ import os
 import PIL.Image as IMG
 import numpy as np
 import torch
+from torch.autograd import Variable
 
 import neuralnet.unet.utils as ut
 from neuralnet.torchtrainer import NNTrainer
 from neuralnet.utils.loss import dice_loss
 from neuralnet.utils.measurements import ScoreAccumulator
+import torch.nn.functional as F
+import math
 
 sep = os.sep
 
@@ -29,19 +32,20 @@ class UNetNNTrainer(NNTrainer):
             running_loss = 0.0
             self.adjust_learning_rate(optimizer=optimizer, epoch=epoch + 1)
             for i, data in enumerate(data_loader, 0):
-                inputs, labels = data[-2].to(self.device), data[-1].to(self.device)
+                inputs, labels, = data[-2].to(self.device), data[-1].to(self.device)
 
                 optimizer.zero_grad()
-                outputs = self.model(inputs)
 
-                loss = dice_loss(outputs[:, 1, :, :], labels)
+                outputs = self.model(inputs)
+                _, predicted = torch.max(Variable(outputs.float(), requires_grad=True), 1)
+
+                # loss = dice_loss.forward(predicted, Variable(labels, requires_grad=True))
+                loss = F.cross_entropy(outputs, labels, torch.Tensor([1/math.sqrt(epoch+1), 1]).to(self.device))
                 loss.backward()
                 optimizer.step()
 
                 running_loss += float(loss.item())
                 current_loss = loss.item()
-                _, predicted = torch.max(outputs, 1)
-
                 p, r, f1, a = score_acc.reset().add(labels, predicted).get_prf1a()
                 if (i + 1) % log_frequency == 0:  # Inspect the loss of every log_frequency batches
                     current_loss = running_loss / log_frequency if (i + 1) % log_frequency == 0 \
@@ -79,11 +83,13 @@ class UNetNNTrainer(NNTrainer):
                                                         force_checkpoint=force_checkpoint, mode=mode, logger=logger))
                 if mode is 'eval' and to_dir is not None:
                     scores, predictions, labels = self._evaluate(data_loader=loader,
-                                                                 force_checkpoint=force_checkpoint, mode=mode,
+                                                                 force_checkpoint=force_checkpoint,
+                                                                 mode=mode,
                                                                  logger=logger)
                     segmented = ut.merge_patches(scores=scores,
                                                  image_size=loader.dataset.image_objects[0].working_arr.shape,
                                                  training_patch_size=patch_size)
+
                     IMG.fromarray(segmented).save(to_dir + sep + loader.dataset.image_objects[0].file_name + '.png')
         if mode is 'train':
             self._save_if_better(force_checkpoint=force_checkpoint, score=score_acc.get_prf1a()[2])
