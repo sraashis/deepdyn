@@ -1,5 +1,9 @@
 import os
+import sys
+
+sys.path.append('/home/akhanal1/ature')
 os.chdir('/home/akhanal1/ature')
+
 from commons.segmentation import AtureTest
 from testing import params as p
 sep = os.sep
