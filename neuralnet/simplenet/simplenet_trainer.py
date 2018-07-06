@@ -77,7 +77,7 @@ class PatchNetTrainer(NNTrainer):
                 if mode is 'eval' and to_dir is not None:
                     IJs, scores, predictions, labels = self._evaluate(data_loader=loader,
                                                                       logger=logger, mode=mode)
-                    sc = np.exp(scores.copy)
+                    sc = np.exp(scores.copy())
                     segmented = np.zeros_like(loader.dataset.image_objects[0].working_array)
                     for val in zip(IJs, sc):
                         (i, j), (b_prob, v_prob) = val
