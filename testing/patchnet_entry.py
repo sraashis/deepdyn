@@ -16,7 +16,7 @@ if __name__ == "__main__":
     Params = {}
     Params['num_channels'] = 1
     Params['classes'] = {'background': 0, 'vessel': 1, }
-    Params['batch_size'] = 1600
+    Params['batch_size'] = 512
     Params['num_classes'] = len(Params['classes'])
     Params['epochs'] = 100
     Params['patch_size'] = (51, 51)  # rows X cols

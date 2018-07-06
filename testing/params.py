@@ -6,7 +6,7 @@ import numpy as np
 
 def get_param_combinations():
     SK_THRESHOLD_PARAMS = [100]
-    ALPHA_PARAMS = [5, 6, 7]
+    ALPHA_PARAMS = [5, 5.5, 6, 6.5, 7]
     ORIG_CONTRIBUTION_PARAMS = [0.6, 0.7, 0.8, 0.9]
     SEGMENTATION_THRESHOLD_PARAMS = np.arange(10, 17, 1)
 
@@ -18,3 +18,5 @@ def get_param_combinations():
     keys = ('sk_threshold', 'alpha', 'orig_contrib', 'seg_threshold')
 
     return list(dict(zip(keys, param)) for param in PARAMS_COMBINATION)
+
+print(len(get_param_combinations()))
