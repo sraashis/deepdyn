@@ -1,10 +1,8 @@
 import os
-
+os.chdir('/home/akhanal1/ature')
 from commons.segmentation import AtureTest
 from testing import params as p
-
 sep = os.sep
-os.chdir('/home/ak/PycharmProjects/ature')
 Dirs = {}
 
 Dirs['data'] = 'data' + sep + 'DRIVE' + sep + 'testing'
