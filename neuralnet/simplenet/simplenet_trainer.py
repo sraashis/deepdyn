@@ -78,11 +78,11 @@ class PatchNetTrainer(NNTrainer):
                     IJs, scores, predictions, labels = self._evaluate(data_loader=loader,
                                                                       logger=logger, mode=mode)
                     sc = np.exp(scores.copy())
-                    segmented = np.zeros_like(loader.dataset.image_objects[0].working_array)
+                    segmented = np.zeros_like(loader.dataset.image_objects[0].working_arr)
                     for val in zip(IJs, sc):
                         (i, j), (b_prob, v_prob) = val
                         segmented[i, j] = 255 * v_prob
-                    IMG.fromarray(segmented).save(to_dir + sep + loader.dataset.image_objects[0].file_name + '.png')
+                    IMG.fromarray(255-segmented).save(to_dir + sep + loader.dataset.image_objects[0].file_name + '.png')
         if mode is 'train':
             self._save_if_better(force_checkpoint=force_checkpoint, score=score_acc.get_prf1a()[2])
 
