@@ -1,14 +1,22 @@
 import os
 
-import testing.params as pms
 from commons.segmentation import AtureTest
+from testing import params as p
 
-base_dir = 'C:\\Projects\\ature'
-os.chdir(base_dir)
+sep = os.sep
+os.chdir('/home/ak/PycharmProjects/ature')
+Dirs = {}
 
-data_file_path = 'data\\DRIVE\\test\\images'
-mask_path = 'data\\DRIVE\\test\\mask'
-ground_truth_path = 'data\\DRIVE\\test\\1st_manual'
+Dirs['data'] = 'data' + sep + 'DRIVE' + sep + 'testing'
+
+Dirs['images'] = Dirs['data'] + sep + 'images'
+Dirs['mask'] = Dirs['data'] + sep + 'mask'
+Dirs['truth'] = Dirs['data'] + sep + '1st_manual'
+Dirs['segmented'] = Dirs['data'] + sep + 'segmented_fishing'
+Dirs['mst_out'] = Dirs['data'] + sep + 'segmented_mst'
+
+for k, folder in Dirs.items():
+    os.makedirs(folder, exist_ok=True)
 
 
 def get_mask_file(file_name):
@@ -18,11 +26,7 @@ def get_mask_file(file_name):
 def get_ground_truth_file(file_name):
     return file_name.split('_')[0] + '_manual1.gif'
 
-params = {'sk_threshold': 60,
-          'alpha': 7.5,
-          'orig_contrib': 0.3,
-          'seg_threshold': 24}
 
-tester = AtureTest(out_dir='data\\drive_segmented_out')
-tester.run_all(data_dir=data_file_path, mask_path=mask_path, gt_path=ground_truth_path, save_images=False,
-               params_combination=[params], fget_mask=get_mask_file, fget_gt=get_ground_truth_file)
+tester = AtureTest(out_dir=Dirs['mst_out'])
+tester.run_all(Dirs=Dirs, save_images=False,
+               params_combination=p.get_param_combinations(), fget_mask=get_mask_file, fget_gt=get_ground_truth_file)

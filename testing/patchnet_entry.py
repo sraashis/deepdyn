@@ -44,7 +44,7 @@ if __name__ == "__main__":
     Dirs['test'] = 'data' + sep + 'DRIVE' + sep + 'testing'
     Dirs['segmented'] = 'data' + sep + 'DRIVE' + sep + 'testing' + sep + 'segmented_patch'
 
-    checkpoint = 'patchnet-drive.chk.tar'
+    checkpoint = 'drive.PATCHNET.chk.tar'
     drive_trainer = PatchNetTrainer(model=model,
                                     checkpoint_file=checkpoint,
                                     log_file=checkpoint + '.csv',
