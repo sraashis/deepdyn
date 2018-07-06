@@ -3,13 +3,15 @@ from itertools import count
 
 import cv2
 import numpy as np
-import utils.img_utils as imgutils
 from PIL import Image as IMG
 
 import commons.fast_mst as fmst
 import utils.filter_utils as fu
+import utils.img_utils as imgutils
 from commons.IMAGE import SegmentedImage, MatSegmentedImage
 from commons.timer import checktime
+
+sep = os.sep
 
 
 class AtureTest:
@@ -47,7 +49,7 @@ class AtureTest:
 
         self._save(img_obj=img_obj, params=params, save_images=save_images)
 
-    def run_all(self, data_dir=None, mask_path=None, gt_path=None, fget_mask=None, fget_gt=None, params_combination=[],
+    def run_all(self, Dirs=None, fget_mask=None, fget_gt=None, params_combination=[],
                 save_images=False):
 
         if os.path.isdir(self.out_dir) is False:
@@ -61,25 +63,28 @@ class AtureTest:
             'ORIG_CONTRIB,'
             'SEG_THRESHOLD\n'
         )
-
-        for file_name in os.listdir(data_dir):
+        for file_name in os.listdir(Dirs['images']):
             print('File: ' + file_name)
 
             img_obj = SegmentedImage()
 
-            img_obj.load_file(data_dir=data_dir, file_name=file_name)
-            img_obj.res['orig'] = img_obj.image_arr[:, :, 1]
+            img_obj.load_file(data_dir=Dirs['images'], file_name=file_name)
             img_obj.working_arr = img_obj.image_arr[:, :, 1]
-            img_obj.working_arr = imgutils.whiten_image2d(img_obj.working_arr)
+            img_obj.apply_clahe()
+            img_obj.res['orig'] = img_obj.working_arr
 
-            img_obj.load_mask(mask_dir=mask_path, fget_mask=fget_mask, erode=True)
-            img_obj.load_ground_truth(gt_dir=gt_path, fget_ground_truth=fget_gt)
-
+            img_obj.working_arr = imgutils.get_image_as_array(Dirs['segmented'] + sep + file_name + '.png', channels=1)
+            img_obj.load_mask(mask_dir=Dirs['mask'], fget_mask=fget_mask, erode=True)
+            img_obj.load_ground_truth(gt_dir=Dirs['truth'], fget_ground_truth=fget_gt)
             img_obj.apply_mask()
-            img_obj.apply_bilateral()
-            img_obj.apply_gabor()
-
             img_obj.generate_lattice_graph()
+
+            arr = img_obj.working_arr.copy()
+            for i in range(arr.shape[0]):
+                for j in range(arr.shape[1]):
+                    if img_obj.mask[i, j] == 0:
+                        arr[i, j] = 255
+            img_obj.working_arr = arr
 
             for params in params_combination:
                 img_obj.generate_skeleton(threshold=int(params['sk_threshold']))
