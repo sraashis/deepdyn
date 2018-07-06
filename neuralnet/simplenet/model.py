@@ -9,7 +9,7 @@ class PatchNet(nn.Module):
         self.channels = channels
         self.width = width
 
-        self.kern_size = 11
+        self.kern_size = 3
         self.kern_stride = 2
         self.kern_padding = 1
         self.mxp_kern_size = 1
@@ -19,9 +19,9 @@ class PatchNet(nn.Module):
                                stride=self.kern_stride, padding=self.kern_padding)
         self._update_output_size()
 
-        self.kern_size = 5
+        self.kern_size = 3
         self.kern_stride = 1
-        self.kern_padding = 3
+        self.kern_padding = 2
         self.mxp_kern_size = 2
         self.mxp_stride = 2
         self.pool2 = nn.MaxPool2d(kernel_size=self.mxp_kern_size, stride=self.mxp_stride)
@@ -29,33 +29,23 @@ class PatchNet(nn.Module):
                                stride=self.kern_stride, padding=self.kern_padding)
         self._update_output_size()
 
-        self.kern_size = 5
+        self.kern_size = 3
         self.kern_stride = 1
         self.kern_padding = 1
-        self.mxp_kern_size = 2
-        self.mxp_stride = 2
+        self.mxp_kern_size = 1
+        self.mxp_stride = 1
         self.pool3 = nn.MaxPool2d(kernel_size=self.mxp_kern_size, stride=self.mxp_stride)
         self.conv3 = nn.Conv2d(256, 512, self.kern_size,
                                stride=self.kern_stride, padding=self.kern_padding)
         self._update_output_size()
 
         self.kern_size = 3
-        self.kern_stride = 2
-        self.kern_padding = 2
+        self.kern_stride = 1
+        self.kern_padding = 1
         self.mxp_kern_size = 2
         self.mxp_stride = 2
         self.pool4 = nn.MaxPool2d(kernel_size=self.mxp_kern_size, stride=self.mxp_stride)
-        self.conv4 = nn.Conv2d(512, 1024, self.kern_size,
-                               stride=self.kern_stride, padding=self.kern_padding)
-        self._update_output_size()
-
-        self.kern_size = 3
-        self.kern_stride = 1
-        self.kern_padding = 2
-        self.mxp_kern_size = 1
-        self.mxp_stride = 1
-        self.pool5 = nn.MaxPool2d(kernel_size=self.mxp_kern_size, stride=self.mxp_stride)
-        self.conv5 = nn.Conv2d(1024, 128, self.kern_size,
+        self.conv4 = nn.Conv2d(512, 128, self.kern_size,
                                stride=self.kern_stride, padding=self.kern_padding)
         self._update_output_size()
 
@@ -68,14 +58,13 @@ class PatchNet(nn.Module):
         x = self.pool1(F.relu(self.conv1(x)))
         x = self.pool2(F.relu(self.conv2(x)))
         x = self.pool3(F.relu(self.conv3(x)))
+        x = F.dropout2d(x, p=0.3)
         x = self.pool4(F.relu(self.conv4(x)))
-        x = F.dropout2d(x, p=0.3, training=self.training)
-        x = self.pool5(F.relu(self.conv5(x)))
-        x = F.dropout2d(x, p=0.4, training=self.training)
+        x = F.dropout2d(x, p=0.3)
         x = x.view(-1, self.linearWidth)
-        x = F.dropout2d(x, p=0.3, training=self.training)
+        x = F.dropout2d(x, p=0.4)
         x = F.relu(self.fc1(x))
-        x = F.dropout2d(x, p=0.2, training=self.training)
+        x = F.dropout2d(x, p=0.4)
         x = F.relu(self.fc2(x))
         x = self.fc3(x)
         return F.log_softmax(x, dim=1)
