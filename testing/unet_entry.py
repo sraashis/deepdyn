@@ -7,14 +7,14 @@ os.chdir('/home/akhanal1/ature')
 import torch
 import torch.optim as optim
 from neuralnet.unet.model.unet import UNet
-from neuralnet.unet.unet_dataloader import split_drive_dataset
+from neuralnet.unet.unet_dataloader import split_drive_dataset, split_wide_dataset
 from neuralnet.unet.unet_trainer import UNetNNTrainer
 import torchvision.transforms as transforms
 
 if __name__ == "__main__":
     sep = os.sep
     Params = {}
-    Params['num_channels'] = 3
+    Params['num_channels'] = 1
     Params['batch_size'] = 4
     Params['num_classes'] = 2
     Params['epochs'] = 250
@@ -38,17 +38,45 @@ if __name__ == "__main__":
     """
     ################## UNET Drive Data set ################
     """
-    Dirs = {}
-    Dirs['train'] = 'data' + sep + 'DRIVE' + sep + 'training'
-    Dirs['test'] = 'data' + sep + 'DRIVE' + sep + 'testing'
-    Dirs['segmented'] = 'data' + sep + 'DRIVE' + sep + 'testing' + sep + 'segmented_eroded'
+    # Dirs = {}
+    # Dirs['train'] = 'data' + sep + 'DRIVE' + sep + 'training'
+    # Dirs['test'] = 'data' + sep + 'DRIVE' + sep + 'testing'
+    # Dirs['segmented'] = 'data' + sep + 'DRIVE' + sep + 'testing' + sep + 'segmented_2pass'
+    #
+    # checkpoint = 'unet-drive.FISHING.chk.tar'
+    # drive_trainer = UNetNNTrainer(model=model,
+    #                               checkpoint_file=checkpoint,
+    #                               log_file=checkpoint + '.csv',
+    #                               use_gpu=Params['use_gpu'])
+    # train_loader, val_loader, test_loader = split_drive_dataset(Dirs=Dirs, transform=transform,
+    #                                                             batch_size=Params['batch_size'])
+    # drive_trainer.resume_from_checkpoint(parallel_trained=False)
+    # drive_trainer.train(optimizer=optimizer,
+    #                     data_loader=train_loader,
+    #                     epochs=Params['epochs'],
+    #                     validation_loader=val_loader,
+    #                     force_checkpoint=False, log_frequency=20)
+    # drive_trainer.resume_from_checkpoint(parallel_trained=False)
+    # logger = drive_trainer.get_logger(checkpoint + '-TEST.csv')
+    # drive_trainer.evaluate(data_loader=test_loader, mode='eval', patch_size=(388, 388), segmented_out=Dirs['segmented'],
+    #                        logger=logger)
+    # logger.close()
+    # End
 
-    checkpoint = 'unet-drive.ERODED.chk.tar'
+    """
+    ################## UNET WIDE Data set ################
+    """
+    Dirs = {}
+    Dirs['train'] = 'data' + sep + 'AV-WIDE' + sep + 'training'
+    Dirs['test'] = 'data' + sep + 'AV-WIDE' + sep + 'testing'
+    Dirs['segmented'] = 'data' + sep + 'AV-WIDE' + sep + 'testing' + sep + 'segmented_wide'
+
+    checkpoint = 'unet-wide.UW.chk.tar'
     drive_trainer = UNetNNTrainer(model=model,
                                   checkpoint_file=checkpoint,
                                   log_file=checkpoint + '.csv',
                                   use_gpu=Params['use_gpu'])
-    train_loader, val_loader, test_loader = split_drive_dataset(Dirs=Dirs, transform=transform,
+    train_loader, val_loader, test_loader = split_wide_dataset(Dirs=Dirs, transform=transform,
                                                                 batch_size=Params['batch_size'])
     # drive_trainer.resume_from_checkpoint(parallel_trained=False)
     # drive_trainer.train(optimizer=optimizer,

@@ -3,14 +3,11 @@ import os
 import PIL.Image as IMG
 import numpy as np
 import torch
-from torch.autograd import Variable
+import torch.nn.functional as F
 
 import neuralnet.unet.utils as ut
 from neuralnet.torchtrainer import NNTrainer
-from neuralnet.utils.loss import dice_loss
 from neuralnet.utils.measurements import ScoreAccumulator
-import torch.nn.functional as F
-import math
 
 sep = os.sep
 
@@ -37,10 +34,10 @@ class UNetNNTrainer(NNTrainer):
                 optimizer.zero_grad()
 
                 outputs = self.model(inputs)
-                _, predicted = torch.max(Variable(outputs.float(), requires_grad=True), 1)
+                _, predicted = torch.max(outputs, 1)
 
                 # loss = dice_loss.forward(predicted, Variable(labels, requires_grad=True))
-                loss = F.cross_entropy(outputs, labels, torch.Tensor([1/math.sqrt(epoch+1), 1]).to(self.device))
+                loss = F.cross_entropy(outputs, labels)
                 loss.backward()
                 optimizer.step()
 
