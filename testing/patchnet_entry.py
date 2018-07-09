@@ -16,7 +16,7 @@ if __name__ == "__main__":
     Params = {}
     Params['num_channels'] = 1
     Params['classes'] = {'background': 0, 'vessel': 1, }
-    Params['batch_size'] = 512
+    Params['batch_size'] = 256
     Params['num_classes'] = len(Params['classes'])
     Params['epochs'] = 100
     Params['patch_size'] = (51, 51)  # rows X cols
@@ -42,9 +42,9 @@ if __name__ == "__main__":
     Dirs = {}
     Dirs['train'] = 'data' + sep + 'DRIVE' + sep + 'training'
     Dirs['test'] = 'data' + sep + 'DRIVE' + sep + 'testing'
-    Dirs['segmented'] = 'data' + sep + 'DRIVE' + sep + 'testing' + sep + 'segmented_patch'
+    Dirs['segmented'] = 'data' + sep + 'DRIVE' + sep + 'testing' + sep + 'segmented_patch_unweighted'
 
-    checkpoint = 'drive.PATCHNET.chk.tar'
+    checkpoint = 'drive.PATCHNET_UNWEIGHTED.chk.tar'
     drive_trainer = PatchNetTrainer(model=model,
                                     checkpoint_file=checkpoint,
                                     log_file=checkpoint + '.csv',
@@ -55,7 +55,7 @@ if __name__ == "__main__":
                         data_loader=train_loader,
                         epochs=Params['epochs'],
                         validation_loader=val_loader,
-                        force_checkpoint=False, log_frequency=500)
+                        force_checkpoint=False, log_frequency=200)
     drive_trainer.resume_from_checkpoint(parallel_trained=False)
     logger = drive_trainer.get_logger(checkpoint + '-TEST.csv')
     drive_trainer.evaluate(data_loader=test_loader, mode='eval', segmented_out=Dirs['segmented'],

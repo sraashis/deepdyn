@@ -32,7 +32,7 @@ class PatchNetTrainer(NNTrainer):
 
                 optimizer.zero_grad()
                 outputs = self.model(inputs)
-                loss = F.nll_loss(outputs, labels, torch.Tensor([1, 8]).to(self.device))
+                loss = F.nll_loss(outputs, labels)
                 loss.backward()
                 optimizer.step()
 
