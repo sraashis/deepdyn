@@ -1,6 +1,5 @@
 import os
 
-import cv2
 import numpy as np
 import torch
 from torch.utils.data.dataset import Dataset
@@ -9,7 +8,8 @@ from commons.IMAGE import Image
 
 
 class Generator(Dataset):
-    def __init__(self, images_dir=None, image_files=None, mask_dir=None, manual_dir=None, transforms=None, get_mask=None,
+    def __init__(self, images_dir=None, image_files=None, mask_dir=None, manual_dir=None, transforms=None,
+                 get_mask=None,
                  get_truth=None, **kwargs):
         """
         :param images_dir: Directory where images, mask and manual1 folders are

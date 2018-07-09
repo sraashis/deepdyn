@@ -1,32 +1,21 @@
-import torch
-from torch.autograd import Function
+import torch.nn as nn
+import torch.nn.functional as F
 
 
-class DiceCoeff(Function):
-    """Dice coeff for individual examples"""
+class SoftDiceLoss(nn.Module):
+    def __init__(self):
+        super(SoftDiceLoss, self).__init__()
 
-    def forward(self, input, target):
-        self.save_for_backward(input, target)
-        self.inter = torch.dot(input.contiguous().view(-1), target.contiguous().view(-1).float()) + 0.0001
-        self.union = torch.sum(input) + torch.sum(target.float()) + 0.0001
+    def forward(self, predicted, targets):
+        smooth = 1
+        num = targets.size(0)
+        m1 = predicted.view(num, -1)
+        m2 = targets.view(num, -1)
+        intersection = (m1 * m2)
 
-        t = 2 * self.inter.float() / self.union.float()
-        return t
-
-    # This function has only a single output, so it gets only one gradient
-    def backward(self, grad_output):
-
-        input, target = self.saved_variables
-        grad_input = grad_target = None
-
-        if self.needs_input_grad[0]:
-            grad_input = grad_output.long() * 2 * (target.long() * self.union.long() + self.inter.long()) \
-                         / self.union.long() * self.union.long()
-        if self.needs_input_grad[1]:
-            grad_target = None
-
-        return grad_input, grad_target
+        score = (5. * intersection.sum(1) + smooth) / (4 * ((m1.sum(1) + m2.sum(1)) + smooth))
+        score = 1 - score.sum() / num
+        return score
 
 
-def dice_loss(input, target):
-    return DiceCoeff()(input, target)
+dice_loss = SoftDiceLoss()

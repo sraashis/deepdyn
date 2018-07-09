@@ -21,6 +21,11 @@ class PatchesGenerator(Generator):
 
     def _load_indices(self):
         for ID, img_file in enumerate(self.images):
+
+            #  SKIP flipped versions
+            if img_file[0].isalpha():
+                continue
+
             img_obj = self._get_image_obj(img_file)
             for i, j in itertools.product(np.arange(img_obj.working_arr.shape[0]),
                                           np.arange(img_obj.working_arr.shape[1])):
