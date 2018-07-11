@@ -103,9 +103,6 @@ def split_wide_dataset(Dirs=None, transform=None, batch_size=None):
     for k, folder in Dirs.items():
         os.makedirs(folder, exist_ok=True)
 
-    def get_mask_file(file_name):
-        return file_name.split('_')[0] + '_training_mask.gif'
-
     def get_ground_truth_file(file_name):
         return file_name.split('.')[0] + '_vessels.png'
 
@@ -114,7 +111,6 @@ def split_wide_dataset(Dirs=None, transform=None, batch_size=None):
         mask_dir=Dirs['train'] + sep + 'mask',
         manual_dir=Dirs['train'] + sep + '1st_manual',
         transforms=transform,
-        get_mask=get_mask_file,
         get_truth=get_ground_truth_file
     ).get_loader(batch_size=batch_size)
 
@@ -123,7 +119,6 @@ def split_wide_dataset(Dirs=None, transform=None, batch_size=None):
         mask_dir=Dirs['test'] + sep + 'mask',
         manual_dir=Dirs['test'] + sep + '1st_manual',
         transform=transform,
-        get_mask=get_mask_file,
         get_truth=get_ground_truth_file
     )
 
@@ -132,7 +127,6 @@ def split_wide_dataset(Dirs=None, transform=None, batch_size=None):
         mask_dir=Dirs['test'] + sep + 'mask',
         manual_dir=Dirs['test'] + sep + '1st_manual',
         transform=transform,
-        get_mask=get_mask_file,
         get_truth=get_ground_truth_file
     )
 

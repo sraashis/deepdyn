@@ -23,7 +23,7 @@ class PatchesGenerator(Generator):
         for ID, img_file in enumerate(self.images):
 
             #  SKIP flipped versions
-            if img_file[0].isalpha():
+            if img_file[0] != 'w':
                 continue
 
             img_obj = self._get_image_obj(img_file)
@@ -37,7 +37,7 @@ class PatchesGenerator(Generator):
                 if row_to >= img_obj.working_arr.shape[0] or col_to >= img_obj.working_arr.shape[1]:
                     continue
                 # Discard if the pixel (i, j) is not within the mask ###
-                if img_obj.mask[i, j] != 255:
+                if img_obj.mask and img_obj.mask[i, j] != 255:
                     continue
                 self.indices.append([ID, i, j, 1 if img_obj.ground_truth[i, j] == 255 else 0])
             self.image_objects[ID] = img_obj
@@ -122,9 +122,6 @@ def split_wide_dataset(Dirs=None, transform=None, batch_size=None):
     for k, folder in Dirs.items():
         os.makedirs(folder, exist_ok=True)
 
-    def get_mask_file(file_name):
-        return file_name.split('_')[0] + '_training_mask.gif'
-
     def get_ground_truth_file(file_name):
         return file_name.split('.')[0] + '_vessels.png'
 
@@ -133,7 +130,6 @@ def split_wide_dataset(Dirs=None, transform=None, batch_size=None):
         mask_dir=Dirs['train'] + sep + 'mask',
         manual_dir=Dirs['train'] + sep + '1st_manual',
         transforms=transform,
-        get_mask=get_mask_file,
         get_truth=get_ground_truth_file
     ).get_loader(batch_size=batch_size)
 
@@ -142,7 +138,6 @@ def split_wide_dataset(Dirs=None, transform=None, batch_size=None):
         mask_dir=Dirs['test'] + sep + 'mask',
         manual_dir=Dirs['test'] + sep + '1st_manual',
         transform=transform,
-        get_mask=get_mask_file,
         get_truth=get_ground_truth_file
     )
 
@@ -151,7 +146,6 @@ def split_wide_dataset(Dirs=None, transform=None, batch_size=None):
         mask_dir=Dirs['test'] + sep + 'mask',
         manual_dir=Dirs['test'] + sep + '1st_manual',
         transform=transform,
-        get_mask=get_mask_file,
         get_truth=get_ground_truth_file
     )
 

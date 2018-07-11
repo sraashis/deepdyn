@@ -40,13 +40,14 @@ class Generator(Dataset):
         img_obj = Image()
         img_obj.load_file(data_dir=self.images_dir,
                           file_name=img_file)
+        if self.get_mask is not None:
+            img_obj.load_mask(mask_dir=self.mask_dir,
+                              fget_mask=self.get_mask,
+                              erode=True)
+        if self.get_truth is not None:
+            img_obj.load_ground_truth(gt_dir=self.manual_dir,
+                                      fget_ground_truth=self.get_truth)
 
-        img_obj.load_mask(mask_dir=self.mask_dir,
-                          fget_mask=self.get_mask,
-                          erode=True)
-
-        img_obj.load_ground_truth(gt_dir=self.manual_dir,
-                                  fget_ground_truth=self.get_truth)
         img_obj.working_arr = img_obj.image_arr[:, :, 1]
         img_obj.apply_clahe()
         if img_obj.mask is not None:

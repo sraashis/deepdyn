@@ -1,8 +1,9 @@
 import os
 import sys
+import traceback
 
-sys.path.append('/home/akhanal1/ature')
-os.chdir('/home/akhanal1/ature')
+sys.path.append('/home/ak/PycharmProjects/ature')
+os.chdir('/home/ak/PycharmProjects/ature')
 
 import torch
 import torch.optim as optim
@@ -64,7 +65,7 @@ if __name__ == "__main__":
                                logger=logger)
         logger.close()
     except Exception as e:
-        print(str(e))
+        traceback.print_exc()
     # End
 
     """
@@ -88,7 +89,7 @@ if __name__ == "__main__":
                             data_loader=train_loader,
                             epochs=Params['epochs'],
                             validation_loader=val_loader,
-                            force_checkpoint=False, log_frequency=20)
+                            force_checkpoint=False, log_frequency=500)
         drive_trainer.resume_from_checkpoint(parallel_trained=False)
         logger = drive_trainer.get_logger(checkpoint + '-TEST.csv')
         drive_trainer.evaluate(data_loader=test_loader, mode='eval', patch_size=(388, 388),
@@ -96,5 +97,5 @@ if __name__ == "__main__":
                                logger=logger)
         logger.close()
     except Exception as e:
-        print(str(e))
+        traceback.print_exc()
     # End
