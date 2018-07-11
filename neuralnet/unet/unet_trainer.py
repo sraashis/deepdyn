@@ -37,7 +37,7 @@ class UNetNNTrainer(NNTrainer):
                 _, predicted = torch.max(outputs, 1)
 
                 # loss = dice_loss.forward(predicted, Variable(labels, requires_grad=True))
-                loss = F.cross_entropy(outputs, labels)
+                loss = F.nll_loss(outputs, labels)
                 loss.backward()
                 optimizer.step()
 

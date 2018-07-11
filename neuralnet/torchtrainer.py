@@ -1,4 +1,5 @@
 import os
+import sys
 from time import time
 
 import torch
@@ -126,8 +127,11 @@ class NNTrainer:
 
     @staticmethod
     def get_logger(log_file):
-        assert (os.path.isfile(
-            os.path.join('net_logs', log_file)) is False), log_file + " already present. RENAME OR DELETE "
+
+        if os.path.isfile(os.path.join('net_logs', log_file)):
+            print('### CRITICAL!!! "net_logs/' + log_file + '" already exists. Rename or delete to proceed.')
+            sys.exit(1)
+
         file = open(os.path.join('net_logs', log_file), 'w')
         NNTrainer.flush(file, 'ID,TYPE,EPOCH,BATCH,PRECISION,RECALL,F1,ACCURACY,LOSS')
         return file
@@ -140,6 +144,6 @@ class NNTrainer:
 
     @staticmethod
     def adjust_learning_rate(optimizer, epoch):
-        if epoch % 40 == 0:
+        if epoch % 30 == 0:
             for param_group in optimizer.param_groups:
-                param_group['lr'] = param_group['lr'] * 0.80
+                param_group['lr'] = param_group['lr'] * 0.50
