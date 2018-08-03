@@ -23,7 +23,7 @@ class PatchesGenerator(Generator):
         for ID, img_file in enumerate(self.images):
 
             #  SKIP flipped versions
-            if img_file[0] != 'w':
+            if img_file[0].isalpha():
                 continue
 
             img_obj = self._get_image_obj(img_file)
@@ -37,7 +37,7 @@ class PatchesGenerator(Generator):
                 if row_to >= img_obj.working_arr.shape[0] or col_to >= img_obj.working_arr.shape[1]:
                     continue
                 # Discard if the pixel (i, j) is not within the mask ###
-                if img_obj.mask and img_obj.mask[i, j] != 255:
+                if img_obj.mask is not None and img_obj.mask[i, j] != 255:
                     continue
                 self.indices.append([ID, i, j, 1 if img_obj.ground_truth[i, j] == 255 else 0])
             self.image_objects[ID] = img_obj

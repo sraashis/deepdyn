@@ -57,7 +57,7 @@ class AtureTest:
 
         self.writer = open(self.out_dir + os.sep + "segmentation_result.csv", 'w')
         self.writer.write(
-            'ITR,FILE_NAME,FSCORE,PRECISION,RECALL,ACCURACY,'
+            'ITR,FILE_NAME,F1,PRECISION,RECALL,ACCURACY,'
             'SK_THRESHOLD,'
             'ALPHA,'
             'ORIG_CONTRIB,'
