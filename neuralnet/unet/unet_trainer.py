@@ -83,7 +83,7 @@ class UNetNNTrainer(NNTrainer):
                                                                  force_checkpoint=force_checkpoint,
                                                                  mode=mode,
                                                                  logger=logger)
-                    segmented = ut.merge_patches(scores=scores,
+                    segmented = ut.merge_patches(patches=scores,
                                                  image_size=loader.dataset.image_objects[0].working_arr.shape,
                                                  training_patch_size=patch_size)
 
@@ -118,7 +118,7 @@ class UNetNNTrainer(NNTrainer):
                                      0] + score_acc.get_prf1a()))
         print()
         if mode is 'eval':
-            all_scores = np.array(all_scores)
+            all_scores = np.array(np.exp(all_scores[:, 1, :, :]) * 255, dtype=np.uint8)
             all_predictions = np.array(all_predictions)
             all_labels = np.array(all_labels)
         if mode is 'train':

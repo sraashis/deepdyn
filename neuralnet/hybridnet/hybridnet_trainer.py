@@ -1,77 +1,121 @@
+import os
+
+import PIL.Image as IMG
 import numpy as np
 import torch
+import torch.nn.functional as F
 
-import neuralnet.utils.measurements as mggmt
+import neuralnet.unet.utils as ut
 from neuralnet.torchtrainer import NNTrainer
+from neuralnet.utils.measurements import ScoreAccumulator
+
+sep = os.sep
 
 
-class HybridNNTrainer(NNTrainer):
-    def __init__(self, model=None, checkpoint_dir=None, checkpoint_file=None, log_to_file=True):
-        NNTrainer.__init__(self, model=model, checkpoint_dir=checkpoint_dir, checkpoint_file=checkpoint_file,
-                           log_to_file=log_to_file)
+class UNetNNTrainer(NNTrainer):
+    def __init__(self, **kwargs):
+        NNTrainer.__init__(self, **kwargs)
 
-    def evaluate(self, dataloader=None, use_gpu=False, force_checkpoint=False, save_best=False):
+    def train(self, optimizer=None, data_loader=None, epochs=None, log_frequency=200,
+              validation_loader=None, force_checkpoint=False):
+
+        if validation_loader is None:
+            raise ValueError('Please provide validation loader.')
+        logger = self.get_logger(self.log_file)
+        print('Training...')
+        for epoch in range(0, epochs):
+            self.model.train()
+            score_acc = ScoreAccumulator()
+            running_loss = 0.0
+            self.adjust_learning_rate(optimizer=optimizer, epoch=epoch + 1)
+            for i, data in enumerate(data_loader, 0):
+                inputs, labels, = data[-2].to(self.device), data[-1].to(self.device)
+
+                optimizer.zero_grad()
+
+                outputs = self.model(inputs)
+
+                # loss = dice_loss.forward(predicted, Variable(labels, requires_grad=True))
+                loss = F.mse_loss(outputs, labels)
+                loss.backward()
+                optimizer.step()
+
+                running_loss += float(loss.item())
+                current_loss = loss.item()
+                if (i + 1) % log_frequency == 0:  # Inspect the loss of every log_frequency batches
+                    current_loss = running_loss / log_frequency if (i + 1) % log_frequency == 0 \
+                        else (i + 1) % log_frequency
+                    running_loss = 0.0
+
+                self.flush(logger, ','.join(str(x) for x in [0, 0, epoch + 1, i + 1, 0, 0, 0, 0, current_loss]))
+                print('Epochs[%d/%d] Batch[%d/%d] loss:%.5f' %
+                      (epoch + 1, epochs, i + 1, data_loader.__len__(), current_loss),
+                      end='\r' if running_loss > 0 else '\n')
+
+            self.checkpoint['epochs'] += 1
+            self.evaluate(data_loader=validation_loader, force_checkpoint=force_checkpoint,
+                          mode='train', logger=logger)
+        try:
+            logger.close()
+        except IOError:
+            pass
+
+    def evaluate(self, data_loader=None, force_checkpoint=False, mode=None, logger=None, **kwargs):
+
+        assert (mode == 'eval' or mode == 'train'), 'Mode can either be eval or train'
+        assert (logger is not None), 'Please Provide a logger'
+        to_dir = kwargs['segmented_out'] if 'segmented_out' in kwargs else None
+        patch_size = kwargs['patch_size'] if 'patch_size' in kwargs else None
 
         self.model.eval()
-        self.model.cuda() if use_gpu else self.model.cpu()
-
+        data_loader = data_loader if isinstance(data_loader, list) else [data_loader]
+        score_acc = ScoreAccumulator()
         print('\nEvaluating...')
-        TP, FP, TN, FN = [0] * 4
+        with torch.no_grad():
+            for loader in data_loader:
+                if mode is 'train':
+                    score_acc.accumulate(self._evaluate(data_loader=loader,
+                                                        force_checkpoint=force_checkpoint, mode=mode, logger=logger))
+                if mode is 'eval' and to_dir is not None:
+                    predictions = self._evaluate(data_loader=loader,
+                                                                 force_checkpoint=force_checkpoint,
+                                                                 mode=mode,
+                                                                 logger=logger)
+                    segmented = ut.merge_patches(patches=predictions,
+                                                 image_size=loader.dataset.image_objects[0].working_arr.shape,
+                                                 training_patch_size=patch_size)
+
+                    IMG.fromarray(segmented).save(to_dir + sep + loader.dataset.image_objects[0].file_name + '.png')
+        if mode is 'train':
+            self._save_if_better(force_checkpoint=force_checkpoint, score=score_acc.get_prf1a()[2])
+
+    def _evaluate(self, data_loader=None, force_checkpoint=False, mode=None, logger=None):
+
+        assert (mode == 'eval' or mode == 'train'), 'Mode can either be eval or train'
+        assert (logger is not None), 'Please Provide a logger'
+        score_acc = ScoreAccumulator()
         all_predictions = []
-        all_scores = []
-        all_labels = []
-        all_patchIJs = []
-
-        ##### Segment Mode only to use while testing####
-        mode = dataloader.dataset.mode
-        for i, data in enumerate(dataloader, 0):
-            if mode == 'eval':
-                IDs, IJs, inputs, labels = data
-            else:
-                inputs, labels = data
-            inputs = inputs.cuda() if use_gpu else inputs.cpu()
-            labels = labels.cuda() if use_gpu else labels.cpu()
-
-            outputs = self.model(inputs)
-            _, predicted = torch.max(outputs.data, 1)
-
+        for i, data in enumerate(data_loader, 0):
+            ID, inputs, labels = data[0], data[1].to(self.device), data[2].to(self.device)
+            thr = self.model(inputs)
+            input_img = inputs * 255
+            input_img[input_img > thr] = 255
+            input_img[input_img <= thr] = 0
             # Accumulate scores
-            all_scores += outputs.data.clone().cpu().numpy().tolist()
-            all_predictions += predicted.data.clone().cpu().numpy().tolist()
-            all_labels += labels.data.clone().cpu().numpy().tolist()
+            if mode is 'eval':
+                all_predictions += input_img.clone().cpu().numpy().tolist()
 
-            ###### For segment mode only ##########
-            if mode == 'eval':
-                all_patchIJs += IJs.numpy().tolist()
-            ##### Segment mode End ###############
-
-            _tp, _fp, _tn, _fn = self.get_score(labels, predicted)
-            TP += _tp
-            TN += _tn
-            FP += _fp
-            FN += _fn
-            p, r, f1, a = mggmt.get_prf1a(TP, FP, TN, FN)
-
-            print('Batch[%d/%d] pre:%.3f rec:%.3f f1:%.3f acc:%.3f' % (
-                i + 1, dataloader.__len__(), p, r, f1, a),
+            p, r, f1, a = score_acc.add(labels, input_img).get_prf1a()
+            loss = F.mse_loss(thr, labels)
+            print('Batch[%d/%d] pre:%.3f rec:%.3f f1:%.3f acc:%.3f MSE:%.5f' % (
+                i + 1, data_loader.__len__(), p, r, f1, a, loss),
                   end='\r')
-
-            ########## Feeding to tensorboard starts here...#####################
-            ####################################################################
-            if self.to_tenserboard:
-                step = next(self.res['val_counter'])
-                self.logger.scalar_summary('F1/validation', f1, step)
-                self.logger.scalar_summary('Acc/validation', a, step)
-            #### Tensorfeed stops here# #########################################
-            #####################################################################
-
+        self.flush(logger, ','.join(str(x) for x in
+                                    [data_loader.dataset.image_objects[0].file_name, 1, self.checkpoint['epochs'],
+                                     0] + score_acc.get_prf1a()))
         print()
-        all_patchIJs = np.array(all_patchIJs, dtype=np.int)
-        all_scores = np.array(all_scores)
-        all_predictions = np.array(all_predictions)
-        all_labels = np.array(all_labels)
-        self._save_if_better(save_best=save_best, force_checkpoint=force_checkpoint, score=f1)
-
-        if mode == 'eval':
-            return all_patchIJs, all_scores, all_predictions, all_labels
-        return all_predictions, all_labels
+        if mode is 'eval':
+            all_predictions = np.array(all_predictions)
+        if mode is 'train':
+            return score_acc
+        return all_predictions
