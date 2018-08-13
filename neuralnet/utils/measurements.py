@@ -5,6 +5,8 @@ import numpy as np
 import torch
 from sklearn.metrics import confusion_matrix
 
+import utils.img_utils as imgutils
+
 
 def plot_confusion_matrix(y_pred=None, y_true=None, classes=None, normalize=False, cmap=plt.cm.Greens):
     """
@@ -124,3 +126,17 @@ class ScoreAccumulator:
         except ZeroDivisionError:
             a = 0
         return [round(p, 3), round(r, 3), round(f1, 3), round(a, 3)]
+
+
+def get_best_f1_thr(img, y, for_best='F1'):
+    best_scores = {for_best: 0.0}
+    best_thr = 0.0
+    for thr in np.linspace(1, 255, 255):
+        i = img.copy()
+        i[i > thr] = 255
+        i[i <= thr] = 0
+        scores = imgutils.get_praf1(i, y)
+        if scores[for_best] > best_scores[for_best]:
+            best_scores = scores
+            best_thr = thr
+    return best_scores, best_thr

@@ -21,18 +21,15 @@ def get_rgb_scores(arr_2d=None, truth=None):
 
 
 def get_praf1(arr_2d=None, truth=None):
-    tp, fp, fn, tn = 0, 0, 0, 0
-    for i in range(0, arr_2d.shape[0]):
-        for j in range(0, arr_2d.shape[1]):
-            if arr_2d[i, j] == 255 and truth[i, j] == 255:
-                tp += 1
-            if arr_2d[i, j] == 255 and truth[i, j] == 0:
-                fp += 1
-            if arr_2d[i, j] == 0 and truth[i, j] == 255:
-                fn += 1
-            if arr_2d[i, j] == 0 and truth[i, j] == 0:
-                tn += 1
-    p, r, a, f1 = 0, 0, 0, 0
+    x = arr_2d.copy()
+    y = truth.copy()
+    x[x == 255] = 1
+    y[y == 255] = 1
+    xy = x + (y * 2)
+    tp = xy[xy == 3].shape[0]
+    fp = xy[xy == 1].shape[0]
+    tn = xy[xy == 0].shape[0]
+    fn = xy[xy == 2].shape[0]
     try:
         p = tp / (tp + fp)
     except ZeroDivisionError:
@@ -128,3 +125,19 @@ def get_chunk_indexes(img_shape=(0, 0), chunk_shape=(0, 0), offset_row_col=None)
                 col_from = img_cols - chunk_col
                 col_end = True
             yield [row_from, row_to, col_from, col_to]
+
+
+def merge_patches(patches=None, image_size=(0, 0), patch_size=(0, 0)):
+    padded_sum = np.zeros([image_size[0], image_size[1]])
+    non_zero_count = np.zeros_like(padded_sum)
+    for i, chunk_ix in enumerate(get_chunk_indexes(image_size, patch_size)):
+        row_from, row_to, col_from, col_to = chunk_ix
+
+        patch = np.array(patches[i, :, :].squeeze(), dtype=np.uint8)
+
+        padded = np.pad(255 - patch, [(row_from, image_size[0] - row_to), (col_from, image_size[1] - col_to)],
+                        'constant')
+        padded_sum = padded + padded_sum
+        non_zero_count = non_zero_count + np.array(padded > 0).astype(int)
+    non_zero_count[non_zero_count == 0] = 1
+    return np.array(padded_sum / non_zero_count, dtype=np.uint8)

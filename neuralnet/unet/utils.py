@@ -2,23 +2,6 @@ import numpy as np
 
 import utils.img_utils as imgutils
 
-
-def merge_patches(patches=None, image_size=(0, 0), training_patch_size=(0, 0)):
-    padded_sum = np.zeros([image_size[0], image_size[1]])
-    non_zero_count = np.zeros_like(padded_sum)
-    for i, chunk_ix in enumerate(imgutils.get_chunk_indexes(image_size, training_patch_size)):
-        row_from, row_to, col_from, col_to = chunk_ix
-
-        segmented_arr = np.array(patches[i, :, :].squeeze() * 255, dtype=np.uint8)
-
-        padded = np.pad(255 - segmented_arr, [(row_from, image_size[0] - row_to), (col_from, image_size[1] - col_to)],
-                        'constant')
-        padded_sum = padded + padded_sum
-        non_zero_count = non_zero_count + np.array(padded > 0).astype(int)
-    non_zero_count[non_zero_count == 0] = 1
-    return np.array(padded_sum / non_zero_count, dtype=np.uint8)
-
-
 def get_padding_dims(input_img_size=(388, 388), output_image_size=(572, 572)):
     input_rows, input_cols = input_img_size
     output_rows, output_cols = output_image_size

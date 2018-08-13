@@ -5,7 +5,7 @@ import numpy as np
 import torch
 import torch.nn.functional as F
 
-import neuralnet.unet.utils as ut
+import utils.img_utils as imgutils
 from neuralnet.torchtrainer import NNTrainer
 from neuralnet.utils.measurements import ScoreAccumulator
 
@@ -78,12 +78,12 @@ class UNetNNTrainer(NNTrainer):
                                                         force_checkpoint=force_checkpoint, mode=mode, logger=logger))
                 if mode is 'eval' and to_dir is not None:
                     predictions = self._evaluate(data_loader=loader,
-                                                                 force_checkpoint=force_checkpoint,
-                                                                 mode=mode,
-                                                                 logger=logger)
-                    segmented = ut.merge_patches(patches=predictions,
-                                                 image_size=loader.dataset.image_objects[0].working_arr.shape,
-                                                 training_patch_size=patch_size)
+                                                 force_checkpoint=force_checkpoint,
+                                                 mode=mode,
+                                                 logger=logger)
+                    segmented = imgutils.merge_patches(patches=predictions * 255,
+                                                       image_size=loader.dataset.image_objects[0].working_arr.shape,
+                                                       patch_size=patch_size)
 
                     IMG.fromarray(segmented).save(to_dir + sep + loader.dataset.image_objects[0].file_name + '.png')
         if mode is 'train':
@@ -96,7 +96,7 @@ class UNetNNTrainer(NNTrainer):
         score_acc = ScoreAccumulator()
         all_predictions = []
         for i, data in enumerate(data_loader, 0):
-            ID, inputs, labels = data[0], data[1].to(self.device), data[2].to(self.device)
+            ID, inputs, labels, thr_y = data[0], data[1].to(self.device), data[2].to(self.device), data[3]
             thr = self.model(inputs)
             input_img = inputs * 255
             input_img[input_img > thr] = 255
@@ -106,7 +106,7 @@ class UNetNNTrainer(NNTrainer):
                 all_predictions += input_img.clone().cpu().numpy().tolist()
 
             p, r, f1, a = score_acc.add(labels, input_img).get_prf1a()
-            loss = F.mse_loss(thr, labels)
+            loss = F.mse_loss(thr, thr_y)
             print('Batch[%d/%d] pre:%.3f rec:%.3f f1:%.3f acc:%.3f MSE:%.5f' % (
                 i + 1, data_loader.__len__(), p, r, f1, a, loss),
                   end='\r')

@@ -23,7 +23,7 @@ class PatchesGenerator(Generator):
         for ID, img_file in enumerate(self.images):
 
             #  SKIP flipped versions
-            if img_file[0].isalpha():
+            if img_file[0] != 'w':
                 continue
 
             img_obj = self._get_image_obj(img_file)

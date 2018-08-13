@@ -5,7 +5,7 @@ import numpy as np
 import torch
 import torch.nn.functional as F
 
-import neuralnet.unet.utils as ut
+import utils.img_utils as imgutils
 from neuralnet.torchtrainer import NNTrainer
 from neuralnet.utils.measurements import ScoreAccumulator
 
@@ -83,9 +83,9 @@ class UNetNNTrainer(NNTrainer):
                                                                  force_checkpoint=force_checkpoint,
                                                                  mode=mode,
                                                                  logger=logger)
-                    segmented = ut.merge_patches(patches=scores,
-                                                 image_size=loader.dataset.image_objects[0].working_arr.shape,
-                                                 training_patch_size=patch_size)
+                    segmented = imgutils.merge_patches(patches=predictions,
+                                                       image_size=loader.dataset.image_objects[0].working_arr.shape,
+                                                       patch_size=patch_size)
 
                     IMG.fromarray(segmented).save(to_dir + sep + loader.dataset.image_objects[0].file_name + '.png')
         if mode is 'train':
@@ -119,8 +119,8 @@ class UNetNNTrainer(NNTrainer):
         print()
         if mode is 'eval':
             all_scores = np.array(np.exp(all_scores[:, 1, :, :]) * 255, dtype=np.uint8)
-            all_predictions = np.array(all_predictions)
-            all_labels = np.array(all_labels)
+            all_predictions = np.array(all_predictions * 255)
+            all_labels = np.array(all_labels * 255)
         if mode is 'train':
             return score_acc
         return all_scores, all_predictions, all_labels

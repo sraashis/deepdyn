@@ -6,6 +6,7 @@ import torch
 import utils.img_utils as imgutils
 from commons.IMAGE import Image
 from neuralnet.datagen import Generator
+from neuralnet.utils.measurements import get_best_f1_thr
 
 sep = os.sep
 
@@ -48,7 +49,7 @@ class PatchesGenerator(Generator):
         ID, row_from, row_to, col_from, col_to = self.indices[index]
         img_tensor = self.image_objects[ID].working_arr[row_from:row_to, col_from:col_to]
         y = self.image_objects[ID].ground_truth[row_from:row_to, col_from:col_to]
-        best_thr = get_best_thr(img_tensor, y)
+        _, best_thr = get_best_f1_thr(img_tensor, y)
         img_tensor = img_tensor[..., None]
         y[y == 255] = 1
         if self.transforms is not None:
@@ -152,15 +153,3 @@ def split_wide_dataset(Dirs=None, transform=None, batch_size=None):
 
     return train_loader, val_loaders, test_loaders
 
-
-def get_best_thr(img, y):
-    best_f1 = 0.0
-    best_thr = 0.0
-    for thr in np.linspace(1, 255, 500):
-        img[img > thr] = 255
-        img[img <= thr] = 0
-        f1 = imgutils.get_praf1(img, y)['f1']
-        if f1 > best_f1:
-            best_f1 = f1
-            best_thr = thr
-    return best_thr
