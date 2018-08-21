@@ -3,7 +3,7 @@ from torch import nn
 
 
 class ThrNet(nn.Module):
-    def __init__(self, width, channels, num_classes):
+    def __init__(self, width, channels):
         super(ThrNet, self).__init__()
 
         self.channels = channels
@@ -40,7 +40,7 @@ class ThrNet(nn.Module):
         self._update_output_size()
 
         self.kern_size = 3
-        self.kern_stride = 2
+        self.kern_stride = 1
         self.kern_padding = 1
         self.mxp_kern_size = 1
         self.mxp_stride = 1
@@ -52,8 +52,8 @@ class ThrNet(nn.Module):
         self.kern_size = 1
         self.kern_stride = 1
         self.kern_padding = 1
-        self.mxp_kern_size = 1
-        self.mxp_stride = 1
+        self.mxp_kern_size = 2
+        self.mxp_stride = 2
         self.pool5 = nn.MaxPool2d(kernel_size=self.mxp_kern_size, stride=self.mxp_stride)
         self.conv5 = nn.Conv2d(128, 64, self.kern_size,
                                stride=self.kern_stride, padding=self.kern_padding)
@@ -61,7 +61,7 @@ class ThrNet(nn.Module):
 
         self.linearWidth = 64 * int(self.width) * int(self.width)
         self.fc1 = nn.Linear(self.linearWidth, 16)
-        self.fc2 = nn.Linear(16, num_classes)
+        self.fc2 = nn.Linear(16, 1)
 
     def forward(self, x):
         x = self.pool1(F.relu(self.conv1(x)))
@@ -84,6 +84,3 @@ class ThrNet(nn.Module):
         temp1 = self.width
         self.width = ((self.width - self.mxp_kern_size) / self.mxp_stride) + 1
         print('Output width[ ' + str(temp) + ' -conv-> ' + str(temp1) + ' -maxpool-> ' + str(self.width) + ' ]')
-
-
-x = ThrNet(51, 1, 1)

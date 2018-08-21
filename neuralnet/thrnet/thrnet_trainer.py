@@ -12,7 +12,7 @@ from neuralnet.utils.measurements import ScoreAccumulator
 sep = os.sep
 
 
-class UNetNNTrainer(NNTrainer):
+class ThrnetTrainer(NNTrainer):
     def __init__(self, **kwargs):
         NNTrainer.__init__(self, **kwargs)
 
@@ -29,16 +29,17 @@ class UNetNNTrainer(NNTrainer):
             running_loss = 0.0
             self.adjust_learning_rate(optimizer=optimizer, epoch=epoch + 1)
             for i, data in enumerate(data_loader, 0):
-                inputs, labels, = data[-2].to(self.device), data[-1].to(self.device)
 
+                inputs, _, ths = data[1].to(self.device), data[2].to(self.device), data[3].to(self.device)
                 optimizer.zero_grad()
 
-                outputs = self.model(inputs)
-
+                outputs = self.model(inputs).squeeze()
                 # loss = dice_loss.forward(predicted, Variable(labels, requires_grad=True))
-                loss = F.mse_loss(outputs, labels)
+                # print(outputs.type(), labels.type(), inputs.type())
+                loss = F.mse_loss(outputs, ths.type(torch.FloatTensor).to(self.device))
                 loss.backward()
                 optimizer.step()
+                # print(outputs, loss)
 
                 running_loss += float(loss.item())
                 current_loss = loss.item()
@@ -96,17 +97,22 @@ class UNetNNTrainer(NNTrainer):
         score_acc = ScoreAccumulator()
         all_predictions = []
         for i, data in enumerate(data_loader, 0):
-            ID, inputs, labels, thr_y = data[0], data[1].to(self.device), data[2].to(self.device), data[3]
+            ID, inputs, labels, thr_y = data[0].to(self.device), data[1].to(self.device), data[2].to(self.device), data[
+                3].to(self.device)
             thr = self.model(inputs)
-            input_img = inputs * 255
-            input_img[input_img > thr] = 255
-            input_img[input_img <= thr] = 0
+
+            inputs = inputs.squeeze() * 255
+            thr = thr.squeeze()
+            # print(input_img.type(), thr.type())
+            # print(input_img.shape, thr.shape)
+            for o in range(inputs.shape[0]):
+                inputs[o, :, :][inputs[o, :, :] > thr[o]] = 255
+                inputs[o, :, :][inputs[o, :, :] <= thr[o]] = 0
             # Accumulate scores
             if mode is 'eval':
-                all_predictions += input_img.clone().cpu().numpy().tolist()
-
-            p, r, f1, a = score_acc.add(labels, input_img).get_prf1a()
-            loss = F.mse_loss(thr, thr_y)
+                all_predictions += inputs.clone().cpu().numpy().tolist()
+            p, r, f1, a = score_acc.add(labels, inputs).get_prf1a()
+            loss = F.mse_loss(thr, thr_y.type(torch.FloatTensor).to(self.device))
             print('Batch[%d/%d] pre:%.3f rec:%.3f f1:%.3f acc:%.3f MSE:%.5f' % (
                 i + 1, data_loader.__len__(), p, r, f1, a, loss),
                   end='\r')

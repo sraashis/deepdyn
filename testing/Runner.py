@@ -14,7 +14,7 @@ Dirs['data'] = 'data' + sep + 'DRIVE' + sep + 'testing'
 Dirs['images'] = Dirs['data'] + sep + 'images'
 Dirs['mask'] = Dirs['data'] + sep + 'mask'
 Dirs['truth'] = Dirs['data'] + sep + '1st_manual'
-Dirs['segmented'] = 'data/DRIVE/segmented_unet'
+Dirs['segmented'] = 'data/DRIVE/images'
 Dirs['mst_out'] = 'data/DRIVE/mst_best'
 
 for k, folder in Dirs.items():
