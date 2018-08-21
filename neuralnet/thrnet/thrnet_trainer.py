@@ -49,7 +49,7 @@ class ThrnetTrainer(NNTrainer):
                     running_loss = 0.0
 
                 self.flush(logger, ','.join(str(x) for x in [0, 0, epoch + 1, i + 1, 0, 0, 0, 0, current_loss]))
-                print('Epochs[%d/%d] Batch[%d/%d] loss:%.5f' %
+                print('Epochs[%d/%d] Batch[%d/%d] MSE:%.5f' %
                       (epoch + 1, epochs, i + 1, data_loader.__len__(), current_loss),
                       end='\r' if running_loss > 0 else '\n')
 
@@ -101,17 +101,17 @@ class ThrnetTrainer(NNTrainer):
                 3].to(self.device)
             thr = self.model(inputs)
 
-            inputs = inputs.squeeze() * 255
+            segmented = inputs.squeeze() * 255
             thr = thr.squeeze()
             # print(input_img.type(), thr.type())
             # print(input_img.shape, thr.shape)
-            for o in range(inputs.shape[0]):
-                inputs[o, :, :][inputs[o, :, :] > thr[o]] = 255
-                inputs[o, :, :][inputs[o, :, :] <= thr[o]] = 0
+            for o in range(segmented.shape[0]):
+                segmented[o, :, :][segmented[o, :, :] > thr[o]] = 255
+                segmented[o, :, :][segmented[o, :, :] <= thr[o]] = 0
             # Accumulate scores
             if mode is 'eval':
-                all_predictions += inputs.clone().cpu().numpy().tolist()
-            p, r, f1, a = score_acc.add(labels, inputs).get_prf1a()
+                all_predictions += segmented.clone().cpu().numpy().tolist()
+            p, r, f1, a = score_acc.add(labels, segmented).get_prf1a()
             loss = F.mse_loss(thr, thr_y.type(torch.FloatTensor).to(self.device))
             print('Batch[%d/%d] pre:%.3f rec:%.3f f1:%.3f acc:%.3f MSE:%.5f' % (
                 i + 1, data_loader.__len__(), p, r, f1, a, loss),

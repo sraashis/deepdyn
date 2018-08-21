@@ -18,7 +18,7 @@ if __name__ == "__main__":
     Params['num_channels'] = 1
     Params['batch_size'] = 32
     Params['num_classes'] = 1
-    Params['epochs'] = 5
+    Params['epochs'] = 100
     Params['patch_size'] = (31, 31)  # rows X cols
     Params['use_gpu'] = True
     Params['learning_rate'] = 0.001
@@ -60,7 +60,7 @@ if __name__ == "__main__":
                             data_loader=train_loader,
                             epochs=Params['epochs'],
                             validation_loader=val_loader,
-                            force_checkpoint=True, log_frequency=20)
+                            force_checkpoint=True, log_frequency=100)
         drive_trainer.resume_from_checkpoint(parallel_trained=False)
         logger = drive_trainer.get_logger(checkpoint + '-TEST_THR.csv')
         drive_trainer.evaluate(data_loader=test_loader, mode='eval', patch_size=Params['patch_size'],

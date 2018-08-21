@@ -37,8 +37,8 @@ class PatchesGenerator(Generator):
             img_obj.load_ground_truth(gt_dir=self.manual_dir,
                                       fget_ground_truth=self.get_truth)
 
-        img_obj.working_arr = 255 - img_obj.image_arr
-        img_obj.working_arr[img_obj.mask == 0] = 255
+        img_obj.working_arr = img_obj.image_arr
+        img_obj.working_arr[img_obj.mask == 0] = 0
 
         if img_obj.mask is not None:
             x = np.logical_and(True, img_obj.mask == 255)

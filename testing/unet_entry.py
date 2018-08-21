@@ -43,9 +43,9 @@ if __name__ == "__main__":
         Dirs = {}
         Dirs['train'] = 'data' + sep + 'DRIVE' + sep + 'training'
         Dirs['test'] = 'data' + sep + 'DRIVE' + sep + 'testing'
-        Dirs['segmented'] = 'data' + sep + 'DRIVE' + sep + 'segmented_unet_thr'
+        Dirs['segmented'] = 'data' + sep + 'DRIVE' + sep + 'unet_pmap_val'
 
-        checkpoint = 'unet-DRIVE-THR.chk.tar'
+        checkpoint = 'unet-DRIVE.chk.tar'
         drive_trainer = UNetNNTrainer(model=model,
                                       checkpoint_file=checkpoint,
                                       log_file=checkpoint + '.csv',
@@ -53,14 +53,14 @@ if __name__ == "__main__":
         train_loader, val_loader, test_loader = split_drive_dataset(Dirs=Dirs, transform=transform,
                                                                     batch_size=Params['batch_size'])
         # drive_trainer.resume_from_checkpoint(parallel_trained=False)
-        drive_trainer.train(optimizer=optimizer,
-                            data_loader=train_loader,
-                            epochs=Params['epochs'],
-                            validation_loader=val_loader,
-                            force_checkpoint=False, log_frequency=20)
+        # drive_trainer.train(optimizer=optimizer,
+        #                     data_loader=train_loader,
+        #                     epochs=Params['epochs'],
+        #                     validation_loader=val_loader,
+        #                     force_checkpoint=False, log_frequency=20)
         drive_trainer.resume_from_checkpoint(parallel_trained=False)
-        logger = drive_trainer.get_logger(checkpoint + '-TEST_THR.csv')
-        drive_trainer.evaluate(data_loader=test_loader, mode='eval', patch_size=(388, 388),
+        logger = drive_trainer.get_logger(checkpoint + '-VAL_PMAP.csv')
+        drive_trainer.evaluate(data_loader=val_loader, mode='eval', patch_size=(388, 388),
                                segmented_out=Dirs['segmented'],
                                logger=logger)
         logger.close()
