@@ -133,9 +133,9 @@ def merge_patches(patches=None, image_size=(0, 0), patch_size=(0, 0)):
     for i, chunk_ix in enumerate(get_chunk_indexes(image_size, patch_size)):
         row_from, row_to, col_from, col_to = chunk_ix
 
-        patch = np.array(patches[i, :, :].squeeze(), dtype=np.uint8)
+        patch = np.array(patches[i, :, :]).squeeze()
 
-        padded = np.pad(255 - patch, [(row_from, image_size[0] - row_to), (col_from, image_size[1] - col_to)],
+        padded = np.pad(patch, [(row_from, image_size[0] - row_to), (col_from, image_size[1] - col_to)],
                         'constant')
         padded_sum = padded + padded_sum
         non_zero_count = non_zero_count + np.array(padded > 0).astype(int)
