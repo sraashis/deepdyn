@@ -107,8 +107,8 @@ class ThrnetTrainer(NNTrainer):
             segmented = inputs.squeeze() * 255
 
             for o in range(segmented.shape[0]):
-                segmented[o, :, :][segmented[o, :, :] > thr_y[o].item()] = 255
-                segmented[o, :, :][segmented[o, :, :] <= thr_y[o].item()] = 0
+                segmented[o, :, :][segmented[o, :, :] > thr[o].item()] = 255
+                segmented[o, :, :][segmented[o, :, :] <= thr[o].item()] = 0
 
             # Accumulate scores
             if mode is 'eval':
