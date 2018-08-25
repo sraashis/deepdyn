@@ -12,7 +12,7 @@ from neuralnet.utils.measurements import ScoreAccumulator
 sep = os.sep
 
 
-class UNetNNTrainer(NNTrainer):
+class ThrnetTrainer(NNTrainer):
     def __init__(self, **kwargs):
         NNTrainer.__init__(self, **kwargs)
 
@@ -29,29 +29,28 @@ class UNetNNTrainer(NNTrainer):
             running_loss = 0.0
             self.adjust_learning_rate(optimizer=optimizer, epoch=epoch + 1)
             for i, data in enumerate(data_loader, 0):
-                inputs, labels, = data[-2].to(self.device), data[-1].to(self.device)
 
+                inputs, _, ths = data[1].to(self.device), \
+                                 data[2].to(self.device), \
+                                 data[3].type(torch.FloatTensor).to(self.device)
                 optimizer.zero_grad()
 
-                outputs = self.model(inputs)
-                _, predicted = torch.max(outputs, 1)
+                outputs = self.model(inputs).squeeze()
 
-                # loss = dice_loss.forward(predicted, Variable(labels, requires_grad=True))
-                loss = F.nll_loss(outputs, labels)
+                loss = F.mse_loss(outputs, ths)
                 loss.backward()
                 optimizer.step()
 
                 running_loss += float(loss.item())
                 current_loss = loss.item()
-                p, r, f1, a = score_acc.reset().add(labels, predicted).get_prf1a()
                 if (i + 1) % log_frequency == 0:  # Inspect the loss of every log_frequency batches
                     current_loss = running_loss / log_frequency if (i + 1) % log_frequency == 0 \
                         else (i + 1) % log_frequency
                     running_loss = 0.0
 
-                self.flush(logger, ','.join(str(x) for x in [0, 0, epoch + 1, i + 1, p, r, f1, a, current_loss]))
-                print('Epochs[%d/%d] Batch[%d/%d] loss:%.5f pre:%.3f rec:%.3f f1:%.3f acc:%.3f' %
-                      (epoch + 1, epochs, i + 1, data_loader.__len__(), current_loss, p, r, f1, a),
+                self.flush(logger, ','.join(str(x) for x in [0, 0, epoch + 1, i + 1, 0, 0, 0, 0, current_loss]))
+                print('Epochs[%d/%d] Batch[%d/%d] MSE:%.5f' %
+                      (epoch + 1, epochs, i + 1, data_loader.__len__(), current_loss),
                       end='\r' if running_loss > 0 else '\n')
 
             self.checkpoint['epochs'] += 1
@@ -79,14 +78,15 @@ class UNetNNTrainer(NNTrainer):
                     score_acc.accumulate(self._evaluate(data_loader=loader,
                                                         force_checkpoint=force_checkpoint, mode=mode, logger=logger))
                 if mode is 'eval' and to_dir is not None:
-                    scores, predictions, labels = self._evaluate(data_loader=loader,
-                                                                 force_checkpoint=force_checkpoint,
-                                                                 mode=mode,
-                                                                 logger=logger)
+                    predictions = self._evaluate(data_loader=loader,
+                                                 force_checkpoint=force_checkpoint,
+                                                 mode=mode,
+                                                 logger=logger)
                     segmented = imgutils.merge_patches(patches=predictions,
                                                        image_size=loader.dataset.image_objects[0].working_arr.shape,
-                                                       patch_size=patch_size)
-
+                                                       patch_size=patch_size,
+                                                       offset_row_col=loader.dataset.offset_shape)
+                    segmented[loader.dataset.image_objects[0].mask == 0] = 0
                     print(loader.dataset.image_objects[0].file_name,
                           imgutils.get_praf1(segmented, loader.dataset.image_objects[0].ground_truth))
                     IMG.fromarray(segmented).save(to_dir + sep + loader.dataset.image_objects[0].file_name + '.png')
@@ -99,30 +99,36 @@ class UNetNNTrainer(NNTrainer):
         assert (logger is not None), 'Please Provide a logger'
         score_acc = ScoreAccumulator()
         all_predictions = []
-        all_scores = []
-        all_labels = []
+        loss = 0
         for i, data in enumerate(data_loader, 0):
-            ID, inputs, labels = data[0], data[1].to(self.device), data[2].to(self.device)
-            outputs = self.model(inputs)
-            _, predicted = torch.max(outputs, 1)
+            ID, inputs, labels, thr_y = data[0].to(self.device), \
+                                        data[1].to(self.device), \
+                                        data[2].type(torch.FloatTensor).to(self.device), \
+                                        data[3].type(torch.FloatTensor).to(self.device)
+            thr = self.model(inputs)
+            thr = thr.squeeze()
+            segmented = inputs.squeeze() * 255
+            # segmented[segmented > thr] = 255
+            # segmented[segmented <= thr] = 0
+            for o in range(segmented.shape[0]):
+                segmented[o, :, :][segmented[o, :, :] > thr[o].item()] = 255
+                segmented[o, :, :][segmented[o, :, :] <= thr[o].item()] = 0
 
             # Accumulate scores
             if mode is 'eval':
-                all_scores += outputs.clone().cpu().numpy().tolist()
-                all_predictions += predicted.clone().cpu().numpy().tolist()
-                all_labels += labels.clone().cpu().numpy().tolist()
-
-            p, r, f1, a = score_acc.add(labels, predicted).get_prf1a()
-            print('Batch[%d/%d] pre:%.3f rec:%.3f f1:%.3f acc:%.3f' % (i + 1, data_loader.__len__(), p, r, f1, a),
+                all_predictions += segmented.clone().cpu().numpy().tolist()
+            segmented[segmented == 255] = 1
+            p, r, f1, a = score_acc.add(labels, segmented).get_prf1a()
+            loss += F.mse_loss(thr, thr_y)
+            print('Batch[%d/%d] pre:%.3f rec:%.3f f1:%.3f acc:%.3f MSE:%.5f' % (
+                i + 1, data_loader.__len__(), p, r, f1, a, loss / (i + 1)),
                   end='\r')
         self.flush(logger, ','.join(str(x) for x in
                                     [data_loader.dataset.image_objects[0].file_name, 1, self.checkpoint['epochs'],
                                      0] + score_acc.get_prf1a()))
         print()
         if mode is 'eval':
-            all_scores = np.array(np.exp(all_scores[:, 1, :, :]) * 255, dtype=np.uint8)
-            all_predictions = np.array(all_predictions * 255)
-            all_labels = np.array(all_labels * 255)
+            all_predictions = np.array(all_predictions)
         if mode is 'train':
             return score_acc
-        return all_scores, all_predictions, all_labels
+        return all_predictions

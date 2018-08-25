@@ -7,9 +7,9 @@ os.chdir('/home/akhanal1/ature')
 
 import torch
 import torch.optim as optim
-from neuralnet.simplenet.model import PatchNet
-from neuralnet.simplenet.simplenet_dataloader import split_drive_dataset, split_wide_dataset
-from neuralnet.simplenet.simplenet_trainer import PatchNetTrainer
+from neuralnet.patchnet.model import PatchNet
+from neuralnet.patchnet.patchnet_dataloader import split_drive_dataset, split_wide_dataset
+from neuralnet.patchnet.patchnet_trainer import PatchNetTrainer
 import torchvision.transforms as transforms
 
 if __name__ == "__main__":
@@ -19,7 +19,7 @@ if __name__ == "__main__":
     Params['classes'] = {'background': 0, 'vessel': 1, }
     Params['batch_size'] = 256
     Params['num_classes'] = len(Params['classes'])
-    Params['epochs'] = 20
+    Params['epochs'] = 150
     Params['patch_size'] = (51, 51)  # rows X cols
     Params['use_gpu'] = True
     Params['learning_rate'] = 0.001
@@ -53,6 +53,7 @@ if __name__ == "__main__":
     #                                     use_gpu=Params['use_gpu'])
     #     train_loader, val_loader, test_loader = split_drive_dataset(Dirs=Dirs, transform=transform,
     #                                                                 batch_size=Params['batch_size'])
+    #     # drive_trainer.resume_from_checkpoint(parallel_trained=False)
     #     drive_trainer.train(optimizer=optimizer,
     #                         data_loader=train_loader,
     #                         epochs=Params['epochs'],
@@ -97,4 +98,4 @@ if __name__ == "__main__":
         logger.close()
     except Exception as e:
         traceback.print_exc()
-    # End
+    #End

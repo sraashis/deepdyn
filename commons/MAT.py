@@ -1,5 +1,4 @@
 from scipy import io
-import path_config as cfg
 
 
 class Mat:
