@@ -10,12 +10,12 @@ DRIVE = {
         'batch_size': 32,
         'epochs': 100,
         'learning_rate': 0.001,
-        'patch_shape': (31, 31),
+        'patch_shape': (21, 21),
         'use_gpu': True,
         'distribute': True,
         'shuffle': True,
         'checkpoint_file': 'THRNET-DRIVE.chk.tar',
-        'mode': 'train'
+        'mode': 'eval'
     },
 
     'D': {
@@ -23,11 +23,11 @@ DRIVE = {
         'train_mask': 'data' + sep + 'DRIVE' + sep + 'thr_training' + sep + 'mask',
         'train_manual': 'data' + sep + 'DRIVE' + sep + 'thr_training' + sep + '1st_manual',
 
-        'val_img': 'data' + sep + 'DRIVE' + sep + 'thr_testing' + sep + 'images',
+        'val_img': 'data' + sep + 'DRIVE' + sep + 'thr_testing' + sep + 'validation_images',
         'val_mask': 'data' + sep + 'DRIVE' + sep + 'thr_testing' + sep + 'mask',
         'val_manual': 'data' + sep + 'DRIVE' + sep + 'thr_testing' + sep + '1st_manual',
 
-        'test_img': 'data' + sep + 'DRIVE' + sep + 'thr_testing' + sep + 'validation_images',
+        'test_img': 'data' + sep + 'DRIVE' + sep + 'thr_testing' + sep + 'images',
         'test_mask': 'data' + sep + 'DRIVE' + sep + 'thr_testing' + sep + 'mask',
         'test_manual': 'data' + sep + 'DRIVE' + sep + 'thr_testing' + sep + '1st_manual',
 

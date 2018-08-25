@@ -1,5 +1,4 @@
 import os
-import sys
 
 import PIL.Image as IMG
 import numpy as np
@@ -31,13 +30,14 @@ class ThrnetTrainer(NNTrainer):
             self.adjust_learning_rate(optimizer=optimizer, epoch=epoch + 1)
             for i, data in enumerate(data_loader, 0):
 
-                inputs, _, ths = data[1].to(self.device), data[2].to(self.device), data[3].to(self.device)
+                inputs, _, ths = data[1].to(self.device), \
+                                 data[2].to(self.device), \
+                                 data[3].type(torch.FloatTensor).to(self.device)
                 optimizer.zero_grad()
 
                 outputs = self.model(inputs).squeeze()
-                # loss = dice_loss.forward(predicted, Variable(labels, requires_grad=True))
-                # print(outputs.type(), labels.type(), inputs.type())
-                loss = F.mse_loss(outputs, ths.type(torch.FloatTensor).to(self.device))
+
+                loss = F.mse_loss(outputs, ths)
                 loss.backward()
                 optimizer.step()
 
@@ -82,10 +82,11 @@ class ThrnetTrainer(NNTrainer):
                                                  force_checkpoint=force_checkpoint,
                                                  mode=mode,
                                                  logger=logger)
-                    segmented = imgutils.merge_patches(patches=predictions * 255,
+                    segmented = imgutils.merge_patches(patches=predictions,
                                                        image_size=loader.dataset.image_objects[0].working_arr.shape,
-                                                       patch_size=patch_size)
-
+                                                       patch_size=patch_size,
+                                                       offset_row_col=patch_size)
+                    segmented[loader.dataset.image_objects[0].mask == 0] = 0
                     IMG.fromarray(segmented).save(to_dir + sep + loader.dataset.image_objects[0].file_name + '.png')
         if mode is 'train':
             self._save_if_better(force_checkpoint=force_checkpoint, score=score_acc.get_prf1a()[2])
@@ -97,28 +98,23 @@ class ThrnetTrainer(NNTrainer):
         score_acc = ScoreAccumulator()
         all_predictions = []
         for i, data in enumerate(data_loader, 0):
-            ID, inputs, labels, thr_y = data[0].to(self.device), data[1].to(self.device), data[2].to(self.device), data[
-                3].to(self.device)
+            ID, inputs, labels, thr_y = data[0].to(self.device), \
+                                        data[1].to(self.device), \
+                                        data[2].type(torch.FloatTensor).to(self.device), \
+                                        data[3].type(torch.FloatTensor).to(self.device)
             thr = self.model(inputs)
             thr = thr.squeeze()
-            # print(thr.shape, thr_y.shape)
-            # print("##############################################################################")
-            # print(thr)
-            # print(thr_y)
-            # print('##############################################################################')
-            # sys.exit(0)
             segmented = inputs.squeeze() * 255
 
-            # print(input_img.type(), thr.type())
-            # print(input_img.shape, thr.shape)
             for o in range(segmented.shape[0]):
-                segmented[o, :, :][segmented[o, :, :] > thr_y[o].data[0]] = 255
-                segmented[o, :, :][segmented[o, :, :] <= thr_y[o].data[0]] = 0
+                segmented[o, :, :][segmented[o, :, :] > thr_y[o].item()] = 255
+                segmented[o, :, :][segmented[o, :, :] <= thr_y[o].item()] = 0
+
             # Accumulate scores
             if mode is 'eval':
                 all_predictions += segmented.clone().cpu().numpy().tolist()
             p, r, f1, a = score_acc.add(labels, segmented).get_prf1a()
-            loss = F.mse_loss(thr, thr_y.type(torch.FloatTensor).to(self.device))
+            loss = F.mse_loss(thr, thr_y)
             print('Batch[%d/%d] pre:%.3f rec:%.3f f1:%.3f acc:%.3f MSE:%.5f' % (
                 i + 1, data_loader.__len__(), p, r, f1, a, loss),
                   end='\r')

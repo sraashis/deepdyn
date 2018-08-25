@@ -1,4 +1,4 @@
-BASE_PROJECT_DIR = '/home/akhanal1/ature'
+BASE_PROJECT_DIR = '/home/ak/PycharmProjects/ature'
 
 import os
 import sys
@@ -25,6 +25,8 @@ if __name__ == "__main__":
     ])
 
     for I in RUNS:
+        for k, folder in I['D'].items():
+            os.makedirs(folder, exist_ok=True)
         model = ThrNet(I['P']['patch_shape'][0], I['P']['num_channels'])
         optimizer = optim.Adam(model.parameters(), lr=I['P']['learning_rate'])
         if I['P']['distribute']:
@@ -68,13 +70,13 @@ if __name__ == "__main__":
                 images_dir=I['D']['test_img'],
                 mask_dir=I['D']['test_mask'],
                 manual_dir=I['D']['test_manual'],
-                transforms=transforms,
+                transforms=transform,
                 get_mask=I['F']['test_mask_getter'],
                 get_truth=I['F']['test_gt_getter'],
                 patch_shape=I['P']['patch_shape']
             )
 
-            drive_trainer.resume_from_checkpoint(parallel_trained=False)
+            # drive_trainer.resume_from_checkpoint(parallel_trained=False)
             logger = drive_trainer.get_logger(I['P']['checkpoint_file'] + '-TEST.csv')
             drive_trainer.evaluate(data_loader=test_loaders, mode='eval', patch_size=I['P']['patch_shape'],
                                    segmented_out=I['D']['test_img_out'],

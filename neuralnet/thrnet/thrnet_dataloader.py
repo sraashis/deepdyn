@@ -21,7 +21,7 @@ class PatchesGenerator(Generator):
     def _load_indices(self):
         for ID, img_file in enumerate(self.images):
             img_obj = self._get_image_obj(img_file)
-            for chunk_ix in imgutils.get_chunk_indexes(img_obj.working_arr.shape, self.patch_shape):
+            for chunk_ix in imgutils.get_chunk_indexes(img_obj.working_arr.shape, self.patch_shape, self.patch_shape):
                 self.indices.append([ID] + chunk_ix)
             self.image_objects[ID] = img_obj
 
@@ -58,7 +58,7 @@ class PatchesGenerator(Generator):
         y[y == 255] = 1
         if ~np.isin(1, y):
             best_thr = 255
-
+        # print(best_scores['F1'], best_thr)
         return ID, img_tensor, torch.FloatTensor(y), best_thr
 
     def get_loader(self, batch_size=8, shuffle=True, sampler=None, num_workers=2):
