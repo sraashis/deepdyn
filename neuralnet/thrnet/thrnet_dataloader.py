@@ -12,16 +12,16 @@ sep = os.sep
 
 
 class PatchesGenerator(Generator):
-    def __init__(self, shape=None, **kwargs):
+    def __init__(self, patch_shape=None, **kwargs):
         super(PatchesGenerator, self).__init__(**kwargs)
-        self.shape = shape
+        self.patch_shape = patch_shape
         self._load_indices()
         print('Patches:', self.__len__())
 
     def _load_indices(self):
         for ID, img_file in enumerate(self.images):
             img_obj = self._get_image_obj(img_file)
-            for chunk_ix in imgutils.get_chunk_indexes(img_obj.working_arr.shape, self.shape):
+            for chunk_ix in imgutils.get_chunk_indexes(img_obj.working_arr.shape, self.patch_shape):
                 self.indices.append([ID] + chunk_ix)
             self.image_objects[ID] = img_obj
 
@@ -65,8 +65,8 @@ class PatchesGenerator(Generator):
                                            shuffle=shuffle, num_workers=num_workers, sampler=sampler)
 
 
-def get_loaders(images_dir=None, mask_dir=None, manual_dir=None,
-                transform=None, get_mask=None, get_truth=None, patch_shape=None):
+def get_loader_per_img(images_dir=None, mask_dir=None, manual_dir=None,
+                       transforms=None, get_mask=None, get_truth=None, patch_shape=None):
     loaders = []
     for file in os.listdir(images_dir):
         loaders.append(PatchesGenerator(
@@ -74,89 +74,9 @@ def get_loaders(images_dir=None, mask_dir=None, manual_dir=None,
             image_files=file,
             mask_dir=mask_dir,
             manual_dir=manual_dir,
-            transforms=transform,
+            transforms=transforms,
             get_mask=get_mask,
             get_truth=get_truth,
-            shape=patch_shape
+            patch_shape=patch_shape
         ).get_loader(shuffle=False))
     return loaders
-
-
-def split_drive_dataset(Dirs=None, transform=None, batch_size=None, patch_shape=None):
-    for k, folder in Dirs.items():
-        os.makedirs(folder, exist_ok=True)
-
-    def get_mask_file(file_name):
-        return file_name.split('_')[0] + '_test_mask.gif'
-
-    def get_ground_truth_file(file_name):
-        return file_name.split('_')[0] + '_manual1.gif'
-
-    train_loader = PatchesGenerator(
-        images_dir=Dirs['train'] + sep + 'images',
-        mask_dir=Dirs['train'] + sep + 'mask',
-        manual_dir=Dirs['train'] + sep + '1st_manual',
-        transforms=transform,
-        get_mask=get_mask_file,
-        get_truth=get_ground_truth_file,
-        shape=patch_shape
-    ).get_loader(batch_size=batch_size)
-
-    val_loaders = get_loaders(
-        images_dir=Dirs['test'] + sep + 'validation_images',
-        mask_dir=Dirs['test'] + sep + 'mask',
-        manual_dir=Dirs['test'] + sep + '1st_manual',
-        transform=transform,
-        get_mask=get_mask_file,
-        get_truth=get_ground_truth_file,
-        patch_shape=patch_shape
-    )
-
-    test_loaders = get_loaders(
-        images_dir=Dirs['test'] + sep + 'images',
-        mask_dir=Dirs['test'] + sep + 'mask',
-        manual_dir=Dirs['test'] + sep + '1st_manual',
-        transform=transform,
-        get_mask=get_mask_file,
-        get_truth=get_ground_truth_file,
-        patch_shape=patch_shape
-    )
-
-    return train_loader, val_loaders, test_loaders
-
-
-def split_wide_dataset(Dirs=None, transform=None, batch_size=None, patch_shape=None):
-    for k, folder in Dirs.items():
-        os.makedirs(folder, exist_ok=True)
-
-    def get_ground_truth_file(file_name):
-        return file_name.split('.')[0] + '_vessels.png'
-
-    train_loader = PatchesGenerator(
-        images_dir=Dirs['train'] + sep + 'images',
-        mask_dir=Dirs['train'] + sep + 'mask',
-        manual_dir=Dirs['train'] + sep + '1st_manual',
-        transforms=transform,
-        get_truth=get_ground_truth_file,
-        shape=patch_shape
-    ).get_loader(batch_size=batch_size)
-
-    val_loaders = get_loaders(
-        images_dir=Dirs['test'] + sep + 'validation_images',
-        mask_dir=Dirs['test'] + sep + 'mask',
-        manual_dir=Dirs['test'] + sep + '1st_manual',
-        transform=transform,
-        get_truth=get_ground_truth_file,
-        patch_shape=patch_shape
-    )
-
-    test_loaders = get_loaders(
-        images_dir=Dirs['test'] + sep + 'images',
-        mask_dir=Dirs['test'] + sep + 'mask',
-        manual_dir=Dirs['test'] + sep + '1st_manual',
-        transform=transform,
-        get_truth=get_ground_truth_file,
-        patch_shape=patch_shape
-    )
-
-    return train_loader, val_loaders, test_loaders

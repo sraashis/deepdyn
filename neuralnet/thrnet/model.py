@@ -87,6 +87,3 @@ class ThrNet(nn.Module):
         temp1 = self.width
         self.width = ((self.width - self.mxp_kern_size) / self.mxp_stride) + 1
         print('Output width[ ' + str(temp) + ' -conv-> ' + str(temp1) + ' -maxpool-> ' + str(self.width) + ' ]')
-
-
-f = ThrNet(31, 1)

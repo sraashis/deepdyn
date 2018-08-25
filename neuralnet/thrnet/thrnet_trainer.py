@@ -1,4 +1,5 @@
 import os
+import sys
 
 import PIL.Image as IMG
 import numpy as np
@@ -39,7 +40,6 @@ class ThrnetTrainer(NNTrainer):
                 loss = F.mse_loss(outputs, ths.type(torch.FloatTensor).to(self.device))
                 loss.backward()
                 optimizer.step()
-                # print(outputs, loss)
 
                 running_loss += float(loss.item())
                 current_loss = loss.item()
@@ -100,14 +100,20 @@ class ThrnetTrainer(NNTrainer):
             ID, inputs, labels, thr_y = data[0].to(self.device), data[1].to(self.device), data[2].to(self.device), data[
                 3].to(self.device)
             thr = self.model(inputs)
-
-            segmented = inputs.squeeze() * 255
             thr = thr.squeeze()
+            # print(thr.shape, thr_y.shape)
+            # print("##############################################################################")
+            # print(thr)
+            # print(thr_y)
+            # print('##############################################################################')
+            # sys.exit(0)
+            segmented = inputs.squeeze() * 255
+
             # print(input_img.type(), thr.type())
             # print(input_img.shape, thr.shape)
             for o in range(segmented.shape[0]):
-                segmented[o, :, :][segmented[o, :, :] > thr[o]] = 255
-                segmented[o, :, :][segmented[o, :, :] <= thr[o]] = 0
+                segmented[o, :, :][segmented[o, :, :] > thr_y[o].data[0]] = 255
+                segmented[o, :, :][segmented[o, :, :] <= thr_y[o].data[0]] = 0
             # Accumulate scores
             if mode is 'eval':
                 all_predictions += segmented.clone().cpu().numpy().tolist()
