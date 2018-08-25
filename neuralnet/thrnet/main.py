@@ -1,4 +1,5 @@
-BASE_PROJECT_DIR = '/home/ak/PycharmProjects/ature'
+BASE_PROJECT_DIR = '/home/akhanal1/ature'
+# BASE_PROJECT_DIR = '/home/ak/PycharmProjects/ature'
 
 import os
 import sys
@@ -47,7 +48,8 @@ if __name__ == "__main__":
                     transforms=transform,
                     get_mask=I['F']['train_mask_getter'],
                     get_truth=I['F']['train_gt_getter'],
-                    patch_shape=I['P']['patch_shape']
+                    patch_shape=I['P']['patch_shape'],
+                    offset_shape=(I['P']['patch_shape'][0] // 2, I['P']['patch_shape'][1] // 2)
                 ).get_loader(batch_size=I['P']['batch_size'])
 
                 val_loaders = get_loader_per_img(
@@ -64,7 +66,9 @@ if __name__ == "__main__":
                                     data_loader=train_loader,
                                     epochs=I['P']['epochs'],
                                     validation_loader=val_loaders,
-                                    force_checkpoint=True, log_frequency=200)
+                                    force_checkpoint=False, log_frequency=50)
+            else:
+                drive_trainer.resume_from_checkpoint(parallel_trained=False)
 
             test_loaders = get_loader_per_img(
                 images_dir=I['D']['test_img'],
@@ -76,7 +80,6 @@ if __name__ == "__main__":
                 patch_shape=I['P']['patch_shape']
             )
 
-            # drive_trainer.resume_from_checkpoint(parallel_trained=False)
             logger = drive_trainer.get_logger(I['P']['checkpoint_file'] + '-TEST.csv')
             drive_trainer.evaluate(data_loader=test_loaders, mode='eval', patch_size=I['P']['patch_shape'],
                                    segmented_out=I['D']['test_img_out'],

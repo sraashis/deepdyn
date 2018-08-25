@@ -85,8 +85,10 @@ class ThrnetTrainer(NNTrainer):
                     segmented = imgutils.merge_patches(patches=predictions,
                                                        image_size=loader.dataset.image_objects[0].working_arr.shape,
                                                        patch_size=patch_size,
-                                                       offset_row_col=patch_size)
+                                                       offset_row_col=loader.dataset.offset_shape)
                     segmented[loader.dataset.image_objects[0].mask == 0] = 0
+                    print(loader.dataset.image_objects[0].file_name,
+                          imgutils.get_praf1(segmented, loader.dataset.image_objects[0].ground_truth))
                     IMG.fromarray(segmented).save(to_dir + sep + loader.dataset.image_objects[0].file_name + '.png')
         if mode is 'train':
             self._save_if_better(force_checkpoint=force_checkpoint, score=score_acc.get_prf1a()[2])
@@ -97,6 +99,7 @@ class ThrnetTrainer(NNTrainer):
         assert (logger is not None), 'Please Provide a logger'
         score_acc = ScoreAccumulator()
         all_predictions = []
+        loss = 0
         for i, data in enumerate(data_loader, 0):
             ID, inputs, labels, thr_y = data[0].to(self.device), \
                                         data[1].to(self.device), \
@@ -113,10 +116,11 @@ class ThrnetTrainer(NNTrainer):
             # Accumulate scores
             if mode is 'eval':
                 all_predictions += segmented.clone().cpu().numpy().tolist()
+            segmented[segmented == 255] = 1
             p, r, f1, a = score_acc.add(labels, segmented).get_prf1a()
-            loss = F.mse_loss(thr, thr_y)
+            loss += F.mse_loss(thr, thr_y)
             print('Batch[%d/%d] pre:%.3f rec:%.3f f1:%.3f acc:%.3f MSE:%.5f' % (
-                i + 1, data_loader.__len__(), p, r, f1, a, loss),
+                i + 1, data_loader.__len__(), p, r, f1, a, loss / (i + 1)),
                   end='\r')
         self.flush(logger, ','.join(str(x) for x in
                                     [data_loader.dataset.image_objects[0].file_name, 1, self.checkpoint['epochs'],

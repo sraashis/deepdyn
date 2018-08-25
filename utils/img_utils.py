@@ -98,12 +98,7 @@ def get_image_as_array(image_file, channels=3):
 def get_chunk_indexes(img_shape=(0, 0), chunk_shape=(0, 0), offset_row_col=None):
     img_rows, img_cols = img_shape
     chunk_row, chunk_col = chunk_shape
-
-    if offset_row_col is None:
-        offset_row = chunk_row // 2
-        offset_col = chunk_col // 2
-    else:
-        offset_row, offset_col = offset_row_col
+    offset_row, offset_col = offset_row_col
 
     row_end = False
     for i in range(0, img_rows, offset_row):

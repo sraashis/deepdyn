@@ -10,7 +10,7 @@ from commons.IMAGE import Image
 class Generator(Dataset):
     def __init__(self, images_dir=None, image_files=None, mask_dir=None, manual_dir=None, transforms=None,
                  get_mask=None,
-                 get_truth=None, **kwargs):
+                 get_truth=None, shuffle=True, **kwargs):
         """
         :param images_dir: Directory where images, mask and manual1 folders are
         :param image_files: Pass a list of file names inside images.
@@ -25,6 +25,7 @@ class Generator(Dataset):
 
         self.get_mask = get_mask
         self.get_truth = get_truth
+        self.shuffle = shuffle
 
         if image_files is not None:
             self.images = image_files if isinstance(image_files, list) else [image_files]

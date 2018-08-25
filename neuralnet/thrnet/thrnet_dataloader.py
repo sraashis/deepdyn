@@ -1,4 +1,5 @@
 import os
+from random import shuffle
 
 import numpy as np
 import torch
@@ -12,18 +13,21 @@ sep = os.sep
 
 
 class PatchesGenerator(Generator):
-    def __init__(self, patch_shape=None, **kwargs):
+    def __init__(self, patch_shape=None, offset_shape=None, **kwargs):
         super(PatchesGenerator, self).__init__(**kwargs)
         self.patch_shape = patch_shape
+        self.offset_shape = offset_shape
         self._load_indices()
         print('Patches:', self.__len__())
 
     def _load_indices(self):
         for ID, img_file in enumerate(self.images):
             img_obj = self._get_image_obj(img_file)
-            for chunk_ix in imgutils.get_chunk_indexes(img_obj.working_arr.shape, self.patch_shape, self.patch_shape):
+            for chunk_ix in imgutils.get_chunk_indexes(img_obj.working_arr.shape, self.patch_shape, self.offset_shape):
                 self.indices.append([ID] + chunk_ix)
             self.image_objects[ID] = img_obj
+        if self.shuffle:
+            shuffle(self.indices)
 
     def _get_image_obj(self, img_file=None):
         img_obj = Image()
@@ -78,6 +82,8 @@ def get_loader_per_img(images_dir=None, mask_dir=None, manual_dir=None,
             transforms=transforms,
             get_mask=get_mask,
             get_truth=get_truth,
-            patch_shape=patch_shape
+            patch_shape=patch_shape,
+            offset_shape=patch_shape,
+            shuffle=False
         ).get_loader(shuffle=False))
     return loaders
