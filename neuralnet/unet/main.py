@@ -9,9 +9,9 @@ os.chdir(BASE_PROJECT_DIR)
 
 import torch
 import torch.optim as optim
-from neuralnet.thrnet.model import ThrNet
-from neuralnet.thrnet.thrnet_dataloader import PatchesGenerator, get_loader_per_img
-from neuralnet.thrnet.thrnet_trainer import ThrnetTrainer
+from neuralnet.unet.model import UNet
+from neuralnet.unet.unet_dataloader import PatchesGenerator, get_loader_per_img
+from neuralnet.unet.unet_trainer import UNetNNTrainer
 import torchvision.transforms as transforms
 from neuralnet.thrnet.runs import DRIVE
 
@@ -25,7 +25,7 @@ if __name__ == "__main__":
     ])
 
     for I in RUNS:
-        model = ThrNet(I['P']['patch_shape'][0], I['P']['num_channels'])
+        model = UNet(I['P']['num_channels'], I['P']['num_classes'])
         optimizer = optim.Adam(model.parameters(), lr=I['P']['learning_rate'])
         if I['P']['distribute']:
             model = torch.nn.DataParallel(model)
@@ -33,7 +33,7 @@ if __name__ == "__main__":
             optimizer = optim.Adam(model.module.parameters(), lr=I['P']['learning_rate'])
 
         try:
-            drive_trainer = ThrnetTrainer(model=model,
+            drive_trainer = UNetNNTrainer(model=model,
                                           checkpoint_file=I['P']['checkpoint_file'],
                                           log_file=I['P']['checkpoint_file'] + '.csv',
                                           use_gpu=I['P']['use_gpu'])

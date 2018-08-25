@@ -29,9 +29,13 @@ class Image:
             self.file_name = file_name
             self.image_arr = imgutil.get_image_as_array(os.path.join(self.data_dir, self.file_name),
                                                         channels=num_channels)
-        except Exception as e:
-            print('Error Loading file: ' + self.file_name)
-            print(str(e))
+        except Exception:
+            try:
+                self.image_arr = imgutil.get_image_as_array(os.path.join(self.data_dir, self.file_name),
+                                                            channels=3 if num_channels == 1 else 1)
+            except Exception as e1:
+                print('Error Loading file: ' + self.file_name)
+                print(str(e1))
 
     def load_mask(self, mask_dir=None, fget_mask=None, erode=False, channels=1):
         try:
