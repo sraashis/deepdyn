@@ -49,7 +49,7 @@ if __name__ == "__main__":
                     get_mask=I['F']['train_mask_getter'],
                     get_truth=I['F']['train_gt_getter'],
                     patch_shape=I['P']['patch_shape'],
-                    offset_shape=(I['P']['patch_shape'][0] // 2, I['P']['patch_shape'][1] // 2)
+                    offset_shape=(15, 15)
                 ).get_loader(batch_size=I['P']['batch_size'])
 
                 val_loaders = get_loader_per_img(

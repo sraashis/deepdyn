@@ -108,7 +108,8 @@ class ThrnetTrainer(NNTrainer):
             thr = self.model(inputs)
             thr = thr.squeeze()
             segmented = inputs.squeeze() * 255
-
+            # segmented[segmented > thr] = 255
+            # segmented[segmented <= thr] = 0
             for o in range(segmented.shape[0]):
                 segmented[o, :, :][segmented[o, :, :] > thr[o].item()] = 255
                 segmented[o, :, :][segmented[o, :, :] <= thr[o].item()] = 0
