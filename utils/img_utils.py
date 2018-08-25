@@ -127,10 +127,10 @@ def get_chunk_indexes(img_shape=(0, 0), chunk_shape=(0, 0), offset_row_col=None)
             yield [row_from, row_to, col_from, col_to]
 
 
-def merge_patches(patches=None, image_size=(0, 0), patch_size=(0, 0)):
+def merge_patches(patches=None, image_size=(0, 0), patch_size=(0, 0), offset_row_col=None):
     padded_sum = np.zeros([image_size[0], image_size[1]])
     non_zero_count = np.zeros_like(padded_sum)
-    for i, chunk_ix in enumerate(get_chunk_indexes(image_size, patch_size)):
+    for i, chunk_ix in enumerate(get_chunk_indexes(image_size, patch_size, offset_row_col)):
         row_from, row_to, col_from, col_to = chunk_ix
 
         patch = np.array(patches[i, :, :]).squeeze()
