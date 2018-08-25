@@ -1,4 +1,5 @@
 BASE_PROJECT_DIR = '/home/akhanal1/ature'
+# BASE_PROJECT_DIR = '/home/ak/PycharmProjects/ature'
 
 import os
 import sys
@@ -9,9 +10,9 @@ os.chdir(BASE_PROJECT_DIR)
 
 import torch
 import torch.optim as optim
-from neuralnet.unet.model import UNet
-from neuralnet.unet.unet_dataloader import PatchesGenerator, get_loader_per_img
-from neuralnet.unet.unet_trainer import UNetNNTrainer
+from neuralnet.patchnet.model import PatchNet
+from neuralnet.patchnet.patchnet_dataloader import PatchesGenerator, get_loader_per_img
+from neuralnet.patchnet.patchnet_trainer import PatchNetTrainer
 import torchvision.transforms as transforms
 from neuralnet.thrnet.runs import DRIVE
 
@@ -27,7 +28,7 @@ if __name__ == "__main__":
     for I in RUNS:
         for k, folder in I['D'].items():
             os.makedirs(folder, exist_ok=True)
-        model = UNet(I['P']['num_channels'][0], I['P']['num_classes'])
+        model = PatchNet(I['patch_shape'][0], I['P']['num_channels'][0], I['P']['num_class'])
         optimizer = optim.Adam(model.parameters(), lr=I['P']['learning_rate'])
         if I['P']['distribute']:
             model = torch.nn.DataParallel(model)
@@ -35,10 +36,10 @@ if __name__ == "__main__":
             optimizer = optim.Adam(model.module.parameters(), lr=I['P']['learning_rate'])
 
         try:
-            drive_trainer = UNetNNTrainer(model=model,
-                                          checkpoint_file=I['P']['checkpoint_file'],
-                                          log_file=I['P']['checkpoint_file'] + '.csv',
-                                          use_gpu=I['P']['use_gpu'])
+            drive_trainer = PatchNetTrainer(model=model,
+                                            checkpoint_file=I['P']['checkpoint_file'],
+                                            log_file=I['P']['checkpoint_file'] + '.csv',
+                                            use_gpu=I['P']['use_gpu'])
             if I['P']['mode'] == 'train':
                 train_loader = PatchesGenerator(
                     images_dir=I['D']['train_img'],
@@ -48,7 +49,7 @@ if __name__ == "__main__":
                     get_mask=I['F']['train_mask_getter'],
                     get_truth=I['F']['train_gt_getter'],
                     patch_shape=I['P']['patch_shape'],
-                    offset_shape=(100, 100)
+                    offset_shape=(15, 15)
                 ).get_loader(batch_size=I['P']['batch_size'])
 
                 val_loaders = get_loader_per_img(

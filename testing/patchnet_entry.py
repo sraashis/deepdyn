@@ -7,9 +7,9 @@ os.chdir('/home/akhanal1/ature')
 
 import torch
 import torch.optim as optim
-from neuralnet.simplenet.model import PatchNet
-from neuralnet.simplenet.simplenet_dataloader import split_drive_dataset, split_wide_dataset
-from neuralnet.simplenet.simplenet_trainer import PatchNetTrainer
+from neuralnet.patchnet.model import PatchNet
+from neuralnet.patchnet.patchnet_dataloader import split_drive_dataset, split_wide_dataset
+from neuralnet.patchnet.patchnet_trainer import PatchNetTrainer
 import torchvision.transforms as transforms
 
 if __name__ == "__main__":

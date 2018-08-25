@@ -87,6 +87,8 @@ class UNetNNTrainer(NNTrainer):
                                                        image_size=loader.dataset.image_objects[0].working_arr.shape,
                                                        patch_size=patch_size)
 
+                    print(loader.dataset.image_objects[0].file_name,
+                          imgutils.get_praf1(segmented, loader.dataset.image_objects[0].ground_truth))
                     IMG.fromarray(segmented).save(to_dir + sep + loader.dataset.image_objects[0].file_name + '.png')
         if mode is 'train':
             self._save_if_better(force_checkpoint=force_checkpoint, score=score_acc.get_prf1a()[2])
