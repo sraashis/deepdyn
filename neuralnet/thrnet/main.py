@@ -67,10 +67,8 @@ if __name__ == "__main__":
                                     epochs=I['P']['epochs'],
                                     validation_loader=val_loaders,
                                     force_checkpoint=False, log_frequency=50)
-            else:
-                # drive_trainer.resume_from_checkpoint(parallel_trained=False)
-                pass
 
+            drive_trainer.resume_from_checkpoint(parallel_trained=False)
             test_loaders = get_loader_per_img(
                 images_dir=I['D']['test_img'],
                 mask_dir=I['D']['test_mask'],
