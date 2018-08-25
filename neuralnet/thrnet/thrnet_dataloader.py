@@ -7,6 +7,8 @@ import utils.img_utils as imgutils
 from commons.IMAGE import Image
 from neuralnet.datagen import Generator
 from neuralnet.utils.measurements import get_best_f1_thr
+from PIL import Image as IMG
+import sys
 
 sep = os.sep
 
@@ -50,13 +52,11 @@ class PatchesGenerator(Generator):
         img_tensor = self.image_objects[ID].working_arr[row_from:row_to, col_from:col_to]
         y = self.image_objects[ID].ground_truth[row_from:row_to, col_from:col_to]
         best_scores, best_thr = get_best_f1_thr(img_tensor, y)
-        # IMG.fromarray(img_tensor).save('THR_IMAGE.png')
-        # IMG.fromarray(y).save('y_THR.png')
+
         img_tensor = img_tensor[..., None]
         if self.transforms is not None:
             img_tensor = self.transforms(img_tensor)
 
-        # print(best_scores, best_thr)
         y[y == 255] = 1
         return ID, img_tensor, torch.FloatTensor(y), best_thr
 
