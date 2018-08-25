@@ -56,7 +56,7 @@ class PatchesGenerator(Generator):
             img_tensor = self.transforms(img_tensor)
 
         y[y == 255] = 1
-        if np.isin(1, y):
+        if ~np.isin(1, y):
             best_thr = 255
 
         return ID, img_tensor, torch.FloatTensor(y), best_thr
