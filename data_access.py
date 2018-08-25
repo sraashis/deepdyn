@@ -15,7 +15,8 @@ Drive_Dirs = {
         'test_mask': 'data' + sep + 'DRIVE' + sep + 'thr_testing' + sep + 'mask',
         'test_manual': 'data' + sep + 'DRIVE' + sep + 'thr_testing' + sep + '1st_manual',
 
-        'test_img_out': 'data' + sep + 'DRIVE' + sep + 'thr_testing' + sep + 'thrnet_out'},
+        'test_img_out': 'data' + sep + 'DRIVE' + sep + 'thr_testing' + sep + 'thrnet_out'
+}
 
 Drive_Funcs = {
     'train_gt_getter': lambda file_name: file_name.split('_')[0] + '_manual1.gif',

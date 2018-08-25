@@ -68,7 +68,8 @@ if __name__ == "__main__":
                                     validation_loader=val_loaders,
                                     force_checkpoint=False, log_frequency=50)
             else:
-                drive_trainer.resume_from_checkpoint(parallel_trained=False)
+                # drive_trainer.resume_from_checkpoint(parallel_trained=False)
+                pass
 
             test_loaders = get_loader_per_img(
                 images_dir=I['D']['test_img'],
