@@ -1,6 +1,5 @@
 import os
 import sys
-from time import time
 
 import torch
 import torch.nn.functional as F
@@ -9,75 +8,76 @@ from neuralnet.utils.measurements import ScoreAccumulator
 
 
 class NNTrainer:
-    def __init__(self, model=None, checkpoint_file='{}'.format(time()) + '.tar',
-                 log_file='{}'.format(time()) + '.csv',
-                 use_gpu=True):
+
+    def __init__(self, run_conf=None, model=None):
+
+        self.run_conf = run_conf
+        self.log_dir = self.run_conf.get('Dirs').get('logs')
+        self.use_gpu = self.run_conf['Params']['use_gpu']
+        self.epochs = self.run_conf.get('Params').get('epochs')
+        self.log_frequency = self.run_conf.get('Params').get('log_frequency')
+        self.validation_frequency = self.run_conf.get('Params').get('validation_frequency')
+        self.force_checkpoint = self.run_conf.get('Params').get('force_checkpoint')
+
+        self.checkpoint_file = os.path.join(self.log_dir, self.run_conf.get('Params').get('checkpoint_file'))
+        self.log_file = os.path.join(self.log_dir, self.run_conf.get('Params').get('checkpoint_file') + '-TRAIN.csv')
+
         if torch.cuda.is_available():
-            self.device = torch.device("cuda" if use_gpu else "cpu")
+            self.device = torch.device("cuda" if self.use_gpu else "cpu")
         else:
             print('### GPU not found.')
             self.device = torch.device("cpu")
+
         self.model = model.to(self.device)
-        os.makedirs('net_logs', exist_ok=True)
-        self.log_file = log_file
-        self.checkpoint_file = os.path.join('net_logs', checkpoint_file)
+
         self.checkpoint = {'epochs': 0, 'state': None, 'score': 0.0, 'model': 'EMPTY'}
 
-    def train(self, optimizer=None, data_loader=None, epochs=None, log_frequency=200,
-              validation_loader=None, force_checkpoint=False):
+    def train(self, optimizer=None, data_loader=None, validation_loader=None):
 
         if validation_loader is None:
             raise ValueError('Please provide validation loader.')
 
-        logger = self.get_logger(self.log_file)
+        logger = NNTrainer.get_logger(self.log_file)
         print('Training...')
-        for epoch in range(0, epochs):
+        for epoch in range(0, self.epochs):
             self.model.train()
             score_acc = ScoreAccumulator()
             running_loss = 0.0
             self.adjust_learning_rate(optimizer=optimizer, epoch=epoch + 1)
             for i, data in enumerate(data_loader, 0):
-                inputs, labels = data[-2].to(self.device), data[-1].to(self.device)
+                inputs, labels = data['inputs'].to(self.device), data['labels'].to(self.device)
 
                 optimizer.zero_grad()
                 outputs = self.model(inputs)
+                _, predicted = torch.max(outputs, 1)
+
                 loss = F.nll_loss(outputs, labels)
                 loss.backward()
                 optimizer.step()
 
                 running_loss += float(loss.item())
                 current_loss = loss.item()
-                _, predicted = torch.max(outputs, 1)
-
-                p, r, f1, a = score_acc.reset().add(labels, predicted).get_prf1a()
-                if (i + 1) % log_frequency == 0:  # Inspect the loss of every log_frequency batches
-                    current_loss = running_loss / log_frequency if (i + 1) % log_frequency == 0 \
-                        else (i + 1) % log_frequency
+                p, r, f1, a = score_acc.reset().add_tensor(labels, predicted).get_prf1a()
+                if (i + 1) % self.log_frequency == 0:  # Inspect the loss of every log_frequency batches
+                    current_loss = running_loss / self.log_frequency if (i + 1) % self.log_frequency == 0 \
+                        else (i + 1) % self.log_frequency
                     running_loss = 0.0
 
                 self.flush(logger, ','.join(str(x) for x in [0, 0, epoch + 1, i + 1, p, r, f1, a, current_loss]))
                 print('Epochs[%d/%d] Batch[%d/%d] loss:%.5f pre:%.3f rec:%.3f f1:%.3f acc:%.3f' %
-                      (epoch + 1, epochs, i + 1, data_loader.__len__(), current_loss, p, r, f1, a),
+                      (epoch + 1, self.epochs, i + 1, data_loader.__len__(), current_loss, p, r, f1, a),
                       end='\r' if running_loss > 0 else '\n')
 
             self.checkpoint['epochs'] += 1
-            self.evaluate(data_loader=validation_loader, force_checkpoint=force_checkpoint,
-                          mode='train', logger=logger)
+            if (epoch + 1) % self.validation_frequency == 0:
+                self.evaluate(data_loaders=validation_loader, force_checkpoint=self.force_checkpoint, logger=logger,
+                              mode='train')
         try:
             logger.close()
         except IOError:
             pass
 
-    def evaluate(self, data_loader=None, force_checkpoint=False, mode='val', logger=None, **kwargs):
-
-        assert (logger is not None), 'Please Provide a logger'
-        assert (mode == 'val' or mode == 'train'), 'Mode can either be val or train'
-        self.model.eval()
-        print('\nEvaluating...')
-        with torch.no_grad():
-            return self._evaluate(data_loader=data_loader, force_checkpoint=force_checkpoint, mode=mode, logger=logger)
-
-    def _evaluate(self, data_loader=None, force_checkpoint=None, mode=None, logger=None):
+    def evaluate(self, data_loaders=None, force_checkpoint=False, logger=None, mode=None):
         raise NotImplementedError('ERROR!!!!! Must be implemented')
 
     def _save_checkpoint(self, checkpoint):
@@ -126,13 +126,13 @@ class NNTrainer:
             print('Score did not improve. _was:' + str(self.checkpoint['score']))
 
     @staticmethod
-    def get_logger(log_file):
+    def get_logger(log_file=None):
 
-        if os.path.isfile(os.path.join('net_logs', log_file)):
-            print('### CRITICAL!!! "net_logs/' + log_file + '" already exists. Rename or delete to proceed.')
+        if os.path.isfile(log_file):
+            print('### CRITICAL!!! ' + log_file + '" already exists. Rename or delete to proceed.')
             sys.exit(1)
 
-        file = open(os.path.join('net_logs', log_file), 'w')
+        file = open(log_file, 'w')
         NNTrainer.flush(file, 'ID,TYPE,EPOCH,BATCH,PRECISION,RECALL,F1,ACCURACY,LOSS')
         return file
 
@@ -141,9 +141,10 @@ class NNTrainer:
         if logger is not None:
             logger.write(msg + '\n')
             logger.flush()
+        pass
 
     @staticmethod
     def adjust_learning_rate(optimizer, epoch):
-        if epoch % 30 == 0:
+        if epoch % 40 == 0:
             for param_group in optimizer.param_groups:
-                param_group['lr'] = param_group['lr'] * 0.50
+                param_group['lr'] = param_group['lr'] * 0.75

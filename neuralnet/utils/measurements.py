@@ -39,54 +39,18 @@ def plot_confusion_matrix(y_pred=None, y_true=None, classes=None, normalize=Fals
     plt.show()
 
 
-def get_score(y_true, y_pred):
-    TP = 0
-    FP = 0
-    TN = 0
-    FN = 0
-
-    for i in range(len(y_pred)):
-        if y_true[i] == y_pred[i] == 1:
-            TP += 1
-        if y_pred[i] == 1 and y_true[i] != y_pred[i]:
-            FP += 1
-        if y_true[i] == y_pred[i] == 0:
-            TN += 1
-        if y_pred[i] == 0 and y_true[i] != y_pred[i]:
-            FN += 1
-
-    return TP, FP, TN, FN
-
-
-def get_prf1a(tp, fp, tn, fn):
-    try:
-        p = tp / (tp + fp)
-    except ZeroDivisionError:
-        p = 0
-
-    try:
-        r = tp / (tp + fn)
-    except ZeroDivisionError:
-        r = 0
-
-    try:
-        f1 = 2 * p * r / (p + r)
-    except ZeroDivisionError:
-        f1 = 0
-
-    try:
-        a = (tp + tn) / (tp + fp + fn + tn)
-    except ZeroDivisionError:
-        a = 0
-
-    return round(p, 3), round(r, 3), round(f1, 3), round(a, 3)
-
-
 class ScoreAccumulator:
     def __init__(self):
         self.tn, self.fp, self.fn, self.tp = [0] * 4
 
-    def add(self, y_true_tensor, y_pred_tensor):
+    def add(self, tn=0, fp=0, fn=0, tp=0):
+        self.tp += tp
+        self.fp += fp
+        self.tn += tn
+        self.fn += fn
+        return self
+
+    def add_tensor(self, y_true_tensor, y_pred_tensor):
         y_true = y_true_tensor.view(1, -1).squeeze()
         y_pred = y_pred_tensor.view(1, -1).squeeze()
         y_true = y_true * 2
@@ -96,6 +60,17 @@ class ScoreAccumulator:
         self.tn += torch.sum(y_cases == 0).item()
         self.fn += torch.sum(y_cases == 2).item()
         return self
+
+    def add_array(self, arr_2d=None, truth=None):
+        x = arr_2d.copy()
+        y = truth.copy()
+        x[x == 255] = 1
+        y[y == 255] = 1
+        xy = x + (y * 2)
+        self.tp += xy[xy == 3].shape[0]
+        self.fp += xy[xy == 1].shape[0]
+        self.tn += xy[xy == 0].shape[0]
+        self.fn += xy[xy == 2].shape[0]
 
     def accumulate(self, other):
         self.tp += other.tp

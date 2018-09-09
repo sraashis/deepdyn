@@ -72,7 +72,7 @@ class UNet(nn.Module):
         dec1 = self.dec1(UNet.match_and_concat(enc2_, self.dec2_up(dec2)))
         out = self.out(UNet.match_and_concat(enc1_, self.dec1_up(dec1)))
         final = self.final(out)
-        return F.log_softmax(final, 1)
+        return F.log_softmax(final, dim=1)
 
     @staticmethod
     def match_and_concat(bypass, upsampled, crop=True):

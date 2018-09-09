@@ -1,3 +1,4 @@
+import copy
 import os
 
 import cv2
@@ -59,6 +60,17 @@ class Image:
     def apply_clahe(self, clip_limit=2.0, tile_shape=(8, 8)):
         enhancer = cv2.createCLAHE(clipLimit=clip_limit, tileGridSize=tile_shape)
         self.working_arr = enhancer.apply(self.working_arr)
+
+    def __copy__(self):
+        copy_obj = Image()
+        copy_obj.data_dir = copy.copy(self.data_dir)
+        copy_obj.file_name = copy.copy(self.file_name)
+        copy_obj.image_arr = copy.copy(self.image_arr)
+        copy_obj.working_arr = copy.copy(self.working_arr)
+        copy_obj.mask = copy.copy(self.mask)
+        copy_obj.ground_truth = copy.copy(self.ground_truth)
+        copy_obj.res = copy.deepcopy(self.res)
+        return copy_obj
 
 
 class SegmentedImage(Image):
