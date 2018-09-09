@@ -1,4 +1,5 @@
 import os
+import random
 import sys
 
 import torch
@@ -51,7 +52,8 @@ class NNTrainer:
                 outputs = self.model(inputs)
                 _, predicted = torch.max(outputs, 1)
 
-                loss = F.nll_loss(outputs, labels)
+                weights = torch.FloatTensor([random.uniform(1, 100), random.uniform(1, 100)])
+                loss = F.nll_loss(outputs, labels, weight=weights.to(self.device))
                 loss.backward()
                 optimizer.step()
 
