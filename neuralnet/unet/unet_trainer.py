@@ -54,7 +54,6 @@ class UNetNNTrainer(NNTrainer):
                                                       patch_size=self.patch_shape,
                                                       offset_row_col=self.patch_offset)
                     IMG.fromarray(maps_img).save(os.path.join(self.log_dir, img_obj.file_name.split('.')[0] + '.png'))
-                    sys.exit(0)
 
                 print(img_obj.file_name + ' PRF1A: ', all_score.get_prf1a())
 
