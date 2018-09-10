@@ -7,7 +7,7 @@ import torch.nn.functional as F
 
 import utils.img_utils as imgutils
 from neuralnet.torchtrainer import NNTrainer
-from neuralnet.utils.measurements import ScoreAccumulator, AverageMeter
+from neuralnet.utils.measurements import ScoreAccumulator
 
 sep = os.sep
 
@@ -43,10 +43,10 @@ class ThrnetTrainer(NNTrainer):
                 running_loss += current_loss
                 if i % self.log_frequency == 0:
                     print('Epochs[%d/%d] Batch[%d/%d] mse per patch:%.5f' % (
-                        epoch, self.epochs, i + 1, data_loader.__len__(), running_loss / self.log_frequency))
+                        epoch, self.epochs, i, data_loader.__len__(), running_loss / self.log_frequency))
                     running_loss = 0.0
 
-                self.flush(logger, '.'.join([0, 0, epoch, i, current_loss]))
+                self.flush(logger, '.'.join(str(x) for x in [0, 0, epoch, i, current_loss]))
 
             self.checkpoint['epochs'] += 1
             if epoch % self.validation_frequency == 0:
@@ -70,14 +70,15 @@ class ThrnetTrainer(NNTrainer):
                 img_obj = loader.dataset.image_objects[0]
                 segmented_map, labels_acc = [], []
                 img_loss = 0.0
-                for i, data in enumerate(loader, 0):
+                for i, data in enumerate(loader, 1):
                     inputs, labels, y_thr = data['inputs'].to(self.device), data['labels'].to(self.device), data[
                         'y_thresholds'].to(self.device)
                     thr = self.model(inputs)
                     thr = thr.squeeze()
                     loss = F.mse_loss(thr, y_thr.float())
-                    img_loss += loss.item() / thr.numel()
+                    current_loss = loss.item() / thr.numel()
 
+                    img_loss += current_loss
                     segmented = inputs.squeeze() * 255
                     for o in range(segmented.shape[0]):
                         segmented[o, :, :][segmented[o, :, :] > thr[o].item()] = 255
@@ -94,9 +95,9 @@ class ThrnetTrainer(NNTrainer):
                     self.flush(logger, ','.join(
                         str(x) for x in
                         [img_obj.file_name, 1, self.checkpoint['epochs'], 0] + current_score.get_prf1a() + [
-                            loss.item()]))
+                            current_loss]))
 
-                print(img_obj.file_name + ' PRF1A: ', img_score.get_prf1a(), ' Loss:', img_loss / (i + 1))
+                print(img_obj.file_name + ' PRF1A: ', img_score.get_prf1a(), ' Loss:', img_loss / i)
                 if mode is 'test':
                     segmented_map = np.array(segmented_map, dtype=np.uint8)
                     # labels_acc = np.array(np.array(labels_acc).squeeze()*255, dtype=np.uint8)

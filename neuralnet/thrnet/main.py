@@ -1,5 +1,5 @@
 BASE_PROJECT_DIR = '/home/akhanal1/ature'
-BASE_PROJECT_DIR = '/home/akhanal1/PycharmProjects/ature'
+# BASE_PROJECT_DIR = '/home/akhanal1/ature'
 
 import os
 import sys
