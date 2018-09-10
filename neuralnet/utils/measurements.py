@@ -51,8 +51,13 @@ class ScoreAccumulator:
         return self
 
     def add_tensor(self, y_true_tensor, y_pred_tensor):
-        y_true = y_true_tensor.view(1, -1).squeeze()
-        y_pred = y_pred_tensor.view(1, -1).squeeze()
+
+        y_true = y_true_tensor.clone().view(1, -1).squeeze()
+        y_pred = y_pred_tensor.clone().view(1, -1).squeeze()
+
+        y_true[y_true == 255] = 1
+        y_pred[y_pred == 255] = 1
+
         y_true = y_true * 2
         y_cases = y_true + y_pred
         self.tp += torch.sum(y_cases == 3).item()

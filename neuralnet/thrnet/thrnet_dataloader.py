@@ -26,13 +26,6 @@ class PatchesGenerator(Generator):
             img_obj = self._get_image_obj(img_file)
             for chunk_ix in imgutils.get_chunk_indexes(img_obj.working_arr.shape, self.patch_shape,
                                                        self.patch_offset):
-                p, q, r, s = chunk_ix
-                y = img_obj.mask[p:q, r:s]
-
-                # Skip patches outside mask
-                if ~np.isin(255, y):
-                    continue
-
                 self.indices.append([ID] + chunk_ix)
             self.image_objects[ID] = img_obj
         if self.shuffle_indices:
@@ -57,7 +50,7 @@ class PatchesGenerator(Generator):
             img_tensor = self.transforms(img_tensor)
 
         y[y == 255] = 1
-        if ~np.isin(1, y):
+        if np.sum(y) == 0:
             best_thr = 255
 
         return {'ID': ID, 'inputs': img_tensor, 'labels': torch.LongTensor(y.copy()),
