@@ -46,7 +46,7 @@ class ThrnetTrainer(NNTrainer):
                         epoch, self.epochs, i, data_loader.__len__(), running_loss / self.log_frequency))
                     running_loss = 0.0
 
-                self.flush(logger, '.'.join(str(x) for x in [0, 0, epoch, i, current_loss]))
+                self.flush(logger, ','.join(str(x) for x in [0, 0, epoch, i, current_loss]))
 
             self.checkpoint['epochs'] += 1
             if epoch % self.validation_frequency == 0:
