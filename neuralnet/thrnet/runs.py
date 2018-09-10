@@ -1,24 +1,34 @@
 import os
-import data_access
 
 sep = os.sep
 
 DRIVE = {
-
-    'P': {
+    'Params': {
         'num_channels': 1,
         'num_classes': 1,
-        'batch_size': 32,
-        'epochs': 100,
+        'batch_size': 16,
+        'epochs': 200,
         'learning_rate': 0.001,
-        'patch_shape': (51, 51),
+        'patch_shape': (27, 27),
+        'patch_offset': (10, 10),
         'use_gpu': True,
         'distribute': True,
         'shuffle': True,
         'checkpoint_file': 'THRNET-DRIVE.chk.tar',
-        'mode': 'train'
+        'log_frequency': 100,
+        'validation_frequency': 2,
+        'mode': 'train',
+        'parallel_trained': False
+    },
+    'Dirs': {
+        'image': 'data' + sep + 'DRIVE_UNET_MAP' + sep + 'images',
+        'mask': 'data' + sep + 'DRIVE' + sep + 'mask',
+        'truth': 'data' + sep + 'DRIVE' + sep + 'manual',
+        'logs': 'data' + sep + 'DRIVE_UNET_MAP' + sep + 'unet_logs'
     },
 
-    'D': data_access.Drive_Dirs,
-    'F': data_access.Drive_Funcs
+    'Funcs': {
+        'truth_getter': lambda file_name: file_name.split('_')[0] + '_manual1.gif',
+        'mask_getter': lambda file_name: file_name.split('_')[0] + '_mask.gif'
+    }
 }

@@ -2,35 +2,30 @@ import os
 
 import numpy as np
 import torch
+import torchvision.transforms as tfm
 from torch.utils.data.dataset import Dataset
 
 from commons.IMAGE import Image
 
 
 class Generator(Dataset):
-    def __init__(self, images_dir=None, image_files=None, mask_dir=None, manual_dir=None, transforms=None,
-                 get_mask=None,
-                 get_truth=None, shuffle=True, **kwargs):
-        """
-        :param images_dir: Directory where images, mask and manual1 folders are
-        :param image_files: Pass a list of file names inside images.
-        :param transforms:
-        :param get_mask:
-        :param get_truth:
-        """
+    def __init__(self, run_conf=None, images=None,
+                 transforms=None, shuffle_indices=False, mode=None, **kwargs):
+
+        self.run_conf = run_conf
+        self.mask_getter = self.run_conf.get('Funcs').get('mask_getter')
+        self.truth_getter = self.run_conf.get('Funcs').get('truth_getter')
+        self.image_dir = self.run_conf.get('Dirs').get('image')
+        self.mask_dir = self.run_conf.get('Dirs').get('mask')
+        self.truth_dir = self.run_conf.get('Dirs').get('truth')
+        self.shuffle_indices = shuffle_indices
         self.transforms = transforms
-        self.images_dir = images_dir
-        self.mask_dir = mask_dir
-        self.manual_dir = manual_dir
+        self.mode = mode
 
-        self.get_mask = get_mask
-        self.get_truth = get_truth
-        self.shuffle = shuffle
-
-        if image_files is not None:
-            self.images = image_files if isinstance(image_files, list) else [image_files]
+        if images is not None:
+            self.images = images
         else:
-            self.images = os.listdir(self.images_dir)
+            self.images = os.listdir(self.image_dir)
         self.image_objects = {}
         self.indices = []
 
@@ -39,17 +34,21 @@ class Generator(Dataset):
 
     def _get_image_obj(self, img_file=None):
         img_obj = Image()
-        img_obj.load_file(data_dir=self.images_dir,
+        img_obj.load_file(data_dir=self.image_dir,
                           file_name=img_file)
-        if self.get_mask is not None:
+        if self.mask_getter is not None:
             img_obj.load_mask(mask_dir=self.mask_dir,
-                              fget_mask=self.get_mask,
+                              fget_mask=self.mask_getter,
                               erode=True)
-        if self.get_truth is not None:
-            img_obj.load_ground_truth(gt_dir=self.manual_dir,
-                                      fget_ground_truth=self.get_truth)
+        if self.truth_getter is not None:
+            img_obj.load_ground_truth(gt_dir=self.truth_dir,
+                                      fget_ground_truth=self.truth_getter)
+        s = img_obj.image_arr.shape
+        if len(img_obj.image_arr.shape) == 3:
+            img_obj.working_arr = img_obj.image_arr[:, :, 1]
+        elif len(img_obj.image_arr.shape) == 2:
+            img_obj.working_arr = img_obj.image_arr
 
-        img_obj.working_arr = img_obj.image_arr[:, :, 1]
         img_obj.apply_clahe()
         if img_obj.mask is not None:
             x = np.logical_and(True, img_obj.mask == 255)
@@ -62,6 +61,26 @@ class Generator(Dataset):
     def __len__(self):
         return len(self.indices)
 
-    def get_loader(self, batch_size=32, shuffle=True, sampler=None, num_workers=2):
-        return torch.utils.data.DataLoader(self, batch_size=batch_size,
-                                           shuffle=shuffle, num_workers=num_workers, sampler=sampler)
+    @classmethod
+    def get_loader(cls, images, run_conf, transforms):
+        mode = run_conf.get('Params').get('mode')
+        gen = cls(run_conf=run_conf, images=images, transforms=transforms, shuffle_indices=True, mode=mode)
+        return torch.utils.data.DataLoader(gen, batch_size=run_conf.get('Params').get('batch_size'),
+                                           shuffle=True, num_workers=3,
+                                           sampler=None)
+
+    @classmethod
+    def get_loader_per_img(cls, images, run_conf, mode=None):
+        loaders = []
+        for file in images:
+            gen = cls(
+                run_conf=run_conf,
+                images=[file],
+                transforms=tfm.Compose([tfm.ToPILImage(), tfm.ToTensor()]),
+                shuffle_indices=False,
+                mode=mode
+            )
+            loader = torch.utils.data.DataLoader(gen, batch_size=min(64, gen.__len__()),
+                                                 shuffle=False, num_workers=1, sampler=None)
+            loaders.append(loader)
+        return loaders

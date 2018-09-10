@@ -51,8 +51,8 @@ class ThrNet(nn.Module):
 
         self.kern_size = 1
         self.kern_stride = 2
-        self.kern_padding = 0
-        self.mxp_kern_size = 2
+        self.kern_padding = 1
+        self.mxp_kern_size = 1
         self.mxp_stride = 1
         self.pool5 = nn.MaxPool2d(kernel_size=self.mxp_kern_size, stride=self.mxp_stride)
         self.conv5 = nn.Conv2d(1024, 128, self.kern_size,
@@ -87,5 +87,3 @@ class ThrNet(nn.Module):
         temp1 = self.width
         self.width = ((self.width - self.mxp_kern_size) / self.mxp_stride) + 1
         print('Output width[ ' + str(temp) + ' -conv-> ' + str(temp1) + ' -maxpool-> ' + str(self.width) + ' ]')
-
-# t = ThrNet(51, 1)

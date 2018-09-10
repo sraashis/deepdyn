@@ -1,4 +1,5 @@
 BASE_PROJECT_DIR = '/home/akhanal1/ature'
+# BASE_PROJECT_DIR = '/home/ak/PycharmProjects/ature'
 
 import os
 import sys
@@ -10,10 +11,11 @@ os.chdir(BASE_PROJECT_DIR)
 import torch
 import torch.optim as optim
 from neuralnet.unet.model import UNet
-from neuralnet.unet.unet_dataloader import PatchesGenerator, get_loader_per_img
+from neuralnet.unet.unet_dataloader import PatchesGenerator
 from neuralnet.unet.unet_trainer import UNetNNTrainer
 import torchvision.transforms as transforms
-from neuralnet.thrnet.runs import DRIVE
+from neuralnet.utils import auto_split as asp
+from neuralnet.unet.runs import DRIVE
 
 RUNS = [DRIVE]
 
@@ -24,63 +26,36 @@ if __name__ == "__main__":
         transforms.ToTensor()
     ])
 
-    for I in RUNS:
-        for k, folder in I['D'].items():
+    for R in RUNS:
+        for k, folder in R['Dirs'].items():
             os.makedirs(folder, exist_ok=True)
-        model = UNet(I['P']['num_channels'][0], I['P']['num_classes'])
-        optimizer = optim.Adam(model.parameters(), lr=I['P']['learning_rate'])
-        if I['P']['distribute']:
+
+        splits = asp.create_split_json(
+            images_src_dir=R.get('Dirs').get('image'),
+            to_file=os.path.join(R.get('Dirs').get('logs'), R.get('Params').get('checkpoint_file') + '.json'))
+
+        model = UNet(R['Params']['num_channels'], R['Params']['num_classes'])
+        optimizer = optim.Adam(model.parameters(), lr=R['Params']['learning_rate'])
+        if R['Params']['distribute']:
             model = torch.nn.DataParallel(model)
             model.float()
-            optimizer = optim.Adam(model.module.parameters(), lr=I['P']['learning_rate'])
+            optimizer = optim.Adam(model.module.parameters(), lr=R['Params']['learning_rate'])
 
         try:
-            drive_trainer = UNetNNTrainer(model=model,
-                                          checkpoint_file=I['P']['checkpoint_file'],
-                                          log_file=I['P']['checkpoint_file'] + '.csv',
-                                          use_gpu=I['P']['use_gpu'])
-            if I['P']['mode'] == 'train':
-                train_loader = PatchesGenerator(
-                    images_dir=I['D']['train_img'],
-                    mask_dir=I['D']['train_mask'],
-                    manual_dir=I['D']['train_manual'],
-                    transforms=transform,
-                    get_mask=I['F']['train_mask_getter'],
-                    get_truth=I['F']['train_gt_getter'],
-                    patch_shape=I['P']['patch_shape'],
-                    offset_shape=(100, 100)
-                ).get_loader(batch_size=I['P']['batch_size'])
+            drive_trainer = UNetNNTrainer(model=model, run_conf=R)
 
-                val_loaders = get_loader_per_img(
-                    images_dir=I['D']['val_img'],
-                    mask_dir=I['D']['val_mask'],
-                    manual_dir=I['D']['val_manual'],
-                    transforms=transform,
-                    get_mask=I['F']['val_mask_getter'],
-                    get_truth=I['F']['val_gt_getter'],
-                    patch_shape=I['P']['patch_shape']
-                )
+            if R.get('Params').get('mode') == 'train':
+                train_loader = PatchesGenerator.get_loader(run_conf=R, images=splits['train'], transforms=transform)
+                val_loader = PatchesGenerator.get_loader_per_img(run_conf=R, images=splits['validation'],
+                                                                 mode='validation')
+                drive_trainer.train(optimizer=optimizer, data_loader=train_loader, validation_loader=val_loader)
 
-                drive_trainer.train(optimizer=optimizer,
-                                    data_loader=train_loader,
-                                    epochs=I['P']['epochs'],
-                                    validation_loader=val_loaders,
-                                    force_checkpoint=False, log_frequency=50)
+            drive_trainer.resume_from_checkpoint(parallel_trained=R.get('Params').get('parallel_trained'))
+            test_loader = PatchesGenerator.get_loader_per_img(run_conf=R, images=splits['test'], mode='test')
 
-            drive_trainer.resume_from_checkpoint(parallel_trained=False)
-            test_loaders = get_loader_per_img(
-                images_dir=I['D']['test_img'],
-                mask_dir=I['D']['test_mask'],
-                manual_dir=I['D']['test_manual'],
-                transforms=transform,
-                get_mask=I['F']['test_mask_getter'],
-                get_truth=I['F']['test_gt_getter'],
-                patch_shape=I['P']['patch_shape']
-            )
-
-            logger = drive_trainer.get_logger(I['P']['checkpoint_file'] + '-TEST.csv')
-            drive_trainer.evaluate(data_loader=test_loaders, mode='eval', patch_size=I['P']['patch_shape'],
-                                   segmented_out=I['D']['test_img_out'],
+            log_file = os.path.join(R['Dirs']['logs'], R['Params']['checkpoint_file'] + '-TEST.csv')
+            logger = drive_trainer.get_logger(log_file)
+            drive_trainer.evaluate(data_loaders=test_loader, mode='test',
                                    logger=logger)
             logger.close()
         except Exception as e:

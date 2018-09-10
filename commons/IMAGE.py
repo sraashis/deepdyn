@@ -1,3 +1,4 @@
+import copy
 import os
 
 import cv2
@@ -40,9 +41,9 @@ class Image:
     def load_mask(self, mask_dir=None, fget_mask=None, erode=False, channels=1):
         try:
             mask_file = fget_mask(self.file_name)
-            mask = imgutil.get_image_as_array(os.path.join(mask_dir, mask_file), channels)
+            self.mask = imgutil.get_image_as_array(os.path.join(mask_dir, mask_file), channels)
             if erode:
-                self.mask = cv2.erode(mask, kernel=fu.get_chosen_mask_erode_kernel(), iterations=5)
+                self.mask = cv2.erode(self.mask, kernel=fu.get_chosen_mask_erode_kernel(), iterations=5)
         except Exception as e:
             print('Fail to load mask: ' + str(e))
 
@@ -59,6 +60,17 @@ class Image:
     def apply_clahe(self, clip_limit=2.0, tile_shape=(8, 8)):
         enhancer = cv2.createCLAHE(clipLimit=clip_limit, tileGridSize=tile_shape)
         self.working_arr = enhancer.apply(self.working_arr)
+
+    def __copy__(self):
+        copy_obj = Image()
+        copy_obj.data_dir = copy.copy(self.data_dir)
+        copy_obj.file_name = copy.copy(self.file_name)
+        copy_obj.image_arr = copy.copy(self.image_arr)
+        copy_obj.working_arr = copy.copy(self.working_arr)
+        copy_obj.mask = copy.copy(self.mask)
+        copy_obj.ground_truth = copy.copy(self.ground_truth)
+        copy_obj.res = copy.deepcopy(self.res)
+        return copy_obj
 
 
 class SegmentedImage(Image):
