@@ -69,10 +69,10 @@ class ThrnetTrainer(NNTrainer):
 
         print('\nEvaluating...')
         with torch.no_grad():
-            all_score = ScoreAccumulator()
+            eval_score = ScoreAccumulator()
 
             for loader in data_loaders:
-                current_score = ScoreAccumulator()
+                img_score = ScoreAccumulator()
                 img_obj = loader.dataset.image_objects[0]
                 segmented_map, labels_acc = [], []
                 img_loss = 0.0
@@ -89,8 +89,10 @@ class ThrnetTrainer(NNTrainer):
                         segmented[o, :, :][segmented[o, :, :] > thr[o].item()] = 255
                         segmented[o, :, :][segmented[o, :, :] <= thr[o].item()] = 0
 
-                    current_score.reset().add_tensor(labels, segmented.long())
-                    all_score.accumulate(current_score)
+                    current_score = ScoreAccumulator()
+                    current_score.add_tensor(labels, segmented.long())
+                    img_score.accumulate(current_score)
+                    eval_score.accumulate(current_score)
                     if mode is 'test':
                         segmented_map += segmented.clone().cpu().numpy().tolist()
                         labels_acc += labels.clone().cpu().numpy().tolist()
@@ -99,7 +101,7 @@ class ThrnetTrainer(NNTrainer):
                         str(x) for x in
                         [img_obj.file_name, 1, self.checkpoint['epochs'], 0] + current_score.get_prf1a() + [loss.item()]))
 
-                print(img_obj.file_name + ' PRF1A: ', all_score.get_prf1a(), ' Loss:', img_loss/(i+1))
+                print(img_obj.file_name + ' PRF1A: ', img_score.get_prf1a(), ' Loss:', img_loss/(i+1))
                 if mode is 'test':
                     segmented_map = np.exp(np.array(segmented_map)).squeeze()
                     segmented_map = np.array(segmented_map * 255, dtype=np.uint8)
@@ -111,4 +113,4 @@ class ThrnetTrainer(NNTrainer):
                     IMG.fromarray(maps_img).save(os.path.join(self.log_dir, img_obj.file_name.split('.')[0] + '.png'))
 
         if mode is 'train':
-            self._save_if_better(force_checkpoint=force_checkpoint, score=all_score.get_prf1a()[2])
+            self._save_if_better(force_checkpoint=force_checkpoint, score=eval_score.get_prf1a()[2])

@@ -1,5 +1,4 @@
 import os
-import sys
 
 import numpy as np
 import torch
@@ -24,27 +23,30 @@ class UNetNNTrainer(NNTrainer):
 
         print('\nEvaluating...')
         with torch.no_grad():
-            all_score = ScoreAccumulator()
-
+            eval_score = ScoreAccumulator()
             for loader in data_loaders:
-                current_score = ScoreAccumulator()
                 img_obj = loader.dataset.image_objects[0]
                 segmented_map, labels_acc = [], []
 
+                img_score = ScoreAccumulator()
                 for i, data in enumerate(loader, 0):
                     inputs, labels = data['inputs'].to(self.device), data['labels'].to(self.device)
                     outputs = self.model(inputs)
                     _, predicted = torch.max(outputs, 1)
 
+                    current_score = ScoreAccumulator()
                     current_score.add_tensor(labels, predicted)
-                    all_score.accumulate(current_score)
+                    img_score.accumulate(current_score)
+                    eval_score.accumulate(current_score)
+
                     if mode is 'test':
                         segmented_map += outputs.clone().cpu().numpy().tolist()
                         labels_acc += labels.clone().cpu().numpy().tolist()
 
-                self.flush(logger, ','.join(
-                    str(x) for x in [img_obj.file_name, 1, self.checkpoint['epochs'], 0] + current_score.get_prf1a()))
+                    self.flush(logger, ','.join(
+                        str(x) for x in [img_obj.file_name, 1, self.checkpoint['epochs'], 0] + current_score.get_prf1a()))
 
+                print(img_obj.file_name + ' PRF1A: ', img_score.get_prf1a())
                 if mode is 'test':
                     segmented_map = np.exp(np.array(segmented_map)[:, 1, :, :]).squeeze()
                     segmented_map = np.array(segmented_map * 255, dtype=np.uint8)
@@ -55,7 +57,5 @@ class UNetNNTrainer(NNTrainer):
                                                       offset_row_col=self.patch_offset)
                     IMG.fromarray(maps_img).save(os.path.join(self.log_dir, img_obj.file_name.split('.')[0] + '.png'))
 
-                print(img_obj.file_name + ' PRF1A: ', all_score.get_prf1a())
-
         if mode is 'train':
-            self._save_if_better(force_checkpoint=force_checkpoint, score=all_score.get_prf1a()[2])
+            self._save_if_better(force_checkpoint=force_checkpoint, score=eval_score.get_prf1a()[2])
