@@ -15,9 +15,9 @@ from neuralnet.thrnet.thrnet_dataloader import PatchesGenerator
 from neuralnet.thrnet.thrnet_trainer import ThrnetTrainer
 import torchvision.transforms as transforms
 from neuralnet.utils import auto_split as asp
-from neuralnet.thrnet.runs import DRIVE
+from neuralnet.thrnet.runs import DRIVE16, DRIVE32, DRIVE64
 
-RUNS = [DRIVE]
+RUNS = [DRIVE16, DRIVE32, DRIVE64]
 
 if __name__ == "__main__":
 
