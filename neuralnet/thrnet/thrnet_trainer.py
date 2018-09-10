@@ -29,19 +29,19 @@ class ThrnetTrainer(NNTrainer):
             running_loss = 0.0
             self.adjust_learning_rate(optimizer=optimizer, epoch=epoch + 1)
             for i, data in enumerate(data_loader, 0):
-                inputs, labels = data['inputs'].to(self.device), data['labels'].to(self.device)
+                inputs, y_thresholds = data['inputs'].to(self.device), data['y_thresholds']
 
                 optimizer.zero_grad()
                 outputs = self.model(inputs)
                 _, predicted = torch.max(outputs, 1)
 
-                loss = F.mse_loss(outputs, labels)
+                loss = F.mse_loss(outputs.squeeze(), y_thresholds.float().to(self.device))
                 loss.backward()
                 optimizer.step()
 
                 running_loss += float(loss.item())
                 current_loss = loss.item()
-                p, r, f1, a = score_acc.reset().add_tensor(labels, predicted).get_prf1a()
+                p, r, f1, a = score_acc.reset().get_prf1a()
                 if (i + 1) % self.log_frequency == 0:  # Inspect the loss of every log_frequency batches
                     current_loss = running_loss / self.log_frequency if (i + 1) % self.log_frequency == 0 \
                         else (i + 1) % self.log_frequency
@@ -75,8 +75,7 @@ class ThrnetTrainer(NNTrainer):
                 segmented_map, labels_acc = [], []
 
                 for i, data in enumerate(loader, 0):
-                    inputs, labels, y_thr = data['inputs'].to(self.device), data['labels'].to(self.device), data[
-                        'y_thresholds'].to(self.device)
+                    inputs, labels, y_thr = data[1].to(self.device), data[2].to(self.device), data[3].to(self.device)
                     thr = self.model(inputs)
                     thr = thr.squeeze()
                     segmented = inputs.squeeze() * 255

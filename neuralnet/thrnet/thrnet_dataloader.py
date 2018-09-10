@@ -44,10 +44,6 @@ class PatchesGenerator(Generator):
         y = self.image_objects[ID].ground_truth[row_from:row_to, col_from:col_to]
         best_scores, best_thr = get_best_f1_thr(img_tensor, y)
 
-        img_tensor = img_tensor[..., None]
-        if self.transforms is not None:
-            img_tensor = self.transforms(img_tensor)
-
         if self.mode == 'train' and random.uniform(0, 1) <= 0.5:
             img_tensor = np.flip(img_tensor, 0)
             y = np.flip(y, 0)
@@ -56,8 +52,13 @@ class PatchesGenerator(Generator):
             img_tensor = np.flip(img_tensor, 1)
             y = np.flip(y, 1)
 
+        img_tensor = img_tensor[..., None]
+        if self.transforms is not None:
+            img_tensor = self.transforms(img_tensor)
+
         y[y == 255] = 1
         if ~np.isin(1, y):
             best_thr = 255
-        # print(best_scores['F1'], best_thr)
-        return {'IDs': ID, 'inputs': img_tensor, 'labels': torch.FloatTensor(y.copy()), 'y_thresholds': best_thr}
+
+        return {'ID': ID, 'inputs': img_tensor, 'labels': torch.LongTensor(y.copy()),
+                'y_thresholds': best_thr}

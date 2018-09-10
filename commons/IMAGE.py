@@ -41,9 +41,9 @@ class Image:
     def load_mask(self, mask_dir=None, fget_mask=None, erode=False, channels=1):
         try:
             mask_file = fget_mask(self.file_name)
-            mask = imgutil.get_image_as_array(os.path.join(mask_dir, mask_file), channels)
+            self.mask = imgutil.get_image_as_array(os.path.join(mask_dir, mask_file), channels)
             if erode:
-                self.mask = cv2.erode(mask, kernel=fu.get_chosen_mask_erode_kernel(), iterations=5)
+                self.mask = cv2.erode(self.mask, kernel=fu.get_chosen_mask_erode_kernel(), iterations=5)
         except Exception as e:
             print('Fail to load mask: ' + str(e))
 
