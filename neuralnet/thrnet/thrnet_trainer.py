@@ -103,8 +103,7 @@ class ThrnetTrainer(NNTrainer):
 
                 print(img_obj.file_name + ' PRF1A: ', img_score.get_prf1a(), ' Loss:', img_loss/(i+1))
                 if mode is 'test':
-                    segmented_map = np.exp(np.array(segmented_map)).squeeze()
-                    segmented_map = np.array(segmented_map * 255, dtype=np.uint8)
+                    segmented_map = np.array(segmented_map, dtype=np.uint8)
                     # labels_acc = np.array(np.array(labels_acc).squeeze()*255, dtype=np.uint8)
 
                     maps_img = imgutils.merge_patches(patches=segmented_map, image_size=img_obj.working_arr.shape,
