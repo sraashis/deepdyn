@@ -29,7 +29,7 @@ class UNetNNTrainer(NNTrainer):
                 segmented_map, labels_acc = [], []
 
                 img_score = ScoreAccumulator()
-                for i, data in enumerate(loader, 0):
+                for i, data in enumerate(loader, 1):
                     inputs, labels = data['inputs'].to(self.device), data['labels'].to(self.device)
                     outputs = self.model(inputs)
                     _, predicted = torch.max(outputs, 1)
@@ -44,7 +44,8 @@ class UNetNNTrainer(NNTrainer):
                         labels_acc += labels.clone().cpu().numpy().tolist()
 
                     self.flush(logger, ','.join(
-                        str(x) for x in [img_obj.file_name, 1, self.checkpoint['epochs'], 0] + current_score.get_prf1a()))
+                        str(x) for x in
+                        [img_obj.file_name, 1, self.checkpoint['epochs'], 0] + current_score.get_prf1a()))
 
                 print(img_obj.file_name + ' PRF1A: ', img_score.get_prf1a())
                 if mode is 'test':

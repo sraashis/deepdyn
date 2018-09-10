@@ -38,14 +38,14 @@ class NNTrainer:
         if validation_loader is None:
             raise ValueError('Please provide validation loader.')
 
-        logger = NNTrainer.get_logger(self.log_file)
+        logger = NNTrainer.get_logger(self.log_file, header='ID,TYPE,EPOCH,BATCH,PRECISION,RECALL,F1,ACCURACY,LOSS')
         print('Training...')
-        for epoch in range(0, self.epochs):
+        for epoch in range(1, self.epochs + 1):
             self.model.train()
             score_acc = ScoreAccumulator()
             running_loss = 0.0
-            self.adjust_learning_rate(optimizer=optimizer, epoch=epoch + 1)
-            for i, data in enumerate(data_loader, 0):
+            self.adjust_learning_rate(optimizer=optimizer, epoch=epoch)
+            for i, data in enumerate(data_loader, 1):
                 inputs, labels = data['inputs'].to(self.device), data['labels'].to(self.device)
 
                 optimizer.zero_grad()
@@ -57,21 +57,18 @@ class NNTrainer:
                 loss.backward()
                 optimizer.step()
 
-                running_loss += float(loss.item())
                 current_loss = loss.item()
+                running_loss += current_loss
                 p, r, f1, a = score_acc.reset().add_tensor(labels, predicted).get_prf1a()
-                if (i + 1) % self.log_frequency == 0:  # Inspect the loss of every log_frequency batches
-                    current_loss = running_loss / self.log_frequency if (i + 1) % self.log_frequency == 0 \
-                        else (i + 1) % self.log_frequency
+                if i % self.log_frequency == 0:
+                    print('Epochs[%d/%d] Batch[%d/%d] loss:%.5f pre:%.3f rec:%.3f f1:%.3f acc:%.3f' %
+                          (epoch, self.epochs, i, data_loader.__len__(), running_loss/self.log_frequency, p, r, f1, a))
                     running_loss = 0.0
 
-                self.flush(logger, ','.join(str(x) for x in [0, 0, epoch + 1, i + 1, p, r, f1, a, current_loss]))
-                print('Epochs[%d/%d] Batch[%d/%d] loss:%.5f pre:%.3f rec:%.3f f1:%.3f acc:%.3f' %
-                      (epoch + 1, self.epochs, i + 1, data_loader.__len__(), current_loss, p, r, f1, a),
-                      end='\r' if running_loss > 0 else '\n')
+                self.flush(logger, ','.join(str(x) for x in [0, 0, epoch, i, p, r, f1, a, current_loss]))
 
             self.checkpoint['epochs'] += 1
-            if (epoch + 1) % self.validation_frequency == 0:
+            if epoch % self.validation_frequency == 0:
                 self.evaluate(data_loaders=validation_loader, force_checkpoint=self.force_checkpoint, logger=logger,
                               mode='train')
         try:
@@ -128,14 +125,14 @@ class NNTrainer:
             print('Score did not improve. _was:' + str(self.checkpoint['score']))
 
     @staticmethod
-    def get_logger(log_file=None):
+    def get_logger(log_file=None, header=''):
 
         if os.path.isfile(log_file):
             print('### CRITICAL!!! ' + log_file + '" already exists. Rename or delete to proceed.')
             sys.exit(1)
 
         file = open(log_file, 'w')
-        NNTrainer.flush(file, 'ID,TYPE,EPOCH,BATCH,PRECISION,RECALL,F1,ACCURACY,LOSS')
+        NNTrainer.flush(file, header)
         return file
 
     @staticmethod
