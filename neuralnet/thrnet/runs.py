@@ -17,7 +17,7 @@ DRIVE = {
         'checkpoint_file': 'THRNET-DRIVE.chk.tar',
         'log_frequency': 100,
         'validation_frequency': 4,
-        'mode': 'test',
+        'mode': 'train',
         'parallel_trained': False
     },
     'Dirs': {

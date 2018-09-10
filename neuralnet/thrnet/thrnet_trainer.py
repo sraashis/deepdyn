@@ -89,7 +89,6 @@ class ThrnetTrainer(NNTrainer):
                         segmented[o, :, :][segmented[o, :, :] > thr[o].item()] = 255
                         segmented[o, :, :][segmented[o, :, :] <= thr[o].item()] = 0
 
-                    segmented[segmented == 255] = 1
                     current_score.reset().add_tensor(labels, segmented.long())
                     all_score.accumulate(current_score)
                     if mode is 'test':
