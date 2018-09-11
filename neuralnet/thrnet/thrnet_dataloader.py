@@ -3,9 +3,9 @@ import random
 from random import shuffle
 
 import numpy as np
-import torch
 
 import utils.img_utils as imgutils
+from commons.IMAGE import Image
 from neuralnet.datagen import Generator
 from neuralnet.utils.measurements import get_best_f1_thr
 
@@ -31,9 +31,38 @@ class PatchesGenerator(Generator):
         if self.shuffle_indices:
             shuffle(self.indices)
 
+    def _get_image_obj(self, img_file=None):
+        img_obj = Image()
+        img_obj.load_file(data_dir=self.image_dir,
+                          file_name=img_file, num_channels=1)
+        if self.mask_getter is not None:
+            img_obj.load_mask(mask_dir=self.mask_dir,
+                              fget_mask=self.mask_getter,
+                              erode=True)
+        if self.truth_getter is not None:
+            img_obj.load_ground_truth(gt_dir=self.truth_dir,
+                                      fget_ground_truth=self.truth_getter)
+
+        # if self.orig_getter is not None:
+        #     orig_file = os.path.join(self.orig_dir, self.orig_getter(img_file))
+        #     enhancer = cv2.createCLAHE(clipLimit=2.0, tileGridSize=(8, 8))
+        #     img_obj.res['orig'] = imgutils.get_image_as_array(orig_file, channels=3)
+        #     img_obj.res['orig'] = enhancer.apply(img_obj.res['orig'][:, :, 1])
+
+        if len(img_obj.image_arr.shape) == 3:
+            img_obj.working_arr = img_obj.image_arr[:, :, 1]
+        elif len(img_obj.image_arr.shape) == 2:
+            img_obj.working_arr = img_obj.image_arr
+
+        if img_obj.mask is not None:
+            x = np.logical_and(True, img_obj.mask == 255)
+            img_obj.working_arr[img_obj.mask == 0] = img_obj.working_arr[x].mean()
+        return img_obj
+
     def __getitem__(self, index):
         ID, row_from, row_to, col_from, col_to = self.indices[index]
         img_tensor = self.image_objects[ID].working_arr[row_from:row_to, col_from:col_to]
+        prob_map = img_tensor.copy()
         y = self.image_objects[ID].ground_truth[row_from:row_to, col_from:col_to]
         best_scores, best_thr = get_best_f1_thr(img_tensor, y)
 
@@ -53,5 +82,5 @@ class PatchesGenerator(Generator):
         if np.sum(y) == 0:
             best_thr = 255
 
-        return {'ID': ID, 'inputs': img_tensor, 'labels': torch.LongTensor(y.copy()),
-                'y_thresholds': best_thr}
+        return {'ID': ID, 'inputs': img_tensor, 'labels': y.copy(),
+                'y_thresholds': best_thr, 'prob_map': prob_map}

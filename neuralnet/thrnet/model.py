@@ -120,8 +120,8 @@ class ThrNet(nn.Module):
         self.bn10 = nn.BatchNorm2d(256)
 
         self.linearWidth = 256 * int(self.width) * int(self.width)
-        self.fc1 = nn.Linear(self.linearWidth, width)
-        self.out = nn.Linear(width, 1)
+        self.fc1 = nn.Linear(self.linearWidth, 128)
+        self.out = nn.Linear(128, 1)
 
     def forward(self, x):
         x = self.pool1(F.relu(self.bn1(self.conv1(x))))
