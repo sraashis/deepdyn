@@ -10,14 +10,14 @@ os.chdir(BASE_PROJECT_DIR)
 
 import torch
 import torch.optim as optim
-from neuralnet.thrnet.model import ThrNet
+from neuralnet.thrnet.inception import InceptionThrNet
 from neuralnet.thrnet.thrnet_dataloader import PatchesGenerator
 from neuralnet.thrnet.thrnet_trainer import ThrnetTrainer
 import torchvision.transforms as transforms
 from neuralnet.utils import auto_split as asp
-from neuralnet.thrnet.runs import DRIVE16, DRIVE32, DRIVE64
+from neuralnet.thrnet.runs import DRIVE16
 
-RUNS = [DRIVE16, DRIVE32, DRIVE64]
+RUNS = [DRIVE16]  # , DRIVE32, DRIVE64]
 
 if __name__ == "__main__":
 
@@ -34,7 +34,8 @@ if __name__ == "__main__":
             images_src_dir=R.get('Dirs').get('image'),
             to_file=os.path.join(R.get('Dirs').get('logs'), R.get('Params').get('checkpoint_file') + '.json'))
 
-        model = ThrNet(R['Params']['patch_shape'][0], R['Params']['num_channels'])
+        model = InceptionThrNet(R['Params']['patch_shape'][0], R['Params']['num_channels'], R['Params']['num_classes'])
+        # model = ThrNet(R['Params']['patch_shape'][0], R['Params']['num_channels'])
         optimizer = optim.Adam(model.parameters(), lr=R['Params']['learning_rate'])
         if R['Params']['distribute']:
             model = torch.nn.DataParallel(model)
@@ -51,7 +52,7 @@ if __name__ == "__main__":
                 drive_trainer.train(optimizer=optimizer, data_loader=train_loader, validation_loader=val_loader)
 
             drive_trainer.resume_from_checkpoint(parallel_trained=R.get('Params').get('parallel_trained'))
-            test_loader = PatchesGenerator.get_loader_per_img(run_conf=R, images=splits['validation'], mode='test')
+            test_loader = PatchesGenerator.get_loader_per_img(run_conf=R, images=splits['test'], mode='test')
 
             log_file = os.path.join(R['Dirs']['logs'], R['Params']['checkpoint_file'] + '-TEST.csv')
             logger = drive_trainer.get_logger(log_file)
