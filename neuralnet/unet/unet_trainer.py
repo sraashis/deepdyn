@@ -26,7 +26,7 @@ class UNetNNTrainer(NNTrainer):
             eval_score = ScoreAccumulator()
             for loader in data_loaders:
                 img_obj = loader.dataset.image_objects[0]
-                segmented_map, labels_acc = [], []
+                segmented_img = []
 
                 img_score = ScoreAccumulator()
                 for i, data in enumerate(loader, 1):
@@ -40,8 +40,7 @@ class UNetNNTrainer(NNTrainer):
                     eval_score.accumulate(current_score)
 
                     if mode is 'test':
-                        segmented_map += outputs.clone().cpu().numpy().tolist()
-                        labels_acc += labels.clone().cpu().numpy().tolist()
+                        segmented_img += outputs.clone().cpu().numpy().tolist()
 
                     self.flush(logger, ','.join(
                         str(x) for x in
@@ -49,11 +48,10 @@ class UNetNNTrainer(NNTrainer):
 
                 print(img_obj.file_name + ' PRF1A: ', img_score.get_prf1a())
                 if mode is 'test':
-                    segmented_map = np.exp(np.array(segmented_map)[:, 1, :, :]).squeeze()
-                    segmented_map = np.array(segmented_map * 255, dtype=np.uint8)
-                    # labels_acc = np.array(np.array(labels_acc).squeeze()*255, dtype=np.uint8)
+                    segmented_img = np.exp(np.array(segmented_img)[:, 1, :, :]).squeeze()
+                    segmented_img = np.array(segmented_img * 255, dtype=np.uint8)
 
-                    maps_img = imgutils.merge_patches(patches=segmented_map, image_size=img_obj.working_arr.shape,
+                    maps_img = imgutils.merge_patches(patches=segmented_img, image_size=img_obj.working_arr.shape,
                                                       patch_size=self.patch_shape,
                                                       offset_row_col=self.patch_offset)
                     IMG.fromarray(maps_img).save(os.path.join(self.log_dir, img_obj.file_name.split('.')[0] + '.png'))
