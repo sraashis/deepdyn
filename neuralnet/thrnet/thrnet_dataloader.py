@@ -43,12 +43,6 @@ class PatchesGenerator(Generator):
             img_obj.load_ground_truth(gt_dir=self.truth_dir,
                                       fget_ground_truth=self.truth_getter)
 
-        # if self.orig_getter is not None:
-        #     orig_file = os.path.join(self.orig_dir, self.orig_getter(img_file))
-        #     enhancer = cv2.createCLAHE(clipLimit=2.0, tileGridSize=(8, 8))
-        #     img_obj.res['orig'] = imgutils.get_image_as_array(orig_file, channels=3)
-        #     img_obj.res['orig'] = enhancer.apply(img_obj.res['orig'][:, :, 1])
-
         if len(img_obj.image_arr.shape) == 3:
             img_obj.working_arr = img_obj.image_arr[:, :, 1]
         elif len(img_obj.image_arr.shape) == 2:

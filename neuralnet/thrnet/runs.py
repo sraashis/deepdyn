@@ -6,8 +6,8 @@ DRIVE16 = {
     'Params': {
         'num_channels': 1,
         'num_classes': 1,
-        'batch_size': 32,
-        'epochs': 60,
+        'batch_size': 16,
+        'epochs': 400,
         'learning_rate': 0.0005,
         'patch_shape': (16, 16),
         'patch_offset': (10, 10),
@@ -37,8 +37,8 @@ DRIVE32 = {
     'Params': {
         'num_channels': 1,
         'num_classes': 1,
-        'batch_size': 32,
-        'epochs': 60,
+        'batch_size': 16,
+        'epochs': 400,
         'learning_rate': 0.0005,
         'patch_shape': (32, 32),
         'patch_offset': (20, 20),
@@ -48,7 +48,7 @@ DRIVE32 = {
         'checkpoint_file': 'THRNET32-DRIVE.chk.tar',
         'log_frequency': 50,
         'validation_frequency': 4,
-        'mode': 'train',
+        'mode': 'test',
         'parallel_trained': False
     },
     'Dirs': {
@@ -69,8 +69,8 @@ DRIVE64 = {
     'Params': {
         'num_channels': 1,
         'num_classes': 1,
-        'batch_size': 32,
-        'epochs': 60,
+        'batch_size': 16,
+        'epochs': 400,
         'learning_rate': 0.0005,
         'patch_shape': (64, 64),
         'patch_offset': (30, 30),
