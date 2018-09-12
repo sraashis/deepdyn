@@ -80,3 +80,9 @@ class UNet(nn.Module):
             c = (bypass.size()[2] - upsampled.size()[2]) // 2
             bypass = F.pad(bypass, (-c, -c, -c, -c))
         return torch.cat((upsampled, bypass), 1)
+
+import numpy as np
+i = UNet(1, 2)
+model_parameters = filter(lambda p: p.requires_grad, i.parameters())
+params = sum([np.prod(p.size()) for p in model_parameters])
+print(params)

@@ -4,6 +4,7 @@ import math
 import torch
 import torch.nn.functional as F
 from torch import nn
+
 from neuralnet.utils.weights_utils import initialize_weights
 
 
@@ -74,7 +75,7 @@ class InceptionRecursiveDownSample(nn.Module):
     def __init__(self, width, in_ch, out_ch):
         super(InceptionRecursiveDownSample, self).__init__()
         layers = []
-        for i in range(1, int(math.log2(width)) - 2):
+        for i in range(1, int(math.log2(width)) - 1):
             inception = Inception(width=width, in_ch=in_ch, out_ch=out_ch, downsample=True)
             layers.append(inception)
             width = width / 2
@@ -88,27 +89,23 @@ class InceptionRecursiveDownSample(nn.Module):
 class InceptionThrNet(nn.Module):
     def __init__(self, width, input_ch, num_class):
         super(InceptionThrNet, self).__init__()
-        self.inception1_rec = InceptionRecursiveDownSample(width=width, in_ch=input_ch, out_ch=32)
+        self.inception1_rec = InceptionRecursiveDownSample(width=width, in_ch=input_ch, out_ch=16)
         self.inception1 = Inception(width=width, in_ch=input_ch, out_ch=64)
-        self.inception2 = Inception(width=width, in_ch=64, out_ch=128)
+        self.inception2 = Inception(width=width, in_ch=64, out_ch=64)
 
-        self.inception2_rec = InceptionRecursiveDownSample(width=width, in_ch=128, out_ch=32)
-        self.inception3 = Inception(width=width, in_ch=128, out_ch=128)
-        self.inception4 = Inception(width=width, in_ch=128, out_ch=128)
+        self.inception2_rec = InceptionRecursiveDownSample(width=width, in_ch=64, out_ch=16)
+        self.inception3 = Inception(width=width, in_ch=64, out_ch=64)
+        self.inception4 = Inception(width=width, in_ch=64, out_ch=64)
 
-        self.inception3_rec = InceptionRecursiveDownSample(width=width, in_ch=128, out_ch=32)
-        self.inception5 = Inception(width=width, in_ch=128, out_ch=64)
+        self.inception3_rec = InceptionRecursiveDownSample(width=width, in_ch=64, out_ch=16)
+        self.inception5 = Inception(width=width, in_ch=64, out_ch=64)
         self.inception6 = Inception(width=width, in_ch=64, out_ch=64)
 
-        self.inception_rec_all = Inception(width=width, in_ch=32 * 3, out_ch=32)
+        self.inception_rec_all = Inception(width=width, in_ch=16 * 3, out_ch=32)
         self.inception_rec_final = InceptionRecursiveDownSample(width=width, in_ch=64, out_ch=32)
 
         # concat self.inception_rec_final and self.inception_rec_all
-        self.conv = BasicConv2d(in_ch=2 * 32, out_ch=8, k=1, s=1, p=0)
-
-        self.linearWidth = 8 * 8 * 8
-        self.fc1 = nn.Linear(self.linearWidth, 32)
-        self.out = nn.Linear(32, num_class)
+        self.out_conv = BasicConv2d(in_ch=2 * 32, out_ch=num_class, k=1, s=1, p=0)
 
         initialize_weights(self)
 
@@ -116,27 +113,25 @@ class InceptionThrNet(nn.Module):
         i1_rec_out = self.inception1_rec(x)
         i1_out = self.inception1(x)
         i2_out = self.inception2(i1_out)
+        i2_out = F.dropout2d(i2_out, p=0.2)
 
         i2_rec_out = self.inception2_rec(i2_out)
         i3_out = self.inception3(i2_out)
         i4_out = self.inception4(i3_out)
-        i4_out = F.dropout2d(i4_out, p=0.4)
+        i4_out = F.dropout2d(i4_out, p=0.2)
 
         i3_rec_out = self.inception3_rec(i4_out)
         i5_out = self.inception5(i4_out)
         i6_out = self.inception6(i5_out)
+        i6_out = F.dropout2d(i6_out, p=0.2)
 
         rec_final_out = self.inception_rec_final(i6_out)
 
         full_concat = torch.cat([i1_rec_out, i2_rec_out, i3_rec_out], 1)
         rec_prev = self.inception_rec_all(full_concat)
         final_conv = torch.cat([rec_prev, rec_final_out], 1)
-        final_conv = self.conv(final_conv)
-
-        flat = final_conv.view(-1, self.linearWidth)
-        f1 = F.relu(self.fc1(flat), inplace=True)
-        f1 = F.dropout2d(f1, p=0.4)
-        return self.out(f1)
+        final_conv = self.out_conv(final_conv)
+        return F.log_softmax(final_conv, dim=1)
 
 
 import numpy as np
