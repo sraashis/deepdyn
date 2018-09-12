@@ -72,9 +72,5 @@ class PatchesGenerator(Generator):
         if self.transforms is not None:
             img_tensor = self.transforms(img_tensor)
 
-        y[y == 255] = 1
-        if np.sum(y) == 0:
-            best_thr = 255
-
         return {'ID': ID, 'inputs': img_tensor, 'labels': y.copy(),
                 'y_thresholds': best_thr, 'prob_map': prob_map}

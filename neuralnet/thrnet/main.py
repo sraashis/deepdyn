@@ -1,5 +1,5 @@
 BASE_PROJECT_DIR = '/home/akhanal1/ature'
-# BASE_PROJECT_DIR = '/home/ak/PycharmProjects/ature'
+BASE_PROJECT_DIR = '/home/ak/PycharmProjects/ature'
 
 import os
 import sys
@@ -17,7 +17,7 @@ import torchvision.transforms as transforms
 from neuralnet.utils import auto_split as asp
 from neuralnet.thrnet.runs import DRIVE16, DRIVE32, DRIVE64
 
-RUNS = [DRIVE32, DRIVE16, DRIVE64]
+RUNS = [DRIVE32, DRIVE64, DRIVE16]
 
 if __name__ == "__main__":
 

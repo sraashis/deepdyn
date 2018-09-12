@@ -119,7 +119,7 @@ def get_chunk_indexes(img_shape=(0, 0), chunk_shape=(0, 0), offset_row_col=None)
                 col_to = img_cols
                 col_from = img_cols - chunk_col
                 col_end = True
-            yield [row_from, row_to, col_from, col_to]
+            yield [int(row_from), int(row_to), int(col_from), int(col_to)]
 
 
 def merge_patches(patches=None, image_size=(0, 0), patch_size=(0, 0), offset_row_col=None):
