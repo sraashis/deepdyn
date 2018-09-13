@@ -72,7 +72,6 @@ class InceptionRecursiveDownSample(nn.Module):
             inception = Inception(width=width, in_ch=in_ch, out_ch=out_ch)
             layers.append(inception)
             layers.append(nn.MaxPool2d(kernel_size=2, stride=2, padding=0))
-            layers.append(nn.Dropout2d(p=0.2))
             width = width / 2
             in_ch = out_ch
             if width == 8:
@@ -87,42 +86,41 @@ class InceptionThrNet(nn.Module):
     def __init__(self, width, input_ch, num_class):
         super(InceptionThrNet, self).__init__()
 
-        self.inception1 = Inception(width=width, in_ch=input_ch, out_ch=64)
-        self.inception1_rec = InceptionRecursiveDownSample(width=width, in_ch=64, out_ch=64)
+        self.inception1 = Inception(width=width, in_ch=input_ch, out_ch=256)
+        self.inception1_rec = InceptionRecursiveDownSample(width=width, in_ch=256, out_ch=128)
 
-        self.inception2 = Inception(width=width, in_ch=64, out_ch=256)
-        self.inception2_rec = InceptionRecursiveDownSample(width=width, in_ch=256, out_ch=64)
+        self.inception2 = Inception(width=width, in_ch=256, out_ch=512)
+        self.inception2_rec = InceptionRecursiveDownSample(width=width, in_ch=512, out_ch=128)
 
-        self.inception3 = Inception(width=width, in_ch=256, out_ch=64)
-        self.inception3_rec = InceptionRecursiveDownSample(width=width, in_ch=64, out_ch=64)
+        self.inception3 = Inception(width=width, in_ch=512, out_ch=512)
+        self.inception3_rec = InceptionRecursiveDownSample(width=width, in_ch=512, out_ch=128)
 
-        self.inception_final = Inception(width=width, in_ch=64 * 3, out_ch=8)
+        self.inception_final = Inception(width=width, in_ch=128 * 3, out_ch=16)
 
-        self.linearWidth = 8 * 8 * 8
+        self.linearWidth = 16 * 8 * 8
         self.fc_out = nn.Linear(self.linearWidth, num_class)
         initialize_weights(self)
 
     def forward(self, x):
         i1_out = self.inception1(x)
-        i1_out = F.dropout2d(i1_out, p=0.2)
         i1_rec_out = self.inception1_rec(i1_out)
 
         i2_out = self.inception2(i1_out)
-        i2_out = F.dropout2d(i2_out, p=0.2)
         i2_rec_out = self.inception2_rec(i2_out)
 
         i3_out = self.inception3(i2_out)
-        i3_out = F.dropout2d(i3_out, p=0.2)
+        # i3_out = F.dropout2d(i3_out, 0.2)
         i3_rec_out = self.inception3_rec(i3_out)
 
         rec_out = torch.cat([i1_rec_out, i2_rec_out, i3_rec_out], 1)
         inc_final_out = self.inception_final(rec_out)
         flattened = inc_final_out.view(-1, self.linearWidth)
-        flattened = F.dropout2d(flattened, p=0.2)
+        # flattened = F.dropout2d(flattened, 0.2)
         return self.fc_out(flattened)
 
 
 import numpy as np
+
 i = InceptionThrNet(width=64, input_ch=1, num_class=1)
 model_parameters = filter(lambda p: p.requires_grad, i.parameters())
 params = sum([np.prod(p.size()) for p in model_parameters])
