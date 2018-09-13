@@ -110,9 +110,9 @@ class NNTrainer:
 
         if score > self.checkpoint['score']:
             torch.save(current_chk, self.checkpoint_file)
-            self.checkpoint = current_chk
             print('Score improved: ',
                   str(self.checkpoint['score']) + ' to ' + str(score) + ' BEST CHECKPOINT SAVED')
+            self.checkpoint = current_chk
         else:
             print('Score did not improve:' + str(score) + ' BEST: ' + str(self.checkpoint['score']))
 
