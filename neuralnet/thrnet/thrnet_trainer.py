@@ -7,6 +7,7 @@ import torch.nn.functional as F
 
 import utils.img_utils as imgutils
 from neuralnet.torchtrainer import NNTrainer
+import math
 
 sep = os.sep
 
@@ -29,17 +30,16 @@ class ThrnetTrainer(NNTrainer):
             running_loss = 0.0
             self.adjust_learning_rate(optimizer=optimizer, epoch=epoch)
             for i, data in enumerate(data_loader, 1):
-                inputs, y_thresholds = data['inputs'].to(self.device), data['y_thresholds'].to(self.device)
+                inputs, y_thresholds = data['inputs'].to(self.device), data['y_thresholds'].float().to(self.device)
 
                 optimizer.zero_grad()
-                thr = self.model(inputs)
-                thr = thr.squeeze()
-                loss = F.mse_loss(thr, y_thresholds.float())
+                thr_map = self.model(inputs)
+                loss = F.mse_loss(thr_map.squeeze(), y_thresholds)  # Loss per item
+
                 loss.backward()
                 optimizer.step()
 
-                current_loss = loss.item() / thr.numel()
-
+                current_loss = math.sqrt(loss.item())
                 running_loss += current_loss
                 if i % self.log_frequency == 0:
                     print('Epochs[%d/%d] Batch[%d/%d] mse:%.5f' %
@@ -69,18 +69,17 @@ class ThrnetTrainer(NNTrainer):
                 segmented_img = []
                 img_loss = 0.0
                 for i, data in enumerate(loader, 1):
-                    inputs, labels, y_thr = data['inputs'].to(self.device), data['labels'].to(self.device), data[
-                        'y_thresholds'].to(self.device)
+                    inputs = data['inputs'].to(self.device)
                     prob_map = data['prob_map'].to(self.device)
+                    y_thresholds = data['y_thresholds'].float().to(self.device)
 
-                    thr = self.model(inputs)
-                    thr = thr.squeeze()
-
-                    loss = F.mse_loss(thr, y_thr.float().squeeze())
-                    current_loss = loss.item() / thr.numel()
+                    thr_map = self.model(inputs)
+                    thr_map = thr_map.squeeze()
+                    loss = F.mse_loss(thr_map, y_thresholds)
+                    current_loss = math.sqrt(loss.item())
                     img_loss += current_loss
 
-                    segmented = (prob_map >= thr[..., None][..., None].byte())
+                    segmented = (prob_map >= thr_map[..., None][..., None].byte())
                     if mode is 'test':
                         segmented_img += segmented.clone().cpu().numpy().tolist()
 

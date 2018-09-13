@@ -8,8 +8,7 @@ import utils.img_utils as imgutils
 from commons.IMAGE import Image
 from neuralnet.datagen import Generator
 from neuralnet.utils.measurements import get_best_f1_thr
-from PIL import Image as IMG
-import sys
+import torch
 
 sep = os.sep
 
@@ -29,11 +28,6 @@ class PatchesGenerator(Generator):
             img_obj = self._get_image_obj(img_file)
             for chunk_ix in imgutils.get_chunk_indexes(img_obj.working_arr.shape, self.patch_shape,
                                                        self.patch_offset):
-                if self.mode == 'train':
-                    p, q, r, s = chunk_ix
-                    y = img_obj.ground_truth[p:q, r:s]
-                    if y.sum() == 0:
-                        continue
                 self.indices.append([ID] + chunk_ix)
             self.image_objects[ID] = img_obj
         if self.shuffle_indices:
@@ -63,29 +57,30 @@ class PatchesGenerator(Generator):
 
     def __getitem__(self, index):
         ID, row_from, row_to, col_from, col_to = self.indices[index]
-        img_tensor = self.image_objects[ID].working_arr[row_from:row_to, col_from:col_to]
-        prob_map = img_tensor.copy()
-        y = self.image_objects[ID].ground_truth[row_from:row_to, col_from:col_to]
-        best_scores, best_thr = get_best_f1_thr(img_tensor, y)
+        img_arr = self.image_objects[ID].working_arr.copy()
+        prob_map = img_arr[row_from:row_to, col_from:col_to].copy()
+        y = self.image_objects[ID].ground_truth[row_from:row_to, col_from:col_to].copy()
+        _, best_thr = get_best_f1_thr(prob_map, y)
 
-        p, q, r, s, pad = imgutils.expand_and_mirror_patch(full_img_shape=self.image_objects[ID].working_arr.shape,
+        p, q, r, s, pad = imgutils.expand_and_mirror_patch(full_img_shape=img_arr.shape,
                                                            orig_patch_indices=[row_from, row_to, col_from, col_to],
                                                            expand_by=self.expand_by)
 
-        img_tensor = np.pad(self.image_objects[ID].working_arr[p:q, r:s], pad, 'reflect')
+        img_tensor = np.pad(img_arr[p:q, r:s], pad, 'reflect')
 
-        IMG.fromarray(img_tensor).show()
         if self.mode == 'train' and random.uniform(0, 1) <= 0.5:
             img_tensor = np.flip(img_tensor, 0)
             y = np.flip(y, 0)
+            prob_map = np.flip(prob_map, 0)
 
         if self.mode == 'train' and random.uniform(0, 1) <= 0.5:
             img_tensor = np.flip(img_tensor, 1)
             y = np.flip(y, 1)
+            prob_map = np.flip(prob_map, 1)
 
         img_tensor = img_tensor[..., None]
         if self.transforms is not None:
             img_tensor = self.transforms(img_tensor)
 
-        return {'ID': ID, 'inputs': img_tensor, 'labels': y.copy(),
-                'y_thresholds': best_thr, 'prob_map': prob_map}
+        return {'ID': ID, 'inputs': img_tensor,
+                'y_thresholds': best_thr, 'prob_map': prob_map.copy()}

@@ -41,7 +41,7 @@ class PatchesGenerator(Generator):
                                                            orig_patch_indices=[row_from, row_to, col_from, col_to],
                                                            expand_by=self.expand_by)
         img_tensor = np.pad(self.image_objects[ID].working_arr[p:q, r:s], pad, 'reflect')
-        IMG.fromarray(img_tensor).show()
+
         if self.mode == 'train' and random.uniform(0, 1) <= 0.5:
             img_tensor = np.flip(img_tensor, 0)
             y = np.flip(y, 0)

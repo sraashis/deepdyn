@@ -17,8 +17,8 @@ import torchvision.transforms as transforms
 from neuralnet.utils import auto_split as asp
 from neuralnet.thrnet.runs import DRIVE16, DRIVE32, DRIVE64
 
-RUNS = [DRIVE32, DRIVE64, DRIVE16]
-RUNS = [DRIVE16, DRIVE32]
+# RUNS = [DRIVE32, DRIVE16]
+RUNS = [DRIVE32]
 
 if __name__ == "__main__":
 

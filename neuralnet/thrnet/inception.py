@@ -27,10 +27,16 @@ class Inception(nn.Module):
         self.out_ch_per_cell = int(out_ch / 4)
 
         _, k, s, p = self.get_wksp(w=width, w_match=width, k=1)
-        self.conv_in_1by1 = BasicConv2d(in_ch=in_ch, out_ch=self.out_ch_per_cell, k=k, s=s, p=p)
+        self.convA_in_1by1 = BasicConv2d(in_ch=in_ch, out_ch=self.out_ch_per_cell, k=k, s=s, p=p)
+
+        _, k, s, p = self.get_wksp(w=width, w_match=width, k=1)
+        self.convB_in_1by1 = BasicConv2d(in_ch=in_ch, out_ch=self.out_ch_per_cell, k=k, s=s, p=p)
+
+        _, k, s, p = self.get_wksp(w=width, w_match=width, k=1)
+        self.convC_in_1by1 = BasicConv2d(in_ch=in_ch, out_ch=self.out_ch_per_cell, k=k, s=s, p=p)
 
         _, k, s, p = self.get_wksp(w=width, w_match=width, k=3)
-        self.conv_in_3by3 = BasicConv2d(in_ch=in_ch, out_ch=self.out_ch_per_cell, k=k, s=s, p=p)
+        self.convD_in_3by3 = BasicConv2d(in_ch=in_ch, out_ch=self.out_ch_per_cell, k=k, s=s, p=p)
 
         _, k, s, p = self.get_wksp(w=width, w_match=width, k=3)
         self.convB_3by3 = BasicConv2d(in_ch=self.out_ch_per_cell, out_ch=self.out_ch_per_cell, k=k, s=s, p=p)
@@ -38,13 +44,11 @@ class Inception(nn.Module):
         self.convC_5by5 = BasicConv2d(in_ch=self.out_ch_per_cell, out_ch=self.out_ch_per_cell, k=k, s=s, p=p)
 
     def forward(self, x):
-        conv_in_1by1 = self.conv_in_1by1(x)
-        convB_3by3_out = self.convB_3by3(conv_in_1by1.clone())
-        convC_5by5_out = self.convC_5by5(conv_in_1by1.clone())
-        conv_3by3_out = self.conv_in_3by3(x)
-
-        inception_cat = torch.cat([conv_in_1by1, convB_3by3_out, convC_5by5_out, conv_3by3_out], 1)
-        return inception_cat
+        a = self.convA_in_1by1(x)
+        b = self.convB_3by3(self.convB_in_1by1(x))
+        c = self.convC_5by5(self.convC_in_1by1(x))
+        d = self.convD_in_3by3(x)
+        return torch.cat([a, b, c, d], 1)
 
     @staticmethod
     def out_w(w, k, s, p):
@@ -71,7 +75,7 @@ class InceptionRecursiveDownSample(nn.Module):
             layers.append(nn.Dropout2d(p=0.2))
             width = width / 2
             in_ch = out_ch
-            if width == 16:
+            if width == 8:
                 break
         self.encode = nn.Sequential(*layers)
 
@@ -92,10 +96,10 @@ class InceptionThrNet(nn.Module):
         self.inception3 = Inception(width=width, in_ch=1024, out_ch=256)
         self.inception3_rec = InceptionRecursiveDownSample(width=width, in_ch=256, out_ch=256)
 
-        self.inception_final = Inception(width=width, in_ch=256 * 3, out_ch=4)
-        self.linearWidth = 16 * 16 * 4
-        self.fc = nn.Linear(self.linearWidth, num_class)
+        self.inception_final = Inception(width=width, in_ch=256 * 3, out_ch=8)
 
+        self.linearWidth = 8 * 8 * 8
+        self.fc_out = nn.Linear(self.linearWidth, 1)
         initialize_weights(self)
 
     def forward(self, x):
@@ -113,16 +117,12 @@ class InceptionThrNet(nn.Module):
 
         rec_out = torch.cat([i1_rec_out, i2_rec_out, i3_rec_out], 1)
         inc_final_out = self.inception_final(rec_out)
-
-        flat = inc_final_out.view(-1, self.linearWidth)
-        flat = F.dropout2d(flat, p=0.5)
-        out = self.fc(flat)
-
-        return out
+        flattened = inc_final_out.view(-1, self.linearWidth)
+        flattened = F.dropout2d(flattened, p=0.2)
+        return self.fc_out(flattened)
 
 
 import numpy as np
-
 i = InceptionThrNet(width=64, input_ch=1, num_class=1)
 model_parameters = filter(lambda p: p.requires_grad, i.parameters())
 params = sum([np.prod(p.size()) for p in model_parameters])

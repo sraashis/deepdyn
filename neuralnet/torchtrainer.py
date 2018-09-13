@@ -120,8 +120,10 @@ class NNTrainer:
     def get_logger(log_file=None, header=''):
 
         if os.path.isfile(log_file):
-            print('### CRITICAL!!! ' + log_file + '" already exists. Rename or delete to proceed.')
-            sys.exit(1)
+            print('### CRITICAL!!! ' + log_file + '" already exists. Rename or delete to proceed. PROCEED [Y/N]?')
+            ui = input()
+            if ui == 'N' or ui == 'n':
+                sys.exit(1)
 
         file = open(log_file, 'w')
         NNTrainer.flush(file, header)
