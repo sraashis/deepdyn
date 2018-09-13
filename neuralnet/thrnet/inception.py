@@ -87,19 +87,19 @@ class InceptionThrNet(nn.Module):
     def __init__(self, width, input_ch, num_class):
         super(InceptionThrNet, self).__init__()
 
-        self.inception1 = Inception(width=width, in_ch=input_ch, out_ch=256)
-        self.inception1_rec = InceptionRecursiveDownSample(width=width, in_ch=256, out_ch=256)
+        self.inception1 = Inception(width=width, in_ch=input_ch, out_ch=64)
+        self.inception1_rec = InceptionRecursiveDownSample(width=width, in_ch=64, out_ch=64)
 
-        self.inception2 = Inception(width=width, in_ch=256, out_ch=1024)
-        self.inception2_rec = InceptionRecursiveDownSample(width=width, in_ch=1024, out_ch=256)
+        self.inception2 = Inception(width=width, in_ch=64, out_ch=256)
+        self.inception2_rec = InceptionRecursiveDownSample(width=width, in_ch=256, out_ch=64)
 
-        self.inception3 = Inception(width=width, in_ch=1024, out_ch=256)
-        self.inception3_rec = InceptionRecursiveDownSample(width=width, in_ch=256, out_ch=256)
+        self.inception3 = Inception(width=width, in_ch=256, out_ch=64)
+        self.inception3_rec = InceptionRecursiveDownSample(width=width, in_ch=64, out_ch=64)
 
-        self.inception_final = Inception(width=width, in_ch=256 * 3, out_ch=8)
+        self.inception_final = Inception(width=width, in_ch=64 * 3, out_ch=8)
 
         self.linearWidth = 8 * 8 * 8
-        self.fc_out = nn.Linear(self.linearWidth, 1)
+        self.fc_out = nn.Linear(self.linearWidth, num_class)
         initialize_weights(self)
 
     def forward(self, x):
