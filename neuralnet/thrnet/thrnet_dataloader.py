@@ -8,6 +8,8 @@ import utils.img_utils as imgutils
 from commons.IMAGE import Image
 from neuralnet.datagen import Generator
 from neuralnet.utils.measurements import get_best_f1_thr
+from PIL import Image as IMG
+import sys
 
 sep = os.sep
 
@@ -17,6 +19,7 @@ class PatchesGenerator(Generator):
         super(PatchesGenerator, self).__init__(**kwargs)
         self.patch_shape = self.run_conf.get('Params').get('patch_shape')
         self.patch_offset = self.run_conf.get('Params').get('patch_offset')
+        self.expand_by = self.run_conf.get('Params').get('expand_patch_by')
         self._load_indices()
         print('Patches:', self.__len__())
 
@@ -26,6 +29,11 @@ class PatchesGenerator(Generator):
             img_obj = self._get_image_obj(img_file)
             for chunk_ix in imgutils.get_chunk_indexes(img_obj.working_arr.shape, self.patch_shape,
                                                        self.patch_offset):
+                if self.mode == 'train':
+                    p, q, r, s = chunk_ix
+                    y = img_obj.ground_truth[p:q, r:s]
+                    if y.sum() == 0:
+                        continue
                 self.indices.append([ID] + chunk_ix)
             self.image_objects[ID] = img_obj
         if self.shuffle_indices:
@@ -60,6 +68,13 @@ class PatchesGenerator(Generator):
         y = self.image_objects[ID].ground_truth[row_from:row_to, col_from:col_to]
         best_scores, best_thr = get_best_f1_thr(img_tensor, y)
 
+        p, q, r, s, pad = imgutils.expand_and_mirror_patch(full_img_shape=self.image_objects[ID].working_arr.shape,
+                                                           orig_patch_indices=[row_from, row_to, col_from, col_to],
+                                                           expand_by=self.expand_by)
+
+        img_tensor = np.pad(self.image_objects[ID].working_arr[p:q, r:s], pad, 'reflect')
+
+        IMG.fromarray(img_tensor).show()
         if self.mode == 'train' and random.uniform(0, 1) <= 0.5:
             img_tensor = np.flip(img_tensor, 0)
             y = np.flip(y, 0)

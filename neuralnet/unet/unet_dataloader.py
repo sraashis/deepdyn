@@ -7,6 +7,7 @@ import torch
 
 import utils.img_utils as imgutils
 from neuralnet.datagen import Generator
+from PIL import Image as IMG
 
 sep = os.sep
 
@@ -15,7 +16,7 @@ class PatchesGenerator(Generator):
     def __init__(self, **kwargs):
         super(PatchesGenerator, self).__init__(**kwargs)
         self.patch_shape = self.run_conf.get('Params').get('patch_shape')
-        self.patch_pad = self.run_conf.get('Params').get('patch_pad')
+        self.expand_by = self.run_conf.get('Params').get('expand_patch_by')
         self.patch_offset = self.run_conf.get('Params').get('patch_offset')
         self._load_indices()
         print('Patches:', self.__len__())
@@ -33,9 +34,14 @@ class PatchesGenerator(Generator):
 
     def __getitem__(self, index):
         ID, row_from, row_to, col_from, col_to = self.indices[index]
-        img_tensor = self.image_objects[ID].working_arr[row_from:row_to, col_from:col_to]
+        # img_tensor = self.image_objects[ID].working_arr[row_from:row_to, col_from:col_to]
         y = self.image_objects[ID].ground_truth[row_from:row_to, col_from:col_to]
 
+        p, q, r, s, pad = imgutils.expand_and_mirror_patch(full_img_shape=self.image_objects[ID].working_arr.shape,
+                                                           orig_patch_indices=[row_from, row_to, col_from, col_to],
+                                                           expand_by=self.expand_by)
+        img_tensor = np.pad(self.image_objects[ID].working_arr[p:q, r:s], pad, 'reflect')
+        IMG.fromarray(img_tensor).show()
         if self.mode == 'train' and random.uniform(0, 1) <= 0.5:
             img_tensor = np.flip(img_tensor, 0)
             y = np.flip(y, 0)
@@ -44,7 +50,6 @@ class PatchesGenerator(Generator):
             img_tensor = np.flip(img_tensor, 1)
             y = np.flip(y, 1)
 
-        img_tensor = np.pad(img_tensor, self.patch_pad, 'reflect')
         img_tensor = img_tensor[..., None]
         y[y == 255] = 1
         if self.transforms is not None:

@@ -34,7 +34,6 @@ class ThrnetTrainer(NNTrainer):
                 optimizer.zero_grad()
                 thr = self.model(inputs)
                 thr = thr.squeeze()
-
                 loss = F.mse_loss(thr, y_thresholds.float())
                 loss.backward()
                 optimizer.step()
@@ -65,7 +64,7 @@ class ThrnetTrainer(NNTrainer):
 
         print('\nEvaluating...')
         with torch.no_grad():
-            all_loss = 0.0
+            eval_loss = 0.0
             for loader in data_loaders:
                 img_obj = loader.dataset.image_objects[0]
                 segmented_img = []
@@ -90,8 +89,8 @@ class ThrnetTrainer(NNTrainer):
                         str(x) for x in
                         [img_obj.file_name, 1, self.checkpoint['epochs'], 0] + [current_loss]))
 
-                img_loss = img_loss / loader.dataset.__len__()
-                all_loss += img_loss
+                img_loss = img_loss / loader.__len__()  # Number of batches
+                eval_loss += img_loss
                 print(img_obj.file_name + ' MSE LOSS: ', img_loss)
                 if mode is 'test':
                     segmented_img = np.array(segmented_img, dtype=np.uint8) * 255
@@ -102,4 +101,4 @@ class ThrnetTrainer(NNTrainer):
                     IMG.fromarray(maps_img).save(os.path.join(self.log_dir, img_obj.file_name.split('.')[0] + '.png'))
 
         if mode is 'train':
-            self._save_if_better(force_checkpoint=force_checkpoint, score=all_loss / len(data_loaders))
+            self._save_if_better(force_checkpoint=force_checkpoint, score=1 / (eval_loss / len(data_loaders)))

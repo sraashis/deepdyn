@@ -65,7 +65,7 @@ class InceptionRecursiveDownSample(nn.Module):
     def __init__(self, width, in_ch, out_ch):
         super(InceptionRecursiveDownSample, self).__init__()
         layers = []
-        for i in range(1, int(math.log2(width)) - 1):
+        for i in range(1, int(math.log2(width) - 1)):
             inception = Inception(width=width, in_ch=in_ch, out_ch=out_ch)
             layers.append(inception)
             layers.append(nn.MaxPool2d(kernel_size=2, stride=2, padding=0))
@@ -106,17 +106,18 @@ class InceptionThrNet(nn.Module):
 
         i3_out = self.inception3(i2_out)
         i3_rec_out = self.inception3_rec(i3_out)
-
         rec_out = torch.cat([i1_rec_out, i2_rec_out, i3_rec_out], 1)
         conv_out = self.conv(rec_out)
+
         flat = conv_out.view(-1, self.linearWidth)
         flat = F.dropout2d(flat, p=0.2)
-        return self.fc(flat)
+        out = self.fc(flat)
 
+        return out
 
 import numpy as np
-
-i = InceptionThrNet(width=32, input_ch=1, num_class=1)
+i = InceptionThrNet(width=64, input_ch=1, num_class=1)
 model_parameters = filter(lambda p: p.requires_grad, i.parameters())
 params = sum([np.prod(p.size()) for p in model_parameters])
 print(params)
+# print(i)

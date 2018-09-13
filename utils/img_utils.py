@@ -138,26 +138,21 @@ def merge_patches(patches=None, image_size=(0, 0), patch_size=(0, 0), offset_row
     return np.array(padded_sum / non_zero_count, dtype=np.uint8)
 
 
-def get_expanded_patch_indices(orig_shape=None, orig_patch_indices=None, expand_by=None):
-    x, y = orig_shape
+def expand_and_mirror_patch(full_img_shape=None, orig_patch_indices=None, expand_by=None):
     i, j = int(expand_by[0] / 2), int(expand_by[1] / 2)
     p, q, r, s = orig_patch_indices
-    a = p - i
-    b = q + i
-    c = r - j
-    d = s + j
+    a, b, c, d = p - i, q + i, r - j, s + j
     pad_a, pad_b, pad_c, pad_d = [0] * 4
     if a < 0:
-        pad_a = abs(a)
-        a = p
-    if b > x:
-        pad_b = abs(b)
-        b = q
+        pad_a = i - p
+        a = 0
+    if b > full_img_shape[0]:
+        pad_b = b - full_img_shape[0]
+        b = full_img_shape[0]
     if c < 0:
-        pad_c = abs(c)
-        c = r
-    if d > y:
-        pad_d = abs(d)
-        d = s
-
+        pad_c = j - r
+        c = 0
+    if d > full_img_shape[1]:
+        pad_d = d - full_img_shape[1]
+        d = full_img_shape[1]
     return a, b, c, d, [(pad_a, pad_b), (pad_c, pad_d)]

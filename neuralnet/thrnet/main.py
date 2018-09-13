@@ -1,5 +1,5 @@
 BASE_PROJECT_DIR = '/home/akhanal1/ature'
-BASE_PROJECT_DIR = '/home/ak/PycharmProjects/ature'
+# BASE_PROJECT_DIR = '/home/ak/PycharmProjects/ature'
 
 import os
 import sys
@@ -18,6 +18,7 @@ from neuralnet.utils import auto_split as asp
 from neuralnet.thrnet.runs import DRIVE16, DRIVE32, DRIVE64
 
 RUNS = [DRIVE32, DRIVE64, DRIVE16]
+RUNS = [DRIVE16, DRIVE32]
 
 if __name__ == "__main__":
 
@@ -33,8 +34,8 @@ if __name__ == "__main__":
         splits = asp.create_split_json(
             images_src_dir=R.get('Dirs').get('image'),
             to_file=os.path.join(R.get('Dirs').get('logs'), R.get('Params').get('checkpoint_file') + '.json'))
-
-        model = InceptionThrNet(R['Params']['patch_shape'][0], R['Params']['num_channels'], R['Params']['num_classes'])
+        patch_shape = R['Params']['patch_shape'][0] + R['Params']['expand_patch_by'][0]
+        model = InceptionThrNet(patch_shape, R['Params']['num_channels'], R['Params']['num_classes'])
         # model = ThrNet(R['Params']['patch_shape'][0], R['Params']['num_channels'])
         optimizer = optim.Adam(model.parameters(), lr=R['Params']['learning_rate'])
         if R['Params']['distribute']:

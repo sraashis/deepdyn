@@ -11,6 +11,7 @@ DRIVE16 = {
         'learning_rate': 0.001,
         'patch_shape': (16, 16),
         'patch_offset': (10, 10),
+        'expand_patch_by': (48, 48),
         'use_gpu': True,
         'distribute': True,
         'shuffle': True,
@@ -37,11 +38,12 @@ DRIVE32 = {
     'Params': {
         'num_channels': 1,
         'num_classes': 1,
-        'batch_size': 16,
+        'batch_size': 8,
         'epochs': 400,
         'learning_rate': 0.001,
         'patch_shape': (32, 32),
         'patch_offset': (20, 20),
+        'expand_patch_by': (32, 32),
         'use_gpu': True,
         'distribute': True,
         'shuffle': True,
@@ -64,7 +66,6 @@ DRIVE32 = {
     }
 }
 
-
 DRIVE64 = {
     'Params': {
         'num_channels': 1,
@@ -74,6 +75,7 @@ DRIVE64 = {
         'learning_rate': 0.001,
         'patch_shape': (64, 64),
         'patch_offset': (30, 30),
+        'expand_patch_by': (64, 64),
         'use_gpu': True,
         'distribute': True,
         'shuffle': True,
