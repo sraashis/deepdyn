@@ -43,7 +43,7 @@ class Generator(Dataset):
         if self.truth_getter is not None:
             img_obj.load_ground_truth(gt_dir=self.truth_dir,
                                       fget_ground_truth=self.truth_getter)
-        s = img_obj.image_arr.shape
+
         if len(img_obj.image_arr.shape) == 3:
             img_obj.working_arr = img_obj.image_arr[:, :, 1]
         elif len(img_obj.image_arr.shape) == 2:
@@ -80,7 +80,7 @@ class Generator(Dataset):
                 shuffle_indices=False,
                 mode=mode
             )
-            loader = torch.utils.data.DataLoader(gen, batch_size=min(64, gen.__len__()),
+            loader = torch.utils.data.DataLoader(gen, batch_size=min(2, gen.__len__()),
                                                  shuffle=False, num_workers=1, sampler=None)
             loaders.append(loader)
         return loaders

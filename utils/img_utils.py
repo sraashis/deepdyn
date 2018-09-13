@@ -119,7 +119,7 @@ def get_chunk_indexes(img_shape=(0, 0), chunk_shape=(0, 0), offset_row_col=None)
                 col_to = img_cols
                 col_from = img_cols - chunk_col
                 col_end = True
-            yield [row_from, row_to, col_from, col_to]
+            yield [int(row_from), int(row_to), int(col_from), int(col_to)]
 
 
 def merge_patches(patches=None, image_size=(0, 0), patch_size=(0, 0), offset_row_col=None):
@@ -136,3 +136,23 @@ def merge_patches(patches=None, image_size=(0, 0), patch_size=(0, 0), offset_row
         non_zero_count = non_zero_count + np.array(padded > 0).astype(int)
     non_zero_count[non_zero_count == 0] = 1
     return np.array(padded_sum / non_zero_count, dtype=np.uint8)
+
+
+def expand_and_mirror_patch(full_img_shape=None, orig_patch_indices=None, expand_by=None):
+    i, j = int(expand_by[0] / 2), int(expand_by[1] / 2)
+    p, q, r, s = orig_patch_indices
+    a, b, c, d = p - i, q + i, r - j, s + j
+    pad_a, pad_b, pad_c, pad_d = [0] * 4
+    if a < 0:
+        pad_a = i - p
+        a = 0
+    if b > full_img_shape[0]:
+        pad_b = b - full_img_shape[0]
+        b = full_img_shape[0]
+    if c < 0:
+        pad_c = j - r
+        c = 0
+    if d > full_img_shape[1]:
+        pad_d = d - full_img_shape[1]
+        d = full_img_shape[1]
+    return a, b, c, d, [(pad_a, pad_b), (pad_c, pad_d)]

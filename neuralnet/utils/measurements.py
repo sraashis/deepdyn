@@ -108,15 +108,36 @@ class ScoreAccumulator:
         return [round(p, 3), round(r, 3), round(f1, 3), round(a, 3)]
 
 
+class AverageMeter(object):
+    """Computes and stores the average and current value"""
+
+    def __init__(self):
+        self.reset()
+
+    def reset(self):
+        self.val = 0
+        self.avg = 0
+        self.sum = 0
+        self.count = 0
+
+    def update(self, val, n=1):
+        self.val = val
+        self.sum += val * n
+        self.count += n
+        self.avg = self.sum / self.count
+
+
 def get_best_f1_thr(img, y, for_best='F1'):
-    best_scores = {for_best: 0.0}
+    best_score = 0.0
     best_thr = 0.0
     for thr in np.linspace(1, 255, 255):
         i = img.copy()
         i[i > thr] = 255
         i[i <= thr] = 0
-        scores = imgutils.get_praf1(i, y)
-        if scores[for_best] > best_scores[for_best]:
-            best_scores = scores
+        current_score = imgutils.get_praf1(i, y)[for_best]
+        if current_score > best_score:
+            best_score = current_score
             best_thr = thr
-    return best_scores, best_thr
+    if best_score == 0 and best_thr == 0:
+        best_thr = 255
+    return best_score, best_thr
