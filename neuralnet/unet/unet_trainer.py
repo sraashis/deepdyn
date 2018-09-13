@@ -17,7 +17,7 @@ class UNetNNTrainer(NNTrainer):
         self.patch_shape = self.run_conf.get('Params').get('patch_shape')
         self.patch_offset = self.run_conf.get('Params').get('patch_offset')
 
-    def evaluate(self, data_loaders=None, force_checkpoint=False, logger=None, mode=None):
+    def evaluate(self, data_loaders=None, logger=None, mode=None, epoch=0):
         assert (logger is not None), 'Please Provide a logger'
         self.model.eval()
 
@@ -57,4 +57,4 @@ class UNetNNTrainer(NNTrainer):
                     IMG.fromarray(maps_img).save(os.path.join(self.log_dir, img_obj.file_name.split('.')[0] + '.png'))
 
         if mode is 'train':
-            self._save_if_better(force_checkpoint=force_checkpoint, score=eval_score.get_prf1a()[2])
+            self._save_if_better(score=eval_score.get_prf1a()[2])

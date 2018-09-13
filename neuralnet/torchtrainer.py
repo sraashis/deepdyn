@@ -13,14 +13,14 @@ class NNTrainer:
     def __init__(self, run_conf=None, model=None):
 
         self.run_conf = run_conf
-        self.log_dir = self.run_conf.get('Dirs').get('logs')
-        self.use_gpu = self.run_conf['Params']['use_gpu']
-        self.epochs = self.run_conf.get('Params').get('epochs')
-        self.log_frequency = self.run_conf.get('Params').get('log_frequency')
-        self.validation_frequency = self.run_conf.get('Params').get('validation_frequency')
-        self.force_checkpoint = self.run_conf.get('Params').get('force_checkpoint')
+        self.log_dir = self.run_conf.get('Dirs').get('logs', 'net_logs')
+        self.use_gpu = self.run_conf['Params'].get('use_gpu', False)
+        self.epochs = self.run_conf.get('Params').get('epochs', 100)
+        self.log_frequency = self.run_conf.get('Params').get('log_frequency', 10)
+        self.validation_frequency = self.run_conf.get('Params').get('validation_frequency', 1)
 
         self.checkpoint_file = os.path.join(self.log_dir, self.run_conf.get('Params').get('checkpoint_file'))
+        self.temp_chk_file = os.path.join(self.log_dir, 'RUNNING' + self.run_conf.get('Params').get('checkpoint_file'))
         self.log_file = os.path.join(self.log_dir, self.run_conf.get('Params').get('checkpoint_file') + '-TRAIN.csv')
 
         if torch.cuda.is_available():
@@ -62,33 +62,23 @@ class NNTrainer:
                 p, r, f1, a = score_acc.reset().add_tensor(labels, predicted).get_prf1a()
                 if i % self.log_frequency == 0:
                     print('Epochs[%d/%d] Batch[%d/%d] loss:%.5f pre:%.3f rec:%.3f f1:%.3f acc:%.3f' %
-                          (epoch, self.epochs, i, data_loader.__len__(), running_loss/self.log_frequency, p, r, f1, a))
+                          (
+                              epoch, self.epochs, i, data_loader.__len__(), running_loss / self.log_frequency, p, r, f1,
+                              a))
                     running_loss = 0.0
 
                 self.flush(logger, ','.join(str(x) for x in [0, 0, epoch, i, p, r, f1, a, current_loss]))
 
-            self.checkpoint['epochs'] += 1
             if epoch % self.validation_frequency == 0:
-                self.evaluate(data_loaders=validation_loader, force_checkpoint=self.force_checkpoint, logger=logger,
+                self.evaluate(data_loaders=validation_loader, logger=logger,
                               mode='train')
         try:
             logger.close()
         except IOError:
             pass
 
-    def evaluate(self, data_loaders=None, force_checkpoint=False, logger=None, mode=None):
+    def evaluate(self, data_loaders=None, logger=None, mode=None):
         raise NotImplementedError('ERROR!!!!! Must be implemented')
-
-    def _save_checkpoint(self, checkpoint):
-        torch.save(checkpoint, self.checkpoint_file)
-        self.checkpoint = checkpoint
-
-    @staticmethod
-    def _checkpoint(epochs=None, model=None, score=None):
-        return {'state': model.state_dict(),
-                'epochs': epochs,
-                'score': score,
-                'model': str(model)}
 
     def resume_from_checkpoint(self, parallel_trained=False):
         try:
@@ -103,26 +93,28 @@ class NNTrainer:
                 self.model.load_state_dict(new_state_dict)
             else:
                 self.model.load_state_dict(self.checkpoint['state'])
-            print('Resumed last checkpoint: ' + self.checkpoint_file)
+            print('RESUMED FROM CHECKPOINT: ' + self.checkpoint_file)
         except Exception as e:
             print('ERROR: ' + str(e))
 
-    def _save_if_better(self, force_checkpoint=None, score=None):
-        if force_checkpoint:
-            self._save_checkpoint(
-                NNTrainer._checkpoint(epochs=self.checkpoint['epochs'], model=self.model,
-                                      score=score))
-            print('FORCED checkpoint saved. ')
-            return
+    def _save_if_better(self, score=None):
+
+        current_epoch = self.checkpoint['epochs'] + self.validation_frequency
+        current_chk = {'state': self.model.state_dict(),
+                       'epochs': current_epoch,
+                       'score': score,
+                       'model': str(self.model)}
+
+        # Save a running version of checkpoint with a different name
+        torch.save(current_chk, self.temp_chk_file)
 
         if score > self.checkpoint['score']:
-            print('Score improved from ',
-                  str(self.checkpoint['score']) + ' to ' + str(score) + '. Saving model..')
-            self._save_checkpoint(
-                NNTrainer._checkpoint(epochs=self.checkpoint['epochs'], model=self.model,
-                                      score=score))
+            torch.save(current_chk, self.checkpoint_file)
+            self.checkpoint = current_chk
+            print('Score improved: ',
+                  str(self.checkpoint['score']) + ' to ' + str(score) + ' BEST CHECKPOINT SAVED')
         else:
-            print('Score did not improve. _was:' + str(self.checkpoint['score']))
+            print('Score did not improve:' + str(score) + ' BEST: ' + str(self.checkpoint['score']))
 
     @staticmethod
     def get_logger(log_file=None, header=''):

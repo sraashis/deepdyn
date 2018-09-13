@@ -88,7 +88,7 @@ class PatchNetTrainer(NNTrainer):
                           imgutils.get_praf1(segmented, loader.dataset.image_objects[0].ground_truth))
                     IMG.fromarray(segmented).save(to_dir + sep + loader.dataset.image_objects[0].file_name + '.png')
         if mode is 'train':
-            self._save_if_better(force_checkpoint=force_checkpoint, score=score_acc.get_prf1a()[2])
+            self._save_if_better(score=score_acc.get_prf1a()[2], epochs=ep)
 
     def _evaluate(self, data_loader=None, force_checkpoint=False, mode=None, logger=None):
 

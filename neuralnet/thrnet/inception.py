@@ -1,5 +1,4 @@
 import itertools
-import math
 
 import torch
 import torch.nn.functional as F
@@ -65,12 +64,15 @@ class InceptionRecursiveDownSample(nn.Module):
     def __init__(self, width, in_ch, out_ch):
         super(InceptionRecursiveDownSample, self).__init__()
         layers = []
-        for i in range(1, int(math.log2(width) - 1)):
+        for i in range(4):
             inception = Inception(width=width, in_ch=in_ch, out_ch=out_ch)
             layers.append(inception)
             layers.append(nn.MaxPool2d(kernel_size=2, stride=2, padding=0))
+            layers.append(nn.Dropout2d(p=0.2))
             width = width / 2
             in_ch = out_ch
+            if width == 16:
+                break
         self.encode = nn.Sequential(*layers)
 
     def forward(self, x):
@@ -90,32 +92,37 @@ class InceptionThrNet(nn.Module):
         self.inception3 = Inception(width=width, in_ch=1024, out_ch=256)
         self.inception3_rec = InceptionRecursiveDownSample(width=width, in_ch=256, out_ch=256)
 
-        self.conv = BasicConv2d(in_ch=256 * 3, out_ch=64, k=1, s=1, p=0)
-        self.linearWidth = 64 * 4 * 4
+        self.inception_final = Inception(width=width, in_ch=256 * 3, out_ch=4)
+        self.linearWidth = 16 * 16 * 4
         self.fc = nn.Linear(self.linearWidth, num_class)
 
         initialize_weights(self)
 
     def forward(self, x):
         i1_out = self.inception1(x)
+        i1_out = F.dropout2d(i1_out, p=0.2)
         i1_rec_out = self.inception1_rec(i1_out)
 
         i2_out = self.inception2(i1_out)
-        i2_rec_out = self.inception2_rec(i2_out)
         i2_out = F.dropout2d(i2_out, p=0.2)
+        i2_rec_out = self.inception2_rec(i2_out)
 
         i3_out = self.inception3(i2_out)
+        i3_out = F.dropout2d(i3_out, p=0.2)
         i3_rec_out = self.inception3_rec(i3_out)
-        rec_out = torch.cat([i1_rec_out, i2_rec_out, i3_rec_out], 1)
-        conv_out = self.conv(rec_out)
 
-        flat = conv_out.view(-1, self.linearWidth)
-        flat = F.dropout2d(flat, p=0.2)
+        rec_out = torch.cat([i1_rec_out, i2_rec_out, i3_rec_out], 1)
+        inc_final_out = self.inception_final(rec_out)
+
+        flat = inc_final_out.view(-1, self.linearWidth)
+        flat = F.dropout2d(flat, p=0.5)
         out = self.fc(flat)
 
         return out
 
+
 import numpy as np
+
 i = InceptionThrNet(width=64, input_ch=1, num_class=1)
 model_parameters = filter(lambda p: p.requires_grad, i.parameters())
 params = sum([np.prod(p.size()) for p in model_parameters])

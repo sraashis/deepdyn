@@ -49,16 +49,15 @@ class ThrnetTrainer(NNTrainer):
 
                 self.flush(logger, ','.join(str(x) for x in [0, 0, epoch, i, current_loss]))
 
-            self.checkpoint['epochs'] += 1
             if epoch % self.validation_frequency == 0:
-                self.evaluate(data_loaders=validation_loader, force_checkpoint=self.force_checkpoint, logger=logger,
+                self.evaluate(data_loaders=validation_loader, logger=logger,
                               mode='train')
         try:
             logger.close()
         except IOError:
             pass
 
-    def evaluate(self, data_loaders=None, force_checkpoint=False, logger=None, mode=None):
+    def evaluate(self, data_loaders=None, logger=None, mode=None):
         assert (logger is not None), 'Please Provide a logger'
         self.model.eval()
 
@@ -101,4 +100,4 @@ class ThrnetTrainer(NNTrainer):
                     IMG.fromarray(maps_img).save(os.path.join(self.log_dir, img_obj.file_name.split('.')[0] + '.png'))
 
         if mode is 'train':
-            self._save_if_better(force_checkpoint=force_checkpoint, score=1 / (eval_loss / len(data_loaders)))
+            self._save_if_better(score=1 / (eval_loss / len(data_loaders)))
