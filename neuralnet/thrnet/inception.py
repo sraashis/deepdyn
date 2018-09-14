@@ -12,7 +12,7 @@ class BasicConv2d(nn.Module):
     def __init__(self, in_ch, out_ch, k, s, p):
         super(BasicConv2d, self).__init__()
         self.conv = nn.Conv2d(in_channels=in_ch, out_channels=out_ch, kernel_size=k, stride=s, padding=p, bias=False)
-        self.bn = nn.BatchNorm2d(out_ch, eps=0.001)
+        self.bn = nn.BatchNorm2d(out_ch)
 
     def forward(self, x):
         x = self.conv(x)
@@ -94,9 +94,9 @@ class InceptionThrNet(nn.Module):
 
         self.inception5 = Inception(width=width, in_ch=256, out_ch=512)
         self.inception6 = Inception(width=width, in_ch=512, out_ch=256)
-        self.inception3_rec = InceptionRecursiveDownSample(width=width, in_ch=512, out_ch=4, recursion=1)
+        self.inception3_rec = InceptionRecursiveDownSample(width=width, in_ch=512, out_ch=16, recursion=1)
 
-        self.linearWidth = 4 * 8 * 8
+        self.linearWidth = 16 * 8 * 8
         self.fc_out = nn.Linear(self.linearWidth, num_class)
         initialize_weights(self)
 
