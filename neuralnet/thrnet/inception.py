@@ -3,7 +3,6 @@ import itertools
 import torch
 import torch.nn.functional as F
 from torch import nn
-
 from neuralnet.utils.weights_utils import initialize_weights
 
 
@@ -96,7 +95,7 @@ class InceptionThrNet(nn.Module):
         self.inception6 = Inception(width=width, in_ch=512, out_ch=256)
         self.inception3_rec = InceptionRecursiveDownSample(width=width, in_ch=512, out_ch=16, recursion=1)
 
-        self.linearWidth = 16 * 8 * 8
+        self.linearWidth = 16 * 2 * 2
         self.fc_out = nn.Linear(self.linearWidth, num_class)
         initialize_weights(self)
 
