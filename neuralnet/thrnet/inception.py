@@ -65,17 +65,15 @@ class Inception(nn.Module):
 
 
 class InceptionRecursiveDownSample(nn.Module):
-    def __init__(self, width, in_ch, out_ch):
+    def __init__(self, width, in_ch, out_ch, recursion=1):
         super(InceptionRecursiveDownSample, self).__init__()
         layers = []
-        for i in range(4):
+        for i in range(recursion):
             inception = Inception(width=width, in_ch=in_ch, out_ch=out_ch)
             layers.append(inception)
             layers.append(nn.MaxPool2d(kernel_size=2, stride=2, padding=0))
             width = width / 2
             in_ch = out_ch
-            if width == 8:
-                break
         self.encode = nn.Sequential(*layers)
 
     def forward(self, x):
@@ -87,35 +85,35 @@ class InceptionThrNet(nn.Module):
         super(InceptionThrNet, self).__init__()
 
         self.inception1 = Inception(width=width, in_ch=input_ch, out_ch=256)
-        self.inception1_rec = InceptionRecursiveDownSample(width=width, in_ch=256, out_ch=128)
+        self.inception2 = Inception(width=width, in_ch=256, out_ch=256)
+        self.inception1_rec = InceptionRecursiveDownSample(width=width, in_ch=257, out_ch=256, recursion=1)
 
-        self.inception2 = Inception(width=width, in_ch=256, out_ch=512)
-        self.inception2_rec = InceptionRecursiveDownSample(width=width, in_ch=512, out_ch=128)
+        self.inception3 = Inception(width=width, in_ch=256, out_ch=512)
+        self.inception4 = Inception(width=width, in_ch=512, out_ch=256)
+        self.inception2_rec = InceptionRecursiveDownSample(width=width, in_ch=512, out_ch=256, recursion=1)
 
-        self.inception3 = Inception(width=width, in_ch=512, out_ch=512)
-        self.inception3_rec = InceptionRecursiveDownSample(width=width, in_ch=512, out_ch=128)
+        self.inception5 = Inception(width=width, in_ch=256, out_ch=512)
+        self.inception6 = Inception(width=width, in_ch=512, out_ch=256)
+        self.inception3_rec = InceptionRecursiveDownSample(width=width, in_ch=512, out_ch=4, recursion=1)
 
-        self.inception_final = Inception(width=width, in_ch=128 * 3, out_ch=16)
-
-        self.linearWidth = 16 * 8 * 8
+        self.linearWidth = 4 * 8 * 8
         self.fc_out = nn.Linear(self.linearWidth, num_class)
         initialize_weights(self)
 
     def forward(self, x):
         i1_out = self.inception1(x)
-        i1_rec_out = self.inception1_rec(i1_out)
-
         i2_out = self.inception2(i1_out)
-        i2_rec_out = self.inception2_rec(i2_out)
+        i1_rec_out = self.inception1_rec(torch.cat([x, i2_out], 1))
 
-        i3_out = self.inception3(i2_out)
-        # i3_out = F.dropout2d(i3_out, 0.2)
-        i3_rec_out = self.inception3_rec(i3_out)
+        i3_out = self.inception3(i1_rec_out)
+        i4_out = self.inception4(i3_out)
+        i3_rec_out = self.inception2_rec(torch.cat([i1_rec_out, i4_out], 1))
 
-        rec_out = torch.cat([i1_rec_out, i2_rec_out, i3_rec_out], 1)
-        inc_final_out = self.inception_final(rec_out)
-        flattened = inc_final_out.view(-1, self.linearWidth)
-        # flattened = F.dropout2d(flattened, 0.2)
+        i4_out = self.inception3(i3_rec_out)
+        i5_out = self.inception4(i4_out)
+        i3_rec_out = self.inception3_rec(torch.cat([i3_rec_out, i5_out], 1))
+
+        flattened = i3_rec_out.view(-1, self.linearWidth)
         return self.fc_out(flattened)
 
 
