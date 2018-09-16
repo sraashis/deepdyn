@@ -1,3 +1,4 @@
+import math
 import os
 
 import PIL.Image as IMG
@@ -7,7 +8,7 @@ import torch.nn.functional as F
 
 import utils.img_utils as imgutils
 from neuralnet.torchtrainer import NNTrainer
-import math
+from neuralnet.utils.measurements import ScoreAccumulator
 
 sep = os.sep
 
@@ -34,6 +35,8 @@ class ThrnetTrainer(NNTrainer):
 
                 optimizer.zero_grad()
                 thr_map = self.model(inputs)
+                # print(y_thresholds)
+                # print(thr_map)
                 loss = F.mse_loss(thr_map.squeeze(), y_thresholds)  # Loss per item
 
                 loss.backward()
@@ -51,7 +54,7 @@ class ThrnetTrainer(NNTrainer):
 
             if epoch % self.validation_frequency == 0:
                 self.evaluate(data_loaders=validation_loader, logger=logger,
-                              mode='train')
+                              mode='test')
         try:
             logger.close()
         except IOError:
@@ -60,7 +63,7 @@ class ThrnetTrainer(NNTrainer):
     def evaluate(self, data_loaders=None, logger=None, mode=None):
         assert (logger is not None), 'Please Provide a logger'
         self.model.eval()
-
+        eval_score = ScoreAccumulator()
         print('\nEvaluating...')
         with torch.no_grad():
             eval_loss = 0.0
@@ -76,6 +79,7 @@ class ThrnetTrainer(NNTrainer):
                     thr_map = self.model(inputs)
                     thr_map = thr_map.squeeze()
                     loss = F.mse_loss(thr_map, y_thresholds)
+                    thr_map = thr_map.mean(dim=1)
                     current_loss = math.sqrt(loss.item())
                     img_loss += current_loss
 
@@ -89,14 +93,16 @@ class ThrnetTrainer(NNTrainer):
 
                 img_loss = img_loss / loader.__len__()  # Number of batches
                 eval_loss += img_loss
-                print(img_obj.file_name + ' MSE LOSS: ', img_loss)
                 if mode is 'test':
                     segmented_img = np.array(segmented_img, dtype=np.uint8) * 255
 
                     maps_img = imgutils.merge_patches(patches=segmented_img, image_size=img_obj.working_arr.shape,
                                                       patch_size=self.patch_shape,
                                                       offset_row_col=self.patch_offset)
+                    maps_img[img_obj.mask == 0] = 0
                     IMG.fromarray(maps_img).save(os.path.join(self.log_dir, img_obj.file_name.split('.')[0] + '.png'))
-
-        if mode is 'train':
-            self._save_if_better(score=1 / (eval_loss / len(data_loaders)))
+                    eval_score.add_array(maps_img, img_obj.ground_truth)
+                print(img_obj.file_name + ' MSE LOSS: ' + str(round(img_loss, 5)) + ' F1: ' + str(
+                    round(eval_score.get_prf1a()[2], 5)))
+        if mode is 'train' or True:
+            self._save_if_better(score=eval_score.get_prf1a()[2])

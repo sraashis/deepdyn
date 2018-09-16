@@ -98,7 +98,7 @@ class NNTrainer:
             print('ERROR: ' + str(e))
 
     def _save_if_better(self, score=None):
-
+        score = round(score, 5)
         current_epoch = self.checkpoint['epochs'] + self.validation_frequency
         current_chk = {'state': self.model.state_dict(),
                        'epochs': current_epoch,
@@ -120,7 +120,7 @@ class NNTrainer:
     def get_logger(log_file=None, header=''):
 
         if os.path.isfile(log_file):
-            print('### CRITICAL!!! ' + log_file + '" already exists. Rename or delete to proceed. PROCEED [Y/N]?')
+            print('### CRITICAL!!! ' + log_file + '" already exists. OVERRIDE [Y/N]?')
             ui = input()
             if ui == 'N' or ui == 'n':
                 sys.exit(1)

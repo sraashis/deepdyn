@@ -18,7 +18,8 @@ from neuralnet.utils import auto_split as asp
 from neuralnet.thrnet.runs import DRIVE16, DRIVE32, DRIVE64
 
 # RUNS = [DRIVE32, DRIVE16]
-RUNS = [DRIVE32]
+
+RUNS = [DRIVE16]
 
 if __name__ == "__main__":
 
@@ -56,7 +57,7 @@ if __name__ == "__main__":
             test_loader = PatchesGenerator.get_loader_per_img(run_conf=R, images=splits['test'], mode='test')
 
             log_file = os.path.join(R['Dirs']['logs'], R['Params']['checkpoint_file'] + '-TEST.csv')
-            logger = drive_trainer.get_logger(log_file)
+            logger = drive_trainer.get_logger(log_file, header='ID,TYPE,EPOCH,BATCH,LOSS')
             drive_trainer.evaluate(data_loaders=test_loader, mode='test',
                                    logger=logger)
             logger.close()

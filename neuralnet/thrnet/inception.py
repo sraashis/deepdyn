@@ -3,6 +3,7 @@ import itertools
 import torch
 import torch.nn.functional as F
 from torch import nn
+
 from neuralnet.utils.weights_utils import initialize_weights
 
 
@@ -85,40 +86,38 @@ class InceptionThrNet(nn.Module):
 
         self.inception1 = Inception(width=width, in_ch=input_ch, out_ch=256)
         self.inception2 = Inception(width=width, in_ch=256, out_ch=256)
-        self.inception1_rec = InceptionRecursiveDownSample(width=width, in_ch=257, out_ch=256, recursion=1)
 
-        self.inception3 = Inception(width=width, in_ch=256, out_ch=512)
-        self.inception4 = Inception(width=width, in_ch=512, out_ch=256)
-        self.inception2_rec = InceptionRecursiveDownSample(width=width, in_ch=512, out_ch=256, recursion=1)
+        self.inception2_dwn = InceptionRecursiveDownSample(width=width, in_ch=256, out_ch=256, recursion=1)
 
-        self.inception5 = Inception(width=width, in_ch=256, out_ch=512)
-        self.inception6 = Inception(width=width, in_ch=512, out_ch=256)
-        self.inception3_rec = InceptionRecursiveDownSample(width=width, in_ch=512, out_ch=16, recursion=1)
+        self.inception3 = Inception(width=width, in_ch=512, out_ch=1024)
+        self.inception4 = Inception(width=width, in_ch=1024, out_ch=512)
 
-        self.linearWidth = 16 * 2 * 2
-        self.fc_out = nn.Linear(self.linearWidth, num_class)
+        self.inception4_dwn = InceptionRecursiveDownSample(width=width, in_ch=512, out_ch=256, recursion=3)
+
+        self.linearWidth = 256 * 2 * 2
+        self.fc1_out = nn.Linear(self.linearWidth, 256)
+        self.fc2_out = nn.Linear(256, num_class)
         initialize_weights(self)
 
     def forward(self, x):
         i1_out = self.inception1(x)
         i2_out = self.inception2(i1_out)
-        i1_rec_out = self.inception1_rec(torch.cat([x, i2_out], 1))
 
-        i3_out = self.inception3(i1_rec_out)
+        i2_out_dwn = self.inception2_dwn(i2_out)
+
+        i3_out = self.inception3(torch.cat([i2_out[:, :, 8:24, 8:24], i2_out_dwn], 1))
         i4_out = self.inception4(i3_out)
-        i3_rec_out = self.inception2_rec(torch.cat([i1_rec_out, i4_out], 1))
+        i4_dwn_out = self.inception4_dwn(i4_out)
 
-        i4_out = self.inception3(i3_rec_out)
-        i5_out = self.inception4(i4_out)
-        i3_rec_out = self.inception3_rec(torch.cat([i3_rec_out, i5_out], 1))
-
-        flattened = i3_rec_out.view(-1, self.linearWidth)
-        return self.fc_out(flattened)
+        flattened = i4_dwn_out.view(-1, self.linearWidth)
+        fc1_out = self.fc1_out(flattened)
+        fc2_out = self.fc2_out(fc1_out)
+        return fc2_out
 
 
 import numpy as np
 
-i = InceptionThrNet(width=64, input_ch=1, num_class=1)
+i = InceptionThrNet(width=32, input_ch=1, num_class=1)
 model_parameters = filter(lambda p: p.requires_grad, i.parameters())
 params = sum([np.prod(p.size()) for p in model_parameters])
 print(params)

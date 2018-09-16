@@ -8,7 +8,6 @@ import utils.img_utils as imgutils
 from commons.IMAGE import Image
 from neuralnet.datagen import Generator
 from neuralnet.utils.measurements import get_best_f1_thr
-import torch
 
 sep = os.sep
 
@@ -60,7 +59,10 @@ class PatchesGenerator(Generator):
         img_arr = self.image_objects[ID].working_arr.copy()
         prob_map = img_arr[row_from:row_to, col_from:col_to].copy()
         y = self.image_objects[ID].ground_truth[row_from:row_to, col_from:col_to].copy()
-        _, best_thr = get_best_f1_thr(prob_map, y)
+        best_score, best_thr = get_best_f1_thr(prob_map, y)
+        y1 = best_thr
+        if best_score == 0 and best_thr == 0:
+            y1 = 255
 
         p, q, r, s, pad = imgutils.expand_and_mirror_patch(full_img_shape=img_arr.shape,
                                                            orig_patch_indices=[row_from, row_to, col_from, col_to],
@@ -83,4 +85,4 @@ class PatchesGenerator(Generator):
             img_tensor = self.transforms(img_tensor)
 
         return {'ID': ID, 'inputs': img_tensor,
-                'y_thresholds': best_thr, 'prob_map': prob_map.copy()}
+                'y_thresholds': np.array([best_thr, y1]), 'prob_map': prob_map.copy()}
