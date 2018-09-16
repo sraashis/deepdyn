@@ -17,7 +17,7 @@ class BasicConv2d(nn.Module):
     def forward(self, x):
         x = self.conv(x)
         x = self.bn(x)
-        return F.relu(x, inplace=True)
+        return F.elu(x, inplace=True)
 
 
 class Inception(nn.Module):
@@ -92,9 +92,9 @@ class InceptionThrNet(nn.Module):
         self.inception3 = Inception(width=width, in_ch=512, out_ch=1024)
         self.inception4 = Inception(width=width, in_ch=1024, out_ch=512)
 
-        self.inception4_dwn = InceptionRecursiveDownSample(width=width, in_ch=512, out_ch=256, recursion=3)
+        self.inception4_dwn = InceptionRecursiveDownSample(width=width, in_ch=512, out_ch=256, recursion=2)
 
-        self.linearWidth = 256 * 2 * 2
+        self.linearWidth = 256 * 4 * 4
         self.fc1_out = nn.Linear(self.linearWidth, 256)
         self.fc2_out = nn.Linear(256, num_class)
         initialize_weights(self)
@@ -110,8 +110,9 @@ class InceptionThrNet(nn.Module):
         i4_dwn_out = self.inception4_dwn(i4_out)
 
         flattened = i4_dwn_out.view(-1, self.linearWidth)
-        fc1_out = self.fc1_out(flattened)
+        fc1_out = self.fc1_out(F.elu(flattened, inplace=True))
         fc2_out = self.fc2_out(fc1_out)
+
         return fc2_out
 
 
