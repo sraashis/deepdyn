@@ -37,9 +37,9 @@ class ThrnetTrainer(NNTrainer):
                 optimizer.zero_grad()
                 thr_map = self.model(inputs)
 
-                if epoch % 2 == 0 or True:
-                    print(torch.cat([y_thresholds[..., None], thr_map], 1))
-                    print('-------------------------------------------------')
+                # if False:
+                #     print(torch.cat([y_thresholds[..., None], thr_map], 1))
+                #     print('-------------------------------------------------')
 
                 y_thresholds = y_thresholds.squeeze()
                 thr_map = thr_map.squeeze()
@@ -83,6 +83,11 @@ class ThrnetTrainer(NNTrainer):
                     y_thresholds = data['y_thresholds'].float().to(self.device)
 
                     thr_map = self.model(inputs)
+
+                    # if True:
+                    #     print(torch.cat([y_thresholds[..., None], thr_map], 1))
+                    #     print('-------------------------------------------------')
+
                     thr_map = thr_map.squeeze()
                     prob_map = prob_map.squeeze()
                     y_thresholds = y_thresholds.squeeze()

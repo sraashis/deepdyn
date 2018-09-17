@@ -1,5 +1,5 @@
 BASE_PROJECT_DIR = '/home/akhanal1/ature'
-# BASE_PROJECT_DIR = '/home/ak/PycharmProjects/ature'
+BASE_PROJECT_DIR = '/home/ak/PycharmProjects/ature'
 
 import os
 import sys
@@ -37,7 +37,6 @@ if __name__ == "__main__":
             to_file=os.path.join(R.get('Dirs').get('logs'), R.get('Params').get('checkpoint_file') + '.json'))
         patch_shape = R['Params']['patch_shape'][0] + R['Params']['expand_patch_by'][0]
         model = InceptionThrNet(patch_shape, R['Params']['num_channels'], R['Params']['num_classes'])
-        # model = ThrNet(R['Params']['patch_shape'][0], R['Params']['num_channels'])
         optimizer = optim.Adam(model.parameters(), lr=R['Params']['learning_rate'])
         if R['Params']['distribute']:
             model = torch.nn.DataParallel(model)

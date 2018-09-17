@@ -75,7 +75,7 @@ DRIVE64 = {
         'learning_rate': 0.001,
         'patch_shape': (64, 64),
         'patch_offset': (30, 30),
-        'expand_patch_by': (0, 0),
+        'expand_patch_by': (64, 64),
         'use_gpu': True,
         'distribute': True,
         'shuffle': True,
