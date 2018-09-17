@@ -1,3 +1,4 @@
+import math
 import os
 
 import PIL.Image as IMG
@@ -7,7 +8,8 @@ import torch.nn.functional as F
 
 import utils.img_utils as imgutils
 from neuralnet.torchtrainer import NNTrainer
-import math
+from neuralnet.utils.measurements import ScoreAccumulator
+from neuralnet.utils.loss import weighted_mse_loss
 
 sep = os.sep
 
@@ -34,8 +36,14 @@ class ThrnetTrainer(NNTrainer):
 
                 optimizer.zero_grad()
                 thr_map = self.model(inputs)
-                loss = F.mse_loss(thr_map.squeeze(), y_thresholds)  # Loss per item
 
+                # if False:
+                #     print(torch.cat([y_thresholds[..., None], thr_map], 1))
+                #     print('-------------------------------------------------')
+
+                y_thresholds = y_thresholds.squeeze()
+                thr_map = thr_map.squeeze()
+                loss = F.mse_loss(thr_map, y_thresholds)
                 loss.backward()
                 optimizer.step()
 
@@ -51,7 +59,7 @@ class ThrnetTrainer(NNTrainer):
 
             if epoch % self.validation_frequency == 0:
                 self.evaluate(data_loaders=validation_loader, logger=logger,
-                              mode='train')
+                              mode='test')
         try:
             logger.close()
         except IOError:
@@ -64,6 +72,7 @@ class ThrnetTrainer(NNTrainer):
         print('\nEvaluating...')
         with torch.no_grad():
             eval_loss = 0.0
+            eval_score = ScoreAccumulator()
             for loader in data_loaders:
                 img_obj = loader.dataset.image_objects[0]
                 segmented_img = []
@@ -74,7 +83,15 @@ class ThrnetTrainer(NNTrainer):
                     y_thresholds = data['y_thresholds'].float().to(self.device)
 
                     thr_map = self.model(inputs)
+
+                    # if True:
+                    #     print(torch.cat([y_thresholds[..., None], thr_map], 1))
+                    #     print('-------------------------------------------------')
+
                     thr_map = thr_map.squeeze()
+                    prob_map = prob_map.squeeze()
+                    y_thresholds = y_thresholds.squeeze()
+
                     loss = F.mse_loss(thr_map, y_thresholds)
                     current_loss = math.sqrt(loss.item())
                     img_loss += current_loss
@@ -89,14 +106,17 @@ class ThrnetTrainer(NNTrainer):
 
                 img_loss = img_loss / loader.__len__()  # Number of batches
                 eval_loss += img_loss
-                print(img_obj.file_name + ' MSE LOSS: ', img_loss)
                 if mode is 'test':
                     segmented_img = np.array(segmented_img, dtype=np.uint8) * 255
 
                     maps_img = imgutils.merge_patches(patches=segmented_img, image_size=img_obj.working_arr.shape,
                                                       patch_size=self.patch_shape,
                                                       offset_row_col=self.patch_offset)
+                    maps_img[img_obj.mask == 0] = 0
                     IMG.fromarray(maps_img).save(os.path.join(self.log_dir, img_obj.file_name.split('.')[0] + '.png'))
-
-        if mode is 'train':
-            self._save_if_better(score=1 / (eval_loss / len(data_loaders)))
+                    img_score = ScoreAccumulator().add_array(maps_img, img_obj.ground_truth)
+                    eval_score.accumulate(img_score)
+                print(img_obj.file_name + ' MSE LOSS: ' + str(round(img_loss, 5)) + ' prf1a: ' + str(
+                    img_score.get_prf1a()))
+        if mode is 'train' or True:
+            self._save_if_better(score=eval_score.get_prf1a()[2])

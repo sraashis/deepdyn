@@ -80,7 +80,7 @@ class Generator(Dataset):
                 shuffle_indices=False,
                 mode=mode
             )
-            loader = torch.utils.data.DataLoader(gen, batch_size=min(2, gen.__len__()),
+            loader = torch.utils.data.DataLoader(gen, batch_size=min(16, gen.__len__()),
                                                  shuffle=False, num_workers=1, sampler=None)
             loaders.append(loader)
         return loaders

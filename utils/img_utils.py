@@ -51,10 +51,10 @@ def get_praf1(arr_2d=None, truth=None):
         f1 = 0
 
     return {
-        'Precision': p,
-        'Recall': r,
-        'Accuracy': a,
-        'F1': f1
+        'Precision': round(p, 5),
+        'Recall': round(r, 5),
+        'Accuracy': round(a, 5),
+        'F1': round(f1, 5)
     }
 
 

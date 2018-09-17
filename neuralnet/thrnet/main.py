@@ -1,5 +1,5 @@
 BASE_PROJECT_DIR = '/home/akhanal1/ature'
-# BASE_PROJECT_DIR = '/home/ak/PycharmProjects/ature'
+BASE_PROJECT_DIR = '/home/ak/PycharmProjects/ature'
 
 import os
 import sys
@@ -18,7 +18,8 @@ from neuralnet.utils import auto_split as asp
 from neuralnet.thrnet.runs import DRIVE16, DRIVE32, DRIVE64
 
 # RUNS = [DRIVE32, DRIVE16]
-RUNS = [DRIVE32]
+
+RUNS = [DRIVE16]
 
 if __name__ == "__main__":
 
@@ -36,7 +37,6 @@ if __name__ == "__main__":
             to_file=os.path.join(R.get('Dirs').get('logs'), R.get('Params').get('checkpoint_file') + '.json'))
         patch_shape = R['Params']['patch_shape'][0] + R['Params']['expand_patch_by'][0]
         model = InceptionThrNet(patch_shape, R['Params']['num_channels'], R['Params']['num_classes'])
-        # model = ThrNet(R['Params']['patch_shape'][0], R['Params']['num_channels'])
         optimizer = optim.Adam(model.parameters(), lr=R['Params']['learning_rate'])
         if R['Params']['distribute']:
             model = torch.nn.DataParallel(model)
@@ -56,7 +56,7 @@ if __name__ == "__main__":
             test_loader = PatchesGenerator.get_loader_per_img(run_conf=R, images=splits['test'], mode='test')
 
             log_file = os.path.join(R['Dirs']['logs'], R['Params']['checkpoint_file'] + '-TEST.csv')
-            logger = drive_trainer.get_logger(log_file)
+            logger = drive_trainer.get_logger(log_file, header='ID,TYPE,EPOCH,BATCH,LOSS')
             drive_trainer.evaluate(data_loaders=test_loader, mode='test',
                                    logger=logger)
             logger.close()

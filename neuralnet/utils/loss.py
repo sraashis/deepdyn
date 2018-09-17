@@ -1,3 +1,4 @@
+import torch
 import torch.nn as nn
 
 
@@ -18,3 +19,17 @@ class SoftDiceLoss(nn.Module):
 
 
 dice_loss = SoftDiceLoss()
+
+
+class WeightedMSE(nn.Module):
+    def __init__(self):
+        super(WeightedMSE, self).__init__()
+
+    def forward(self, inputs, targets, weights):
+        out = (inputs - targets) ** 2
+        out = out * weights.expand_as(out)
+        loss = torch.mean(out)  # or sum over whatever dimensions
+        return loss
+
+
+weighted_mse_loss = WeightedMSE()
