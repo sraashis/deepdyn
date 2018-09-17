@@ -1,3 +1,9 @@
+"""
+### author: Aashis Khanal
+### sraashis@gmail.com
+### date: 9/10/2018
+"""
+
 import PIL.Image as IMG
 import matplotlib.pyplot as plt
 import numpy as np

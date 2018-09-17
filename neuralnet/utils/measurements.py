@@ -1,3 +1,9 @@
+"""
+### author: Aashis Khanal
+### sraashis@gmail.com
+### date: 9/10/2018
+"""
+
 import itertools
 
 import matplotlib.pyplot as plt
