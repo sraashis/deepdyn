@@ -30,12 +30,12 @@ class UNetNNTrainer(NNTrainer):
 
                 img_score = ScoreAccumulator()
                 for i, data in enumerate(loader, 1):
-                    inputs, labels = data['inputs'].to(self.device), data['labels'].to(self.device)
+                    inputs, labels = data['inputs'].float().to(self.device), data['labels'].float().to(self.device)
                     outputs = self.model(inputs)
                     _, predicted = torch.max(outputs, 1)
 
                     current_score = ScoreAccumulator()
-                    current_score.add_tensor(labels, predicted)
+                    current_score.add_tensor(labels.float(), predicted.float())
                     img_score.accumulate(current_score)
                     eval_score.accumulate(current_score)
 

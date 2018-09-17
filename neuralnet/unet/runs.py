@@ -6,7 +6,7 @@ DRIVE = {
     'Params': {
         'num_channels': 1,
         'num_classes': 2,
-        'batch_size': 8,
+        'batch_size': 4,
         'epochs': 200,
         'learning_rate': 0.001,
         'patch_shape': (388, 388),
@@ -17,7 +17,7 @@ DRIVE = {
         'shuffle': True,
         'checkpoint_file': 'UNET-DRIVE.chk.tar',
         'log_frequency': 5,
-        'validation_frequency': 10,
+        'validation_frequency': 4,
         'mode': 'train',
         'parallel_trained': False
     },
