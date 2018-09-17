@@ -1,3 +1,9 @@
+"""
+### author: Aashis Khanal
+### sraashis@gmail.com
+### date: 9/10/2018
+"""
+
 BASE_PROJECT_DIR = '/home/akhanal1/ature'
 # BASE_PROJECT_DIR = '/home/ak/PycharmProjects/ature'
 
