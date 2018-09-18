@@ -61,15 +61,15 @@ class InceptionThrNet(nn.Module):
     def __init__(self, width, input_ch, num_class):
         super(InceptionThrNet, self).__init__()
 
-        self.inception1 = Inception(width=width, in_ch=input_ch, out_ch=32)
+        self.inception1 = Inception(width=width, in_ch=input_ch, out_ch=16)
         self.inception1_mxp = nn.MaxPool2d(kernel_size=2, stride=2, padding=0)
 
         # We will crop and concat from inception1 to this layer
-        self.inception2 = Inception(width=width, in_ch=64, out_ch=64)
+        self.inception2 = Inception(width=width, in_ch=32, out_ch=32)
         self.inception2_mxp = nn.MaxPool2d(kernel_size=2, stride=2, padding=0)
 
-        self.inception3 = Inception(width=width, in_ch=64, out_ch=64)
-        self.inception4 = Inception(width=width, in_ch=64, out_ch=32)
+        self.inception3 = Inception(width=width, in_ch=32, out_ch=32)
+        self.inception4 = Inception(width=width, in_ch=32, out_ch=32)
         self.inception4_mxp = nn.MaxPool2d(kernel_size=2, stride=2, padding=0)
 
         self.inception5 = Inception(width=width, in_ch=32, out_ch=32)
@@ -100,10 +100,6 @@ class InceptionThrNet(nn.Module):
         return self.fc3_out(fc2_out)
 
 
-import numpy as np
-
-i = InceptionThrNet(width=32, input_ch=1, num_class=1)
-model_parameters = filter(lambda p: p.requires_grad, i.parameters())
-params = sum([np.prod(p.size()) for p in model_parameters])
-print(params)
-# print(i)
+m = InceptionThrNet(width=32, input_ch=1, num_class=1)
+torch_total_params = sum(p.numel() for p in m.parameters() if p.requires_grad)
+print('Total Params:', torch_total_params)

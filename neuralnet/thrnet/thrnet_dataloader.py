@@ -60,8 +60,8 @@ class PatchesGenerator(Generator):
             img_obj.working_arr[img_obj.mask == 0] = img_obj.working_arr[x].mean()
 
         img_obj.res['est'] = img_obj.working_arr.copy()
-        img_obj.res['est'][img_obj.res['est'] >= self.est_thr] = 255
-        img_obj.res['est'][img_obj.res['est'] < self.est_thr] = 0
+        img_obj.res['est'][img_obj.res['est'] > self.est_thr] = 255
+        img_obj.res['est'][img_obj.res['est'] <= self.est_thr] = 0
 
         return img_obj
 
@@ -72,9 +72,8 @@ class PatchesGenerator(Generator):
         gt = self.image_objects[ID].ground_truth.copy()
 
         prob_map = img_arr[row_from:row_to, col_from:col_to]
-        y = gt[row_from:row_to, col_from:col_to]
 
-        best_score1, best_thr1 = get_best_f1_thr(prob_map, y)
+        best_score1, best_thr1 = get_best_f1_thr(prob_map, gt[row_from:row_to, col_from:col_to])
 
         p, q, r, s, pad = imgutils.expand_and_mirror_patch(full_img_shape=img_arr.shape,
                                                            orig_patch_indices=[row_from, row_to, col_from, col_to],
@@ -83,21 +82,17 @@ class PatchesGenerator(Generator):
 
         if self.mode == 'train' and random.uniform(0, 1) <= 0.5:
             img_tensor = np.flip(img_tensor, 0)
-            y = np.flip(y, 0)
             prob_map = np.flip(prob_map, 0)
 
         if self.mode == 'train' and random.uniform(0, 1) <= 0.5:
             img_tensor = np.flip(img_tensor, 1)
-            y = np.flip(y, 1)
             prob_map = np.flip(prob_map, 1)
 
         img_tensor = img_tensor[..., None]
         if self.transforms is not None:
             img_tensor = self.transforms(img_tensor)
 
-        y[y == 255] = 1
-        return {'ID': ID, 'inputs': img_tensor,
+        return {'inputs': img_tensor,
                 'clip_ix': np.array([row_from, row_to, col_from, col_to]),
                 'y_thresholds': best_thr1,
-                'prob_map': prob_map.copy(),
-                'truth': y.copy()}
+                'prob_map': prob_map.copy()}
