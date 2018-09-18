@@ -30,7 +30,7 @@ class PatchesGenerator(Generator):
             est = img_obj.res['est']
             all_est_ixes = list(zip(*np.where(est == 255)))
             best_est_indices = list(
-                imgutils.get_chunk_indices_by_index(est.shape, self.patch_shape, indices=all_est_ixes[::20]))
+                imgutils.get_chunk_indices_by_index(est.shape, self.patch_shape, indices=all_est_ixes[::15]))
 
             for chunk_ix in best_est_indices:
                 self.indices.append([ID] + chunk_ix)

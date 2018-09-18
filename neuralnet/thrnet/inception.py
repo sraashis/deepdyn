@@ -17,7 +17,7 @@ class BasicConv2d(nn.Module):
     def forward(self, x):
         x = self.conv(x)
         x = self.bn(x)
-        return F.elu(x, inplace=True)
+        return F.relu(x, inplace=True)
 
 
 class Inception(nn.Module):
@@ -69,7 +69,7 @@ class InceptionThrNet(nn.Module):
         self.inception3 = Inception(width=width, in_ch=64, out_ch=64)
         self.inception3_mxp = nn.MaxPool2d(kernel_size=2, stride=2, padding=0)
 
-        self.inception4 = Inception(width=width, in_ch=64, out_ch=32)
+        self.inception4 = Inception(width=width, in_ch=32, out_ch=32)
         self.inception4_mxp = nn.MaxPool2d(kernel_size=2, stride=2, padding=0)
 
         self.inception5 = Inception(width=width, in_ch=32, out_ch=32)
@@ -94,8 +94,8 @@ class InceptionThrNet(nn.Module):
         i5_out = self.inception5(i4_dwn_out)
 
         flattened = i5_out.view(-1, self.linearWidth)
-        fc1_out = F.elu(self.fc1_out(flattened))
-        fc2_out = F.elu(self.fc2_out(fc1_out))
+        fc1_out = F.relu(self.fc1_out(flattened))
+        fc2_out = F.relu(self.fc2_out(fc1_out))
 
         return self.fc3_out(fc2_out)
 

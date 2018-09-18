@@ -6,7 +6,7 @@ DRIVE16 = {
     'Params': {
         'num_channels': 1,
         'num_classes': 1,
-        'batch_size': 16,
+        'batch_size': 32,
         'epochs': 200,
         'learning_rate': 0.001,
         'patch_shape': (16, 16),
@@ -17,7 +17,7 @@ DRIVE16 = {
         'shuffle': True,
         'checkpoint_file': 'THRNET16-DRIVE.chk.tar',
         'log_frequency': 50,
-        'validation_frequency': 1,
+        'validation_frequency': 2,
         'mode': 'train',
         'parallel_trained': False
     },
