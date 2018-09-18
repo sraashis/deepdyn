@@ -65,10 +65,10 @@ class InceptionThrNet(nn.Module):
         self.inception1_mxp = nn.MaxPool2d(kernel_size=2, stride=2, padding=0)
 
         # We will crop and concat from inception1 to this layer
-        self.inception2 = Inception(width=width, in_ch=64, out_ch=64)
-        self.inception3 = Inception(width=width, in_ch=64, out_ch=64)
-        self.inception3_mxp = nn.MaxPool2d(kernel_size=2, stride=2, padding=0)
+        self.inception2 = Inception(width=width, in_ch=64, out_ch=32)
+        self.inception2_mxp = nn.MaxPool2d(kernel_size=2, stride=2, padding=0)
 
+        self.inception3 = Inception(width=width, in_ch=32, out_ch=32)
         self.inception4 = Inception(width=width, in_ch=32, out_ch=32)
         self.inception4_mxp = nn.MaxPool2d(kernel_size=2, stride=2, padding=0)
 
@@ -85,10 +85,10 @@ class InceptionThrNet(nn.Module):
         i1_out_dwn = self.inception1_mxp(i1_out)
 
         i2_out = self.inception2(torch.cat([i1_out[:, :, 8:24, 8:24], i1_out_dwn], 1))
-        i3_out = self.inception3(i2_out)
-        i3_dwn_out = self.inception3_mxp(i3_out)
+        i2_dwn_out = self.inception2_mxp(i2_out)
 
-        i4_out = self.inception4(i3_dwn_out)
+        i3_out = self.inception3(i2_dwn_out)
+        i4_out = self.inception4(i3_out)
         i4_dwn_out = self.inception4_mxp(i4_out)
 
         i5_out = self.inception5(i4_dwn_out)
