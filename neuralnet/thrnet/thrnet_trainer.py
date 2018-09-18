@@ -96,7 +96,8 @@ class ThrnetTrainer(NNTrainer):
                     current_loss = math.sqrt(loss.item())
                     img_loss += current_loss
 
-                    segmented = (prob_map >= thr_map[..., None][..., None].byte())
+                    thr = thr_map.abs_()[:, 0][..., None][..., None]
+                    segmented = (prob_map >= thr.byte())
                     if mode is 'test':
                         segmented_img += segmented.clone().cpu().numpy().tolist()
 
