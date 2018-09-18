@@ -100,10 +100,6 @@ class InceptionThrNet(nn.Module):
         return self.fc3_out(fc2_out)
 
 
-import numpy as np
-
-i = InceptionThrNet(width=32, input_ch=1, num_class=1)
-model_parameters = filter(lambda p: p.requires_grad, i.parameters())
-params = sum([np.prod(p.size()) for p in model_parameters])
-print(params)
-# print(i)
+m = InceptionThrNet(width=32, input_ch=1, num_class=1)
+torch_total_params = sum(p.numel() for p in m.parameters() if p.requires_grad)
+print('Total Params:', torch_total_params)
