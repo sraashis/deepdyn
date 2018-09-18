@@ -8,7 +8,6 @@ import torch.nn.functional as F
 
 from neuralnet.torchtrainer import NNTrainer
 from neuralnet.utils.measurements import ScoreAccumulator
-from utils import img_utils as iu
 
 sep = os.sep
 
@@ -36,9 +35,9 @@ class ThrnetTrainer(NNTrainer):
                 optimizer.zero_grad()
                 thr_map = self.model(inputs)
 
-                if True:
-                    print(torch.cat([y_thresholds[..., None], thr_map], 1))
-                    print('-------------------------------------------------')
+                # if True:
+                #     print(torch.cat([y_thresholds[..., None], thr_map], 1))
+                #     print('-------------------------------------------------')
 
                 y_thresholds = y_thresholds.squeeze()
                 thr_map = thr_map.squeeze()
@@ -81,12 +80,12 @@ class ThrnetTrainer(NNTrainer):
                     prob_map = data['prob_map'].to(self.device)
                     y_thresholds = data['y_thresholds'].float().to(self.device)
                     clip_ix = data['clip_ix'].int().squeeze().to(self.device)
-                    thr_map = self.model(inputs)
-                    truth = data['truth'].squeeze().to(self.device)
 
-                    # if True:
-                    #     print(torch.cat([y_thresholds[..., None], thr_map], 1))
-                    #     print('-------------------------------------------------')
+                    thr_map = self.model(inputs)
+
+                    if True:
+                        print(torch.cat([y_thresholds[..., None], thr_map], 1))
+                        print('-------------------------------------------------')
 
                     thr_map = thr_map.squeeze()
                     prob_map = prob_map.squeeze()

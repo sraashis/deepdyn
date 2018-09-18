@@ -84,3 +84,11 @@ class PatchNet(nn.Module):
         temp1 = self.width
         self.width = ((self.width - self.mxp_kern_size) / self.mxp_stride) + 1
         print('Output width[ ' + str(temp) + ' -conv-> ' + str(temp1) + ' -maxpool-> ' + str(self.width) + ' ]')
+
+import numpy as np
+
+i = PatchNet(32, 1, 1 )
+model_parameters = filter(lambda p: p.requires_grad, i.parameters())
+params = sum([np.prod(p.size()) for p in model_parameters])
+print(params)
+# print(i)

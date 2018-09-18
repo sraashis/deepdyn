@@ -72,7 +72,7 @@ class Generator(Dataset):
         mode = run_conf.get('Params').get('mode')
         gen = cls(run_conf=run_conf, images=images, transforms=transforms, shuffle_indices=True, mode=mode)
         return torch.utils.data.DataLoader(gen, batch_size=run_conf.get('Params').get('batch_size'),
-                                           shuffle=True, num_workers=3,
+                                           shuffle=True, num_workers=5,
                                            sampler=None)
 
     @classmethod
@@ -87,6 +87,6 @@ class Generator(Dataset):
                 mode=mode
             )
             loader = torch.utils.data.DataLoader(gen, batch_size=min(64, gen.__len__()),
-                                                 shuffle=False, num_workers=1, sampler=None)
+                                                 shuffle=False, num_workers=5, sampler=None)
             loaders.append(loader)
         return loaders

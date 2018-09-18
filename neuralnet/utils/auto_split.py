@@ -16,10 +16,13 @@ def create_split_json(images_src_dir=None, ratio=[0.64, 0.18, 0.18], to_file='sp
 
     image_files = os.listdir(images_src_dir)
     n = len(image_files)
+    i = int(round(ratio[0]*n))
+    j = i+int(round(ratio[1]*n))
+    k = j+int(round(ratio[2]*n))
     configuration = {
-        'train': image_files[0:int(round(ratio[0] * n))],
-        'validation': image_files[0:int(round(ratio[1] * n))],
-        'test': image_files[0:int(round(ratio[2] * n))]
+        'train': image_files[0:i],
+        'validation': image_files[i:j],
+        'test': image_files[j:k]
     }
 
     f = open(to_file, "w")
