@@ -1,8 +1,11 @@
+import math
 import os
 import random
 from random import shuffle
 
 import numpy as np
+from scipy.ndimage.measurements import label
+from skimage.morphology import skeletonize
 
 import utils.img_utils as imgutils
 from commons.IMAGE import Image
@@ -18,7 +21,9 @@ class PatchesGenerator(Generator):
         self.patch_shape = self.run_conf.get('Params').get('patch_shape')
         # self.patch_offset = self.run_conf.get('Params').get('patch_offset')
         self.expand_by = self.run_conf.get('Params').get('expand_patch_by')
-        self.est_thr = self.run_conf.get('Params').get('est_threshold', 50)
+        self.est_thr = self.run_conf.get('Params').get('est_threshold', 40)
+        self.skip_patch_by = self.run_conf.get('Params').get('skip_patch_by', 10)
+        self.component_diameter_limit = self.run_conf.get('Params').get('comp_diam_limit', 20)
         self._load_indices()
         print('Patches:', self.__len__())
 
@@ -30,7 +35,8 @@ class PatchesGenerator(Generator):
             est = img_obj.res['est']
             all_est_ixes = list(zip(*np.where(est == 255)))
             best_est_indices = list(
-                imgutils.get_chunk_indices_by_index(est.shape, self.patch_shape, indices=all_est_ixes[::15]))
+                imgutils.get_chunk_indices_by_index(est.shape, self.patch_shape,
+                                                    indices=all_est_ixes[::self.skip_patch_by]))
 
             for chunk_ix in best_est_indices:
                 self.indices.append([ID] + chunk_ix)
@@ -59,10 +65,27 @@ class PatchesGenerator(Generator):
             x = np.logical_and(True, img_obj.mask == 255)
             img_obj.working_arr[img_obj.mask == 0] = img_obj.working_arr[x].mean()
 
-        img_obj.res['est'] = img_obj.working_arr.copy()
-        img_obj.res['est'][img_obj.res['est'] > self.est_thr] = 255
-        img_obj.res['est'][img_obj.res['est'] <= self.est_thr] = 0
+        estimate = img_obj.working_arr.copy()
+        estimate[estimate > self.est_thr] = 255
+        estimate[estimate <= self.est_thr] = 0
 
+        # Clear up small components(components less that 20px)
+        structure = np.ones((3, 3), dtype=np.int)
+        labeled, ncomponents = label(estimate, structure)
+        for i in range(ncomponents):
+            ixy = np.array(list(zip(*np.where(labeled == i))))
+            x1, y1 = ixy[0]
+            x2, y2 = ixy[-1]
+            dst = math.sqrt((x2 - x1) ** 2 + (y2 - y1) ** 2)
+            if dst < self.component_diameter_limit:
+                for u, v in ixy:
+                    estimate[u, v] = 0
+
+        # Now skeletonize the perfect estimate
+        # estimate[estimate == 255] = 1
+        # estimate = skeletonize(estimate) * 255
+
+        img_obj.res['est'] = estimate
         return img_obj
 
     def __getitem__(self, index):
