@@ -60,8 +60,8 @@ class PatchesGenerator(Generator):
             img_obj.working_arr[img_obj.mask == 0] = img_obj.working_arr[x].mean()
 
         img_obj.res['est'] = img_obj.working_arr.copy()
-        img_obj.res['est'][img_obj.res['est'] >= self.est_thr] = 255
-        img_obj.res['est'][img_obj.res['est'] < self.est_thr] = 0
+        img_obj.res['est'][img_obj.res['est'] > self.est_thr] = 255
+        img_obj.res['est'][img_obj.res['est'] <= self.est_thr] = 0
 
         return img_obj
 

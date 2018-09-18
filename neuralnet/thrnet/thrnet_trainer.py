@@ -96,7 +96,7 @@ class ThrnetTrainer(NNTrainer):
                     img_loss += current_loss
 
                     thr = thr_map[..., None][..., None]
-                    segmented = (prob_map >= thr.byte())
+                    segmented = (prob_map > thr.byte())
 
                     # batch_score = ScoreAccumulator().add_tensor(segmented, truth)
                     print('Loss: ', current_loss, end='\r')
