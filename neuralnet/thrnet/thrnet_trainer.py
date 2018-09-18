@@ -6,10 +6,9 @@ import numpy as np
 import torch
 import torch.nn.functional as F
 
-import utils.img_utils as imgutils
 from neuralnet.torchtrainer import NNTrainer
 from neuralnet.utils.measurements import ScoreAccumulator
-from neuralnet.utils.loss import weighted_mse_loss
+from utils import img_utils as iu
 
 sep = os.sep
 
@@ -37,9 +36,9 @@ class ThrnetTrainer(NNTrainer):
                 optimizer.zero_grad()
                 thr_map = self.model(inputs)
 
-                # if False:
-                #     print(torch.cat([y_thresholds[..., None], thr_map], 1))
-                #     print('-------------------------------------------------')
+                if True:
+                    print(torch.cat([y_thresholds[..., None], thr_map], 1))
+                    print('-------------------------------------------------')
 
                 y_thresholds = y_thresholds.squeeze()
                 thr_map = thr_map.squeeze()
@@ -75,14 +74,15 @@ class ThrnetTrainer(NNTrainer):
             eval_score = ScoreAccumulator()
             for loader in data_loaders:
                 img_obj = loader.dataset.image_objects[0]
-                segmented_img = []
+                segmented_img = np.zeros_like(img_obj.working_arr)
                 img_loss = 0.0
                 for i, data in enumerate(loader, 1):
                     inputs = data['inputs'].to(self.device)
                     prob_map = data['prob_map'].to(self.device)
                     y_thresholds = data['y_thresholds'].float().to(self.device)
-
+                    clip_ix = data['clip_ix'].int().squeeze().to(self.device)
                     thr_map = self.model(inputs)
+                    truth = data['truth'].squeeze().to(self.device)
 
                     # if True:
                     #     print(torch.cat([y_thresholds[..., None], thr_map], 1))
@@ -96,28 +96,31 @@ class ThrnetTrainer(NNTrainer):
                     current_loss = math.sqrt(loss.item())
                     img_loss += current_loss
 
-                    thr = thr_map.abs_()[:, 0][..., None][..., None]
+                    thr = thr_map.abs_()[..., None][..., None]
                     segmented = (prob_map >= thr.byte())
-                    if mode is 'test':
-                        segmented_img += segmented.clone().cpu().numpy().tolist()
 
+                    # batch_score = ScoreAccumulator().add_tensor(segmented, truth)
+                    print('Loss: ', current_loss, end='\r')
                     self.flush(logger, ','.join(
                         str(x) for x in
                         [img_obj.file_name, 1, self.checkpoint['epochs'], 0] + [current_loss]))
 
+                    if mode == 'test':
+                        for j, patch in enumerate(segmented):
+                            p, q, r, s = clip_ix[j]
+                            segmented_img[p:q, r:s] += patch.cpu().numpy().squeeze()
+
                 img_loss = img_loss / loader.__len__()  # Number of batches
                 eval_loss += img_loss
                 if mode is 'test':
-                    segmented_img = np.array(segmented_img, dtype=np.uint8) * 255
-
-                    maps_img = imgutils.merge_patches(patches=segmented_img, image_size=img_obj.working_arr.shape,
-                                                      patch_size=self.patch_shape,
-                                                      offset_row_col=self.patch_offset)
-                    maps_img[img_obj.mask == 0] = 0
-                    IMG.fromarray(maps_img).save(os.path.join(self.log_dir, img_obj.file_name.split('.')[0] + '.png'))
-                    img_score = ScoreAccumulator().add_array(maps_img, img_obj.ground_truth)
+                    segmented_img[segmented_img > 0] = 255
+                    img_score = ScoreAccumulator()
+                    img_score.add_array(segmented_img, img_obj.ground_truth)
                     eval_score.accumulate(img_score)
-                print(img_obj.file_name + ' MSE LOSS: ' + str(round(img_loss, 5)) + ' prf1a: ' + str(
-                    img_score.get_prf1a()))
+                    IMG.fromarray(segmented_img).save(
+                        os.path.join(self.log_dir, img_obj.file_name.split('.')[0] + '.png'))
+
+                    print('\n' + img_obj.file_name + ' prf1a: ', img_score.get_prf1a())
+
         if mode is 'train' or True:
             self._save_if_better(score=eval_score.get_prf1a()[2])

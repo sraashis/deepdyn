@@ -16,8 +16,9 @@ class PatchesGenerator(Generator):
     def __init__(self, **kwargs):
         super(PatchesGenerator, self).__init__(**kwargs)
         self.patch_shape = self.run_conf.get('Params').get('patch_shape')
-        self.patch_offset = self.run_conf.get('Params').get('patch_offset')
+        # self.patch_offset = self.run_conf.get('Params').get('patch_offset')
         self.expand_by = self.run_conf.get('Params').get('expand_patch_by')
+        self.est_thr = self.run_conf.get('Params').get('est_threshold', 50)
         self._load_indices()
         print('Patches:', self.__len__())
 
@@ -25,8 +26,13 @@ class PatchesGenerator(Generator):
         for ID, img_file in enumerate(self.images):
 
             img_obj = self._get_image_obj(img_file)
-            for chunk_ix in imgutils.get_chunk_indexes(img_obj.working_arr.shape, self.patch_shape,
-                                                       self.patch_offset):
+
+            est = img_obj.res['est']
+            all_est_ixes = list(zip(*np.where(est == 255)))
+            best_est_indices = list(
+                imgutils.get_chunk_indices_by_index(est.shape, self.patch_shape, indices=all_est_ixes[::20]))
+
+            for chunk_ix in best_est_indices:
                 self.indices.append([ID] + chunk_ix)
             self.image_objects[ID] = img_obj
         if self.shuffle_indices:
@@ -52,6 +58,11 @@ class PatchesGenerator(Generator):
         if img_obj.mask is not None:
             x = np.logical_and(True, img_obj.mask == 255)
             img_obj.working_arr[img_obj.mask == 0] = img_obj.working_arr[x].mean()
+
+        img_obj.res['est'] = img_obj.working_arr.copy()
+        img_obj.res['est'][img_obj.res['est'] >= self.est_thr] = 255
+        img_obj.res['est'][img_obj.res['est'] < self.est_thr] = 0
+
         return img_obj
 
     def __getitem__(self, index):
@@ -59,6 +70,7 @@ class PatchesGenerator(Generator):
 
         img_arr = self.image_objects[ID].working_arr.copy()
         gt = self.image_objects[ID].ground_truth.copy()
+
         prob_map = img_arr[row_from:row_to, col_from:col_to]
         y = gt[row_from:row_to, col_from:col_to]
 
@@ -83,6 +95,9 @@ class PatchesGenerator(Generator):
         if self.transforms is not None:
             img_tensor = self.transforms(img_tensor)
 
+        y[y == 255] = 1
         return {'ID': ID, 'inputs': img_tensor,
-                'y_thresholds': np.array([best_thr1, prob_map.mean()]),
-                'prob_map': prob_map.copy()}
+                'clip_ix': np.array([row_from, row_to, col_from, col_to]),
+                'y_thresholds': best_thr1,
+                'prob_map': prob_map.copy(),
+                'truth': y.copy()}

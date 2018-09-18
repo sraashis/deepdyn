@@ -128,6 +128,34 @@ def get_chunk_indexes(img_shape=(0, 0), chunk_shape=(0, 0), offset_row_col=None)
             yield [int(row_from), int(row_to), int(col_from), int(col_to)]
 
 
+def get_chunk_indices_by_index(img_shape=(0, 0), chunk_shape=(0, 0), indices=None):
+    x, y = chunk_shape
+    row_end, col_end = img_shape
+
+    if x % 2 == 0:
+        row_from = x / 2 - 1
+    else:
+        row_from = x // 2
+
+    if y % 2 == 0:
+        col_from = y / 2 - 1
+    else:
+        col_from = y // 2
+    row_to, col_to = x // 2 + 1, y // 2 + 1
+
+    for i, j in indices:
+        p = i - row_from
+        q = i + row_to
+        r = j - col_from
+        s = j + col_to
+
+        if p < 0 or r < 0:
+            continue
+        if q > row_end or s > col_end:
+            continue
+        yield [int(p), int(q), int(r), int(s)]
+
+
 def merge_patches(patches=None, image_size=(0, 0), patch_size=(0, 0), offset_row_col=None):
     padded_sum = np.zeros([image_size[0], image_size[1]])
     non_zero_count = np.zeros_like(padded_sum)

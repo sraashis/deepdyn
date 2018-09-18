@@ -17,7 +17,7 @@ class BasicConv2d(nn.Module):
     def forward(self, x):
         x = self.conv(x)
         x = self.bn(x)
-        return F.leaky_relu(x, inplace=True)
+        return F.elu(x, inplace=True)
 
 
 class Inception(nn.Module):
@@ -61,12 +61,12 @@ class InceptionThrNet(nn.Module):
     def __init__(self, width, input_ch, num_class):
         super(InceptionThrNet, self).__init__()
 
-        self.inception1 = Inception(width=width, in_ch=input_ch, out_ch=16)
+        self.inception1 = Inception(width=width, in_ch=input_ch, out_ch=32)
         self.inception1_mxp = nn.MaxPool2d(kernel_size=2, stride=2, padding=0)
 
         # We will crop and concat from inception1 to this layer
-        self.inception2 = Inception(width=width, in_ch=32, out_ch=64)
-        self.inception3 = Inception(width=width, in_ch=64, out_ch=32)
+        self.inception2 = Inception(width=width, in_ch=64, out_ch=32)
+        self.inception3 = Inception(width=width, in_ch=32, out_ch=32)
         self.inception3_mxp = nn.MaxPool2d(kernel_size=2, stride=2, padding=0)
 
         self.inception4 = Inception(width=width, in_ch=32, out_ch=32)
@@ -75,8 +75,9 @@ class InceptionThrNet(nn.Module):
         self.inception5 = Inception(width=width, in_ch=32, out_ch=32)
 
         self.linearWidth = 32 * 4 * 4
-        self.fc1_out = nn.Linear(self.linearWidth, 64)
-        self.fc2_out = nn.Linear(64, num_class)
+        self.fc1_out = nn.Linear(self.linearWidth, 512)
+        self.fc2_out = nn.Linear(512, 64)
+        self.fc3_out = nn.Linear(64, num_class)
         initialize_weights(self)
 
     def forward(self, x):
@@ -93,9 +94,10 @@ class InceptionThrNet(nn.Module):
         i5_out = self.inception5(i4_dwn_out)
 
         flattened = i5_out.view(-1, self.linearWidth)
-        fc1_out = F.leaky_relu(self.fc1_out(flattened))
+        fc1_out = F.elu(self.fc1_out(flattened))
+        fc2_out = F.elu(self.fc2_out(fc1_out))
 
-        return self.fc2_out(fc1_out)
+        return self.fc3_out(fc2_out)
 
 
 import numpy as np
