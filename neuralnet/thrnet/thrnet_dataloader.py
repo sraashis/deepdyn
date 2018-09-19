@@ -5,7 +5,6 @@ from random import shuffle
 
 import numpy as np
 from scipy.ndimage.measurements import label
-from skimage.morphology import skeletonize
 
 import utils.img_utils as imgutils
 from commons.IMAGE import Image
@@ -65,6 +64,7 @@ class PatchesGenerator(Generator):
             x = np.logical_and(True, img_obj.mask == 255)
             img_obj.working_arr[img_obj.mask == 0] = img_obj.working_arr[x].mean()
 
+        img_obj.working_arr[img_obj.mask == 0] = 0
         estimate = img_obj.working_arr.copy()
         estimate[estimate > self.est_thr] = 255
         estimate[estimate <= self.est_thr] = 0

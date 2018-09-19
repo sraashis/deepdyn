@@ -62,37 +62,46 @@ class InceptionThrNet(nn.Module):
         super(InceptionThrNet, self).__init__()
 
         self.inception1 = Inception(width=width, in_ch=input_ch, out_ch=32)
-        self.inception1_mxp = nn.MaxPool2d(kernel_size=2, stride=2, padding=0)
-
-        # We will crop and concat from inception1 to this layer
-        self.inception2 = Inception(width=width, in_ch=64, out_ch=32)
+        self.inception2 = Inception(width=width, in_ch=32, out_ch=32)
         self.inception2_mxp = nn.MaxPool2d(kernel_size=2, stride=2, padding=0)
 
-        self.inception3 = Inception(width=width, in_ch=32, out_ch=64)
+        # We will crop and concat from inception1 to this layer
+        self.inception3 = Inception(width=width, in_ch=64, out_ch=64)
         self.inception4 = Inception(width=width, in_ch=64, out_ch=32)
+        self.inception4_mxp = nn.MaxPool2d(kernel_size=2, stride=2, padding=0)
 
-        self.linearWidth = 32 * 8 * 8
+        self.inception5 = Inception(width=width, in_ch=32, out_ch=64)
+        self.inception6 = Inception(width=width, in_ch=64, out_ch=32)
+        self.inception6_mxp = nn.MaxPool2d(kernel_size=2, stride=2, padding=0)
+
+        self.inception7 = Inception(width=width, in_ch=32, out_ch=32)
+        self.inception8 = Inception(width=width, in_ch=32, out_ch=32)
+
+        self.linearWidth = 32 * 4 * 4
         self.fc1_out = nn.Linear(self.linearWidth, 512)
-        self.fc2_out = nn.Linear(512, 64)
-        self.fc3_out = nn.Linear(64, num_class)
+        self.fc2_out = nn.Linear(512, num_class)
         initialize_weights(self)
 
     def forward(self, x):
         i1_out = self.inception1(x)
-        i1_out_dwn = self.inception1_mxp(i1_out)
+        i2_out = self.inception2(i1_out)
+        i2_out_dwn = self.inception2_mxp(i2_out)
 
-        i2_out = self.inception2(torch.cat([i1_out[:, :, 8:24, 8:24], i1_out_dwn], 1))
-        i2_dwn_out = self.inception2_mxp(i2_out)
-
-        i3_out = self.inception3(i2_dwn_out)
+        i3_out = self.inception3(torch.cat([i2_out[:, :, 8:24, 8:24], i2_out_dwn], 1))
         i4_out = self.inception4(i3_out)
+        i4_dwn_out = self.inception4_mxp(i4_out)
 
-        flattened = i4_out.view(-1, self.linearWidth)
-        # flattened = F.dropout2d(flattened, p=0.4)
+        i5_out = self.inception5(i4_dwn_out)
+        i6_out = self.inception6(i5_out)
+        i6_dwn_out = self.inception6_mxp(i6_out)
+
+        i7_out = self.inception7(i6_dwn_out)
+        i8_out = self.inception8(i7_out)
+
+        flattened = i8_out.view(-1, self.linearWidth)
+
         fc1_out = F.relu(self.fc1_out(flattened))
-        fc2_out = F.relu(self.fc2_out(fc1_out))
-
-        return self.fc3_out(fc2_out)
+        return self.fc2_out(fc1_out)
 
 
 m = InceptionThrNet(width=32, input_ch=1, num_class=1)
