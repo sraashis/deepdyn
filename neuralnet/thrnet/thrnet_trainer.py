@@ -83,9 +83,9 @@ class ThrnetTrainer(NNTrainer):
 
                     thr_map = self.model(inputs)
 
-                    if True:
-                        print(torch.cat([y_thresholds[..., None], thr_map], 1))
-                        print('-------------------------------------------------')
+                    # if True:
+                    #     print(torch.cat([y_thresholds[..., None], thr_map], 1))
+                    #     print('-------------------------------------------------')
 
                     thr_map = thr_map.squeeze()
                     prob_map = prob_map.squeeze()
