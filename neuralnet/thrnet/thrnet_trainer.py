@@ -113,6 +113,7 @@ class ThrnetTrainer(NNTrainer):
                 eval_loss += img_loss
                 if mode is 'test':
                     segmented_img[segmented_img > 0] = 255
+                    segmented_img[img_obj.mask == 0] = 0
                     img_score = ScoreAccumulator()
                     img_score.add_array(segmented_img, img_obj.ground_truth)
                     eval_score.accumulate(img_score)
