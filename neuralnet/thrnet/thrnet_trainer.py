@@ -78,8 +78,8 @@ class ThrnetTrainer(NNTrainer):
                 for i, data in enumerate(loader, 1):
                     inputs = data['inputs'].to(self.device)
                     prob_map = data['prob_map'].to(self.device)
-                    y_thresholds = data['y_thresholds'].float().to(self.device)
-                    clip_ix = data['clip_ix'].int().squeeze().to(self.device)
+                    y_thresholds = data['y_thresholds'].unsqueeze(1).float().to(self.device)
+                    clip_ix = data['clip_ix'].int().to(self.device)
 
                     thr_map = self.model(inputs)
 
@@ -87,15 +87,11 @@ class ThrnetTrainer(NNTrainer):
                     #     print(torch.cat([y_thresholds[..., None], thr_map], 1))
                     #     print('-------------------------------------------------')
 
-                    thr_map = thr_map.squeeze()
-                    prob_map = prob_map.squeeze()
-                    y_thresholds = y_thresholds.squeeze()
-
                     loss = F.mse_loss(thr_map, y_thresholds)
                     current_loss = math.sqrt(loss.item())
                     img_loss += current_loss
 
-                    thr = thr_map[..., None][..., None]
+                    thr = thr_map[..., None]
                     segmented = (prob_map > thr.byte())
 
                     # batch_score = ScoreAccumulator().add_tensor(segmented, truth)
@@ -103,11 +99,10 @@ class ThrnetTrainer(NNTrainer):
                     self.flush(logger, ','.join(
                         str(x) for x in
                         [img_obj.file_name, 1, self.checkpoint['epochs'], 0] + [current_loss]))
-
                     if mode == 'test':
-                        for j, patch in enumerate(segmented):
+                        for j in range(segmented.shape[0]):
                             p, q, r, s = clip_ix[j]
-                            segmented_img[p:q, r:s] += patch.cpu().numpy().squeeze()
+                            segmented_img[p:q, r:s] += segmented[j].cpu().numpy()
 
                 img_loss = img_loss / loader.__len__()  # Number of batches
                 eval_loss += img_loss
