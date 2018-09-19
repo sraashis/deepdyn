@@ -4,13 +4,13 @@ import random
 from random import shuffle
 
 import numpy as np
+from PIL import Image as IMG
 from scipy.ndimage.measurements import label
 
 import utils.img_utils as imgutils
 from commons.IMAGE import Image
 from neuralnet.datagen import Generator
 from neuralnet.utils.measurements import get_best_f1_thr
-from PIL import Image as IMG
 
 sep = os.sep
 
@@ -34,12 +34,29 @@ class PatchesGenerator(Generator):
 
             est = img_obj.res['est']
             all_est_ixes = list(zip(*np.where(est == 255)))
+
             best_est_indices = list(
                 imgutils.get_chunk_indices_by_index(est.shape, self.patch_shape,
                                                     indices=all_est_ixes[::self.skip_patch_by]))
 
             for chunk_ix in best_est_indices:
                 self.indices.append([ID] + chunk_ix)
+
+            backgroun_cond = np.logical_and(est == 0, img_obj.mask == 255)
+            all_blank_ixes = list(zip(*np.where(backgroun_cond)))
+            all_blank_ixes = list(imgutils.get_chunk_indices_by_index(est.shape, self.patch_shape,
+                                                                      indices=all_blank_ixes[::10]))
+
+            random.shuffle(all_blank_ixes)
+            size = self.__len__()
+            for blank_ix in all_blank_ixes:
+                if self.__len__() >= 2 * size:
+                    break
+                p, q, r, s = blank_ix
+                patch = est[p:q, r:s]
+                if ~np.isin(255, patch):
+                    self.indices.append([ID] + blank_ix)
+
             self.image_objects[ID] = img_obj
         if self.shuffle_indices:
             shuffle(self.indices)
