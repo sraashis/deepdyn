@@ -10,6 +10,7 @@ import utils.img_utils as imgutils
 from commons.IMAGE import Image
 from neuralnet.datagen import Generator
 from neuralnet.utils.measurements import get_best_f1_thr
+from PIL import Image as IMG
 
 sep = os.sep
 
@@ -20,7 +21,7 @@ class PatchesGenerator(Generator):
         self.patch_shape = self.run_conf.get('Params').get('patch_shape')
         # self.patch_offset = self.run_conf.get('Params').get('patch_offset')
         self.expand_by = self.run_conf.get('Params').get('expand_patch_by')
-        self.est_thr = self.run_conf.get('Params').get('est_threshold', 40)
+        self.est_thr = self.run_conf.get('Params').get('est_threshold', 20)
         self.skip_patch_by = self.run_conf.get('Params').get('skip_patch_by', 10)
         self.component_diameter_limit = self.run_conf.get('Params').get('comp_diam_limit', 20)
         self._load_indices()
@@ -81,10 +82,6 @@ class PatchesGenerator(Generator):
                 for u, v in ixy:
                     estimate[u, v] = 0
 
-        # Now skeletonize the perfect estimate
-        # estimate[estimate == 255] = 1
-        # estimate = skeletonize(estimate) * 255
-
         img_obj.res['est'] = estimate
         return img_obj
 
@@ -110,6 +107,10 @@ class PatchesGenerator(Generator):
         if self.mode == 'train' and random.uniform(0, 1) <= 0.5:
             img_tensor = np.flip(img_tensor, 1)
             prob_map = np.flip(prob_map, 1)
+
+        IMG.fromarray(img_tensor).save('tens.png')
+        IMG.fromarray(prob_map).save('map.png')
+        IMG.fromarray(img_arr).save('full.png')
 
         img_tensor = img_tensor[..., None]
         if self.transforms is not None:
