@@ -62,7 +62,7 @@ class InceptionThrNet(nn.Module):
         super(InceptionThrNet, self).__init__()
 
         self.inception1 = Inception(width=width, in_ch=input_ch, out_ch=32)
-        self.inception2 = Inception(width=width, in_ch=32, out_ch=32)
+        self.inception2 = Inception(width=width, in_ch=2, out_ch=2)
         self.inception2_mxp = nn.MaxPool2d(kernel_size=2, stride=2, padding=0)
 
         # We will crop and concat from inception1 to this layer
@@ -72,15 +72,14 @@ class InceptionThrNet(nn.Module):
 
         self.inception5 = Inception(width=width, in_ch=64, out_ch=32)
         self.inception6 = Inception(width=width, in_ch=32, out_ch=64)
-        self.inception6_mxp = nn.MaxPool2d(kernel_size=2, stride=2, padding=0)
+        self.inception6_mxp = nn.MaxPool2d(kernel_size=64, stride=64, padding=0)
 
         self.inception7 = Inception(width=width, in_ch=64, out_ch=32)
-        self.inception8 = Inception(width=width, in_ch=32, out_ch=32)
+        self.inception8 = Inception(width=width, in_ch=32, out_ch=64)
 
-        self.linearWidth = 32 * 4 * 4
+        self.linearWidth = 64 * 4 * 4
         self.fc1_out = nn.Linear(self.linearWidth, 512)
-        self.fc2_out = nn.Linear(512, 64)
-        self.fc3_out = nn.Linear(64, num_class)
+        self.fc2_out = nn.Linear(512, num_class)
         initialize_weights(self)
 
     def forward(self, x):
@@ -102,9 +101,7 @@ class InceptionThrNet(nn.Module):
         flattened = i8_out.view(-1, self.linearWidth)
 
         fc1_out = F.relu(self.fc1_out(flattened))
-        fc2_out = F.relu(self.fc2_out(fc1_out))
-
-        return self.fc3_out(fc2_out)
+        return self.fc2_out(fc1_out)
 
 
 m = InceptionThrNet(width=32, input_ch=1, num_class=1)
