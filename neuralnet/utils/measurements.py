@@ -134,7 +134,7 @@ class AverageMeter(object):
         self.avg = self.sum / self.count
 
 
-def get_best_f1_thr(img, y, for_best='F1'):
+def get_best_thr(img, y, for_best='F1'):
     best_score = {for_best: 0.0}
     best_thr = 0.0
 
@@ -143,10 +143,10 @@ def get_best_f1_thr(img, y, for_best='F1'):
         return best_score, 255.0
 
     for thr in np.linspace(1, 255, 255):
-        i = img.copy()
-        i[i > thr] = 255
-        i[i <= thr] = 0
-        current_score = imgutils.get_praf1(i, y)
+        i_best = img.copy()
+        i_best[i_best > thr] = 255
+        i_best[i_best <= thr] = 0
+        current_score = imgutils.get_praf1(i_best, y)
         if current_score[for_best] > best_score[for_best]:
             best_score = current_score
             best_thr = thr

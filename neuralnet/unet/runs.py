@@ -13,12 +13,12 @@ DRIVE = {
         'patch_offset': (150, 150),
         'expand_patch_by': (184, 184),
         'use_gpu': True,
-        'distribute': True,
+        'distribute': False,
         'shuffle': True,
         'checkpoint_file': 'UNET-DRIVE.chk.tar',
         'log_frequency': 5,
         'validation_frequency': 4,
-        'mode': 'train',
+        'mode': 'test',
         'parallel_trained': False
     },
     'Dirs': {
