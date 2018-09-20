@@ -134,7 +134,7 @@ class AverageMeter(object):
         self.avg = self.sum / self.count
 
 
-def get_best_f1_thr(img, y, for_best='F1'):
+def get_best_thr(img, y, for_best='F1'):
     best_score = {for_best: 0.0}
     best_thr = 0.0
 

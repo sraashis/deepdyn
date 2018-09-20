@@ -84,7 +84,7 @@ class ThrnetTrainer(NNTrainer):
                     thr_map = self.model(inputs)
 
                     # if True:
-                    #     print(torch.cat([y_thresholds, thr_map], 1))
+                    #     print(img_obj.file_name, torch.cat([y_thresholds, thr_map, clip_ix.float()], 1))
                     #     print('-------------------------------------------------')
 
                     loss = F.mse_loss(thr_map, y_thresholds)

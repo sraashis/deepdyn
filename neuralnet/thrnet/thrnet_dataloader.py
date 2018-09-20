@@ -3,7 +3,6 @@ import os
 import random
 from random import shuffle
 
-import cv2
 import numpy as np
 from PIL import Image as IMG
 from scipy.ndimage.measurements import label
@@ -12,7 +11,7 @@ from skimage.morphology import skeletonize
 import utils.img_utils as imgutils
 from commons.IMAGE import Image
 from neuralnet.datagen import Generator
-from neuralnet.utils.measurements import get_best_f1_thr
+from neuralnet.utils.measurements import get_best_thr
 
 sep = os.sep
 
@@ -125,7 +124,14 @@ class PatchesGenerator(Generator):
 
         prob_map = img_arr[row_from:row_to, col_from:col_to]
 
-        best_score1, best_thr1 = get_best_f1_thr(prob_map, gt[row_from:row_to, col_from:col_to])
+        # best_score, best_thr = get_best_thr(prob_map, gt[row_from:row_to, col_from:col_to], for_best='F1')
+        best_score2, best_thr2 = get_best_thr(prob_map, gt[row_from:row_to, col_from:col_to], for_best='Precision')
+        best_score3, best_thr3 = get_best_thr(prob_map, gt[row_from:row_to, col_from:col_to], for_best='Recall')
+
+        if random.uniform(0, 1) <= 0.5:
+            best_thr = best_thr2
+        else:
+            best_thr = best_thr3
 
         p, q, r, s, pad = imgutils.expand_and_mirror_patch(full_img_shape=img_arr.shape,
                                                            orig_patch_indices=[row_from, row_to, col_from, col_to],
@@ -140,11 +146,12 @@ class PatchesGenerator(Generator):
             img_tensor = np.flip(img_tensor, 1)
             prob_map = np.flip(prob_map, 1)
 
+        # IMG.fromarray(img_tensor).save('data/get/' + self.image_objects[ID].file_name + str(best_thr1) + '.png')
         img_tensor = img_tensor[..., None]
         if self.transforms is not None:
             img_tensor = self.transforms(img_tensor)
         # print(self.image_objects[ID].file_name, [row_from, row_to, col_from, col_to], best_thr1)
         return {'inputs': img_tensor,
                 'clip_ix': np.array([row_from, row_to, col_from, col_to]),
-                'y_thresholds': best_thr1,
+                'y_thresholds': best_thr,
                 'prob_map': prob_map.copy()}
