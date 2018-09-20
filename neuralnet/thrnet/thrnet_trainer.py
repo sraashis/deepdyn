@@ -84,7 +84,7 @@ class ThrnetTrainer(NNTrainer):
                     thr_map = self.model(inputs)
 
                     # if True:
-                    #     print(torch.cat([y_thresholds[..., None], thr_map], 1))
+                    #     print(torch.cat([y_thresholds, thr_map], 1))
                     #     print('-------------------------------------------------')
 
                     loss = F.mse_loss(thr_map, y_thresholds)

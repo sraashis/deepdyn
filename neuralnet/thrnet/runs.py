@@ -11,7 +11,7 @@ DRIVE16 = {
         'learning_rate': 0.001,
         'patch_shape': (16, 16),
         'patch_offset': (14, 14),
-        'expand_patch_by': (16, 16),
+        'expand_patch_by': (0, 0),
         'use_gpu': True,
         'distribute': True,
         'shuffle': True,

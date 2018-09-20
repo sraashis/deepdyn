@@ -41,15 +41,15 @@ class PatchesGenerator(Generator):
                 self.indices.append([ID] + chunk_ix)
 
             # Load equal number of background patches as well. But only for test set
-            if self.mode == 'train':
-                all_bg_pix_pos = list(zip(*np.where(img_obj.res['seed_bg'] == 0)))
-                shuffle(all_bg_pix_pos)
-                all_bg_patch_indices = list(
-                    imgutils.get_chunk_indices_by_index(img_obj.res['seed_bg'].shape, self.patch_shape,
-                                                        indices=all_bg_pix_pos[0:len(all_patch_indices)]))
-
-                for chunk_ix in all_bg_patch_indices:
-                    self.indices.append([ID] + chunk_ix)
+            # if self.mode == 'train1':
+            #     all_bg_pix_pos = list(zip(*np.where(img_obj.res['seed_bg'] == 0)))
+            #     shuffle(all_bg_pix_pos)
+            #     all_bg_patch_indices = list(
+            #         imgutils.get_chunk_indices_by_index(img_obj.res['seed_bg'].shape, self.patch_shape,
+            #                                             indices=all_bg_pix_pos[0:len(all_patch_indices)]))
+            #
+            #     for chunk_ix in all_bg_patch_indices:
+            #         self.indices.append([ID] + chunk_ix)
 
             self.image_objects[ID] = img_obj
         if self.shuffle_indices:
@@ -107,13 +107,13 @@ class PatchesGenerator(Generator):
         # <PREP5> Apply mask and save seed
         img_obj.res['seed'] = seed * sk_mask * 255
 
-        if self.mode == 'train':
-            # <PREP6> NOW WORK ON FINDING equal number of background patch indices
-            # No need tp generate background patches for test set
-            kernel = np.ones((10, 10), np.uint8)
-            dilated_estimate = cv2.dilate(raw_estimate, kernel, iterations=1)
-            dilated_estimate[img_obj.mask == 0] = 255
-            img_obj.res['seed_bg'] = dilated_estimate
+        # if self.mode == 'train1':
+        #     # <PREP6> NOW WORK ON FINDING equal number of background patch indices
+        #     # No need tp generate background patches for test set
+        #     kernel = np.ones((10, 10), np.uint8)
+        #     dilated_estimate = cv2.dilate(raw_estimate, kernel, iterations=1)
+        #     dilated_estimate[img_obj.mask == 0] = 255
+        #     img_obj.res['seed_bg'] = dilated_estimate
 
         return img_obj
 
@@ -143,7 +143,7 @@ class PatchesGenerator(Generator):
         img_tensor = img_tensor[..., None]
         if self.transforms is not None:
             img_tensor = self.transforms(img_tensor)
-
+        # print(self.image_objects[ID].file_name, [row_from, row_to, col_from, col_to], best_thr1)
         return {'inputs': img_tensor,
                 'clip_ix': np.array([row_from, row_to, col_from, col_to]),
                 'y_thresholds': best_thr1,
