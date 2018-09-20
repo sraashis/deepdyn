@@ -68,8 +68,7 @@ class Generator(Dataset):
         return len(self.indices)
 
     @classmethod
-    def get_loader(cls, images, run_conf, transforms):
-        mode = run_conf.get('Params').get('mode')
+    def get_loader(cls, images, run_conf, transforms, mode):
         gen = cls(run_conf=run_conf, images=images, transforms=transforms, shuffle_indices=True, mode=mode)
         return torch.utils.data.DataLoader(gen, batch_size=run_conf.get('Params').get('batch_size'),
                                            shuffle=True, num_workers=5,

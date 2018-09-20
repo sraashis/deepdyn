@@ -50,7 +50,8 @@ if __name__ == "__main__":
             drive_trainer = ThrnetTrainer(model=model, run_conf=R)
 
             if R.get('Params').get('mode') == 'train':
-                train_loader = PatchesGenerator.get_loader(run_conf=R, images=splits['train'], transforms=transform)
+                train_loader = PatchesGenerator.get_loader(run_conf=R, images=splits['train'], transforms=transform,
+                                                           mode='train')
                 val_loader = PatchesGenerator.get_loader_per_img(run_conf=R, images=splits['validation'],
                                                                  mode='validation')
                 drive_trainer.train(optimizer=optimizer, data_loader=train_loader, validation_loader=val_loader)

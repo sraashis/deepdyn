@@ -3,9 +3,11 @@ import os
 import random
 from random import shuffle
 
+import cv2
 import numpy as np
 from PIL import Image as IMG
 from scipy.ndimage.measurements import label
+from skimage.morphology import skeletonize
 
 import utils.img_utils as imgutils
 from commons.IMAGE import Image
@@ -19,10 +21,8 @@ class PatchesGenerator(Generator):
     def __init__(self, **kwargs):
         super(PatchesGenerator, self).__init__(**kwargs)
         self.patch_shape = self.run_conf.get('Params').get('patch_shape')
-        # self.patch_offset = self.run_conf.get('Params').get('patch_offset')
         self.expand_by = self.run_conf.get('Params').get('expand_patch_by')
         self.est_thr = self.run_conf.get('Params').get('est_threshold', 20)
-        self.skip_patch_by = self.run_conf.get('Params').get('skip_patch_by', 10)
         self.component_diameter_limit = self.run_conf.get('Params').get('comp_diam_limit', 20)
         self._load_indices()
         print('Patches:', self.__len__())
@@ -32,30 +32,24 @@ class PatchesGenerator(Generator):
 
             img_obj = self._get_image_obj(img_file)
 
-            est = img_obj.res['est']
-            all_est_ixes = list(zip(*np.where(est == 255)))
-
-            best_est_indices = list(
-                imgutils.get_chunk_indices_by_index(est.shape, self.patch_shape,
-                                                    indices=all_est_ixes[::self.skip_patch_by]))
-
-            for chunk_ix in best_est_indices:
+            # Load the patch corners based on estimated pixel seed
+            all_pix_pos = list(zip(*np.where(img_obj.res['seed'] == 255)))
+            all_patch_indices = list(
+                imgutils.get_chunk_indices_by_index(img_obj.res['seed'].shape, self.patch_shape,
+                                                    indices=all_pix_pos))
+            for chunk_ix in all_patch_indices:
                 self.indices.append([ID] + chunk_ix)
 
-            backgroun_cond = np.logical_and(est == 0, img_obj.mask == 255)
-            all_blank_ixes = list(zip(*np.where(backgroun_cond)))
-            all_blank_ixes = list(imgutils.get_chunk_indices_by_index(est.shape, self.patch_shape,
-                                                                      indices=all_blank_ixes[::10]))
+            # Load equal number of background patches as well. But only for test set
+            if self.mode == 'train':
+                all_bg_pix_pos = list(zip(*np.where(img_obj.res['seed_bg'] == 0)))
+                shuffle(all_bg_pix_pos)
+                all_bg_patch_indices = list(
+                    imgutils.get_chunk_indices_by_index(img_obj.res['seed_bg'].shape, self.patch_shape,
+                                                        indices=all_bg_pix_pos[0:len(all_patch_indices)]))
 
-            random.shuffle(all_blank_ixes)
-            size = self.__len__()
-            for blank_ix in all_blank_ixes:
-                if self.__len__() >= 2 * size:
-                    break
-                p, q, r, s = blank_ix
-                patch = est[p:q, r:s]
-                if ~np.isin(255, patch):
-                    self.indices.append([ID] + blank_ix)
+                for chunk_ix in all_bg_patch_indices:
+                    self.indices.append([ID] + chunk_ix)
 
             self.image_objects[ID] = img_obj
         if self.shuffle_indices:
@@ -82,14 +76,15 @@ class PatchesGenerator(Generator):
             x = np.logical_and(True, img_obj.mask == 255)
             img_obj.working_arr[img_obj.mask == 0] = img_obj.working_arr[x].mean()
 
+        # <PREP1> Segment with a low threshold and get a raw segmented image
         img_obj.working_arr[img_obj.mask == 0] = 0
-        estimate = img_obj.working_arr.copy()
-        estimate[estimate > self.est_thr] = 255
-        estimate[estimate <= self.est_thr] = 0
+        raw_estimate = img_obj.working_arr.copy()
+        raw_estimate[raw_estimate > self.est_thr] = 255
+        raw_estimate[raw_estimate <= self.est_thr] = 0
 
-        # Clear up small components(components less that 20px)
+        # <PREP2> Clear up small components(components less that 20px)
         structure = np.ones((3, 3), dtype=np.int)
-        labeled, ncomponents = label(estimate, structure)
+        labeled, ncomponents = label(raw_estimate, structure)
         for i in range(ncomponents):
             ixy = np.array(list(zip(*np.where(labeled == i))))
             x1, y1 = ixy[0]
@@ -97,9 +92,29 @@ class PatchesGenerator(Generator):
             dst = math.sqrt((x2 - x1) ** 2 + (y2 - y1) ** 2)
             if dst < self.component_diameter_limit:
                 for u, v in ixy:
-                    estimate[u, v] = 0
+                    raw_estimate[u, v] = 0
 
-        img_obj.res['est'] = estimate
+        # <PREP3> Binarize the image and extract skeleton
+        seed = raw_estimate.copy()
+        seed[seed == 255] = 1
+        seed = skeletonize(seed).astype(np.uint8)
+
+        # <PREP4> Come up with a grid mask to select few possible pixels to reconstruct the vessels from
+        sk_mask = np.zeros_like(seed)
+        sk_mask[::10] = 1
+        sk_mask[:, ::10] = 1
+
+        # <PREP5> Apply mask and save seed
+        img_obj.res['seed'] = seed * sk_mask * 255
+
+        if self.mode == 'train':
+            # <PREP6> NOW WORK ON FINDING equal number of background patch indices
+            # No need tp generate background patches for test set
+            kernel = np.ones((10, 10), np.uint8)
+            dilated_estimate = cv2.dilate(raw_estimate, kernel, iterations=1)
+            dilated_estimate[img_obj.mask == 0] = 255
+            img_obj.res['seed_bg'] = dilated_estimate
+
         return img_obj
 
     def __getitem__(self, index):
@@ -124,10 +139,6 @@ class PatchesGenerator(Generator):
         if self.mode == 'train' and random.uniform(0, 1) <= 0.5:
             img_tensor = np.flip(img_tensor, 1)
             prob_map = np.flip(prob_map, 1)
-
-        IMG.fromarray(img_tensor).save('tens.png')
-        IMG.fromarray(prob_map).save('map.png')
-        IMG.fromarray(img_arr).save('full.png')
 
         img_tensor = img_tensor[..., None]
         if self.transforms is not None:

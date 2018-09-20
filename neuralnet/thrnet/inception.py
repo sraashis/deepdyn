@@ -66,15 +66,15 @@ class InceptionThrNet(nn.Module):
         self.inception2_mxp = nn.MaxPool2d(kernel_size=2, stride=2, padding=0)
 
         # We will crop and concat from inception1 to this layer
-        self.inception3 = Inception(width=width, in_ch=64, out_ch=64)
-        self.inception4 = Inception(width=width, in_ch=64, out_ch=32)
+        self.inception3 = Inception(width=width, in_ch=64, out_ch=32)
+        self.inception4 = Inception(width=width, in_ch=32, out_ch=64)
         self.inception4_mxp = nn.MaxPool2d(kernel_size=2, stride=2, padding=0)
 
-        self.inception5 = Inception(width=width, in_ch=32, out_ch=64)
-        self.inception6 = Inception(width=width, in_ch=64, out_ch=32)
+        self.inception5 = Inception(width=width, in_ch=64, out_ch=32)
+        self.inception6 = Inception(width=width, in_ch=32, out_ch=64)
         self.inception6_mxp = nn.MaxPool2d(kernel_size=2, stride=2, padding=0)
 
-        self.inception7 = Inception(width=width, in_ch=32, out_ch=32)
+        self.inception7 = Inception(width=width, in_ch=64, out_ch=32)
         self.inception8 = Inception(width=width, in_ch=32, out_ch=32)
 
         self.linearWidth = 32 * 4 * 4
