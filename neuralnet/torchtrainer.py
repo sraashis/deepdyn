@@ -52,14 +52,14 @@ class NNTrainer:
             running_loss = 0.0
             self.adjust_learning_rate(optimizer=optimizer, epoch=epoch)
             for i, data in enumerate(data_loader, 1):
-                inputs, labels = data['inputs'].to(self.device), data['labels'].to(self.device)
+                inputs, labels = data['inputs'].to(self.device), data['labels'].long().to(self.device)
 
                 optimizer.zero_grad()
                 outputs = self.model(inputs)
                 _, predicted = torch.max(outputs, 1)
 
                 weights = torch.FloatTensor([random.uniform(1, 100), random.uniform(1, 100)])
-                loss = F.nll_loss(outputs, labels, weight=weights.to(self.device))
+                loss = F.nll_loss(outputs, labels, weight=None)
                 loss.backward()
                 optimizer.step()
 

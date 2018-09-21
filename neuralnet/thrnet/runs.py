@@ -5,17 +5,17 @@ sep = os.sep
 DRIVE16 = {
     'Params': {
         'num_channels': 1,
-        'num_classes': 1,
+        'num_classes': 2,
         'batch_size': 8,
         'epochs': 200,
         'learning_rate': 0.001,
-        'patch_shape': (16, 16),
-        'patch_offset': (14, 14),
-        'expand_patch_by': (16, 16),
+        'patch_shape': (32, 32),
+        # 'patch_offset': (14, 14),
+        'expand_patch_by': (96, 96),
         'use_gpu': True,
         'distribute': True,
         'shuffle': True,
-        'checkpoint_file': 'THRNET16-DRIVE.chk.tar',
+        'checkpoint_file': 'THRNET32-DRIVE.chk.tar',
         'log_frequency': 50,
         'validation_frequency': 1,
         'mode': 'train',
@@ -25,7 +25,7 @@ DRIVE16 = {
         'image': 'data' + sep + 'DRIVE_UNET_MAP' + sep + 'images',
         'mask': 'data' + sep + 'DRIVE' + sep + 'mask',
         'truth': 'data' + sep + 'DRIVE' + sep + 'manual',
-        'logs': 'data' + sep + 'DRIVE_UNET_MAP' + sep + 'thrnet16_logs'
+        'logs': 'data' + sep + 'DRIVE_UNET_MAP' + sep + 'thrnet32_logs'
     },
 
     'Funcs': {

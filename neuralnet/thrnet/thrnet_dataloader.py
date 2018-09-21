@@ -4,7 +4,6 @@ import random
 from random import shuffle
 
 import numpy as np
-from PIL import Image as IMG
 from scipy.ndimage.measurements import label
 from skimage.morphology import skeletonize
 
@@ -100,8 +99,8 @@ class PatchesGenerator(Generator):
 
         # <PREP4> Come up with a grid mask to select few possible pixels to reconstruct the vessels from
         sk_mask = np.zeros_like(seed)
-        sk_mask[::10] = 1
-        sk_mask[:, ::10] = 1
+        sk_mask[::20] = 1
+        sk_mask[:, ::20] = 1
 
         # <PREP5> Apply mask and save seed
         img_obj.res['seed'] = seed * sk_mask * 255
@@ -123,10 +122,11 @@ class PatchesGenerator(Generator):
         gt = self.image_objects[ID].ground_truth.copy()
 
         prob_map = img_arr[row_from:row_to, col_from:col_to]
+        y = gt[row_from:row_to, col_from:col_to]
 
-        # best_score, best_thr = get_best_thr(prob_map, gt[row_from:row_to, col_from:col_to], for_best='F1')
-        best_score2, best_thr2 = get_best_thr(prob_map, gt[row_from:row_to, col_from:col_to], for_best='Precision')
-        best_score3, best_thr3 = get_best_thr(prob_map, gt[row_from:row_to, col_from:col_to], for_best='Recall')
+        best_score1, best_thr1 = get_best_thr(prob_map, y, for_best='F1')
+        best_score2, best_thr2 = get_best_thr(prob_map, y, for_best='Precision')
+        best_score3, best_thr3 = get_best_thr(prob_map, y, for_best='Recall')
 
         if random.uniform(0, 1) <= 0.5:
             best_thr = best_thr2
@@ -141,17 +141,21 @@ class PatchesGenerator(Generator):
         if self.mode == 'train' and random.uniform(0, 1) <= 0.5:
             img_tensor = np.flip(img_tensor, 0)
             prob_map = np.flip(prob_map, 0)
+            y = np.flip(y, 0)
 
         if self.mode == 'train' and random.uniform(0, 1) <= 0.5:
             img_tensor = np.flip(img_tensor, 1)
             prob_map = np.flip(prob_map, 1)
+            y = np.flip(y, 1)
 
         # IMG.fromarray(img_tensor).save('data/get/' + self.image_objects[ID].file_name + str(best_thr1) + '.png')
         img_tensor = img_tensor[..., None]
         if self.transforms is not None:
             img_tensor = self.transforms(img_tensor)
         # print(self.image_objects[ID].file_name, [row_from, row_to, col_from, col_to], best_thr1)
+        y[y == 255] = 1
         return {'inputs': img_tensor,
                 'clip_ix': np.array([row_from, row_to, col_from, col_to]),
-                'y_thresholds': best_thr,
-                'prob_map': prob_map.copy()}
+                'y_thresholds': np.array([best_thr1, best_thr2, best_thr3]),
+                'prob_map': prob_map.copy(),
+                'labels': y.copy()}
