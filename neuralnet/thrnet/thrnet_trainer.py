@@ -1,8 +1,10 @@
+import math
 import os
 
 import PIL.Image as IMG
 import numpy as np
 import torch
+from scipy.ndimage.measurements import label
 
 from neuralnet.torchtrainer import NNTrainer
 from neuralnet.utils.measurements import ScoreAccumulator
@@ -86,6 +88,19 @@ class ThrnetTrainer(NNTrainer):
 
                 segmented_img[segmented_img > 0] = 255
                 segmented_img[img_obj.mask == 0] = 0
+
+                # Remove small connected components
+                structure = np.ones((3, 3), dtype=np.int)
+                labeled, ncomponents = label(segmented_img, structure)
+                for i in range(ncomponents):
+                    ixy = np.array(list(zip(*np.where(labeled == i))))
+                    x1, y1 = ixy[0]
+                    x2, y2 = ixy[-1]
+                    dst = math.sqrt((x2 - x1) ** 2 + (y2 - y1) ** 2)
+                    if dst < 20:
+                        for u, v in ixy:
+                            segmented_img[u, v] = 0
+
                 img_score = ScoreAccumulator()
                 img_score.add_array(img_obj.ground_truth, segmented_img)
                 eval_score.accumulate(img_score)
