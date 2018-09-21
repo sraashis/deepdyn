@@ -83,14 +83,14 @@ class InceptionThrNet(nn.Module):
         i3_out = self.inception3(i2_out)
         i3_out_dwn = self.inception3_mxp(i3_out)
 
-        i4_out = self.inception3(torch.cat([i3_out[:, :, 32:96, 32:96], i3_out_dwn], 1))
-        i5_out = self.inception4(i4_out)
-        i6_out = self.inception5(i5_out)
-        i6_out_dwn = self.inception5_mxp(i6_out)
+        i4_out = self.inception4(torch.cat([i3_out[:, :, 32:96, 32:96], i3_out_dwn], 1))
+        i5_out = self.inception5(i4_out)
+        i6_out = self.inception6(i5_out)
+        i6_out_dwn = self.inception6_mxp(i6_out)
 
-        i7_out = self.inception6(torch.cat([i6_out[:, :, 16:48, 16:48], i6_out_dwn], 1))
-        i8_out = self.inception7(i7_out)
-        i9_out = self.inception8(i8_out)
+        i7_out = self.inception7(torch.cat([i6_out[:, :, 16:48, 16:48], i6_out_dwn], 1))
+        i8_out = self.inception8(i7_out)
+        i9_out = self.inception9(i8_out)
 
         return F.log_softmax(i9_out, dim=1)
 
