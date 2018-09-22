@@ -13,7 +13,6 @@ import torch
 
 import utils.img_utils as imgutils
 from neuralnet.datagen import Generator
-from PIL import Image as IMG
 
 sep = os.sep
 
@@ -61,4 +60,7 @@ class PatchesGenerator(Generator):
         if self.transforms is not None:
             img_tensor = self.transforms(img_tensor)
 
-        return {'id': ID, 'inputs': img_tensor, 'labels': torch.LongTensor(y.copy())}
+        return {'id': ID,
+                'inputs': img_tensor,
+                'labels': torch.LongTensor(y.copy()),
+                'clip_ix': np.array([row_from, row_to, col_from, col_to]), }
