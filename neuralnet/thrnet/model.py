@@ -1,153 +1,109 @@
+import itertools
+
+import torch
 import torch.nn.functional as F
 from torch import nn
 
+from neuralnet.utils.weights_utils import initialize_weights
 
-class ThrNet(nn.Module):
-    def __init__(self, width, channels):
-        super(ThrNet, self).__init__()
 
-        self.channels = channels
-        self.width = width
+class BasicConv2d(nn.Module):
 
-        self.kern_size = 3
-        self.kern_stride = 1
-        self.kern_padding = 1
-        self.mxp_kern_size = 1
-        self.mxp_stride = 1
-        self.pool1 = nn.MaxPool2d(kernel_size=self.mxp_kern_size, stride=self.mxp_stride)
-        self.conv1 = nn.Conv2d(self.channels, 64, self.kern_size,
-                               stride=self.kern_stride, padding=self.kern_padding)
-        self._update_output_size()
-        self.bn1 = nn.BatchNorm2d(64)
-
-        self.kern_size = 3
-        self.kern_stride = 1
-        self.kern_padding = 1
-        self.mxp_kern_size = 1
-        self.mxp_stride = 1
-        self.pool2 = nn.MaxPool2d(kernel_size=self.mxp_kern_size, stride=self.mxp_stride)
-        self.conv2 = nn.Conv2d(64, 64, self.kern_size,
-                               stride=self.kern_stride, padding=self.kern_padding)
-        self._update_output_size()
-        self.bn2 = nn.BatchNorm2d(64)
-
-        self.kern_size = 3
-        self.kern_stride = 1
-        self.kern_padding = 1
-        self.mxp_kern_size = 2
-        self.mxp_stride = 2
-        self.pool3 = nn.MaxPool2d(kernel_size=self.mxp_kern_size, stride=self.mxp_stride)
-        self.conv3 = nn.Conv2d(64, 256, self.kern_size,
-                               stride=self.kern_stride, padding=self.kern_padding)
-        self._update_output_size()
-        self.bn3 = nn.BatchNorm2d(256)
-
-        self.kern_size = 3
-        self.kern_stride = 1
-        self.kern_padding = 1
-        self.mxp_kern_size = 1
-        self.mxp_stride = 1
-        self.pool4 = nn.MaxPool2d(kernel_size=self.mxp_kern_size, stride=self.mxp_stride)
-        self.conv4 = nn.Conv2d(256, 256, self.kern_size,
-                               stride=self.kern_stride, padding=self.kern_padding)
-        self._update_output_size()
-        self.bn4 = nn.BatchNorm2d(256)
-
-        self.kern_size = 3
-        self.kern_stride = 1
-        self.kern_padding = 1
-        self.mxp_kern_size = 1
-        self.mxp_stride = 1
-        self.pool5 = nn.MaxPool2d(kernel_size=self.mxp_kern_size, stride=self.mxp_stride)
-        self.conv5 = nn.Conv2d(256, 256, self.kern_size,
-                               stride=self.kern_stride, padding=self.kern_padding)
-        self._update_output_size()
-        self.bn5 = nn.BatchNorm2d(256)
-
-        self.kern_size = 3
-        self.kern_stride = 1
-        self.kern_padding = 1
-        self.mxp_kern_size = 2
-        self.mxp_stride = 2
-        self.pool6 = nn.MaxPool2d(kernel_size=self.mxp_kern_size, stride=self.mxp_stride)
-        self.conv6 = nn.Conv2d(256, 512, self.kern_size,
-                               stride=self.kern_stride, padding=self.kern_padding)
-        self._update_output_size()
-        self.bn6 = nn.BatchNorm2d(512)
-
-        self.kern_size = 3
-        self.kern_stride = 1
-        self.kern_padding = 1
-        self.mxp_kern_size = 1
-        self.mxp_stride = 1
-        self.pool7 = nn.MaxPool2d(kernel_size=self.mxp_kern_size, stride=self.mxp_stride)
-        self.conv7 = nn.Conv2d(512, 512, self.kern_size,
-                               stride=self.kern_stride, padding=self.kern_padding)
-        self._update_output_size()
-        self.bn7 = nn.BatchNorm2d(512)
-
-        self.kern_size = 3
-        self.kern_stride = 1
-        self.kern_padding = 1
-        self.mxp_kern_size = 1
-        self.mxp_stride = 1
-        self.pool8 = nn.MaxPool2d(kernel_size=self.mxp_kern_size, stride=self.mxp_stride)
-        self.conv8 = nn.Conv2d(512, 512, self.kern_size,
-                               stride=self.kern_stride, padding=self.kern_padding)
-        self._update_output_size()
-        self.bn8 = nn.BatchNorm2d(512)
-
-        self.kern_size = 3
-        self.kern_stride = 1
-        self.kern_padding = 1
-        self.mxp_kern_size = 2
-        self.mxp_stride = 2
-        self.pool9 = nn.MaxPool2d(kernel_size=self.mxp_kern_size, stride=self.mxp_stride)
-        self.conv9 = nn.Conv2d(512, 1024, self.kern_size,
-                               stride=self.kern_stride, padding=self.kern_padding)
-        self._update_output_size()
-        self.bn9 = nn.BatchNorm2d(1024)
-
-        self.kern_size = 1
-        self.kern_stride = 1
-        self.kern_padding = 0
-        self.mxp_kern_size = 1
-        self.mxp_stride = 1
-        self.pool10 = nn.MaxPool2d(kernel_size=self.mxp_kern_size, stride=self.mxp_stride)
-        self.conv10 = nn.Conv2d(1024, 256, self.kern_size,
-                                stride=self.kern_stride, padding=self.kern_padding)
-        self._update_output_size()
-        self.bn10 = nn.BatchNorm2d(256)
-
-        self.linearWidth = 256 * int(self.width) * int(self.width)
-        self.fc1 = nn.Linear(self.linearWidth, 128)
-        self.out = nn.Linear(128, 1)
+    def __init__(self, in_ch, out_ch, k, s, p):
+        super(BasicConv2d, self).__init__()
+        self.conv = nn.Conv2d(in_channels=in_ch, out_channels=out_ch, kernel_size=k, stride=s, padding=p, bias=False)
+        self.bn = nn.BatchNorm2d(out_ch)
 
     def forward(self, x):
-        x = self.pool1(F.relu(self.bn1(self.conv1(x))))
-        x = self.pool2(F.relu(self.bn2(self.conv2(x))))
-        x = self.pool3(F.relu(self.bn3(self.conv3(x))))
-        x = self.pool4(F.relu(self.bn4(self.conv4(x))))
-        x = self.pool5(F.relu(self.bn5(self.conv5(x))))
-        x = self.pool6(F.relu(self.bn6(self.conv6(x))))
-        x = self.pool7(F.relu(self.bn7(self.conv7(x))))
-        x = self.pool8(F.relu(self.bn8(self.conv8(x))))
-        x = self.pool9(F.relu(self.bn9(self.conv9(x))))
-        x = self.pool10(F.relu(self.bn10(self.conv10(x))))
+        x = self.conv(x)
+        x = self.bn(x)
+        return F.relu(x, inplace=True)
 
-        x = x.view(-1, self.linearWidth)
-        x = F.relu(self.fc1(x))
-        x = self.out(x)
-        return x
 
-    def _update_output_size(self):
-        temp = self.width
-        self.width = ((self.width - self.kern_size + 2 * self.kern_padding) / self.kern_stride) + 1
-        temp1 = self.width
-        self.width = ((self.width - self.mxp_kern_size) / self.mxp_stride) + 1
-        print('Output width[ ' + str(temp) + ' -conv-> ' + str(temp1) + ' -maxpool-> ' + str(self.width) + ' ]')
-        self.width = int(self.width)
+class Inception(nn.Module):
+    def __init__(self, in_ch=None, width=None, out_ch=128):
+        super(Inception, self).__init__()
 
-# for i in [16, 32, 64]:
-#     k = ThrNet(i, 1)
-#     print("######################################################")
+        _, k, s, p = self.get_wksp(w=width, w_match=width, k=3)
+        self.convA1_3by3 = BasicConv2d(in_ch=in_ch, out_ch=out_ch, k=k, s=s, p=p)
+
+        _, k, s, p = self.get_wksp(w=width, w_match=width, k=5)
+        self.convB1_5by5 = BasicConv2d(in_ch=in_ch, out_ch=out_ch, k=k, s=s, p=p)
+
+        _, k, s, p = self.get_wksp(w=width, w_match=width, k=5)
+        self.convA2_5by5 = BasicConv2d(in_ch=out_ch, out_ch=out_ch, k=k, s=s, p=p)
+
+        _, k, s, p = self.get_wksp(w=width, w_match=width, k=3)
+        self.convB2_3by3 = BasicConv2d(in_ch=out_ch, out_ch=out_ch, k=k, s=s, p=p)
+
+        self.conv_out_1by1 = BasicConv2d(in_ch=out_ch * 2, out_ch=out_ch, k=1, s=1, p=0)
+
+    def forward(self, x):
+        a = self.convA2_5by5(self.convA1_3by3(x))
+        b = self.convB2_3by3(self.convB1_5by5(x))
+        return self.conv_out_1by1(torch.cat([a, b], 1))
+
+    @staticmethod
+    def out_w(w, k, s, p):
+        return ((w - k + 2 * p) / s) + 1
+
+    def get_wksp(self, w=None, w_match=None, k=None, strides=[1, 2, 3], paddings=[0, 1, 2, 3]):
+        all_sp = itertools.product(strides, paddings)
+        for (s, p) in all_sp:
+            w_out = self.out_w(w, k, s, p)
+            if w_out.is_integer() and w_match == int(w_out):
+                return w_out, k, s, p
+
+        raise LookupError('Solution not within range.')
+
+
+class InceptionThrNet(nn.Module):
+    def __init__(self, width, input_ch, num_class):
+        super(InceptionThrNet, self).__init__()
+
+        self.inception1 = Inception(width=width, in_ch=input_ch, out_ch=32)
+        self.inception2 = Inception(width=width, in_ch=32, out_ch=64)
+        self.inception2_mxp = nn.MaxPool2d(kernel_size=2, stride=2, padding=0)
+
+        # We will crop and concat from inception1 to this layer
+        self.inception3 = Inception(width=width, in_ch=128, out_ch=32)
+        self.inception4 = Inception(width=width, in_ch=32, out_ch=128)
+        self.inception4_mxp = nn.MaxPool2d(kernel_size=2, stride=2, padding=0)
+
+        self.inception5 = Inception(width=width, in_ch=128, out_ch=32)
+        self.inception6 = Inception(width=width, in_ch=32, out_ch=128)
+        self.inception6_mxp = nn.MaxPool2d(kernel_size=2, stride=2, padding=0)
+
+        self.inception7 = Inception(width=width, in_ch=128, out_ch=32)
+        self.inception8 = Inception(width=width, in_ch=32, out_ch=128)
+
+        self.linearWidth = 128 * 4 * 4
+        self.fc1_out = nn.Linear(self.linearWidth, 512)
+        self.fc2_out = nn.Linear(512, num_class)
+        initialize_weights(self)
+
+    def forward(self, x):
+        i1_out = self.inception1(x)
+        i2_out = self.inception2(i1_out)
+        i2_out_dwn = self.inception2_mxp(i2_out)
+
+        i3_out = self.inception3(torch.cat([i2_out[:, :, 8:24, 8:24], i2_out_dwn], 1))
+        i4_out = self.inception4(i3_out)
+        i4_dwn_out = self.inception4_mxp(i4_out)
+
+        i5_out = self.inception5(i4_dwn_out)
+        i6_out = self.inception6(i5_out)
+        i6_dwn_out = self.inception6_mxp(i6_out)
+
+        i7_out = self.inception7(i6_dwn_out)
+        i8_out = self.inception8(i7_out)
+
+        flattened = i8_out.view(-1, self.linearWidth)
+
+        fc1_out = F.relu(self.fc1_out(flattened))
+        return self.fc2_out(fc1_out)
+
+
+m = InceptionThrNet(width=32, input_ch=1, num_class=1)
+torch_total_params = sum(p.numel() for p in m.parameters() if p.requires_grad)
+print('Total Params:', torch_total_params)
