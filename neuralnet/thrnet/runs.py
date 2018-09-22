@@ -2,11 +2,11 @@ import os
 
 sep = os.sep
 
-DRIVE16 = {
+DRIVE32 = {
     'Params': {
         'num_channels': 1,
         'num_classes': 2,
-        'batch_size': 8,
+        'batch_size': 16,
         'epochs': 200,
         'learning_rate': 0.001,
         'patch_shape': (32, 32),

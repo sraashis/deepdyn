@@ -69,7 +69,7 @@ class ThrnetTrainer(NNTrainer):
 
         print('\nEvaluating...')
         with torch.no_grad():
-            eval_score = ScoreAccumulator()
+            eval_score = 0.0
             for loader in data_loaders:
                 img_obj = loader.dataset.image_objects[0]
                 segmented_img = np.zeros_like(img_obj.working_arr.copy())
@@ -103,10 +103,10 @@ class ThrnetTrainer(NNTrainer):
 
                 img_score = ScoreAccumulator()
                 img_score.add_array(img_obj.ground_truth, segmented_img)
-                eval_score.accumulate(img_score)
+                eval_score += img_score.get_prf1a()[2]
                 print(img_obj.file_name, ' PRF1A', img_score.get_prf1a())
                 IMG.fromarray(segmented_img).save(
                     os.path.join(self.log_dir, img_obj.file_name.split('.')[0] + '.png'))
 
         if mode is 'train':
-            self._save_if_better(score=eval_score.get_prf1a()[2])
+            self._save_if_better(score=eval_score / len(data_loaders))
