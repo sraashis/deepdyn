@@ -10,7 +10,6 @@ import numpy as np
 import torch
 from PIL import Image as IMG
 
-import utils.img_utils as imgutils
 from neuralnet.torchtrainer import NNTrainer
 from neuralnet.utils.measurements import ScoreAccumulator
 
@@ -23,44 +22,47 @@ class UNetNNTrainer(NNTrainer):
         self.patch_shape = self.run_conf.get('Params').get('patch_shape')
         self.patch_offset = self.run_conf.get('Params').get('patch_offset')
 
-    def evaluate(self, data_loaders=None, logger=None, mode=None, epoch=0):
+    def evaluate(self, data_loaders=None, logger=None):
         assert (logger is not None), 'Please Provide a logger'
         self.model.eval()
 
         print('\nEvaluating...')
         with torch.no_grad():
-            eval_score = ScoreAccumulator()
+            eval_score = 0.0
             for loader in data_loaders:
                 img_obj = loader.dataset.image_objects[0]
-                segmented_img = []
+                segmented_img = torch.cuda.LongTensor(img_obj.working_arr.shape[0],
+                                                      img_obj.working_arr.shape[1]).fill_(0).to(self.device)
+                gt = torch.LongTensor(img_obj.ground_truth).to(self.device)
 
-                img_score = ScoreAccumulator()
                 for i, data in enumerate(loader, 1):
                     inputs, labels = data['inputs'].float().to(self.device), data['labels'].float().to(self.device)
+                    clip_ix = data['clip_ix'].int().to(self.device)
+
                     outputs = self.model(inputs)
                     _, predicted = torch.max(outputs, 1)
 
-                    current_score = ScoreAccumulator()
-                    current_score.add_tensor(labels.float(), predicted.float())
-                    img_score.accumulate(current_score)
-                    eval_score.accumulate(current_score)
+                    for j in range(predicted.shape[0]):
+                        p, q, r, s = clip_ix[j]
+                        segmented_img[p:q, r:s] += predicted[j]
+                    print('Batch: ', i, end='\r')
 
-                    if mode is 'test':
-                        segmented_img += outputs.clone().cpu().numpy().tolist()
+                segmented_img[segmented_img > 0] = 255
+                # segmented_img[img_obj.mask == 0] = 0
 
-                    self.flush(logger, ','.join(
-                        str(x) for x in
-                        [img_obj.file_name, 1, self.checkpoint['epochs'], 0] + current_score.get_prf1a()))
+                img_score = ScoreAccumulator()
 
-                print(img_obj.file_name + ' PRF1A: ', img_score.get_prf1a())
-                if mode is 'test':
-                    segmented_img = np.exp(np.array(segmented_img)[:, 1, :, :]).squeeze()
-                    segmented_img = np.array(segmented_img * 255, dtype=np.uint8)
+                if self.model.training:
+                    img_score.add_tensor(segmented_img, gt)
+                else:
+                    segmented_img = segmented_img.cpu().numpy()
+                    img_score.add_array(img_obj.ground_truth, segmented_img)
+                    eval_score += img_score.get_prf1a()[2]
+                    IMG.fromarray(np.array(segmented_img, dtype=np.uint8)).save(
+                        os.path.join(self.log_dir, img_obj.file_name.split('.')[0] + '.png'))
 
-                    maps_img = imgutils.merge_patches(patches=segmented_img, image_size=img_obj.working_arr.shape,
-                                                      patch_size=self.patch_shape,
-                                                      offset_row_col=self.patch_offset)
-                    IMG.fromarray(maps_img).save(os.path.join(self.log_dir, img_obj.file_name.split('.')[0] + '.png'))
+                print(img_obj.file_name, ' PRF1A', img_score.get_prf1a())
 
-        if mode is 'train':
-            self._save_if_better(score=eval_score.get_prf1a()[2])
+        if self.model.training:
+            self._save_if_better(score=eval_score / len(data_loaders))
+

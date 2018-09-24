@@ -4,7 +4,6 @@ import random
 from random import shuffle
 
 import numpy as np
-from PIL import Image as IMG
 from scipy.ndimage.measurements import label
 from skimage.morphology import skeletonize
 
@@ -12,6 +11,7 @@ import utils.img_utils as imgutils
 from commons.IMAGE import Image
 from neuralnet.datagen import Generator
 from neuralnet.utils.measurements import get_best_thr
+import cv2
 
 sep = os.sep
 
@@ -39,8 +39,8 @@ class PatchesGenerator(Generator):
             for chunk_ix in all_patch_indices:
                 self.indices.append([ID] + chunk_ix)
 
-            # Load equal number of background patches as well. But only for test set
-            # if self.mode == 'train1':
+            # # Load equal number of background patches as well. But only for test set
+            # if self.mode == 'train':
             #     all_bg_pix_pos = list(zip(*np.where(img_obj.res['seed_bg'] == 0)))
             #     shuffle(all_bg_pix_pos)
             #     all_bg_patch_indices = list(
@@ -100,13 +100,13 @@ class PatchesGenerator(Generator):
 
         # <PREP4> Come up with a grid mask to select few possible pixels to reconstruct the vessels from
         sk_mask = np.zeros_like(seed)
-        sk_mask[::10] = 1
-        sk_mask[:, ::10] = 1
+        sk_mask[::20] = 1
+        sk_mask[:, ::20] = 1
 
         # <PREP5> Apply mask and save seed
         img_obj.res['seed'] = seed * sk_mask * 255
 
-        # if self.mode == 'train1':
+        # if self.mode == 'train':
         #     # <PREP6> NOW WORK ON FINDING equal number of background patch indices
         #     # No need tp generate background patches for test set
         #     kernel = np.ones((10, 10), np.uint8)
@@ -123,15 +123,11 @@ class PatchesGenerator(Generator):
         gt = self.image_objects[ID].ground_truth.copy()
 
         prob_map = img_arr[row_from:row_to, col_from:col_to]
+        y = gt[row_from:row_to, col_from:col_to]
 
-        # best_score, best_thr = get_best_thr(prob_map, gt[row_from:row_to, col_from:col_to], for_best='F1')
-        best_score2, best_thr2 = get_best_thr(prob_map, gt[row_from:row_to, col_from:col_to], for_best='Precision')
-        best_score3, best_thr3 = get_best_thr(prob_map, gt[row_from:row_to, col_from:col_to], for_best='Recall')
-
-        if random.uniform(0, 1) <= 0.5:
-            best_thr = best_thr2
-        else:
-            best_thr = best_thr3
+        best_score1, best_thr1 = get_best_thr(prob_map, y, for_best='F1')
+        # best_score2, best_thr2 = get_best_thr(prob_map, y, for_best='Precision')
+        # best_score3, best_thr3 = get_best_thr(prob_map, y, for_best='Recall')
 
         p, q, r, s, pad = imgutils.expand_and_mirror_patch(full_img_shape=img_arr.shape,
                                                            orig_patch_indices=[row_from, row_to, col_from, col_to],
@@ -141,17 +137,21 @@ class PatchesGenerator(Generator):
         if self.mode == 'train' and random.uniform(0, 1) <= 0.5:
             img_tensor = np.flip(img_tensor, 0)
             prob_map = np.flip(prob_map, 0)
+            y = np.flip(y, 0)
 
         if self.mode == 'train' and random.uniform(0, 1) <= 0.5:
             img_tensor = np.flip(img_tensor, 1)
             prob_map = np.flip(prob_map, 1)
+            y = np.flip(y, 1)
 
         # IMG.fromarray(img_tensor).save('data/get/' + self.image_objects[ID].file_name + str(best_thr1) + '.png')
         img_tensor = img_tensor[..., None]
         if self.transforms is not None:
             img_tensor = self.transforms(img_tensor)
         # print(self.image_objects[ID].file_name, [row_from, row_to, col_from, col_to], best_thr1)
+        y[y == 255] = 1
         return {'inputs': img_tensor,
                 'clip_ix': np.array([row_from, row_to, col_from, col_to]),
-                'y_thresholds': best_thr,
-                'prob_map': prob_map.copy()}
+                'y_thresholds': best_thr1,
+                'prob_map': prob_map.copy(),
+                'labels': y.copy()}

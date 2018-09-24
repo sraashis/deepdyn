@@ -24,6 +24,7 @@ from neuralnet.utils import auto_split as asp
 from neuralnet.unet.runs import DRIVE
 
 RUNS = [DRIVE]
+torch.cuda.set_device(1)
 
 if __name__ == "__main__":
 
@@ -57,12 +58,13 @@ if __name__ == "__main__":
                 drive_trainer.train(optimizer=optimizer, data_loader=train_loader, validation_loader=val_loader)
 
             drive_trainer.resume_from_checkpoint(parallel_trained=R.get('Params').get('parallel_trained'))
-            test_loader = PatchesGenerator.get_loader_per_img(run_conf=R, images=splits['test'], mode='test')
+            test_loader = PatchesGenerator.get_loader_per_img(run_conf=R,
+                                                              images=splits['train'] + splits['test'] + splits[
+                                                                  'validation'], mode='test')
 
             log_file = os.path.join(R['Dirs']['logs'], R['Params']['checkpoint_file'] + '-TEST.csv')
             logger = drive_trainer.get_logger(log_file)
-            drive_trainer.evaluate(data_loaders=test_loader, mode='test',
-                                   logger=logger)
+            drive_trainer.evaluate(data_loaders=test_loader, logger=logger)
             logger.close()
         except Exception as e:
             traceback.print_exc()

@@ -18,11 +18,12 @@ from neuralnet.thrnet.thrnet_dataloader import PatchesGenerator
 from neuralnet.thrnet.thrnet_trainer import ThrnetTrainer
 import torchvision.transforms as transforms
 from neuralnet.utils import auto_split as asp
-from neuralnet.thrnet.runs import DRIVE16
+from neuralnet.thrnet.runs import DRIVE32
 
 # RUNS = [DRIVE32, DRIVE16]
 
-RUNS = [DRIVE16]
+RUNS = [DRIVE32]
+torch.cuda.set_device(1)
 
 if __name__ == "__main__":
 
@@ -61,8 +62,7 @@ if __name__ == "__main__":
 
             log_file = os.path.join(R['Dirs']['logs'], R['Params']['checkpoint_file'] + '-TEST.csv')
             logger = drive_trainer.get_logger(log_file, header='ID,TYPE,EPOCH,BATCH,LOSS')
-            drive_trainer.evaluate(data_loaders=test_loader, mode='test',
-                                   logger=logger)
+            drive_trainer.evaluate(data_loaders=test_loader, logger=logger)
             logger.close()
         except Exception as e:
             traceback.print_exc()

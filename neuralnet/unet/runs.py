@@ -19,7 +19,7 @@ DRIVE = {
         'log_frequency': 5,
         'validation_frequency': 4,
         'mode': 'test',
-        'parallel_trained': False
+        'parallel_trained': True
     },
     'Dirs': {
         'image': 'data' + sep + 'DRIVE' + sep + 'images',
