@@ -68,6 +68,7 @@ class ThrnetTrainer(NNTrainer):
         print('\nEvaluating...')
         with torch.no_grad():
             eval_score = 0.0
+
             for loader in data_loaders:
                 img_obj = loader.dataset.image_objects[0]
                 segmented_img = torch.cuda.LongTensor(img_obj.working_arr.shape[0],
@@ -102,5 +103,4 @@ class ThrnetTrainer(NNTrainer):
 
                 print(img_obj.file_name, ' PRF1A', img_score.get_prf1a())
 
-        if self.model.training:
-            self._save_if_better(score=eval_score / len(data_loaders))
+        self._save_if_better(score=eval_score / len(data_loaders))

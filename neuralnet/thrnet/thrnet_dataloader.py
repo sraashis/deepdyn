@@ -12,6 +12,7 @@ from commons.IMAGE import Image
 from neuralnet.datagen import Generator
 from neuralnet.utils.measurements import get_best_thr
 import cv2
+from PIL import Image as IMG
 
 sep = os.sep
 
@@ -100,8 +101,8 @@ class PatchesGenerator(Generator):
 
         # <PREP4> Come up with a grid mask to select few possible pixels to reconstruct the vessels from
         sk_mask = np.zeros_like(seed)
-        sk_mask[::20] = 1
-        sk_mask[:, ::20] = 1
+        sk_mask[::30] = 1
+        sk_mask[:, ::30] = 1
 
         # <PREP5> Apply mask and save seed
         img_obj.res['seed'] = seed * sk_mask * 255
@@ -144,7 +145,7 @@ class PatchesGenerator(Generator):
             prob_map = np.flip(prob_map, 1)
             y = np.flip(y, 1)
 
-        # IMG.fromarray(img_tensor).save('data/get/' + self.image_objects[ID].file_name + str(best_thr1) + '.png')
+        IMG.fromarray(img_tensor).save('data/get/' + self.image_objects[ID].file_name + str(best_thr1) + '.png')
         img_tensor = img_tensor[..., None]
         if self.transforms is not None:
             img_tensor = self.transforms(img_tensor)

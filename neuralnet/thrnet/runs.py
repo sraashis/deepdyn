@@ -6,19 +6,19 @@ DRIVE32 = {
     'Params': {
         'num_channels': 1,
         'num_classes': 2,
-        'batch_size': 10,
+        'batch_size': 16,
         'epochs': 200,
         'learning_rate': 0.001,
-        'patch_shape': (32, 32),
+        'patch_shape': (64, 64),
         # 'patch_offset': (14, 14),
-        'expand_patch_by': (96, 96),
+        'expand_patch_by': (0, 0),
         'use_gpu': True,
         'distribute': False,
         'shuffle': True,
         'checkpoint_file': 'THRNET32-DRIVE.chk.tar',
         'log_frequency': 50,
         'validation_frequency': 1,
-        'mode': 'test',
+        'mode': 'train',
         'parallel_trained': False
     },
     'Dirs': {

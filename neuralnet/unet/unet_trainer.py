@@ -25,7 +25,7 @@ class UNetNNTrainer(NNTrainer):
     def evaluate(self, data_loaders=None, logger=None):
         assert (logger is not None), 'Please Provide a logger'
         self.model.eval()
-
+        
         print('\nEvaluating...')
         with torch.no_grad():
             eval_score = 0.0
@@ -63,6 +63,5 @@ class UNetNNTrainer(NNTrainer):
 
                 print(img_obj.file_name, ' PRF1A', img_score.get_prf1a())
 
-        if self.model.training:
-            self._save_if_better(score=eval_score / len(data_loaders))
+        self._save_if_better(score=eval_score / len(data_loaders))
 
