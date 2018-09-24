@@ -58,8 +58,8 @@ class NNTrainer:
                 outputs = self.model(inputs)
                 _, predicted = torch.max(outputs, 1)
 
-                weights = torch.FloatTensor([random.uniform(1, 100), random.uniform(1, 100)])
-                loss = F.nll_loss(outputs, labels, weight=None)
+                weights = torch.FloatTensor([random.uniform(1, 10), random.uniform(1, 10)])
+                loss = F.nll_loss(outputs, labels, weight=weights.to(self.device))
                 loss.backward()
                 optimizer.step()
 
@@ -76,14 +76,13 @@ class NNTrainer:
                 self.flush(logger, ','.join(str(x) for x in [0, 0, epoch, i, p, r, f1, a, current_loss]))
 
             if epoch % self.validation_frequency == 0:
-                self.evaluate(data_loaders=validation_loader, logger=logger,
-                              mode='train')
+                self.evaluate(data_loaders=validation_loader, logger=logger)
         try:
             logger.close()
         except IOError:
             pass
 
-    def evaluate(self, data_loaders=None, logger=None, mode=None):
+    def evaluate(self, data_loaders=None, logger=None):
         raise NotImplementedError('ERROR!!!!! Must be implemented')
 
     def resume_from_checkpoint(self, parallel_trained=False):

@@ -1,10 +1,8 @@
-import math
 import os
 
 import PIL.Image as IMG
 import numpy as np
 import torch
-from scipy.ndimage.measurements import label
 
 from neuralnet.torchtrainer import NNTrainer
 from neuralnet.utils.measurements import ScoreAccumulator
@@ -63,7 +61,7 @@ class ThrnetTrainer(NNTrainer):
     #     except IOError:
     #         pass
 
-    def evaluate(self, data_loaders=None, logger=None, mode=None, epoch=0):
+    def evaluate(self, data_loaders=None, logger=None, epoch=0):
         assert (logger is not None), 'Please Provide a logger'
         self.model.eval()
 
@@ -72,7 +70,9 @@ class ThrnetTrainer(NNTrainer):
             eval_score = 0.0
             for loader in data_loaders:
                 img_obj = loader.dataset.image_objects[0]
-                segmented_img = np.zeros_like(img_obj.working_arr.copy())
+                segmented_img = torch.cuda.LongTensor(img_obj.working_arr.shape[0],
+                                                      img_obj.working_arr.shape[1]).fill_(0).to(self.device)
+                gt = torch.LongTensor(img_obj.ground_truth).to(self.device)
 
                 for i, data in enumerate(loader, 1):
                     inputs, labels = data['inputs'].float().to(self.device), data['labels'].float().to(self.device)
@@ -83,30 +83,24 @@ class ThrnetTrainer(NNTrainer):
 
                     for j in range(predicted.shape[0]):
                         p, q, r, s = clip_ix[j]
-                        segmented_img[p:q, r:s] += predicted[j].cpu().numpy().astype(np.uint8)
+                        segmented_img[p:q, r:s] += predicted[j]
                     print('Batch: ', i, end='\r')
 
                 segmented_img[segmented_img > 0] = 255
-                segmented_img[img_obj.mask == 0] = 0
-
-                # Remove small connected components
-                structure = np.ones((3, 3), dtype=np.int)
-                labeled, ncomponents = label(segmented_img, structure)
-                for i in range(ncomponents):
-                    ixy = np.array(list(zip(*np.where(labeled == i))))
-                    x1, y1 = ixy[0]
-                    x2, y2 = ixy[-1]
-                    dst = math.sqrt((x2 - x1) ** 2 + (y2 - y1) ** 2)
-                    if dst < 20:
-                        for u, v in ixy:
-                            segmented_img[u, v] = 0
+                # segmented_img[img_obj.mask == 0] = 0
 
                 img_score = ScoreAccumulator()
-                img_score.add_array(img_obj.ground_truth, segmented_img)
-                eval_score += img_score.get_prf1a()[2]
-                print(img_obj.file_name, ' PRF1A', img_score.get_prf1a())
-                IMG.fromarray(segmented_img).save(
-                    os.path.join(self.log_dir, img_obj.file_name.split('.')[0] + '.png'))
 
-        if mode is 'train':
+                if self.model.training:
+                    img_score.add_tensor(segmented_img, gt)
+                else:
+                    segmented_img = segmented_img.cpu().numpy()
+                    img_score.add_array(img_obj.ground_truth, segmented_img)
+                    eval_score += img_score.get_prf1a()[2]
+                    IMG.fromarray(np.array(segmented_img, dtype=np.uint8)).save(
+                        os.path.join(self.log_dir, img_obj.file_name.split('.')[0] + '.png'))
+
+                print(img_obj.file_name, ' PRF1A', img_score.get_prf1a())
+
+        if self.model.training:
             self._save_if_better(score=eval_score / len(data_loaders))

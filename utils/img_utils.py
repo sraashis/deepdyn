@@ -7,6 +7,8 @@
 import PIL.Image as IMG
 import matplotlib.pyplot as plt
 import numpy as np
+from scipy.ndimage.measurements import label
+import math
 
 
 def get_rgb_scores(arr_2d=None, truth=None):
@@ -190,3 +192,19 @@ def expand_and_mirror_patch(full_img_shape=None, orig_patch_indices=None, expand
         pad_d = d - full_img_shape[1]
         d = full_img_shape[1]
     return a, b, c, d, [(pad_a, pad_b), (pad_c, pad_d)]
+
+
+def remove_connected_comp(segmented_img, connected_comp_diam_limit=20):
+    # Remove small connected components
+    img = segmented_img.copy()
+    structure = np.ones((3, 3), dtype=np.int)
+    labeled, n_components = label(img, structure)
+    for i in range(n_components):
+        ixy = np.array(list(zip(*np.where(labeled == i))))
+        x1, y1 = ixy[0]
+        x2, y2 = ixy[-1]
+        dst = math.sqrt((x2 - x1) ** 2 + (y2 - y1) ** 2)
+        if dst < connected_comp_diam_limit:
+            for u, v in ixy:
+                img[u, v] = 0
+    return img

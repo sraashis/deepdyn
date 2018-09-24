@@ -64,8 +64,7 @@ if __name__ == "__main__":
 
             log_file = os.path.join(R['Dirs']['logs'], R['Params']['checkpoint_file'] + '-TEST.csv')
             logger = drive_trainer.get_logger(log_file)
-            drive_trainer.evaluate(data_loaders=test_loader, mode='test',
-                                   logger=logger)
+            drive_trainer.evaluate(data_loaders=test_loader, logger=logger)
             logger.close()
         except Exception as e:
             traceback.print_exc()
