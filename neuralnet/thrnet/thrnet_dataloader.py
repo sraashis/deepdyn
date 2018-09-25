@@ -101,8 +101,8 @@ class PatchesGenerator(Generator):
 
         # <PREP4> Come up with a grid mask to select few possible pixels to reconstruct the vessels from
         sk_mask = np.zeros_like(seed)
-        sk_mask[::30] = 1
-        sk_mask[:, ::30] = 1
+        sk_mask[::15] = 1
+        sk_mask[:, ::15] = 1
 
         # <PREP5> Apply mask and save seed
         img_obj.res['seed'] = seed * sk_mask * 255
