@@ -36,7 +36,7 @@ class PatchesGenerator(Generator):
                     continue
                 self.indices.append([ID, i, j, 1 if img_obj.ground_truth[i, j] == 255 else 0])
             self.image_objects[ID] = img_obj
-        if self.shuffle:
+        if self.shuffle_indices:
             shuffle(self.indices)
 
     def __getitem__(self, index):

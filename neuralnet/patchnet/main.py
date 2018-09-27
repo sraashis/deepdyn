@@ -18,12 +18,12 @@ from neuralnet.patchnet.patchnet_dataloader import PatchesGenerator
 from neuralnet.patchnet.patchnet_trainer import PatchNetTrainer
 import torchvision.transforms as transforms
 from neuralnet.utils import auto_split as asp
-from neuralnet.patchnet.runs import DRIVE32a
+from neuralnet.patchnet.runs import DRIVE
 
 # RUNS = [DRIVE32, DRIVE16]
 
-RUNS = [DRIVE32a]
-torch.cuda.set_device(0)
+RUNS = [DRIVE]
+# torch.cuda.set_device(1)
 
 if __name__ == "__main__":
 
@@ -40,7 +40,7 @@ if __name__ == "__main__":
             images_src_dir=R.get('Dirs').get('image'),
             to_file=os.path.join(R.get('Dirs').get('logs'), R.get('Params').get('checkpoint_file') + '.json'))
         patch_shape = R['Params']['patch_shape'][0] + R['Params']['expand_patch_by'][0]
-        model = Inceptionpatchnet(patch_shape, R['Params']['num_channels'], R['Params']['num_classes'])
+        model = PatchNet(R['Params']['num_channels'], R['Params']['num_classes'])
         optimizer = optim.Adam(model.parameters(), lr=R['Params']['learning_rate'])
         if R['Params']['distribute']:
             model = torch.nn.DataParallel(model)
@@ -48,7 +48,7 @@ if __name__ == "__main__":
             optimizer = optim.Adam(model.module.parameters(), lr=R['Params']['learning_rate'])
 
         try:
-            drive_trainer = patchnetTrainer(model=model, run_conf=R)
+            drive_trainer = PatchNetTrainer(model=model, run_conf=R)
 
             if R.get('Params').get('mode') == 'train':
                 train_loader = PatchesGenerator.get_loader(run_conf=R, images=splits['train'], transforms=transform,
