@@ -92,7 +92,7 @@ STARE = {
     },
 
     'Funcs': {
-        'truth_getter': lambda file_name: file_name.split('.')[0] + '.vk.pgm',
+        'truth_getter': lambda file_name: file_name.split('.')[0] + '.ah.pgm',
         'mask_getter': None
     }
 }
@@ -118,13 +118,13 @@ VEVIO = {
     },
     'Dirs': {
         'image': 'data' + sep + 'VEVIO' + sep + 'mosaics',
-        'mask': 'data' + sep + 'VEVIO' + sep + 'mosaic_masks',
+        'mask': 'data' + sep + 'VEVIO' + sep + 'mosaics_masks',
         'truth': 'data' + sep + 'VEVIO' + sep + 'mosaics_manual_01_bw',
         'logs': 'data' + sep + 'VEVIO' + sep + 'unet_logs'
     },
 
     'Funcs': {
-        'truth_getter': lambda file_name: file_name.split('.')[0] + '_black.png',
+        'truth_getter': lambda file_name: 'bw_' + file_name.split('.')[0] + '_black.png',
         'mask_getter': lambda file_name: 'mask_' + file_name
     }
 }
