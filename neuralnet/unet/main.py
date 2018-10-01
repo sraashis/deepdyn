@@ -29,10 +29,10 @@ from neuralnet.unet.unet_dataloader import PatchesGenerator
 from neuralnet.unet.unet_trainer import UNetNNTrainer
 import torchvision.transforms as transforms
 from neuralnet.utils import auto_split as asp
-from neuralnet.unet.runs import WIDE
+from neuralnet.unet.runs import WIDE, STARE, VEVIO
 
-RUNS = [WIDE]
-torch.cuda.set_device(0)
+RUNS = [WIDE, STARE, VEVIO]
+# torch.cuda.set_device(0)
 
 if __name__ == "__main__":
 

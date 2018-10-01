@@ -23,7 +23,7 @@ from neuralnet.patchnet.runs import DRIVE, WIDE
 # RUNS = [DRIVE32, DRIVE16]
 
 RUNS = [DRIVE, WIDE]
-# torch.cuda.set_device(1)
+torch.cuda.set_device(1)
 
 if __name__ == "__main__":
 
@@ -39,7 +39,7 @@ if __name__ == "__main__":
         splits = asp.create_split_json(
             images_src_dir=R.get('Dirs').get('image'),
             to_file=os.path.join(R.get('Dirs').get('logs'), R.get('Params').get('checkpoint_file') + '.json'))
-        patch_shape = R['Params']['patch_shape'][0] + R['Params']['expand_patch_by'][0]
+        patch_shape = R['Params']['patch_shape'][0]
         model = PatchNet(R['Params']['num_channels'], R['Params']['num_classes'])
         optimizer = optim.Adam(model.parameters(), lr=R['Params']['learning_rate'])
         if R['Params']['distribute']:
