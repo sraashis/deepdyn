@@ -18,11 +18,11 @@ from neuralnet.thrnet.thrnet_dataloader import PatchesGenerator
 from neuralnet.thrnet.thrnet_trainer import ThrnetTrainer
 import torchvision.transforms as transforms
 from neuralnet.utils import auto_split as asp
-from neuralnet.thrnet.runs import DRIVE32a
+from neuralnet.thrnet.runs import DRIVE32a, DRIVE32b, DRIVE32c
 
 # RUNS = [DRIVE32, DRIVE16]
 
-RUNS = [DRIVE32a]
+RUNS = [DRIVE32a, DRIVE32b, DRIVE32c]
 torch.cuda.set_device(1)
 
 if __name__ == "__main__":

@@ -7,9 +7,9 @@ DRIVE = {
         'num_channels': 1,
         'num_classes': 2,
         'batch_size': 32,
-        'epochs': 100,
+        'epochs': 30,
         'learning_rate': 0.001,
-        'patch_shape': (31, 31),
+        'patch_shape': (51, 51),
         # 'patch_offset': (14, 14),
         'expand_patch_by': (0, 0),
         'use_gpu': True,
@@ -22,10 +22,10 @@ DRIVE = {
         'parallel_trained': False
     },
     'Dirs': {
-        'image': 'data' + sep + 'DRIVE_UNET_MAP' + sep + 'images',
+        'image': 'data' + sep + 'DRIVE' + sep + 'images',
         'mask': 'data' + sep + 'DRIVE' + sep + 'mask',
         'truth': 'data' + sep + 'DRIVE' + sep + 'manual',
-        'logs': 'data' + sep + 'DRIVE_UNET_MAP' + sep + 'patchnet_logs'
+        'logs': 'data' + sep + 'DRIVE' + sep + 'patchnet_logs'
     },
 
     'Funcs': {
@@ -38,10 +38,10 @@ WIDE = {
     'Params': {
         'num_channels': 1,
         'num_classes': 2,
-        'batch_size': 4,
-        'epochs': 200,
+        'batch_size': 32,
+        'epochs': 30,
         'learning_rate': 0.001,
-        'patch_shape': (31, 31),
+        'patch_shape': (51, 51),
         # 'patch_offset': (150, 150),
         # 'expand_patch_by': (184, 184),
         'use_gpu': True,

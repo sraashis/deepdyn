@@ -38,7 +38,7 @@ WIDE = {
     'Params': {
         'num_channels': 1,
         'num_classes': 2,
-        'batch_size': 4,
+        'batch_size': 3,
         'epochs': 200,
         'learning_rate': 0.001,
         'patch_shape': (388, 388),
@@ -49,7 +49,7 @@ WIDE = {
         'shuffle': True,
         'checkpoint_file': 'UNET-WIDE.chk.tar',
         'log_frequency': 5,
-        'validation_frequency': 2,
+        'validation_frequency': 1,
         'mode': 'train',
         'parallel_trained': False
     },

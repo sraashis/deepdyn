@@ -13,6 +13,7 @@ from PIL import Image as IMG
 
 from neuralnet.torchtrainer import NNTrainer
 from neuralnet.utils.measurements import ScoreAccumulator
+import random
 
 sep = os.sep
 
@@ -42,7 +43,8 @@ class UNetNNTrainer(NNTrainer):
                 outputs = self.model(inputs)
                 _, predicted = torch.max(outputs, 1)
 
-                loss = F.nll_loss(outputs, labels)
+                weights = torch.FloatTensor([random.uniform(1, 100), random.uniform(1, 100)])
+                loss = F.nll_loss(outputs, labels, weight=weights.to(self.device))
                 loss.backward()
                 optimizer.step()
 
@@ -81,8 +83,8 @@ class UNetNNTrainer(NNTrainer):
                 gt = torch.FloatTensor(img_obj.ground_truth).to(self.device)
 
                 for i, data in enumerate(loader, 1):
-                    inputs, labels = data['inputs'].float().to(self.device), data['labels'].float().to(self.device)
-                    clip_ix = data['clip_ix'].int().to(self.device)
+                    inputs, labels = data['inputs'].to(self.device).float(), data['labels'].to(self.device).float()
+                    clip_ix = data['clip_ix'].to(self.device).int()
 
                     outputs = self.model(inputs)
                     predicted = outputs[:, 1, :, :]

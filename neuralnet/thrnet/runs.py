@@ -6,7 +6,7 @@ DRIVE32a = {
     'Params': {
         'num_channels': 1,
         'num_classes': 2,
-        'batch_size': 16,
+        'batch_size': 8,
         'epochs': 200,
         'learning_rate': 0.0001,
         'patch_shape': (32, 32),
@@ -39,7 +39,7 @@ DRIVE32b = {
     'Params': {
         'num_channels': 1,
         'num_classes': 2,
-        'batch_size': 16,
+        'batch_size': 8,
         'epochs': 200,
         'learning_rate': 0.001,
         'patch_shape': (32, 32),
@@ -72,7 +72,7 @@ DRIVE32c = {
     'Params': {
         'num_channels': 1,
         'num_classes': 2,
-        'batch_size': 10,
+        'batch_size': 8,
         'epochs': 200,
         'learning_rate': 0.001,
         'patch_shape': (32, 32),

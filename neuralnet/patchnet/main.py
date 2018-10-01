@@ -18,11 +18,11 @@ from neuralnet.patchnet.patchnet_dataloader import PatchesGenerator
 from neuralnet.patchnet.patchnet_trainer import PatchNetTrainer
 import torchvision.transforms as transforms
 from neuralnet.utils import auto_split as asp
-from neuralnet.patchnet.runs import DRIVE
+from neuralnet.patchnet.runs import DRIVE, WIDE
 
 # RUNS = [DRIVE32, DRIVE16]
 
-RUNS = [DRIVE]
+RUNS = [DRIVE, WIDE]
 # torch.cuda.set_device(1)
 
 if __name__ == "__main__":
