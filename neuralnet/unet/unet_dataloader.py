@@ -13,6 +13,7 @@ import torch
 
 import utils.img_utils as imgutils
 from neuralnet.datagen import Generator
+import torchvision.transforms as tfm
 
 sep = os.sep
 
@@ -64,3 +65,19 @@ class PatchesGenerator(Generator):
                 'inputs': img_tensor,
                 'labels': torch.LongTensor(y.copy()),
                 'clip_ix': np.array([row_from, row_to, col_from, col_to]), }
+
+    @classmethod
+    def get_loader_per_img(cls, images, run_conf, mode=None):
+        loaders = []
+        for file in images:
+            gen = cls(
+                run_conf=run_conf,
+                images=[file],
+                transforms=tfm.Compose([tfm.ToPILImage(), tfm.ToTensor()]),
+                shuffle_indices=False,
+                mode=mode
+            )
+            loader = torch.utils.data.DataLoader(gen, batch_size=min(2, gen.__len__()),
+                                                 shuffle=False, num_workers=3, sampler=None)
+            loaders.append(loader)
+        return loaders

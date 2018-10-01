@@ -16,7 +16,7 @@ DRIVE = {
         'distribute': False,
         'shuffle': True,
         'checkpoint_file': 'PATCHNET-DRIVE.chk.tar',
-        'log_frequency': 50,
+        'log_frequency': 500,
         'validation_frequency': 1,
         'mode': 'train',
         'parallel_trained': False

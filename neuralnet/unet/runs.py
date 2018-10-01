@@ -38,7 +38,7 @@ WIDE = {
     'Params': {
         'num_channels': 1,
         'num_classes': 2,
-        'batch_size': 3,
+        'batch_size': 4,
         'epochs': 200,
         'learning_rate': 0.001,
         'patch_shape': (388, 388),
@@ -63,5 +63,68 @@ WIDE = {
     'Funcs': {
         'truth_getter': lambda file_name: file_name.split('.')[0] + '_vessels.png',
         'mask_getter': None
+    }
+}
+
+STARE = {
+    'Params': {
+        'num_channels': 1,
+        'num_classes': 2,
+        'batch_size': 4,
+        'epochs': 200,
+        'learning_rate': 0.001,
+        'patch_shape': (388, 388),
+        'patch_offset': (150, 150),
+        'expand_patch_by': (184, 184),
+        'use_gpu': True,
+        'distribute': False,
+        'shuffle': True,
+        'checkpoint_file': 'UNET-STARE.chk.tar',
+        'log_frequency': 5,
+        'validation_frequency': 1,
+        'mode': 'train',
+        'parallel_trained': False
+    },
+    'Dirs': {
+        'image': 'data' + sep + 'STARE' + sep + 'stare-images',
+        'truth': 'data' + sep + 'STARE' + sep + 'labels-ah',
+        'logs': 'data' + sep + 'STARE' + sep + 'unet_logs'
+    },
+
+    'Funcs': {
+        'truth_getter': lambda file_name: file_name.split('.')[0] + '.vk.pgm',
+        'mask_getter': None
+    }
+}
+
+VEVIO = {
+    'Params': {
+        'num_channels': 1,
+        'num_classes': 2,
+        'batch_size': 4,
+        'epochs': 200,
+        'learning_rate': 0.001,
+        'patch_shape': (388, 388),
+        'patch_offset': (150, 150),
+        'expand_patch_by': (184, 184),
+        'use_gpu': True,
+        'distribute': False,
+        'shuffle': True,
+        'checkpoint_file': 'UNET-VEVIO.chk.tar',
+        'log_frequency': 5,
+        'validation_frequency': 1,
+        'mode': 'train',
+        'parallel_trained': False
+    },
+    'Dirs': {
+        'image': 'data' + sep + 'VEVIO' + sep + 'mosaics',
+        'mask': 'data' + sep + 'VEVIO' + sep + 'mosaic_masks',
+        'truth': 'data' + sep + 'VEVIO' + sep + 'mosaics_manual_01_bw',
+        'logs': 'data' + sep + 'VEVIO' + sep + 'unet_logs'
+    },
+
+    'Funcs': {
+        'truth_getter': lambda file_name: file_name.split('.')[0] + '_black.png',
+        'mask_getter': lambda file_name: 'mask_' + file_name
     }
 }

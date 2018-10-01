@@ -25,8 +25,8 @@ def evaluate(self, data_loaders=None, logger=None, gen_images=False):
 
         for loader in data_loaders:
             img_obj = loader.dataset.image_objects[0]
-            segmented_img = torch.cuda.LongTensor(img_obj.working_arr.shape[0],
-                                                  img_obj.working_arr.shape[1]).fill_(0).to(self.device)
+            segmented_img = torch.LongTensor(img_obj.working_arr.shape[0],
+                                             img_obj.working_arr.shape[1]).fill_(0).to(self.device)
             gt = torch.LongTensor(img_obj.ground_truth).to(self.device)
 
             for i, data in enumerate(loader, 1):
