@@ -6,6 +6,16 @@
 
 import json
 import os
+import sys
+
+try:
+    BASE_PROJECT_DIR = '/home/ak/PycharmProjects/ature'
+    sys.path.append(BASE_PROJECT_DIR)
+    os.chdir(BASE_PROJECT_DIR)
+except:
+    BASE_PROJECT_DIR = '/home/akhanal1/ature'
+    sys.path.append(BASE_PROJECT_DIR)
+    os.chdir(BASE_PROJECT_DIR)
 
 
 def create_split_json(images_src_dir=None, ratio=[0.64, 0.18, 0.18], to_file='split.json', file_names=None):
@@ -29,3 +39,6 @@ def create_split_json(images_src_dir=None, ratio=[0.64, 0.18, 0.18], to_file='sp
     f.write(json.dumps(configuration))
     f.close()
     return configuration
+
+
+# create_split_json(images_src_dir='data/AV-WIDE/images', ratio=[0.6, 0.20, 0.20], to_file='WIDE.json')

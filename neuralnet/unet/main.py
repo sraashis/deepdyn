@@ -3,9 +3,17 @@
 ### sraashis@gmail.com
 ### date: 9/10/2018
 """
+import os
+import sys
 
-BASE_PROJECT_DIR = '/home/akhanal1/ature'
-# BASE_PROJECT_DIR = '/home/ak/PycharmProjects/ature'
+try:
+    BASE_PROJECT_DIR = '/home/ak/PycharmProjects/ature'
+    sys.path.append(BASE_PROJECT_DIR)
+    os.chdir(BASE_PROJECT_DIR)
+except:
+    BASE_PROJECT_DIR = '/home/akhanal1/ature'
+    sys.path.append(BASE_PROJECT_DIR)
+    os.chdir(BASE_PROJECT_DIR)
 
 import os
 import sys
@@ -21,10 +29,10 @@ from neuralnet.unet.unet_dataloader import PatchesGenerator
 from neuralnet.unet.unet_trainer import UNetNNTrainer
 import torchvision.transforms as transforms
 from neuralnet.utils import auto_split as asp
-from neuralnet.unet.runs import DRIVE
+from neuralnet.unet.runs import WIDE
 
-RUNS = [DRIVE]
-torch.cuda.set_device(1)
+RUNS = [WIDE]
+torch.cuda.set_device(0)
 
 if __name__ == "__main__":
 
@@ -52,19 +60,19 @@ if __name__ == "__main__":
             drive_trainer = UNetNNTrainer(model=model, run_conf=R)
 
             if R.get('Params').get('mode') == 'train':
-                train_loader = PatchesGenerator.get_loader(run_conf=R, images=splits['train'], transforms=transform)
+                train_loader = PatchesGenerator.get_loader(run_conf=R, images=splits['train'], transforms=transform,
+                                                           mode='train')
                 val_loader = PatchesGenerator.get_loader_per_img(run_conf=R, images=splits['validation'],
                                                                  mode='validation')
                 drive_trainer.train(optimizer=optimizer, data_loader=train_loader, validation_loader=val_loader)
 
             drive_trainer.resume_from_checkpoint(parallel_trained=R.get('Params').get('parallel_trained'))
             test_loader = PatchesGenerator.get_loader_per_img(run_conf=R,
-                                                              images=splits['train'] + splits['test'] + splits[
-                                                                  'validation'], mode='test')
+                                                              images=splits['test'], mode='test')
 
             log_file = os.path.join(R['Dirs']['logs'], R['Params']['checkpoint_file'] + '-TEST.csv')
             logger = drive_trainer.get_logger(log_file)
-            drive_trainer.evaluate(data_loaders=test_loader, logger=logger)
+            drive_trainer.evaluate(data_loaders=test_loader, logger=logger, gen_images=True)
             logger.close()
         except Exception as e:
             traceback.print_exc()

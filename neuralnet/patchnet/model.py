@@ -1,94 +1,59 @@
+def out_w(w, k, s, p):
+    return ((w - k + 2 * p) / s) + 1
+
+
 import torch.nn.functional as F
 from torch import nn
 
 
-class PatchNet(nn.Module):
-    def __init__(self, width, channels, num_classes):
-        super(PatchNet, self).__init__()
+class BasicConv2d(nn.Module):
 
-        self.channels = channels
-        self.width = width
-
-        self.kern_size = 5
-        self.kern_stride = 2
-        self.kern_padding = 1
-        self.mxp_kern_size = 1
-        self.mxp_stride = 1
-        self.pool1 = nn.MaxPool2d(kernel_size=self.mxp_kern_size, stride=self.mxp_stride)
-        self.conv1 = nn.Conv2d(self.channels, 64, self.kern_size,
-                               stride=self.kern_stride, padding=self.kern_padding)
-        self._update_output_size()
-
-        self.kern_size = 5
-        self.kern_stride = 2
-        self.kern_padding = 2
-        self.mxp_kern_size = 1
-        self.mxp_stride = 1
-        self.pool2 = nn.MaxPool2d(kernel_size=self.mxp_kern_size, stride=self.mxp_stride)
-        self.conv2 = nn.Conv2d(64, 128, self.kern_size,
-                               stride=self.kern_stride, padding=self.kern_padding)
-        self._update_output_size()
-
-        self.kern_size = 3
-        self.kern_stride = 2
-        self.kern_padding = 2
-        self.mxp_kern_size = 1
-        self.mxp_stride = 1
-        self.pool3 = nn.MaxPool2d(kernel_size=self.mxp_kern_size, stride=self.mxp_stride)
-        self.conv3 = nn.Conv2d(128, 256, self.kern_size,
-                               stride=self.kern_stride, padding=self.kern_padding)
-        self._update_output_size()
-
-        self.kern_size = 3
-        self.kern_stride = 1
-        self.kern_padding = 1
-        self.mxp_kern_size = 2
-        self.mxp_stride = 2
-        self.pool4 = nn.MaxPool2d(kernel_size=self.mxp_kern_size, stride=self.mxp_stride)
-        self.conv4 = nn.Conv2d(256, 128, self.kern_size,
-                               stride=self.kern_stride, padding=self.kern_padding)
-        self._update_output_size()
-
-        self.kern_size = 1
-        self.kern_stride = 1
-        self.kern_padding = 1
-        self.mxp_kern_size = 1
-        self.mxp_stride = 1
-        self.pool5 = nn.MaxPool2d(kernel_size=self.mxp_kern_size, stride=self.mxp_stride)
-        self.conv5 = nn.Conv2d(128, 64, self.kern_size,
-                               stride=self.kern_stride, padding=self.kern_padding)
-        self._update_output_size()
-
-        self.linearWidth = 64 * int(self.width) * int(self.width)
-        self.fc1 = nn.Linear(self.linearWidth, 16)
-        self.fc2 = nn.Linear(16, num_classes)
+    def __init__(self, in_ch, out_ch, k, s, p):
+        super(BasicConv2d, self).__init__()
+        self.conv = nn.Conv2d(in_channels=in_ch, out_channels=out_ch, kernel_size=k, stride=s, padding=p, bias=False)
+        self.bn = nn.BatchNorm2d(out_ch)
 
     def forward(self, x):
-        x = self.pool1(F.relu(self.conv1(x)))
-        x = self.pool2(F.relu(self.conv2(x)))
-        x = self.pool3(F.relu(self.conv3(x)))
-        x = F.dropout2d(x, p=0.3)
-        x = self.pool4(F.relu(self.conv4(x)))
-        x = F.dropout2d(x, p=0.3)
-        x = self.pool5(F.relu(self.conv5(x)))
-        x = x.view(-1, self.linearWidth)
-        x = F.dropout2d(x, p=0.4)
-        x = F.relu(self.fc1(x))
-        x = F.dropout2d(x, p=0.4)
-        x = self.fc2(x)
-        return F.log_softmax(x, dim=1)
+        x = self.conv(x)
+        x = self.bn(x)
+        return F.relu(x, inplace=True)
 
-    def _update_output_size(self):
-        temp = self.width
-        self.width = ((self.width - self.kern_size + 2 * self.kern_padding) / self.kern_stride) + 1
-        temp1 = self.width
-        self.width = ((self.width - self.mxp_kern_size) / self.mxp_stride) + 1
-        print('Output width[ ' + str(temp) + ' -conv-> ' + str(temp1) + ' -maxpool-> ' + str(self.width) + ' ]')
 
-import numpy as np
+class PatchNet(nn.Module):
+    def __init__(self, in_channels, num_classes=2):
+        super(PatchNet, self).__init__()
+        self.conv1 = BasicConv2d(in_ch=in_channels, out_ch=32, k=3, s=1, p=1)
+        self.conv2 = BasicConv2d(in_ch=32, out_ch=48, k=5, s=2, p=0)
+        self.mxp_2 = nn.MaxPool2d(kernel_size=2, stride=2)
 
-i = PatchNet(32, 1, 1 )
-model_parameters = filter(lambda p: p.requires_grad, i.parameters())
-params = sum([np.prod(p.size()) for p in model_parameters])
-print(params)
-# print(i)
+        self.conv3 = BasicConv2d(in_ch=48, out_ch=64, k=3, s=1, p=0)
+        self.conv4 = BasicConv2d(in_ch=64, out_ch=48, k=3, s=1, p=0)
+        self.mxp_4 = nn.MaxPool2d(kernel_size=2, stride=2)
+
+        self.conv_out = BasicConv2d(in_ch=48, out_ch=32, k=1, s=1, p=0)
+
+        self.fc1 = nn.Linear(32 * 4 * 4, 256)
+        self.fc2 = nn.Linear(256, 64)
+        self.fc_out = nn.Linear(64, num_classes)
+
+    def forward(self, x):
+        conv1 = self.conv1(x)
+        conv2 = self.conv2(conv1)
+        conv2 = self.mxp_2(conv2)
+
+        conv3 = self.conv3(conv2)
+        conv4 = self.conv4(conv3)
+        conv4 = self.mxp_4(conv4)
+
+        conv_out = self.conv_out(conv4)
+
+        conv_out = conv_out.view(-1, 32 * 4 * 4)
+        fc1 = F.relu(self.fc1(conv_out))
+        fc2 = F.relu(self.fc2(fc1))
+        return F.log_softmax(self.fc_out(fc2), 1)
+
+
+m = PatchNet(1, 2)
+torch_total_params = sum(p.numel() for p in m.parameters() if p.requires_grad)
+print(torch_total_params)
+# print(out_w(12, 3, 1, 0))

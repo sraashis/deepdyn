@@ -19,7 +19,7 @@ DRIVE = {
         'log_frequency': 5,
         'validation_frequency': 4,
         'mode': 'test',
-        'parallel_trained': True
+        'parallel_trained': False
     },
     'Dirs': {
         'image': 'data' + sep + 'DRIVE' + sep + 'images',
@@ -31,5 +31,37 @@ DRIVE = {
     'Funcs': {
         'truth_getter': lambda file_name: file_name.split('_')[0] + '_manual1.gif',
         'mask_getter': lambda file_name: file_name.split('_')[0] + '_mask.gif'
+    }
+}
+
+WIDE = {
+    'Params': {
+        'num_channels': 1,
+        'num_classes': 2,
+        'batch_size': 3,
+        'epochs': 200,
+        'learning_rate': 0.001,
+        'patch_shape': (388, 388),
+        'patch_offset': (150, 150),
+        'expand_patch_by': (184, 184),
+        'use_gpu': True,
+        'distribute': False,
+        'shuffle': True,
+        'checkpoint_file': 'UNET-WIDE.chk.tar',
+        'log_frequency': 5,
+        'validation_frequency': 1,
+        'mode': 'train',
+        'parallel_trained': False
+    },
+    'Dirs': {
+        'image': 'data' + sep + 'AV-WIDE' + sep + 'images',
+        'mask': 'data' + sep + 'AV-WIDE' + sep + 'mask',
+        'truth': 'data' + sep + 'AV-WIDE' + sep + 'manual',
+        'logs': 'data' + sep + 'AV-WIDE' + sep + 'unet_logs'
+    },
+
+    'Funcs': {
+        'truth_getter': lambda file_name: file_name.split('.')[0] + '_vessels.png',
+        'mask_getter': None
     }
 }
