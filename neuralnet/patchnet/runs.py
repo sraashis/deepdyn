@@ -65,3 +65,66 @@ WIDE = {
         'mask_getter': None
     }
 }
+
+STARE = {
+    'Params': {
+        'num_channels': 1,
+        'num_classes': 2,
+        'batch_size': 32,
+        'epochs': 30,
+        'learning_rate': 0.001,
+        'patch_shape': (51, 51),
+        # 'patch_offset': (150, 150),
+        # 'expand_patch_by': (184, 184),
+        'use_gpu': True,
+        'distribute': False,
+        'shuffle': True,
+        'checkpoint_file': 'PATCHNET-STARE.chk.tar',
+        'log_frequency': 500,
+        'validation_frequency': 1,
+        'mode': 'train',
+        'parallel_trained': False
+    },
+    'Dirs': {
+        'image': 'data' + sep + 'STARE' + sep + 'stare-images',
+        'truth': 'data' + sep + 'STARE' + sep + 'labels-ah',
+        'logs': 'data' + sep + 'STARE' + sep + 'patchnet_logs'
+    },
+
+    'Funcs': {
+        'truth_getter': lambda file_name: file_name.split('.')[0] + '.ah.pgm',
+        'mask_getter': None
+    }
+}
+
+VEVIO = {
+    'Params': {
+        'num_channels': 1,
+        'num_classes': 2,
+        'batch_size': 4,
+        'epochs': 30,
+        'learning_rate': 0.001,
+        'patch_shape': (51, 51),
+        # 'patch_offset': (150, 150),
+        # 'expand_patch_by': (184, 184),
+        'use_gpu': True,
+        'distribute': False,
+        'shuffle': True,
+        'checkpoint_file': 'PATCHNET-VEVIO.chk.tar',
+        'log_frequency': 500,
+        'validation_frequency': 1,
+        'mode': 'train',
+        'parallel_trained': False
+    },
+    'Dirs': {
+        'image': 'data' + sep + 'VEVIO' + sep + 'mosaics',
+        'mask': 'data' + sep + 'VEVIO' + sep + 'mosaics_masks',
+        'truth': 'data' + sep + 'VEVIO' + sep + 'mosaics_manual_01_bw',
+        'logs': 'data' + sep + 'VEVIO' + sep + 'patchnet_logs'
+    },
+
+    'Funcs': {
+        'truth_getter': lambda file_name: 'bw_' + file_name.split('.')[0] + '_black.png',
+        'mask_getter': lambda file_name: 'mask_' + file_name
+    }
+}
