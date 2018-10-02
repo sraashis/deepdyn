@@ -36,9 +36,7 @@ if __name__ == "__main__":
         for k, folder in R['Dirs'].items():
             os.makedirs(folder, exist_ok=True)
 
-        splits = asp.create_split_json(
-            images_src_dir=R.get('Dirs').get('image'),
-            to_file=os.path.join(R.get('Dirs').get('logs'), R.get('Params').get('checkpoint_file') + '.json'))
+        splits = asp.load_split_json(R.get(R.get('Params').get('checkpoint_file') + '.json'))
         patch_shape = R['Params']['patch_shape'][0]
         model = PatchNet(R['Params']['num_channels'], R['Params']['num_classes'])
         optimizer = optim.Adam(model.parameters(), lr=R['Params']['learning_rate'])
