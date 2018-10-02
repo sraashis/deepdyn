@@ -34,7 +34,7 @@ import neuralnet.unet.runs  as rs
 RUNS = [rs.WIDE0, rs.WIDE5, rs.WIDE10, rs.WIDE15, rs.WIDE20, rs.WIDE25,
         rs.STARE0, rs.STARE4, rs.STARE8, rs.STARE12, rs.STARE16,
         rs.VEVIO0, rs.VEVIO4, rs.VEVIO8, rs.VEVIO12]
-torch.cuda.set_device(0)
+# torch.cuda.set_device(0)
 
 if __name__ == "__main__":
 
@@ -47,8 +47,8 @@ if __name__ == "__main__":
         for k, folder in R['Dirs'].items():
             os.makedirs(folder, exist_ok=True)
 
-        splits = asp.load_split_json(R.get(R.get('Params').get('checkpoint_file') + '.json'))
-
+        splits = asp.load_split_json(
+            os.path.join(R.get('Dirs').get('logs'), R.get('Params').get('checkpoint_file') + '.json'))
         model = UNet(R['Params']['num_channels'], R['Params']['num_classes'])
         optimizer = optim.Adam(model.parameters(), lr=R['Params']['learning_rate'])
         if R['Params']['distribute']:
