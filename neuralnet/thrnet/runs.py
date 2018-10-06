@@ -2,30 +2,30 @@ import os
 
 sep = os.sep
 
-DRIVE32a = {
+DRIVE = {
     'Params': {
         'num_channels': 1,
         'num_classes': 2,
-        'batch_size': 8,
-        'epochs': 200,
-        'learning_rate': 0.0001,
+        'batch_size': 16,
+        'epochs': 80,
+        'learning_rate': 0.001,
         'patch_shape': (32, 32),
         # 'patch_offset': (14, 14),
         'expand_patch_by': (16, 16),
         'use_gpu': True,
         'distribute': False,
         'shuffle': True,
-        'checkpoint_file': 'THRNET32a-DRIVE.chk.tar',
         'log_frequency': 50,
         'validation_frequency': 1,
         'mode': 'train',
         'parallel_trained': False
     },
     'Dirs': {
-        'image': 'data' + sep + 'DRIVE_UNET_MAP' + sep + 'images',
+        'image': 'data' + sep + 'DRIVE_MAP' + sep + 'images',
         'mask': 'data' + sep + 'DRIVE' + sep + 'mask',
         'truth': 'data' + sep + 'DRIVE' + sep + 'manual',
-        'logs': 'data' + sep + 'DRIVE_UNET_MAP' + sep + 'thrnet32_logs'
+        'logs': 'data' + sep + 'DRIVE_MAP' + sep + 'thrnet_logs',
+        'splits_json': 'data' + sep + 'DRIVE_MAP' + sep + 'thrnet_splits'
     },
 
     'Funcs': {
@@ -34,121 +34,95 @@ DRIVE32a = {
     }
 }
 
-
-DRIVE32b = {
+WIDE = {
     'Params': {
         'num_channels': 1,
         'num_classes': 2,
-        'batch_size': 8,
-        'epochs': 200,
+        'batch_size': 16,
+        'epochs': 80,
         'learning_rate': 0.001,
         'patch_shape': (32, 32),
-        # 'patch_offset': (14, 14),
         'expand_patch_by': (16, 16),
         'use_gpu': True,
         'distribute': False,
         'shuffle': True,
-        'checkpoint_file': 'THRNET32b-DRIVE.chk.tar',
         'log_frequency': 50,
         'validation_frequency': 1,
         'mode': 'train',
         'parallel_trained': False
     },
     'Dirs': {
-        'image': 'data' + sep + 'DRIVE_UNET_MAP' + sep + 'images',
-        'mask': 'data' + sep + 'DRIVE' + sep + 'mask',
-        'truth': 'data' + sep + 'DRIVE' + sep + 'manual',
-        'logs': 'data' + sep + 'DRIVE_UNET_MAP' + sep + 'thrnet32_logs'
+        'image': 'data' + sep + 'AV-WIDE_MAP' + sep + 'images',
+        'mask': 'data' + sep + 'AV-WIDE' + sep + 'mask',
+        'truth': 'data' + sep + 'AV-WIDE' + sep + 'manual',
+        'logs': 'data' + sep + 'AV-WIDE_MAP' + sep + 'thrnet_logs',
+        'splits_json': 'data' + sep + 'AV-WIDE_MAP' + sep + 'thrnet_splits'
     },
 
     'Funcs': {
-        'truth_getter': lambda file_name: file_name.split('_')[0] + '_manual1.gif',
-        'mask_getter': lambda file_name: file_name.split('_')[0] + '_mask.gif'
+        'truth_getter': lambda file_name: file_name.split('.')[0] + '_vessels.png',
+        'mask_getter': None
     }
 }
 
-
-DRIVE32c = {
+STARE = {
     'Params': {
         'num_channels': 1,
         'num_classes': 2,
-        'batch_size': 8,
-        'epochs': 200,
+        'batch_size': 16,
+        'epochs': 80,
         'learning_rate': 0.001,
         'patch_shape': (32, 32),
-        # 'patch_offset': (14, 14),
         'expand_patch_by': (16, 16),
         'use_gpu': True,
         'distribute': False,
         'shuffle': True,
-        'checkpoint_file': 'THRNET32c-DRIVE.chk.tar',
         'log_frequency': 50,
         'validation_frequency': 1,
         'mode': 'train',
         'parallel_trained': False
     },
     'Dirs': {
-        'image': 'data' + sep + 'DRIVE_UNET_MAP' + sep + 'images',
-        'mask': 'data' + sep + 'DRIVE' + sep + 'mask',
-        'truth': 'data' + sep + 'DRIVE' + sep + 'manual',
-        'logs': 'data' + sep + 'DRIVE_UNET_MAP' + sep + 'thrnet32_logs'
+        'image': 'data' + sep + 'STARE_MAP' + sep + 'stare-images',
+        'truth': 'data' + sep + 'STARE' + sep + 'labels-ah',
+        'logs': 'data' + sep + 'STARE_MAP' + sep + 'thrnet_logs',
+        'splits_json': 'data' + sep + 'STARE_MAP' + sep + 'thrnet_splits'
     },
 
     'Funcs': {
-        'truth_getter': lambda file_name: file_name.split('_')[0] + '_manual1.gif',
-        'mask_getter': lambda file_name: file_name.split('_')[0] + '_mask.gif'
+        'truth_getter': lambda file_name: file_name.split('.')[0] + '.ah.pgm',
+        'mask_getter': None
     }
 }
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-DRIVE16 = {
+VEVIO = {
     'Params': {
         'num_channels': 1,
         'num_classes': 2,
-        'batch_size': 10,
-        'epochs': 200,
+        'batch_size': 16,
+        'epochs': 80,
         'learning_rate': 0.001,
-        'patch_shape': (16, 16),
-        # 'patch_offset': (14, 14),
+        'patch_shape': (32, 32),
         'expand_patch_by': (16, 16),
         'use_gpu': True,
         'distribute': False,
         'shuffle': True,
-        'checkpoint_file': 'THRNET16-DRIVE.chk.tar',
         'log_frequency': 50,
         'validation_frequency': 1,
-        'mode': 'test',
+        'mode': 'train',
         'parallel_trained': False
     },
     'Dirs': {
-        'image': 'data' + sep + 'DRIVE_UNET_MAP' + sep + 'images',
-        'mask': 'data' + sep + 'DRIVE' + sep + 'mask',
-        'truth': 'data' + sep + 'DRIVE' + sep + 'manual',
-        'logs': 'data' + sep + 'DRIVE_UNET_MAP' + sep + 'thrnet16_logs'
+        'image': 'data' + sep + 'VEVIO_MAP' + sep + 'mosaics',
+        'mask': 'data' + sep + 'VEVIO' + sep + 'mosaics_masks',
+        'truth': 'data' + sep + 'VEVIO' + sep + 'mosaics_manual_01_bw',
+        'logs': 'data' + sep + 'VEVIO_MAP' + sep + 'thrnet_logs',
+        'splits_json': 'data' + sep + 'VEVIO_MAP' + sep + 'thrnet_splits'
     },
 
     'Funcs': {
-        'truth_getter': lambda file_name: file_name.split('_')[0] + '_manual1.gif',
-        'mask_getter': lambda file_name: file_name.split('_')[0] + '_mask.gif'
+        'truth_getter': lambda file_name: 'bw_' + file_name.split('.')[0] + '_black.png',
+        'mask_getter': lambda file_name: 'mask_' + file_name
     }
 }

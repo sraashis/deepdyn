@@ -25,14 +25,15 @@ class Inception(nn.Module):
         super(Inception, self).__init__()
 
         _, k, s, p = self.get_wksp(w=width, w_match=width, k=3)
-        self.convA1_3by3 = BasicConv2d(in_ch=in_ch, out_ch=int(out_ch / 2), k=k, s=s, p=p)
+        self.convA_3by3 = BasicConv2d(in_ch=in_ch, out_ch=int(out_ch), k=k, s=s, p=p)
 
-        self.convA_out_1by1 = BasicConv2d(in_ch=in_ch, out_ch=int(out_ch / 2), k=1, s=1, p=0)
+        _, k, s, p = self.get_wksp(w=width, w_match=width, k=3)
+        self.convB_3by3 = BasicConv2d(in_ch=out_ch, out_ch=int(out_ch), k=k, s=s, p=p)
 
     def forward(self, x):
-        a = self.convA1_3by3(x)
-        b = self.convA_out_1by1(x)
-        return torch.cat([a, b], 1)
+        a = self.convA_3by3(x)
+        b = self.convB_3by3(a)
+        return torch.max(a, b)
 
     @staticmethod
     def out_w(w, k, s, p):
@@ -49,22 +50,16 @@ class Inception(nn.Module):
 
 
 class InceptionThrNet(nn.Module):
-    def __init__(self, width, input_ch, num_class):
+    def __init__(self, input_ch, num_class):
         super(InceptionThrNet, self).__init__()
 
         self.inception1 = Inception(width=48, in_ch=input_ch, out_ch=64)
         self.inception2 = Inception(width=48, in_ch=64, out_ch=128)
 
-        self.inception2_mxp = nn.MaxPool2d(kernel_size=2, stride=2, padding=0)
-        self.inception2_up = nn.ConvTranspose2d(in_channels=128, out_channels=128, kernel_size=2, stride=2)
-
-        self.inception3 = Inception(width=40, in_ch=256, out_ch=384)
+        self.inception3 = Inception(width=40, in_ch=129, out_ch=384)
         self.inception4 = Inception(width=40, in_ch=384, out_ch=512)
 
-        self.inception4_mxp = nn.MaxPool2d(kernel_size=2, stride=2, padding=0)
-        self.inception4_up = nn.ConvTranspose2d(in_channels=512, out_channels=512, kernel_size=2, stride=2)
-
-        self.inception5 = Inception(width=32, in_ch=1024, out_ch=512)
+        self.inception5 = Inception(width=32, in_ch=640, out_ch=512)
         self.inception6 = Inception(width=32, in_ch=512, out_ch=256)
         self.inception7 = Inception(width=32, in_ch=256, out_ch=64)
 
@@ -76,16 +71,10 @@ class InceptionThrNet(nn.Module):
         i1_out = self.inception1(x)
         i2_out = self.inception2(i1_out)
 
-        i2_mxp = self.inception2_mxp(i2_out)
-        i2_up = self.inception2_up(i2_mxp)
-
-        i3_out = self.inception3(torch.cat([i2_out[:, :, 4:44, 4:44], i2_up[:, :, 4:44, 4:44]], 1))
+        i3_out = self.inception3(torch.cat([x[:, :, 4:44, 4:44], i2_out[:, :, 4:44, 4:44]], 1))
         i4_out = self.inception4(i3_out)
 
-        i4_mxp = self.inception4_mxp(i4_out)
-        i4_up = self.inception4_up(i4_mxp)
-
-        i5_out = self.inception5(torch.cat([i4_out[:, :, 4:36, 4:36], i4_up[:, :, 4:36, 4:36]], 1))
+        i5_out = self.inception5(torch.cat([i2_out[:, :, 8:40, 8:40], i4_out[:, :, 4:36, 4:36]], 1))
         i6_out = self.inception6(i5_out)
         i7_out = self.inception7(i6_out)
 
@@ -94,6 +83,6 @@ class InceptionThrNet(nn.Module):
         return F.log_softmax(out, dim=1)
 
 
-m = InceptionThrNet(width=48, input_ch=1, num_class=2)
+m = InceptionThrNet(input_ch=1, num_class=2)
 torch_total_params = sum(p.numel() for p in m.parameters() if p.requires_grad)
 print('Total Params:', torch_total_params)
