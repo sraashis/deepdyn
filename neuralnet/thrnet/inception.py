@@ -82,6 +82,6 @@ class InceptionThrNet(nn.Module):
         return F.log_softmax(out, dim=1)
 
 
-m = InceptionThrNet(width=48, input_ch=1, num_class=2)
+m = InceptionThrNet(input_ch=1, num_class=2)
 torch_total_params = sum(p.numel() for p in m.parameters() if p.requires_grad)
 print('Total Params:', torch_total_params)
