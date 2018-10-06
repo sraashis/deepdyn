@@ -56,7 +56,7 @@ class InceptionThrNet(nn.Module):
         self.inception1 = Inception(width=48, in_ch=input_ch, out_ch=64)
         self.inception2 = Inception(width=48, in_ch=64, out_ch=128)
 
-        self.inception3 = Inception(width=40, in_ch=129, out_ch=192)
+        self.inception3 = Inception(width=40, in_ch=128, out_ch=192)
         self.inception4 = Inception(width=40, in_ch=192, out_ch=256)
 
         self.inception5 = Inception(width=32, in_ch=384, out_ch=256)
@@ -71,7 +71,7 @@ class InceptionThrNet(nn.Module):
         i1_out = self.inception1(x)
         i2_out = self.inception2(i1_out)
 
-        i3_out = self.inception3(torch.cat([x[:, :, 4:44, 4:44], i2_out[:, :, 4:44, 4:44]], 1))
+        i3_out = self.inception3(i2_out[:, :, 4:44, 4:44])
         i4_out = self.inception4(i3_out)
 
         i5_out = self.inception5(torch.cat([i2_out[:, :, 8:40, 8:40], i4_out[:, :, 4:36, 4:36]], 1))
