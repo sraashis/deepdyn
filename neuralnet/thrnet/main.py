@@ -23,7 +23,7 @@ from neuralnet.thrnet.runs import DRIVE, WIDE, STARE, VEVIO
 # RUNS = [DRIVE32, DRIVE16]
 
 RUNS = [DRIVE, WIDE, STARE, VEVIO]
-torch.cuda.set_device(1)
+# torch.cuda.set_device(1)
 
 if __name__ == "__main__":
 
@@ -60,7 +60,7 @@ if __name__ == "__main__":
                 drive_trainer.resume_from_checkpoint(parallel_trained=R.get('Params').get('parallel_trained'))
                 test_loader = PatchesGenerator.get_loader_per_img(run_conf=R, images=splits['test'], mode='test')
 
-                log_file = os.path.join(R['Dirs']['logs'], R['Params']['checkpoint_file'] + '-TEST.csv')
+                log_file = os.path.join(R['Dirs']['logs'], R['checkpoint_file'] + '-TEST.csv')
                 logger = drive_trainer.get_logger(log_file,
                                                   header='ID,TYPE,EPOCH,BATCH,PRECISION,RECALL,F1,ACCURACY,LOSS')
                 drive_trainer.evaluate(data_loaders=test_loader, logger=logger, gen_images=True)

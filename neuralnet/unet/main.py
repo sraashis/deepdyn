@@ -70,7 +70,7 @@ if __name__ == "__main__":
                 test_loader = PatchesGenerator.get_loader_per_img(run_conf=R,
                                                                   images=splits['test'], mode='test')
 
-                log_file = os.path.join(R['Dirs']['logs'], R['Params']['checkpoint_file'] + '-TEST.csv')
+                log_file = os.path.join(R['Dirs']['logs'], R['checkpoint_file'] + '-TEST.csv')
                 logger = drive_trainer.get_logger(log_file)
                 drive_trainer.evaluate(data_loaders=test_loader, logger=logger, gen_images=True)
                 logger.close()
