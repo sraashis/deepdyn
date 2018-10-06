@@ -25,14 +25,15 @@ class Inception(nn.Module):
         super(Inception, self).__init__()
 
         _, k, s, p = self.get_wksp(w=width, w_match=width, k=3)
-        self.convA1_3by3 = BasicConv2d(in_ch=in_ch, out_ch=int(out_ch / 2), k=k, s=s, p=p)
+        self.convA_3by3 = BasicConv2d(in_ch=in_ch, out_ch=int(out_ch), k=k, s=s, p=p)
 
-        self.convA_out_1by1 = BasicConv2d(in_ch=in_ch, out_ch=int(out_ch / 2), k=1, s=1, p=0)
+        _, k, s, p = self.get_wksp(w=width, w_match=width, k=3)
+        self.convB_3by3 = BasicConv2d(in_ch=out_ch, out_ch=int(out_ch), k=k, s=s, p=p)
 
     def forward(self, x):
-        a = self.convA1_3by3(x)
-        b = self.convA_out_1by1(x)
-        return torch.cat([a, b], 1)
+        a = self.convA_3by3(x)
+        b = self.convB_3by3(a)
+        return torch.max(a, b)
 
     @staticmethod
     def out_w(w, k, s, p):

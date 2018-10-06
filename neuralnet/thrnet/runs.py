@@ -6,8 +6,8 @@ DRIVE = {
     'Params': {
         'num_channels': 1,
         'num_classes': 2,
-        'batch_size': 8,
-        'epochs': 120,
+        'batch_size': 16,
+        'epochs': 80,
         'learning_rate': 0.001,
         'patch_shape': (32, 32),
         # 'patch_offset': (14, 14),
@@ -38,8 +38,8 @@ WIDE = {
     'Params': {
         'num_channels': 1,
         'num_classes': 2,
-        'batch_size': 8,
-        'epochs': 120,
+        'batch_size': 16,
+        'epochs': 80,
         'learning_rate': 0.001,
         'patch_shape': (32, 32),
         'expand_patch_by': (16, 16),
@@ -69,8 +69,8 @@ STARE = {
     'Params': {
         'num_channels': 1,
         'num_classes': 2,
-        'batch_size': 8,
-        'epochs': 120,
+        'batch_size': 16,
+        'epochs': 80,
         'learning_rate': 0.001,
         'patch_shape': (32, 32),
         'expand_patch_by': (16, 16),
@@ -100,8 +100,8 @@ VEVIO = {
     'Params': {
         'num_channels': 1,
         'num_classes': 2,
-        'batch_size': 8,
-        'epochs': 120,
+        'batch_size': 16,
+        'epochs': 80,
         'learning_rate': 0.001,
         'patch_shape': (32, 32),
         'expand_patch_by': (16, 16),
