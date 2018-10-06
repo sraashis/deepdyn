@@ -26,9 +26,9 @@ class NNTrainer:
         self.log_frequency = self.run_conf.get('Params').get('log_frequency', 10)
         self.validation_frequency = self.run_conf.get('Params').get('validation_frequency', 1)
 
-        self.checkpoint_file = os.path.join(self.log_dir, self.run_conf.get('Params').get('checkpoint_file'))
-        self.temp_chk_file = os.path.join(self.log_dir, 'RUNNING' + self.run_conf.get('Params').get('checkpoint_file'))
-        self.log_file = os.path.join(self.log_dir, self.run_conf.get('Params').get('checkpoint_file') + '-TRAIN.csv')
+        self.checkpoint_file = os.path.join(self.log_dir, self.run_conf.get('checkpoint_file'))
+        self.temp_chk_file = os.path.join(self.log_dir, 'RUNNING' + self.run_conf.get('checkpoint_file'))
+        self.log_file = os.path.join(self.log_dir, self.run_conf.get('checkpoint_file') + '-TRAIN.csv')
 
         if torch.cuda.is_available():
             self.device = torch.device("cuda" if self.use_gpu else "cpu")

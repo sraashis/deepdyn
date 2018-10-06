@@ -7,6 +7,7 @@
 import json
 import os
 import sys
+import random
 
 try:
     BASE_PROJECT_DIR = '/home/ak/PycharmProjects/ature'
@@ -19,10 +20,13 @@ except:
 
 
 def load_split_json(json_file):
-    if os.path.isfile(json_file):
-        with open(json_file) as f:
-            print('####SPLIT FOUND####: ', json_file + ' Loaded')
-            return json.load(f)
+    try:
+        f = open(json_file)
+        f = json.load(f)
+        print('### SPLIT FOUND: ', json_file + ' Loaded')
+        return f
+    except:
+        print(json_file + ' FILE NOT LOADED !!!')
 
 
 def create_splits(files, test_count, val_count, file_name):
@@ -40,3 +44,8 @@ def create_splits(files, test_count, val_count, file_name):
         f = open(str(i) + file_name, "w")
         f.write(json.dumps(configuration))
         f.close()
+
+# import neuralnet.thrnet.runs as r
+# files = os.listdir((r.DRIVE['Dirs']['image']))
+# random.shuffle(files)
+# create_splits(files, 10, 10, 'THRNET-DRIVE.json')
