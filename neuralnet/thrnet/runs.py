@@ -6,8 +6,8 @@ DRIVE = {
     'Params': {
         'num_channels': 1,
         'num_classes': 2,
-        'batch_size': 16,
-        'epochs': 50,
+        'batch_size': 12,
+        'epochs': 40,
         'learning_rate': 0.001,
         'patch_shape': (32, 32),
         # 'patch_offset': (14, 14),
@@ -38,8 +38,8 @@ WIDE = {
     'Params': {
         'num_channels': 1,
         'num_classes': 2,
-        'batch_size': 16,
-        'epochs': 50,
+        'batch_size': 12,
+        'epochs': 40,
         'learning_rate': 0.001,
         'patch_shape': (32, 32),
         'expand_patch_by': (16, 16),
@@ -69,8 +69,8 @@ STARE = {
     'Params': {
         'num_channels': 1,
         'num_classes': 2,
-        'batch_size': 16,
-        'epochs': 50,
+        'batch_size': 12,
+        'epochs': 40,
         'learning_rate': 0.001,
         'patch_shape': (32, 32),
         'expand_patch_by': (16, 16),
@@ -83,7 +83,7 @@ STARE = {
         'parallel_trained': False
     },
     'Dirs': {
-        'image': 'data' + sep + 'STARE_MAP' + sep + 'stare-images',
+        'image': 'data' + sep + 'STARE_MAP' + sep + 'images',
         'truth': 'data' + sep + 'STARE' + sep + 'labels-ah',
         'logs': 'data' + sep + 'STARE_MAP' + sep + 'thrnet_logs',
         'splits_json': 'data' + sep + 'STARE_MAP' + sep + 'thrnet_splits'
@@ -100,8 +100,8 @@ VEVIO = {
     'Params': {
         'num_channels': 1,
         'num_classes': 2,
-        'batch_size': 16,
-        'epochs': 50,
+        'batch_size': 12,
+        'epochs': 40,
         'learning_rate': 0.001,
         'patch_shape': (32, 32),
         'expand_patch_by': (16, 16),
@@ -114,7 +114,7 @@ VEVIO = {
         'parallel_trained': False
     },
     'Dirs': {
-        'image': 'data' + sep + 'VEVIO_MAP' + sep + 'mosaics',
+        'image': 'data' + sep + 'VEVIO_MAP' + sep + 'images',
         'mask': 'data' + sep + 'VEVIO' + sep + 'mosaics_masks',
         'truth': 'data' + sep + 'VEVIO' + sep + 'mosaics_manual_01_bw',
         'logs': 'data' + sep + 'VEVIO_MAP' + sep + 'thrnet_logs',
