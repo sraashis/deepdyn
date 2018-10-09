@@ -25,23 +25,15 @@ class Inception(nn.Module):
         super(Inception, self).__init__()
 
         _, k, s, p = self.get_wksp(w=width, w_match=width, k=3)
-        self.convA1_3by3 = BasicConv2d(in_ch=in_ch, out_ch=out_ch, k=k, s=s, p=p)
-
-        _, k, s, p = self.get_wksp(w=width, w_match=width, k=5)
-        self.convB1_5by5 = BasicConv2d(in_ch=in_ch, out_ch=out_ch, k=k, s=s, p=p)
-
-        _, k, s, p = self.get_wksp(w=width, w_match=width, k=5)
-        self.convA2_5by5 = BasicConv2d(in_ch=out_ch, out_ch=out_ch, k=k, s=s, p=p)
+        self.convA_3by3 = BasicConv2d(in_ch=in_ch, out_ch=int(out_ch), k=k, s=s, p=p)
 
         _, k, s, p = self.get_wksp(w=width, w_match=width, k=3)
-        self.convB2_3by3 = BasicConv2d(in_ch=out_ch, out_ch=out_ch, k=k, s=s, p=p)
-
-        self.conv_out_1by1 = BasicConv2d(in_ch=out_ch * 2, out_ch=out_ch, k=1, s=1, p=0)
+        self.convB_3by3 = BasicConv2d(in_ch=out_ch, out_ch=int(out_ch), k=k, s=s, p=p)
 
     def forward(self, x):
-        a = self.convA2_5by5(self.convA1_3by3(x))
-        b = self.convB2_3by3(self.convB1_5by5(x))
-        return self.conv_out_1by1(torch.cat([a, b], 1))
+        a = self.convA_3by3(x)
+        b = self.convB_3by3(a)
+        return torch.max(a, b)
 
     @staticmethod
     def out_w(w, k, s, p):
@@ -58,52 +50,51 @@ class Inception(nn.Module):
 
 
 class InceptionThrNet(nn.Module):
-    def __init__(self, width, input_ch, num_class):
+    def __init__(self, input_ch, num_class):
         super(InceptionThrNet, self).__init__()
 
-        self.inception1 = Inception(width=width, in_ch=input_ch, out_ch=32)
-        self.inception2 = Inception(width=width, in_ch=32, out_ch=64)
-        self.inception2_mxp = nn.MaxPool2d(kernel_size=2, stride=2, padding=0)
+        self.inception1 = Inception(width=48, in_ch=input_ch, out_ch=64)
+        self.inception2 = Inception(width=40, in_ch=64, out_ch=128)
+        self.inception3 = Inception(width=32, in_ch=192, out_ch=256)
+        self.mxp_3 = nn.MaxPool2d(kernel_size=2, stride=2)
 
-        # We will crop and concat from inception1 to this layer
-        self.inception3 = Inception(width=width, in_ch=128, out_ch=32)
-        self.inception4 = Inception(width=width, in_ch=32, out_ch=128)
-        self.inception4_mxp = nn.MaxPool2d(kernel_size=2, stride=2, padding=0)
+        self.inception4 = Inception(width=192, in_ch=256, out_ch=512)
+        self.mxp_4 = nn.MaxPool2d(kernel_size=2, stride=2)
 
-        self.inception5 = Inception(width=width, in_ch=128, out_ch=32)
-        self.inception6 = Inception(width=width, in_ch=32, out_ch=128)
-        self.inception6_mxp = nn.MaxPool2d(kernel_size=2, stride=2, padding=0)
+        self.inception5 = Inception(width=256, in_ch=512, out_ch=64)
+        self.mxp_5 = nn.MaxPool2d(kernel_size=2, stride=2)
 
-        self.inception7 = Inception(width=width, in_ch=128, out_ch=64)
-        self.inception8 = Inception(width=width, in_ch=64, out_ch=32)
+        self.inception6 = Inception(width=4, in_ch=512, out_ch=256)
+        self.mxp_6 = nn.MaxPool2d(kernel_size=2, stride=2)
 
-        self.linearWidth = 128 * 4 * 4
-        self.fc1_out = nn.Linear(self.linearWidth, 512)
-        self.fc2_out = nn.Linear(512, num_class)
+        self.out_conv = BasicConv2d(in_ch=256, out_ch=128, k=1, s=1, p=0)
+
+        self.fc1 = nn.Linear(128 * 2 * 2, 256)
+        self.fc2 = nn.Linear(256, num_class)
         initialize_weights(self)
 
     def forward(self, x):
         i1_out = self.inception1(x)
-        i2_out = self.inception2(i1_out)
-        i2_out_dwn = self.inception2_mxp(i2_out)
+        i2_out = self.inception2(i1_out[:, :, 4:44, 4:44])
+        i3_out = self.inception3(torch.cat([i1_out[:, :, 8:40, 8:40], i2_out[:, :, 4:36, 4:36]], 1))
+        i3_out = self.mxp_3(i3_out)
 
-        i3_out = self.inception3(torch.cat([i2_out[:, :, 8:24, 8:24], i2_out_dwn], 1))
         i4_out = self.inception4(i3_out)
-        i4_dwn_out = self.inception4_mxp(i4_out)
+        i4_out = self.mxp_4(i4_out)
 
-        i5_out = self.inception5(i4_dwn_out)
+        i5_out = self.inception5(i4_out)
+        i5_out = self.mxp_5(i5_out)
+
         i6_out = self.inception6(i5_out)
-        i6_dwn_out = self.inception6_mxp(i6_out)
+        i6_out = self.mxp_6(i6_out)
 
-        i7_out = self.inception7(i6_dwn_out)
-        i8_out = self.inception8(i7_out)
-
-        flattened = i8_out.view(-1, self.linearWidth)
-
-        fc1_out = F.relu(self.fc1_out(flattened))
-        return self.fc2_out(fc1_out)
+        out = self.out_conv(i6_out)
+        out = out.view(128 * 2 * 2, -1)
+        out = self.fc1(out)
+        out = self.fc2(out)
+        return out
 
 
-m = InceptionThrNet(width=32, input_ch=1, num_class=1)
+m = InceptionThrNet(input_ch=1, num_class=1)
 torch_total_params = sum(p.numel() for p in m.parameters() if p.requires_grad)
 print('Total Params:', torch_total_params)

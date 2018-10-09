@@ -45,7 +45,7 @@ def create_splits(files, test_count, val_count, file_name):
         f.write(json.dumps(configuration))
         f.close()
 
-# import neuralnet.thrnet.runs as r
+# import neuralnet.mapnet.runs as r
 # files = os.listdir((r.DRIVE['Dirs']['image']))
 # random.shuffle(files)
 # create_splits(files, 10, 10, 'THRNET-DRIVE.json')

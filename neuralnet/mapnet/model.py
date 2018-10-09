@@ -56,10 +56,10 @@ class InceptionThrNet(nn.Module):
         self.inception1 = Inception(width=48, in_ch=input_ch, out_ch=64)
         self.inception2 = Inception(width=48, in_ch=64, out_ch=128)
 
-        self.inception3 = Inception(width=40, in_ch=128, out_ch=192)
-        self.inception4 = Inception(width=40, in_ch=192, out_ch=256)
+        self.inception3 = Inception(width=40, in_ch=128, out_ch=256)
+        self.inception4 = Inception(width=40, in_ch=256, out_ch=512)
 
-        self.inception5 = Inception(width=32, in_ch=384, out_ch=256)
+        self.inception5 = Inception(width=32, in_ch=640, out_ch=256)
         self.inception6 = Inception(width=32, in_ch=256, out_ch=128)
         self.inception7 = Inception(width=32, in_ch=128, out_ch=64)
 

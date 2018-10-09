@@ -1,10 +1,6 @@
-"""
-### author: Aashis Khanal
-### sraashis@gmail.com
-### date: 9/10/2018
-"""
 import os
 import sys
+import traceback
 
 try:
     BASE_PROJECT_DIR = '/home/ak/PycharmProjects/ature'
@@ -15,23 +11,18 @@ except:
     sys.path.append(BASE_PROJECT_DIR)
     os.chdir(BASE_PROJECT_DIR)
 
-import os
-import sys
-import traceback
-
-sys.path.append(BASE_PROJECT_DIR)
-os.chdir(BASE_PROJECT_DIR)
-
 import torch
 import torch.optim as optim
-from neuralnet.unet.model import UNet
-from neuralnet.unet.unet_dataloader import PatchesGenerator
-from neuralnet.unet.unet_trainer import UNetNNTrainer
+from neuralnet.mapnet.model import InceptionThrNet
+from neuralnet.mapnet.thrnet_dataloader import PatchesGenerator
+from neuralnet.mapnet.mapnet_trainer import ThrnetTrainer
 import torchvision.transforms as transforms
 from neuralnet.utils import auto_split as asp
-import neuralnet.unet.runs  as rs
+from neuralnet.mapnet.runs import DRIVE, WIDE, STARE, VEVIO
 
-RUNS = [rs.DRIVE]  # , rs.WIDE, rs.STARE, rs.VEVIO]
+RUNS = [DRIVE]
+
+# RUNS = [STARE, VEVIO]  # DRIVE, WIDE]
 torch.cuda.set_device(1)
 
 if __name__ == "__main__":
@@ -47,9 +38,9 @@ if __name__ == "__main__":
 
         for split in os.listdir(R['Dirs']['splits_json']):
             splits = asp.load_split_json(os.path.join(R['Dirs']['splits_json'], split))
-
             R['checkpoint_file'] = split + '.tar'
-            model = UNet(R['Params']['num_channels'], R['Params']['num_classes'])
+
+            model = InceptionThrNet(R['Params']['num_channels'], R['Params']['num_classes'])
             optimizer = optim.Adam(model.parameters(), lr=R['Params']['learning_rate'])
             if R['Params']['distribute']:
                 model = torch.nn.DataParallel(model)
@@ -57,7 +48,7 @@ if __name__ == "__main__":
                 optimizer = optim.Adam(model.module.parameters(), lr=R['Params']['learning_rate'])
 
             try:
-                drive_trainer = UNetNNTrainer(model=model, run_conf=R)
+                drive_trainer = ThrnetTrainer(model=model, run_conf=R)
 
                 if R.get('Params').get('mode') == 'train':
                     train_loader = PatchesGenerator.get_loader(run_conf=R, images=splits['train'], transforms=transform,
@@ -67,13 +58,12 @@ if __name__ == "__main__":
                     drive_trainer.train(optimizer=optimizer, data_loader=train_loader, validation_loader=val_loader)
 
                 drive_trainer.resume_from_checkpoint(parallel_trained=R.get('Params').get('parallel_trained'))
-                test_loader = PatchesGenerator.get_loader_per_img(run_conf=R,
-                                                                  images=splits['test'], mode='test')
+                test_loader = PatchesGenerator.get_loader_per_img(run_conf=R, images=splits['test'], mode='test')
 
                 logger = drive_trainer.get_logger(drive_trainer.test_log_file,
                                                   header='ID,PRECISION,RECALL,F1,ACCURACY')
                 drive_trainer.evaluate(data_loaders=test_loader, logger=logger, gen_images=True)
-                drive_trainer.plot_test(file=drive_trainer.test_log_file)
                 logger.close()
+                drive_trainer.plot_test(file=drive_trainer.test_log_file)
             except Exception as e:
                 traceback.print_exc()

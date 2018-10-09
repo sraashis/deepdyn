@@ -6,12 +6,14 @@
 
 import os
 import sys
+import threading
 
 import PIL.Image as IMG
 import numpy as np
 import torch
 import torch.nn.functional as F
 
+import neuralnet.utils.plotter as plt
 from neuralnet.utils.measurements import ScoreAccumulator
 
 
@@ -28,7 +30,11 @@ class NNTrainer:
 
         self.checkpoint_file = os.path.join(self.log_dir, self.run_conf.get('checkpoint_file'))
         self.temp_chk_file = os.path.join(self.log_dir, 'RUNNING' + self.run_conf.get('checkpoint_file'))
-        self.log_file = os.path.join(self.log_dir, self.run_conf.get('checkpoint_file') + '-TRAIN.csv')
+
+        self.log_key = self.run_conf.get('checkpoint_file').split('.')[0]
+        self.train_log_file = os.path.join(self.log_dir, self.log_key + '-TRAIN.csv')
+        self.test_log_file = os.path.join(self.log_dir, self.log_key + '-TEST.csv')
+        self.validation_log_file = os.path.join(self.log_dir, self.log_key + '-VAL.csv')
 
         if torch.cuda.is_available():
             self.device = torch.device("cuda" if self.use_gpu else "cpu")
@@ -45,13 +51,18 @@ class NNTrainer:
         if validation_loader is None:
             raise ValueError('Please provide validation loader.')
 
-        logger = NNTrainer.get_logger(self.log_file, header='ID,TYPE,EPOCH,BATCH,PRECISION,RECALL,F1,ACCURACY,LOSS')
+        logger = NNTrainer.get_logger(self.train_log_file,
+                                      header='ID,EPOCH,BATCH,PRECISION,RECALL,F1,ACCURACY,LOSS')
+
+        val_logger = NNTrainer.get_logger(self.validation_log_file,
+                                          header='ID,PRECISION,RECALL,F1,ACCURACY')
+
         print('Training...')
         for epoch in range(1, self.epochs + 1):
             self.model.train()
             score_acc = ScoreAccumulator()
             running_loss = 0.0
-            self.adjust_learning_rate(optimizer=optimizer, epoch=epoch)
+            self._adjust_learning_rate(optimizer=optimizer, epoch=epoch)
             for i, data in enumerate(data_loader, 1):
                 inputs, labels = data['inputs'].to(self.device), data['labels'].long().to(self.device)
 
@@ -73,12 +84,17 @@ class NNTrainer:
                               a))
                     running_loss = 0.0
 
-                self.flush(logger, ','.join(str(x) for x in [0, 0, epoch, i, p, r, f1, a, current_loss]))
+                self.flush(logger, ','.join(str(x) for x in [0, epoch, i, p, r, f1, a, current_loss]))
 
+            self.plot_train(file=self.train_log_file, batches_per_epochs=data_loader.__len__(), key='LOSS')
             if epoch % self.validation_frequency == 0:
-                self.evaluate(data_loaders=validation_loader, logger=logger, gen_images=False)
+                self.evaluate(data_loaders=validation_loader, logger=val_logger, gen_images=False)
+
+            self.plot_val(self.validation_log_file, batches_per_epoch=len(validation_loader))
+
         try:
             logger.close()
+            val_logger.close()
         except IOError:
             pass
 
@@ -124,7 +140,7 @@ class NNTrainer:
 
                 prf1a = img_score.get_prf1a()
                 print(img_obj.file_name, ' PRF1A', prf1a)
-                self.flush(logger, ','.join(str(x) for x in [img_obj.file_name, 1, 0, 0] + prf1a))
+                self.flush(logger, ','.join(str(x) for x in [img_obj.file_name] + prf1a))
 
         self._save_if_better(score=eval_score / len(data_loaders))
 
@@ -182,11 +198,44 @@ class NNTrainer:
         if logger is not None:
             logger.write(msg + '\n')
             logger.flush()
-        pass
 
     @staticmethod
-    def adjust_learning_rate(optimizer, epoch):
-        if epoch % 25 == 0:
+    def _adjust_learning_rate(optimizer, epoch):
+        if epoch % 30 == 0:
             for param_group in optimizer.param_groups:
                 if param_group['lr'] >= 1e-5:
-                    param_group['lr'] = param_group['lr'] * 0.6
+                    param_group['lr'] = param_group['lr'] * 0.7
+
+    @staticmethod
+    def plot_train(file=None, key=None, batches_per_epochs=None):
+
+        def f(fl=file, k=key, bpep=batches_per_epochs):
+            plt.plot_csv(file=fl, key=k, title='Training', batches_per_epoch=bpep, save=True)
+
+        NNTrainer.send_to_back(func=f)
+
+    @staticmethod
+    def plot_val(file, batches_per_epoch):
+
+        def f(fl=file, b_per_ep=batches_per_epoch):
+            plt.plot_csv(file=fl, title='Validation', key='F1', save=True,
+                         batches_per_epoch=b_per_ep)
+            plt.plot_csv(file=file, title='Validation', key='ACCURACY', save=True,
+                         batches_per_epoch=b_per_ep)
+            plt.scattermap_prec_recall(file=fl, save=True)
+
+        NNTrainer.send_to_back(f)
+
+    @staticmethod
+    def plot_test(file):
+        def f(fl=file):
+            plt.scatter_with_id(file=fl, key='F1', save=True)
+            plt.scatter_with_id(file=fl, key='ACCURACY', save=True)
+            plt.scatter_prec_recall_with_id(file=fl, save=True)
+
+        NNTrainer.send_to_back(f)
+
+    @staticmethod
+    def send_to_back(func, kwargs={}):
+        t = threading.Thread(target=func, kwargs=kwargs)
+        t.start()
