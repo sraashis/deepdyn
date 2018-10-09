@@ -28,11 +28,11 @@ class Inception(nn.Module):
         self.convA_3by3 = BasicConv2d(in_ch=in_ch, out_ch=int(out_ch), k=k, s=s, p=p)
 
         _, k, s, p = self.get_wksp(w=width, w_match=width, k=3)
-        self.convB_3by3 = BasicConv2d(in_ch=out_ch, out_ch=int(out_ch), k=k, s=s, p=p)
+        self.convB_3by3 = BasicConv2d(in_ch=in_ch, out_ch=int(out_ch), k=k, s=s, p=p)
 
     def forward(self, x):
         a = self.convA_3by3(x)
-        b = self.convB_3by3(a)
+        b = self.convB_3by3(x)
         return torch.max(a, b)
 
     @staticmethod
@@ -59,16 +59,20 @@ class InceptionThrNet(nn.Module):
         self.mxp_3 = nn.MaxPool2d(kernel_size=2, stride=2)
 
         self.inception4 = Inception(width=16, in_ch=256, out_ch=512)
+        self.inception4a = Inception(width=16, in_ch=512, out_ch=512)
         self.mxp_4 = nn.MaxPool2d(kernel_size=2, stride=2)
 
-        self.inception5 = Inception(width=8, in_ch=512, out_ch=384)
+        self.inception5 = Inception(width=8, in_ch=512, out_ch=512)
+        self.inception5a = Inception(width=8, in_ch=512, out_ch=384)
         self.mxp_5 = nn.MaxPool2d(kernel_size=2, stride=2)
 
         self.inception6 = Inception(width=4, in_ch=384, out_ch=256)
-        self.out_conv = BasicConv2d(in_ch=256, out_ch=128, k=1, s=1, p=0)
+        self.inception6a = Inception(width=4, in_ch=256, out_ch=128)
+        self.mxp_6 = nn.MaxPool2d(kernel_size=2, stride=2)
 
-        self.fc1 = nn.Linear(128 * 4 * 4, 512)
-        self.fc2 = nn.Linear(512, num_class)
+        self.out_conv = BasicConv2d(in_ch=128, out_ch=64, k=1, s=1, p=0)
+
+        self.fc1 = nn.Linear(64 * 2 * 2, num_class)
         initialize_weights(self)
 
     def forward(self, x):
@@ -78,18 +82,20 @@ class InceptionThrNet(nn.Module):
         i3_out = self.mxp_3(i3_out)
 
         i4_out = self.inception4(i3_out)
+        i4_out = self.inception4a(i4_out)
         i4_out = self.mxp_4(i4_out)
 
         i5_out = self.inception5(i4_out)
+        i5_out = self.inception5a(i5_out)
         i5_out = self.mxp_5(i5_out)
 
         i6_out = self.inception6(i5_out)
-
+        i6_out = self.inception6a(i6_out)
+        i6_out = self.mxp_6(i6_out)
         conv_out = self.out_conv(i6_out)
-        flat = conv_out.view(-1, 128 * 4 * 4)
-        f1_out = self.fc1(flat)
-        out = self.fc2(f1_out)
-        return out
+
+        flat = conv_out.view(-1, 64 * 2 * 2)
+        return self.fc1(flat)
 
 
 m = InceptionThrNet(input_ch=1, num_class=1)
