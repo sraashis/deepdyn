@@ -8,7 +8,7 @@ DRIVE = {
         'num_classes': 1,
         'batch_size': 12,
         'epochs': 250,
-        'learning_rate': 0.001,
+        'learning_rate': 0.01,
         'patch_shape': (32, 32),
         # 'patch_offset': (14, 14),
         'expand_patch_by': (16, 16),
@@ -25,7 +25,7 @@ DRIVE = {
         'mask': 'data' + sep + 'DRIVE' + sep + 'mask',
         'truth': 'data' + sep + 'DRIVE' + sep + 'manual',
         'logs': 'data' + sep + 'DRIVE_MAP' + sep + 'thrnet_logs',
-        'splits_json': 'data' + sep + 'DRIVE_MAP' + sep + 'mapnet_splits'
+        'splits_json': 'data' + sep + 'DRIVE_MAP' + sep + 'thrnet_splits'
     },
 
     'Funcs': {
@@ -56,7 +56,7 @@ WIDE = {
         'mask': 'data' + sep + 'AV-WIDE' + sep + 'mask',
         'truth': 'data' + sep + 'AV-WIDE' + sep + 'manual',
         'logs': 'data' + sep + 'AV-WIDE_MAP' + sep + 'thrnet_logs',
-        'splits_json': 'data' + sep + 'AV-WIDE_MAP' + sep + 'mapnet_splits'
+        'splits_json': 'data' + sep + 'AV-WIDE_MAP' + sep + 'thrnet_splits'
     },
 
     'Funcs': {
@@ -86,7 +86,7 @@ STARE = {
         'image': 'data' + sep + 'STARE_MAP' + sep + 'images',
         'truth': 'data' + sep + 'STARE' + sep + 'labels-ah',
         'logs': 'data' + sep + 'STARE_MAP' + sep + 'thrnet_logs',
-        'splits_json': 'data' + sep + 'STARE_MAP' + sep + 'mapnet_splits'
+        'splits_json': 'data' + sep + 'STARE_MAP' + sep + 'thrnet_splits'
     },
 
     'Funcs': {
@@ -118,7 +118,7 @@ VEVIO = {
         'mask': 'data' + sep + 'VEVIO' + sep + 'mosaics_masks',
         'truth': 'data' + sep + 'VEVIO' + sep + 'mosaics_manual_01_bw',
         'logs': 'data' + sep + 'VEVIO_MAP' + sep + 'thrnet_logs',
-        'splits_json': 'data' + sep + 'VEVIO_MAP' + sep + 'mapnet_splits'
+        'splits_json': 'data' + sep + 'VEVIO_MAP' + sep + 'thrnet_splits'
     },
 
     'Funcs': {
