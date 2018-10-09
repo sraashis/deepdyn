@@ -49,11 +49,11 @@ class ThrnetTrainer(NNTrainer):
                 img_score = ScoreAccumulator()
 
                 if gen_images:
-                    segmented_img = segmented_img.cpu().numpy()
-                    img_score.add_array(img_obj.ground_truth, segmented_img)
-                    segmented_img = iu.remove_connected_comp(np.array(segmented_img, dtype=np.uint8),
-                                                             connected_comp_diam_limit=10)
-                    IMG.fromarray(segmented_img).save(
+                    img = segmented_img.clone().cpu().numpy()
+                    img_score.add_array(img_obj.ground_truth, img)
+                    img = iu.remove_connected_comp(np.array(segmented_img, dtype=np.uint8),
+                                                   connected_comp_diam_limit=10)
+                    IMG.fromarray(img).save(
                         os.path.join(self.log_dir, img_obj.file_name.split('.')[0] + '.png'))
                 else:
                     img_score.add_tensor(segmented_img, gt)

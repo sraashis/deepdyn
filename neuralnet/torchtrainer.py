@@ -86,7 +86,7 @@ class NNTrainer:
 
                 self.flush(logger, ','.join(str(x) for x in [0, epoch, i, p, r, f1, a, current_loss]))
 
-            self.plot_train(file=self.train_log_file, batches_per_epochs=data_loader.__len__(), key='LOSS')
+            self.plot_train(file=self.train_log_file, batches_per_epochs=data_loader.__len__(), keys=['LOSS', 'F1'])
             if epoch % self.validation_frequency == 0:
                 self.evaluate(data_loaders=validation_loader, logger=val_logger, gen_images=False)
 
@@ -130,9 +130,9 @@ class NNTrainer:
                 img_score = ScoreAccumulator()
 
                 if gen_images:
-                    segmented_img = segmented_img.cpu().numpy()
-                    img_score.add_array(img_obj.ground_truth, segmented_img)
-                    IMG.fromarray(np.array(segmented_img, dtype=np.uint8)).save(
+                    img = segmented_img.cpu().numpy()
+                    img_score.add_array(img_obj.ground_truth, img)
+                    IMG.fromarray(np.array(img, dtype=np.uint8)).save(
                         os.path.join(self.log_dir, img_obj.file_name.split('.')[0] + '.png'))
                 else:
                     img_score.add_tensor(segmented_img, gt)
@@ -207,10 +207,12 @@ class NNTrainer:
                     param_group['lr'] = param_group['lr'] * 0.7
 
     @staticmethod
-    def plot_train(file=None, key=None, batches_per_epochs=None):
+    def plot_train(file=None, keys=None, batches_per_epochs=None):
 
-        def f(fl=file, k=key, bpep=batches_per_epochs):
-            plt.plot_csv(file=fl, key=k, title='Training', batches_per_epoch=bpep, save=True)
+        def f(fl=file, ks=keys, bpep=batches_per_epochs):
+            plt.scattermap_prec_recall(file=fl, save=True)
+            for k in ks:
+                plt.plot_csv(file=fl, key=k, title='Training', batches_per_epoch=bpep, save=True)
 
         NNTrainer.send_to_back(func=f)
 
