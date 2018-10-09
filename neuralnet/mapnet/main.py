@@ -60,9 +60,8 @@ if __name__ == "__main__":
                 drive_trainer.resume_from_checkpoint(parallel_trained=R.get('Params').get('parallel_trained'))
                 test_loader = PatchesGenerator.get_loader_per_img(run_conf=R, images=splits['test'], mode='test')
 
-                log_file = os.path.join(R['Dirs']['logs'], R['checkpoint_file'] + '-TEST.csv')
-                logger = drive_trainer.get_logger(log_file,
-                                                  header='ID,TYPE,EPOCH,BATCH,PRECISION,RECALL,F1,ACCURACY,LOSS')
+                logger = drive_trainer.get_logger(drive_trainer.test_log_file,
+                                                  header='ID,PRECISION,RECALL,F1,ACCURACY')
                 drive_trainer.evaluate(data_loaders=test_loader, logger=logger, gen_images=True)
                 logger.close()
                 drive_trainer.plot_test(file=drive_trainer.test_log_file)

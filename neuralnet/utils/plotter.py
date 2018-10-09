@@ -40,7 +40,7 @@ def plot_csv(file=None, key='LOSS', query=None, title=None, save=False, batches_
 def scattermap_prec_recall(file=None, query=None, save=False):
     try:
         df = pd.read_csv(file).query(query) if query else pd.read_csv(file)
-        plt.rcParams["figure.figsize"] = [8, 8]
+        plt.rcParams["figure.figsize"] = [12, 8]
         fig, ax1 = plt.subplots(nrows=1, ncols=1)
         z = np.linspace(0, 0.9, df['PRECISION'].shape[0])
         df.plot.scatter(x='PRECISION', y='RECALL', c=z, colormap='magma', ax=ax1, s=50, xlim=(0.5, 1), ylim=(0.5, 1))
