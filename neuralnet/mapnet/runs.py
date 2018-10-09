@@ -6,26 +6,26 @@ DRIVE = {
     'Params': {
         'num_channels': 1,
         'num_classes': 2,
-        'batch_size': 4,
+        'batch_size': 12,
         'epochs': 250,
         'learning_rate': 0.001,
-        'patch_shape': (388, 388),
-        'patch_offset': (150, 150),
-        'expand_patch_by': (184, 184),
+        'patch_shape': (32, 32),
+        # 'patch_offset': (14, 14),
+        'expand_patch_by': (16, 16),
         'use_gpu': True,
         'distribute': False,
         'shuffle': True,
-        'log_frequency': 5,
+        'log_frequency': 50,
         'validation_frequency': 1,
-        'mode': 'test',
+        'mode': 'train',
         'parallel_trained': False
     },
     'Dirs': {
-        'image': 'data' + sep + 'DRIVE' + sep + 'images',
+        'image': 'data' + sep + 'DRIVE_MAP' + sep + 'images',
         'mask': 'data' + sep + 'DRIVE' + sep + 'mask',
         'truth': 'data' + sep + 'DRIVE' + sep + 'manual',
-        'logs': 'data' + sep + 'DRIVE' + sep + 'unet_logs',
-        'splits_json': 'data' + sep + 'DRIVE' + sep + 'unet_splits'
+        'logs': 'data' + sep + 'DRIVE_MAP' + sep + 'mapnet_logs',
+        'splits_json': 'data' + sep + 'DRIVE_MAP' + sep + 'thrnet_splits'
     },
 
     'Funcs': {
@@ -38,26 +38,25 @@ WIDE = {
     'Params': {
         'num_channels': 1,
         'num_classes': 2,
-        'batch_size': 4,
-        'epochs': 200,
+        'batch_size': 12,
+        'epochs': 40,
         'learning_rate': 0.001,
-        'patch_shape': (388, 388),
-        'patch_offset': (150, 150),
-        'expand_patch_by': (184, 184),
+        'patch_shape': (32, 32),
+        'expand_patch_by': (16, 16),
         'use_gpu': True,
         'distribute': False,
         'shuffle': True,
-        'log_frequency': 5,
+        'log_frequency': 50,
         'validation_frequency': 1,
-        'mode': 'test',
+        'mode': 'train',
         'parallel_trained': False
     },
     'Dirs': {
-        'image': 'data' + sep + 'AV-WIDE' + sep + 'images',
+        'image': 'data' + sep + 'AV-WIDE_MAP' + sep + 'images',
         'mask': 'data' + sep + 'AV-WIDE' + sep + 'mask',
         'truth': 'data' + sep + 'AV-WIDE' + sep + 'manual',
-        'logs': 'data' + sep + 'AV-WIDE' + sep + 'unet_logs',
-        'splits_json': 'data' + sep + 'AV-WIDE' + sep + 'unet_splits'
+        'logs': 'data' + sep + 'AV-WIDE_MAP' + sep + 'mapnet_logs',
+        'splits_json': 'data' + sep + 'AV-WIDE_MAP' + sep + 'mapnet_splits'
     },
 
     'Funcs': {
@@ -70,25 +69,24 @@ STARE = {
     'Params': {
         'num_channels': 1,
         'num_classes': 2,
-        'batch_size': 4,
-        'epochs': 200,
+        'batch_size': 12,
+        'epochs': 40,
         'learning_rate': 0.001,
-        'patch_shape': (388, 388),
-        'patch_offset': (150, 150),
-        'expand_patch_by': (184, 184),
+        'patch_shape': (32, 32),
+        'expand_patch_by': (16, 16),
         'use_gpu': True,
         'distribute': False,
         'shuffle': True,
-        'log_frequency': 5,
+        'log_frequency': 50,
         'validation_frequency': 1,
         'mode': 'train',
         'parallel_trained': False
     },
     'Dirs': {
-        'image': 'data' + sep + 'STARE' + sep + 'stare-images',
+        'image': 'data' + sep + 'STARE_MAP' + sep + 'images',
         'truth': 'data' + sep + 'STARE' + sep + 'labels-ah',
-        'logs': 'data' + sep + 'STARE' + sep + 'unet_logs',
-        'splits_json': 'data' + sep + 'STARE' + sep + 'unet_splits'
+        'logs': 'data' + sep + 'STARE_MAP' + sep + 'mapnet_logs',
+        'splits_json': 'data' + sep + 'STARE_MAP' + sep + 'mapnet_splits'
     },
 
     'Funcs': {
@@ -97,30 +95,30 @@ STARE = {
     }
 }
 
+
 VEVIO = {
     'Params': {
         'num_channels': 1,
         'num_classes': 2,
-        'batch_size': 4,
-        'epochs': 200,
+        'batch_size': 12,
+        'epochs': 40,
         'learning_rate': 0.001,
-        'patch_shape': (388, 388),
-        'patch_offset': (150, 150),
-        'expand_patch_by': (184, 184),
+        'patch_shape': (32, 32),
+        'expand_patch_by': (16, 16),
         'use_gpu': True,
         'distribute': False,
         'shuffle': True,
-        'log_frequency': 5,
+        'log_frequency': 50,
         'validation_frequency': 1,
         'mode': 'train',
         'parallel_trained': False
     },
     'Dirs': {
-        'image': 'data' + sep + 'VEVIO' + sep + 'mosaics',
+        'image': 'data' + sep + 'VEVIO_MAP' + sep + 'images',
         'mask': 'data' + sep + 'VEVIO' + sep + 'mosaics_masks',
         'truth': 'data' + sep + 'VEVIO' + sep + 'mosaics_manual_01_bw',
-        'logs': 'data' + sep + 'VEVIO' + sep + 'unet_logs',
-        'splits_json': 'data' + sep + 'VEVIO' + sep + 'unet_splits'
+        'logs': 'data' + sep + 'VEVIO_MAP' + sep + 'mapnet_logs',
+        'splits_json': 'data' + sep + 'VEVIO_MAP' + sep + 'mapnet_splits'
     },
 
     'Funcs': {

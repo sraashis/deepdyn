@@ -13,16 +13,16 @@ except:
 
 import torch
 import torch.optim as optim
-from neuralnet.thrnet.inception import InceptionThrNet
-from neuralnet.thrnet.thrnet_dataloader import PatchesGenerator
+from neuralnet.thrnet.model import InceptionThrNet
+from neuralnet.mapnet.thrnet_dataloader import PatchesGenerator
 from neuralnet.thrnet.thrnet_trainer import ThrnetTrainer
 import torchvision.transforms as transforms
 from neuralnet.utils import auto_split as asp
-from neuralnet.thrnet.runs import DRIVE, WIDE, STARE, VEVIO
+from neuralnet.mapnet.runs import DRIVE, WIDE, STARE, VEVIO
 
-# RUNS = [DRIVE32, DRIVE16]
+RUNS = [DRIVE]
 
-RUNS = [DRIVE, WIDE, STARE, VEVIO]
+# RUNS = [STARE, VEVIO]  # DRIVE, WIDE]
 # torch.cuda.set_device(1)
 
 if __name__ == "__main__":
@@ -65,5 +65,6 @@ if __name__ == "__main__":
                                                   header='ID,TYPE,EPOCH,BATCH,PRECISION,RECALL,F1,ACCURACY,LOSS')
                 drive_trainer.evaluate(data_loaders=test_loader, logger=logger, gen_images=True)
                 logger.close()
+                drive_trainer.plot_test(file=drive_trainer.test_log_file)
             except Exception as e:
                 traceback.print_exc()

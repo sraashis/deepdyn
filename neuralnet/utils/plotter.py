@@ -13,7 +13,7 @@ def plot_csv(file=None, key='LOSS', query=None, title=None, save=False, batches_
         df = pd.read_csv(file).query(query) if query else pd.read_csv(file)
 
         df_sv = df.copy()
-        w = min(21, df.shape[0])
+        w = min(21, df.shape[0]-3)
         w = w + 1 if w % 2 == 0 else w
         d = 3 if w > 3 else 1
         df_sv[key] = savgol_filter(df_sv[key], w, d)
@@ -32,6 +32,7 @@ def plot_csv(file=None, key='LOSS', query=None, title=None, save=False, batches_
             plt.savefig(file.split('.')[0] + '-' + key + '.png')
         else:
             plt.show()
+        plt.close('all')
     except Exception:
         traceback.print_exc()
 
@@ -47,6 +48,7 @@ def scattermap_prec_recall(file=None, query=None, save=False):
             plt.savefig(file.split('.')[0] + '-PRECLLMAP' + '.png')
         else:
             plt.show()
+        plt.close('all')
     except Exception:
         traceback.print_exc()
 
@@ -62,13 +64,14 @@ def scatter_with_id(file=None, query=None, key=None, save=False):
         for i, txt in enumerate(df['ID']):
             ax1.annotate(txt, (rows[i], df[key].iloc[i]), xytext=(rows[i] - 0.4, df[key].iloc[i] + 0.006))
         ax1.set_ylabel(key)
-        ax1.set_ylim(0.1, 1)
+        ax1.set_ylim(0.4, 1)
         ax1.grid(True, axis='y')
 
         if save:
             plt.savefig(file.split('.')[0] + '-' + key + '.png')
         else:
             plt.show()
+        plt.close('all')
     except Exception:
         traceback.print_exc()
 
@@ -84,13 +87,14 @@ def scatter_prec_recall_with_id(file=None, query=None, save=False):
             ax1.annotate(txt, (df['PRECISION'].iloc[i] + 0.01, df['RECALL'].iloc[i]))
         ax1.set_xlabel('PRECISION')
         ax1.set_ylabel('RECALL')
-        ax1.set_xlim((0.1, 1))
-        ax1.set_ylim((0.1, 1))
+        ax1.set_xlim((0.4, 1))
+        ax1.set_ylim((0.4, 1))
         ax1.grid(True)
 
         if save:
             plt.savefig(file.split('.')[0] + '-PRECLL' + '.png')
         else:
             plt.show()
+        plt.close('all')
     except Exception:
         traceback.print_exc()
