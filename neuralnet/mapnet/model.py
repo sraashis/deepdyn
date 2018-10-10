@@ -21,19 +21,27 @@ class BasicConv2d(nn.Module):
 
 
 class Inception(nn.Module):
-    def __init__(self, in_ch=None, width=None, out_ch=128):
+    def __init__(self, in_ch=None, width=None, out_ch=128, k=1):
         super(Inception, self).__init__()
 
-        _, k, s, p = self.get_wksp(w=width, w_match=width, k=3)
-        self.convA_3by3 = BasicConv2d(in_ch=in_ch, out_ch=int(out_ch), k=k, s=s, p=p)
+        _, _, s, p = self.get_wksp(w=width, w_match=width, k=k)
+        self.convA = BasicConv2d(in_ch=in_ch, out_ch=int(out_ch / 4), k=k, s=s, p=p)
 
-        _, k, s, p = self.get_wksp(w=width, w_match=width, k=3)
-        self.convB_3by3 = BasicConv2d(in_ch=out_ch, out_ch=int(out_ch), k=k, s=s, p=p)
+        _, _, s, p = self.get_wksp(w=width, w_match=width, k=k)
+        self.convB = BasicConv2d(in_ch=in_ch, out_ch=int(out_ch / 4), k=k, s=s, p=p)
+
+        _, _, s, p = self.get_wksp(w=width, w_match=width, k=k)
+        self.convC = BasicConv2d(in_ch=in_ch, out_ch=int(out_ch / 4), k=k, s=s, p=p)
+
+        _, _, s, p = self.get_wksp(w=width, w_match=width, k=k)
+        self.convD = BasicConv2d(in_ch=in_ch, out_ch=int(out_ch / 4), k=k, s=s, p=p)
 
     def forward(self, x):
-        a = self.convA_3by3(x)
-        b = self.convB_3by3(a)
-        return torch.max(a, b)
+        a = self.convA(x)
+        b = self.convB(x)
+        c = self.convC(x)
+        d = self.convD(x)
+        return torch.cat([a, b, c, d], 1)
 
     @staticmethod
     def out_w(w, k, s, p):
@@ -53,15 +61,15 @@ class InceptionThrNet(nn.Module):
     def __init__(self, input_ch, num_class):
         super(InceptionThrNet, self).__init__()
 
-        self.inception1 = Inception(width=48, in_ch=input_ch, out_ch=64)
-        self.inception2 = Inception(width=48, in_ch=64, out_ch=128)
+        self.inception1 = Inception(width=48, in_ch=input_ch, out_ch=64, k=3)
+        self.inception2 = Inception(width=48, in_ch=64, out_ch=128, k=1)
 
-        self.inception3 = Inception(width=40, in_ch=128, out_ch=256)
-        self.inception4 = Inception(width=40, in_ch=256, out_ch=512)
+        self.inception3 = Inception(width=40, in_ch=128, out_ch=256, k=3)
+        self.inception4 = Inception(width=40, in_ch=256, out_ch=512, k=1)
 
-        self.inception5 = Inception(width=32, in_ch=640, out_ch=256)
-        self.inception6 = Inception(width=32, in_ch=256, out_ch=128)
-        self.inception7 = Inception(width=32, in_ch=128, out_ch=64)
+        self.inception5 = Inception(width=32, in_ch=640, out_ch=256, k=3)
+        self.inception6 = Inception(width=32, in_ch=256, out_ch=128, k=1)
+        self.inception7 = Inception(width=32, in_ch=128, out_ch=64, k=3)
 
         self.out_conv = BasicConv2d(in_ch=64, out_ch=num_class, k=1, s=1, p=0)
 

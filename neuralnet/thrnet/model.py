@@ -21,19 +21,27 @@ class BasicConv2d(nn.Module):
 
 
 class Inception(nn.Module):
-    def __init__(self, in_ch=None, width=None, out_ch=128):
+    def __init__(self, in_ch=None, width=None, out_ch=128, k=1):
         super(Inception, self).__init__()
 
-        _, k, s, p = self.get_wksp(w=width, w_match=width, k=3)
-        self.convA_3by3 = BasicConv2d(in_ch=in_ch, out_ch=int(out_ch), k=k, s=s, p=p)
+        _, _, s, p = self.get_wksp(w=width, w_match=width, k=k)
+        self.convA = BasicConv2d(in_ch=in_ch, out_ch=int(out_ch / 4), k=k, s=s, p=p)
 
-        _, k, s, p = self.get_wksp(w=width, w_match=width, k=3)
-        self.convB_3by3 = BasicConv2d(in_ch=in_ch, out_ch=int(out_ch), k=k, s=s, p=p)
+        _, _, s, p = self.get_wksp(w=width, w_match=width, k=k)
+        self.convB = BasicConv2d(in_ch=in_ch, out_ch=int(out_ch / 4), k=k, s=s, p=p)
+
+        _, _, s, p = self.get_wksp(w=width, w_match=width, k=k)
+        self.convC = BasicConv2d(in_ch=in_ch, out_ch=int(out_ch / 4), k=k, s=s, p=p)
+
+        _, _, s, p = self.get_wksp(w=width, w_match=width, k=k)
+        self.convD = BasicConv2d(in_ch=in_ch, out_ch=int(out_ch / 4), k=k, s=s, p=p)
 
     def forward(self, x):
-        a = self.convA_3by3(x)
-        b = self.convB_3by3(x)
-        return torch.max(a, b)
+        a = self.convA(x)
+        b = self.convB(x)
+        c = self.convC(x)
+        d = self.convD(x)
+        return torch.cat([a, b, c, d], 1)
 
     @staticmethod
     def out_w(w, k, s, p):
@@ -53,48 +61,50 @@ class InceptionThrNet(nn.Module):
     def __init__(self, input_ch, num_class):
         super(InceptionThrNet, self).__init__()
 
-        self.inception1 = Inception(width=48, in_ch=input_ch, out_ch=64)
-        self.inception2 = Inception(width=40, in_ch=64, out_ch=128)
-        self.inception3 = Inception(width=32, in_ch=192, out_ch=256)
+        self.inception1 = Inception(width=48, in_ch=input_ch, out_ch=128, k=3)
+        self.inception1a = Inception(width=48, in_ch=128, out_ch=256, k=1)
+
+        self.inception2 = Inception(width=40, in_ch=256, out_ch=256, k=3)
+        self.inception2a = Inception(width=40, in_ch=256, out_ch=256, k=1)
+
+        self.inception3 = Inception(width=32, in_ch=512, out_ch=512, k=3)
         self.mxp_3 = nn.MaxPool2d(kernel_size=2, stride=2)
 
-        self.inception4 = Inception(width=16, in_ch=256, out_ch=512)
-        self.inception4a = Inception(width=16, in_ch=512, out_ch=512)
+        self.inception4 = Inception(width=16, in_ch=512, out_ch=384, k=1)
         self.mxp_4 = nn.MaxPool2d(kernel_size=2, stride=2)
 
-        self.inception5 = Inception(width=8, in_ch=512, out_ch=512)
-        self.inception5a = Inception(width=8, in_ch=512, out_ch=384)
+        self.inception5 = Inception(width=8, in_ch=384, out_ch=256, k=3)
         self.mxp_5 = nn.MaxPool2d(kernel_size=2, stride=2)
 
-        self.inception6 = Inception(width=4, in_ch=384, out_ch=256)
-        self.inception6a = Inception(width=4, in_ch=256, out_ch=128)
+        self.inception6 = Inception(width=4, in_ch=256, out_ch=128, k=1)
         self.mxp_6 = nn.MaxPool2d(kernel_size=2, stride=2)
 
-        self.out_conv = BasicConv2d(in_ch=128, out_ch=64, k=1, s=1, p=0)
+        self.out_conv = BasicConv2d(in_ch=128, out_ch=32, k=1, s=1, p=0)
 
-        self.fc1 = nn.Linear(64 * 2 * 2, num_class)
+        self.fc1 = nn.Linear(32 * 2 * 2, num_class)
         initialize_weights(self)
 
     def forward(self, x):
         i1_out = self.inception1(x)
+        i1_out = self.inception1a(i1_out)
+
         i2_out = self.inception2(i1_out[:, :, 4:44, 4:44])
+        i2_out = self.inception2a(i2_out)
+
         i3_out = self.inception3(torch.cat([i1_out[:, :, 8:40, 8:40], i2_out[:, :, 4:36, 4:36]], 1))
         i3_out = self.mxp_3(i3_out)
 
         i4_out = self.inception4(i3_out)
-        i4_out = self.inception4a(i4_out)
         i4_out = self.mxp_4(i4_out)
 
         i5_out = self.inception5(i4_out)
-        i5_out = self.inception5a(i5_out)
         i5_out = self.mxp_5(i5_out)
 
         i6_out = self.inception6(i5_out)
-        i6_out = self.inception6a(i6_out)
         i6_out = self.mxp_6(i6_out)
         conv_out = self.out_conv(i6_out)
 
-        flat = conv_out.view(-1, 64 * 2 * 2)
+        flat = conv_out.view(-1, 32 * 2 * 2)
         return self.fc1(flat)
 
 
