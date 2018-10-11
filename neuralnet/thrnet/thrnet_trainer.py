@@ -35,20 +35,18 @@ class ThrnetTrainer(NNTrainer):
             running_loss = 0.0
             self._adjust_learning_rate(optimizer=optimizer, epoch=epoch)
             for i, data in enumerate(data_loader, 1):
-                inputs, y_thresholds = data['inputs'].to(self.device), data['y_thresholds'].float().to(self.device)
+                inputs, y_thresholds = data['inputs'].to(self.device), data['y_thresholds'].float().squeeze().to(
+                    self.device)
 
                 optimizer.zero_grad()
-                thr_map = self.model(inputs)
+                thr_map = self.model(inputs).squeeze()
 
-                # if True:
-                #     print(torch.cat([y_thresholds[..., None], thr_map], 1))
-                #     print('-------------------------------------------------')
-
-                y_thresholds = y_thresholds.squeeze()
-                thr_map = thr_map.squeeze()
                 loss = F.mse_loss(thr_map, y_thresholds)
-                loss.backward()
+                loss.backward(retain_graph=True)
                 optimizer.step()
+                # if True:
+                #     print(torch.cat([y_thresholds[..., None], thr_map[..., None]], 1))
+                #     print('-------------------------------------------------')
 
                 current_loss = math.sqrt(loss.item())
                 running_loss += current_loss
@@ -85,20 +83,19 @@ class ThrnetTrainer(NNTrainer):
                 for i, data in enumerate(loader, 1):
                     inputs = data['inputs'].to(self.device)
                     prob_map = data['prob_map'].to(self.device).float()
-                    y_thresholds = data['y_thresholds'].unsqueeze(1).to(self.device).float()
+                    y_thresholds = data['y_thresholds'].to(self.device).squeeze().float()
                     clip_ix = data['clip_ix'].to(self.device).int()
 
-                    thr_map = self.model(inputs)
-
-                    # if True:
-                    #     print(torch.cat([y_thresholds, thr_map], 1))
-                    #     print('-------------------------------------------------')
+                    thr_map = self.model(inputs).squeeze()
+                    if True:
+                        print(torch.cat([y_thresholds[..., None], thr_map[..., None]], 1))
+                        print('-------------------------------------------------')
 
                     loss = F.mse_loss(thr_map, y_thresholds)
                     current_loss = math.sqrt(loss.item())
                     img_loss += current_loss
 
-                    thr = thr_map[..., None]
+                    thr = thr_map[..., None][..., None]
                     segmented = (prob_map > thr).long()
                     # Reconstruct the image
                     for j in range(segmented.shape[0]):

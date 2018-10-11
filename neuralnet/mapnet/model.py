@@ -24,16 +24,16 @@ class Inception(nn.Module):
     def __init__(self, in_ch=None, width=None, out_ch=128):
         super(Inception, self).__init__()
 
-        _, k, s, p = self.get_wksp(w=width, w_match=width, k=3)
-        self.convA_3by3 = BasicConv2d(in_ch=in_ch, out_ch=int(out_ch), k=k, s=s, p=p)
+        _, _, s, p = self.get_wksp(w=width, w_match=width, k=3)
+        self.convA = BasicConv2d(in_ch=in_ch, out_ch=int(out_ch / 2), k=3, s=s, p=p)
 
-        _, k, s, p = self.get_wksp(w=width, w_match=width, k=3)
-        self.convB_3by3 = BasicConv2d(in_ch=out_ch, out_ch=int(out_ch), k=k, s=s, p=p)
+        _, _, s, p = self.get_wksp(w=width, w_match=width, k=1)
+        self.convB = BasicConv2d(in_ch=in_ch, out_ch=int(out_ch / 2), k=1, s=s, p=p)
 
     def forward(self, x):
-        a = self.convA_3by3(x)
-        b = self.convB_3by3(a)
-        return torch.max(a, b)
+        a = self.convA(x)
+        b = self.convB(x)
+        return torch.cat([a, b], 1)
 
     @staticmethod
     def out_w(w, k, s, p):
@@ -55,13 +55,16 @@ class InceptionThrNet(nn.Module):
 
         self.inception1 = Inception(width=48, in_ch=input_ch, out_ch=64)
         self.inception2 = Inception(width=48, in_ch=64, out_ch=128)
+        self.inception2a = Inception(width=48, in_ch=128, out_ch=256)
 
-        self.inception3 = Inception(width=40, in_ch=128, out_ch=256)
-        self.inception4 = Inception(width=40, in_ch=256, out_ch=512)
+        self.inception3 = Inception(width=40, in_ch=256, out_ch=384)
+        self.inception4 = Inception(width=40, in_ch=384, out_ch=512)
+        self.inception4a = Inception(width=40, in_ch=512, out_ch=512)
 
-        self.inception5 = Inception(width=32, in_ch=640, out_ch=256)
-        self.inception6 = Inception(width=32, in_ch=256, out_ch=128)
-        self.inception7 = Inception(width=32, in_ch=128, out_ch=64)
+        self.inception5 = Inception(width=32, in_ch=768, out_ch=1024)
+        self.inception6 = Inception(width=32, in_ch=1024, out_ch=512)
+        self.inception7 = Inception(width=32, in_ch=512, out_ch=256)
+        self.inception8 = Inception(width=32, in_ch=256, out_ch=64)
 
         self.out_conv = BasicConv2d(in_ch=64, out_ch=num_class, k=1, s=1, p=0)
 
@@ -70,15 +73,18 @@ class InceptionThrNet(nn.Module):
     def forward(self, x):
         i1_out = self.inception1(x)
         i2_out = self.inception2(i1_out)
+        i2_out = self.inception2a(i2_out)
 
         i3_out = self.inception3(i2_out[:, :, 4:44, 4:44])
         i4_out = self.inception4(i3_out)
+        i4_out = self.inception4a(i4_out)
 
         i5_out = self.inception5(torch.cat([i2_out[:, :, 8:40, 8:40], i4_out[:, :, 4:36, 4:36]], 1))
         i6_out = self.inception6(i5_out)
         i7_out = self.inception7(i6_out)
+        i8_out = self.inception8(i7_out)
 
-        out = self.out_conv(i7_out)
+        out = self.out_conv(i8_out)
 
         return F.log_softmax(out, dim=1)
 
