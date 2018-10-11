@@ -13,7 +13,7 @@ import numpy as np
 import torch
 import torch.nn.functional as F
 
-import neuralnet.utils.plotter as plt
+import neuralnet.utils.nviz as plt
 from neuralnet.utils.measurements import ScoreAccumulator
 
 
@@ -210,9 +210,9 @@ class NNTrainer:
     def plot_train(file=None, keys=None, batches_per_epochs=None):
 
         def f(fl=file, ks=keys, bpep=batches_per_epochs):
-            plt.scattermap_prec_recall(file=fl, save=True)
+            plt.plot_cmap(file=fl, save=True, x='PRECISION', y='RECALL', title='Training')
             for k in ks:
-                plt.plot_csv(file=fl, key=k, title='Training', batches_per_epoch=bpep, save=True)
+                plt.plot(file=fl, y=k, title='Training', x_tick_skip=bpep, save=True)
 
         NNTrainer.send_to_back(func=f)
 
@@ -220,20 +220,20 @@ class NNTrainer:
     def plot_val(file, batches_per_epoch):
 
         def f(fl=file, b_per_ep=batches_per_epoch):
-            plt.plot_csv(file=fl, title='Validation', key='F1', save=True,
-                         batches_per_epoch=b_per_ep)
-            plt.plot_csv(file=file, title='Validation', key='ACCURACY', save=True,
-                         batches_per_epoch=b_per_ep)
-            plt.scattermap_prec_recall(file=fl, save=True)
+            plt.plot(file=fl, title='Validation', y='F1', save=True,
+                     x_tick_skip=b_per_ep)
+            plt.plot(file=file, title='Validation', y='ACCURACY', save=True,
+                     x_tick_skip=b_per_ep)
+            plt.plot_cmap(file=fl, save=True, x='PRECISION', y='RECALL', title='Validation')
 
         NNTrainer.send_to_back(f)
 
     @staticmethod
     def plot_test(file):
         def f(fl=file):
-            plt.scatter_with_id(file=fl, key='F1', save=True)
-            plt.scatter_with_id(file=fl, key='ACCURACY', save=True)
-            plt.scatter_prec_recall_with_id(file=fl, save=True)
+            plt.y_scatter(file=fl, y='F1', label='ID', save=True, title='Test')
+            plt.y_scatter(file=fl, y='ACCURACY', label='ID', save=True, title='Test')
+            plt.xy_scatter(file=fl, save=True, x='PRECISION', y='RECALL', label='ID', title='Test')
 
         NNTrainer.send_to_back(f)
 

@@ -21,27 +21,19 @@ class BasicConv2d(nn.Module):
 
 
 class Inception(nn.Module):
-    def __init__(self, in_ch=None, width=None, out_ch=128, k=1):
+    def __init__(self, in_ch=None, width=None, out_ch=128):
         super(Inception, self).__init__()
 
-        _, _, s, p = self.get_wksp(w=width, w_match=width, k=k)
-        self.convA = BasicConv2d(in_ch=in_ch, out_ch=int(out_ch / 4), k=k, s=s, p=p)
+        _, _, s, p = self.get_wksp(w=width, w_match=width, k=3)
+        self.convA = BasicConv2d(in_ch=in_ch, out_ch=int(out_ch / 2), k=3, s=s, p=p)
 
-        _, _, s, p = self.get_wksp(w=width, w_match=width, k=k)
-        self.convB = BasicConv2d(in_ch=in_ch, out_ch=int(out_ch / 4), k=k, s=s, p=p)
-
-        _, _, s, p = self.get_wksp(w=width, w_match=width, k=k)
-        self.convC = BasicConv2d(in_ch=in_ch, out_ch=int(out_ch / 4), k=k, s=s, p=p)
-
-        _, _, s, p = self.get_wksp(w=width, w_match=width, k=k)
-        self.convD = BasicConv2d(in_ch=in_ch, out_ch=int(out_ch / 4), k=k, s=s, p=p)
+        _, _, s, p = self.get_wksp(w=width, w_match=width, k=1)
+        self.convB = BasicConv2d(in_ch=in_ch, out_ch=int(out_ch / 2), k=1, s=s, p=p)
 
     def forward(self, x):
         a = self.convA(x)
         b = self.convB(x)
-        c = self.convC(x)
-        d = self.convD(x)
-        return torch.cat([a, b, c, d], 1)
+        return torch.cat([a, b], 1)
 
     @staticmethod
     def out_w(w, k, s, p):

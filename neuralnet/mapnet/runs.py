@@ -7,7 +7,7 @@ DRIVE = {
         'num_channels': 1,
         'num_classes': 2,
         'batch_size': 12,
-        'epochs': 250,
+        'epochs': 300,
         'learning_rate': 0.001,
         'patch_shape': (32, 32),
         # 'patch_offset': (14, 14),
