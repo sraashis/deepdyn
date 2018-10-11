@@ -53,22 +53,22 @@ class InceptionThrNet(nn.Module):
     def __init__(self, input_ch, num_class):
         super(InceptionThrNet, self).__init__()
 
-        self.inception1 = Inception(width=48, in_ch=input_ch, out_ch=128, k=3)
-        self.inception1a = Inception(width=48, in_ch=128, out_ch=256, k=1)
+        self.inception1 = Inception(width=48, in_ch=input_ch, out_ch=128)
+        self.inception1a = Inception(width=48, in_ch=128, out_ch=256)
 
-        self.inception2 = Inception(width=40, in_ch=256, out_ch=256, k=3)
-        self.inception2a = Inception(width=40, in_ch=256, out_ch=256, k=1)
+        self.inception2 = Inception(width=40, in_ch=256, out_ch=256)
+        self.inception2a = Inception(width=40, in_ch=256, out_ch=256)
 
-        self.inception3 = Inception(width=32, in_ch=512, out_ch=512, k=3)
+        self.inception3 = Inception(width=32, in_ch=512, out_ch=512)
         self.mxp_3 = nn.MaxPool2d(kernel_size=2, stride=2)
 
-        self.inception4 = Inception(width=16, in_ch=512, out_ch=384, k=1)
+        self.inception4 = Inception(width=16, in_ch=512, out_ch=384)
         self.mxp_4 = nn.MaxPool2d(kernel_size=2, stride=2)
 
-        self.inception5 = Inception(width=8, in_ch=384, out_ch=256, k=3)
+        self.inception5 = Inception(width=8, in_ch=384, out_ch=256)
         self.mxp_5 = nn.MaxPool2d(kernel_size=2, stride=2)
 
-        self.inception6 = Inception(width=4, in_ch=256, out_ch=128, k=1)
+        self.inception6 = Inception(width=4, in_ch=256, out_ch=128)
         self.mxp_6 = nn.MaxPool2d(kernel_size=2, stride=2)
 
         self.out_conv = BasicConv2d(in_ch=128, out_ch=32, k=1, s=1, p=0)
