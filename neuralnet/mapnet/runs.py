@@ -56,7 +56,7 @@ WIDE = {
         'mask': 'data' + sep + 'AV-WIDE' + sep + 'mask',
         'truth': 'data' + sep + 'AV-WIDE' + sep + 'manual',
         'logs': 'data' + sep + 'AV-WIDE_MAP' + sep + 'mapnet_logs',
-        'splits_json': 'data' + sep + 'AV-WIDE_MAP' + sep + 'mapnet_splits'
+        'splits_json': 'data' + sep + 'AV-WIDE_MAP' + sep + 'thrnet_splits'
     },
 
     'Funcs': {

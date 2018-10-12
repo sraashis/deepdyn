@@ -8,9 +8,10 @@ plt.switch_backend('agg')
 def plot(file=None, y=None, query=None, title='', save=False, x_tick_skip=None):
     try:
         df = pd.read_csv(file).query(query) if query else pd.read_csv(file)
-
-        sample_every = max(int(df.shape[0] / 1000), 1)
-        df_sample = df.iloc[1::sample_every, :]
+        df_sample = df.copy()
+        w = max(int(df.shape[0] / 1000), 5) if df.shape[0] >= 100 else 1
+        print(df.shape, w)
+        df_sample[y] = df_sample[y].rolling(w, min_periods=1).mean()
 
         plt.rcParams["figure.figsize"] = [12, 6]
         fig, ax1 = plt.subplots(nrows=1, ncols=1)
@@ -99,9 +100,14 @@ def xy_scatter(file=None, query=None, x=None, y=None, label=None, title='', save
     except Exception as e:
         print('### PLOTTER ###', e)
 
-# import neuralnet.mapnet.runs as r
-#
-# D = r.DRIVE
-# file1 = '/home/ak/PycharmProjects/ature/data/DRIVE_MAP/mapnet_logs/THRNET-DRIVE-TEST.csv'
-# print(file1)
-# xy_scatter(file=file1, title='Test', save=True, x='PRECISION', y='RECALL', label='ID')
+
+if __name__ == "__main__":
+    from neuralnet.torchtrainer import NNTrainer
+
+    # train = '/home/ak/PycharmProjects/ature/data/DRIVE_MAP/mapnet_logs/MAPNET-DRIVE-TRAIN.csv'
+    # test = '/home/ak/PycharmProjects/ature/data/DRIVE_MAP/mapnet_logs/MAPNET-DRIVE-TEST.csv'
+    # val = '/home/ak/PycharmProjects/ature/data/DRIVE_MAP/mapnet_logs/MAPNET-DRIVE-VAL.csv'
+    # NNTrainer.plot_train(file1, keys=['LOSS','F1'], batches_per_epochs=1368)
+    # NNTrainer.plot_val(file=val, batches_per_epoch=5)
+    # NNTrainer.plot_test(test)
+    pass
