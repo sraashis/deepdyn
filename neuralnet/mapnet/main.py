@@ -13,7 +13,7 @@ except:
 
 import torch
 import torch.optim as optim
-from neuralnet.mapnet.model import InceptionThrNet
+from neuralnet.mapnet.model import InceptionMapNet
 from neuralnet.mapnet.thrnet_dataloader import PatchesGenerator
 from neuralnet.mapnet.mapnet_trainer import ThrnetTrainer
 import torchvision.transforms as transforms
@@ -40,7 +40,7 @@ if __name__ == "__main__":
             splits = asp.load_split_json(os.path.join(R['Dirs']['splits_json'], split))
             R['checkpoint_file'] = split + '.tar'
 
-            model = InceptionThrNet(R['Params']['num_channels'], R['Params']['num_classes'])
+            model = InceptionMapNet(R['Params']['num_channels'], R['Params']['num_classes'])
             optimizer = optim.Adam(model.parameters(), lr=R['Params']['learning_rate'])
             if R['Params']['distribute']:
                 model = torch.nn.DataParallel(model)

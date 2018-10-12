@@ -49,9 +49,9 @@ class Inception(nn.Module):
         raise LookupError('Solution not within range.')
 
 
-class InceptionThrNet(nn.Module):
+class InceptionMapNet(nn.Module):
     def __init__(self, input_ch, num_class):
-        super(InceptionThrNet, self).__init__()
+        super(InceptionMapNet, self).__init__()
 
         self.inception1 = Inception(width=48, in_ch=input_ch, out_ch=64)
         self.inception2 = Inception(width=48, in_ch=64, out_ch=128)
@@ -89,6 +89,6 @@ class InceptionThrNet(nn.Module):
         return F.log_softmax(out, dim=1)
 
 
-m = InceptionThrNet(input_ch=1, num_class=2)
+m = InceptionMapNet(input_ch=1, num_class=2)
 torch_total_params = sum(p.numel() for p in m.parameters() if p.requires_grad)
 print('Total Params:', torch_total_params)
