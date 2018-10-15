@@ -2,18 +2,16 @@ import math
 import os
 from random import shuffle
 
-import PIL.Image as IMG
 import cv2
 import numpy as np
 import torch
+import torchvision.transforms as tfm
 from scipy.ndimage.measurements import label
 from skimage.morphology import skeletonize
 
 import utils.img_utils as imgutils
 from commons.IMAGE import Image
 from neuralnet.datagen import Generator
-from neuralnet.utils.measurements import get_best_thr
-import torchvision.transforms as tfm
 
 sep = os.sep
 
@@ -91,8 +89,8 @@ class PatchesGenerator(Generator):
 
         # <PREP4> Come up with a grid mask to select few possible pixels to reconstruct the vessels from
         sk_mask = np.zeros_like(seed)
-        sk_mask[::15] = 1
-        sk_mask[:, ::15] = 1
+        sk_mask[::32] = 1
+        sk_mask[:, ::32] = 1
 
         # <PREP5> Apply mask and save seed
         img_obj.res['seed'] = seed * sk_mask * 255
@@ -114,19 +112,20 @@ class PatchesGenerator(Generator):
         ID, row_from, row_to, col_from, col_to = self.indices[index]
 
         img_arr = self.image_objects[ID].res['t9'].copy()
-        gt = self.image_objects[ID].ground_truth.copy()
+        img_tensor = []
+        p, q, r, s, pad = imgutils.expand_and_mirror_patch(full_img_shape=self.image_objects[ID].working_arr.shape,
+                                                           orig_patch_indices=[row_from, row_to, col_from, col_to],
+                                                           expand_by=self.expand_by)
 
-        img_tensor = img_arr[:, row_from:row_to, col_from:col_to]
-        y = gt[row_from:row_to, col_from:col_to]
-        prob_map = self.image_objects[ID].working_arr[row_from:row_to, col_from:col_to].copy()
+        for i in range(self.image_objects[ID].res['t9'].shape[0]):
+            img_tensor.append(np.pad(img_arr[i][p:q, r:s], pad, 'reflect'))
 
-        best_score1, best_thr1 = get_best_thr(prob_map, y, for_best='F1')
+        img_tensor = np.array(img_tensor)
 
+        y = self.image_objects[ID].ground_truth.copy()[row_from:row_to, col_from:col_to]
         y[y == 255] = 1
         return {'inputs': torch.FloatTensor(img_tensor),
                 'clip_ix': np.array([row_from, row_to, col_from, col_to]),
-                'y_thresholds': best_thr1,
-                'prob_map': prob_map,
                 'labels': y.copy()}
 
     @classmethod
