@@ -1,6 +1,5 @@
 import math
 import os
-import random
 from random import shuffle
 
 import numpy as np
@@ -11,7 +10,6 @@ import utils.img_utils as imgutils
 from commons.IMAGE import Image
 from neuralnet.datagen import Generator
 from neuralnet.utils.measurements import get_best_thr
-import cv2
 from PIL import Image as IMG
 
 sep = os.sep
@@ -24,6 +22,7 @@ class PatchesGenerator(Generator):
         self.expand_by = self.run_conf.get('Params').get('expand_patch_by')
         self.est_thr = self.run_conf.get('Params').get('est_threshold', 20)
         self.component_diameter_limit = self.run_conf.get('Params').get('comp_diam_limit', 20)
+        self.orig_dir = self.run_conf.get('Dirs').get('image_orig')
         self._load_indices()
         print('Patches:', self.__len__())
 
@@ -67,6 +66,7 @@ class PatchesGenerator(Generator):
             img_obj.load_ground_truth(gt_dir=self.truth_dir,
                                       fget_ground_truth=self.truth_getter)
 
+        img_obj.res['orig'] = imgutils.get_image_as_array(self.orig_dir + os.sep + img_file.split('.')[0] + '.tif')
         if len(img_obj.image_arr.shape) == 3:
             img_obj.working_arr = img_obj.image_arr[:, :, 1]
         elif len(img_obj.image_arr.shape) == 2:
@@ -121,35 +121,22 @@ class PatchesGenerator(Generator):
         ID, row_from, row_to, col_from, col_to = self.indices[index]
 
         img_arr = self.image_objects[ID].working_arr.copy()
+        img_orig = self.image_objects[ID].res['orig'][:, :, 1].copy()
         gt = self.image_objects[ID].ground_truth.copy()
 
         prob_map = img_arr[row_from:row_to, col_from:col_to]
         y = gt[row_from:row_to, col_from:col_to]
 
         best_score1, best_thr1 = get_best_thr(prob_map, y, for_best='F1')
-        # best_score2, best_thr2 = get_best_thr(prob_map, y, for_best='Precision')
-        # best_score3, best_thr3 = get_best_thr(prob_map, y, for_best='Recall')
 
         p, q, r, s, pad = imgutils.expand_and_mirror_patch(full_img_shape=img_arr.shape,
                                                            orig_patch_indices=[row_from, row_to, col_from, col_to],
                                                            expand_by=self.expand_by)
-        img_tensor = np.pad(img_arr[p:q, r:s], pad, 'reflect')
 
-        if self.mode == 'train' and random.uniform(0, 1) <= 0.5:
-            img_tensor = np.flip(img_tensor, 0)
-            prob_map = np.flip(prob_map, 0)
-            y = np.flip(y, 0)
+        img_tensor = np.zeros((2, *self.patch_shape))
+        img_tensor[0, :, :] = np.pad(img_arr[p:q, r:s], pad, 'reflect')
+        img_tensor[1, :, :] = np.pad(img_orig[p:q, r:s], pad, 'reflect')
 
-        if self.mode == 'train' and random.uniform(0, 1) <= 0.5:
-            img_tensor = np.flip(img_tensor, 1)
-            prob_map = np.flip(prob_map, 1)
-            y = np.flip(y, 1)
-
-        IMG.fromarray(img_tensor).save('data/get/' + self.image_objects[ID].file_name + str(best_thr1) + '.png')
-        img_tensor = img_tensor[..., None]
-        if self.transforms is not None:
-            img_tensor = self.transforms(img_tensor)
-        # print(self.image_objects[ID].file_name, [row_from, row_to, col_from, col_to], best_thr1)
         y[y == 255] = 1
         return {'inputs': img_tensor,
                 'clip_ix': np.array([row_from, row_to, col_from, col_to]),

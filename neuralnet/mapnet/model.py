@@ -1,5 +1,3 @@
-import itertools
-
 import torch
 import torch.nn.functional as F
 from torch import nn
@@ -17,78 +15,52 @@ class BasicConv2d(nn.Module):
     def forward(self, x):
         x = self.conv(x)
         x = self.bn(x)
-        return F.relu(x, inplace=True)
-
-
-class Inception(nn.Module):
-    def __init__(self, in_ch=None, width=None, out_ch=128):
-        super(Inception, self).__init__()
-
-        _, _, s, p = self.get_wksp(w=width, w_match=width, k=3)
-        self.convA = BasicConv2d(in_ch=in_ch, out_ch=int(out_ch / 2), k=3, s=s, p=p)
-
-        _, _, s, p = self.get_wksp(w=width, w_match=width, k=1)
-        self.convB = BasicConv2d(in_ch=in_ch, out_ch=int(out_ch / 2), k=1, s=s, p=p)
-
-    def forward(self, x):
-        a = self.convA(x)
-        b = self.convB(x)
-        return torch.cat([a, b], 1)
-
-    @staticmethod
-    def out_w(w, k, s, p):
-        return ((w - k + 2 * p) / s) + 1
-
-    def get_wksp(self, w=None, w_match=None, k=None, strides=[1, 2, 3], paddings=[0, 1, 2, 3]):
-        all_sp = itertools.product(strides, paddings)
-        for (s, p) in all_sp:
-            w_out = self.out_w(w, k, s, p)
-            if w_out.is_integer() and w_match == int(w_out):
-                return w_out, k, s, p
-
-        raise LookupError('Solution not within range.')
+        return F.relu(x, inplace=False)
 
 
 class InceptionMapNet(nn.Module):
-    def __init__(self, input_ch, num_class):
+    def __init__(self, num_channels, num_class):
         super(InceptionMapNet, self).__init__()
 
-        self.inception1 = Inception(width=48, in_ch=input_ch, out_ch=64)
-        self.inception2 = Inception(width=48, in_ch=64, out_ch=128)
-        self.inception2a = Inception(width=48, in_ch=128, out_ch=256)
+        self.inception1 = BasicConv2d(in_ch=num_channels, out_ch=64, k=3, s=1, p=1)
+        self.inception2 = BasicConv2d(in_ch=64, out_ch=64, k=3, s=1, p=1)
 
-        self.inception3 = Inception(width=40, in_ch=256, out_ch=384)
-        self.inception4 = Inception(width=40, in_ch=384, out_ch=512)
-        self.inception4a = Inception(width=40, in_ch=512, out_ch=512)
+        self.inception3 = BasicConv2d(in_ch=num_channels, out_ch=64, k=1, s=1, p=0)
+        self.inception4 = BasicConv2d(in_ch=64, out_ch=64, k=1, s=1, p=0)
 
-        self.inception5 = Inception(width=32, in_ch=768, out_ch=1024)
-        self.inception6 = Inception(width=32, in_ch=1024, out_ch=512)
-        self.inception7 = Inception(width=32, in_ch=512, out_ch=256)
-        self.inception8 = Inception(width=32, in_ch=256, out_ch=64)
+        self.inception5 = BasicConv2d(in_ch=64, out_ch=128, k=3, s=1, p=1)
+        self.inception6 = BasicConv2d(in_ch=128, out_ch=128, k=3, s=1, p=1)
 
-        self.out_conv = BasicConv2d(in_ch=64, out_ch=num_class, k=1, s=1, p=0)
+        self.inception7 = BasicConv2d(in_ch=128, out_ch=256, k=3, s=1, p=1)
+        self.inception8 = BasicConv2d(in_ch=256, out_ch=256, k=3, s=1, p=1)
 
+        self.inception9 = BasicConv2d(in_ch=256, out_ch=128, k=3, s=1, p=1)
+        self.inception10 = BasicConv2d(in_ch=128, out_ch=64, k=3, s=1, p=1)
+        self.inception11 = BasicConv2d(in_ch=64, out_ch=32, k=1, s=1, p=0)
+        self.out_conv = nn.Conv2d(in_channels=32, out_channels=num_class, kernel_size=1, stride=1, padding=0)
         initialize_weights(self)
 
     def forward(self, x):
-        i1_out = self.inception1(x)
-        i2_out = self.inception2(i1_out)
-        i2_out = self.inception2a(i2_out)
+        x_1 = self.inception1(x)
+        x_2 = self.inception2(x_1)
 
-        i3_out = self.inception3(i2_out[:, :, 4:44, 4:44])
-        i4_out = self.inception4(i3_out)
-        i4_out = self.inception4a(i4_out)
+        x_3 = self.inception3(x)
+        x_4 = self.inception4(x_3)
 
-        i5_out = self.inception5(torch.cat([i2_out[:, :, 8:40, 8:40], i4_out[:, :, 4:36, 4:36]], 1))
-        i6_out = self.inception6(i5_out)
-        i7_out = self.inception7(i6_out)
-        i8_out = self.inception8(i7_out)
+        x_5 = self.inception5(torch.max(x_2, x_4))
+        x_6 = self.inception6(x_5)
 
-        out = self.out_conv(i8_out)
+        x_7 = self.inception7(x_6)
+        x_8 = self.inception8(x_7)
 
+        x_9 = self.inception9(x_8)
+        x_10 = self.inception10(x_9)
+        x_11 = self.inception11(x_10)
+
+        out = self.out_conv(x_11)
         return F.log_softmax(out, dim=1)
 
 
-m = InceptionMapNet(input_ch=1, num_class=2)
+m = InceptionMapNet(num_channels=9, num_class=2)
 torch_total_params = sum(p.numel() for p in m.parameters() if p.requires_grad)
 print('Total Params:', torch_total_params)

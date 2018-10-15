@@ -14,16 +14,16 @@ except:
 import torch
 import torch.optim as optim
 from neuralnet.mapnet.model import InceptionMapNet
-from neuralnet.mapnet.thrnet_dataloader import PatchesGenerator
+from neuralnet.mapnet.mapnet_dataloader import PatchesGenerator
 from neuralnet.mapnet.mapnet_trainer import ThrnetTrainer
 import torchvision.transforms as transforms
 from neuralnet.utils import auto_split as asp
-from neuralnet.mapnet.runs import DRIVE, WIDE, STARE, VEVIO
+from neuralnet.mapnet.runs import DRIVE, DRIVEa
 
 RUNS = [DRIVE]
 
 # RUNS = [STARE, VEVIO]  # DRIVE, WIDE]
-torch.cuda.set_device(1)
+torch.cuda.set_device(0)
 
 if __name__ == "__main__":
 

@@ -4,7 +4,6 @@ import PIL.Image as IMG
 import numpy as np
 import torch
 
-import utils.img_utils as iu
 from neuralnet.torchtrainer import NNTrainer
 from neuralnet.utils.measurements import ScoreAccumulator
 
@@ -32,7 +31,8 @@ class ThrnetTrainer(NNTrainer):
                 gt = torch.LongTensor(img_obj.ground_truth).to(self.device)
 
                 for i, data in enumerate(loader, 1):
-                    inputs, labels = data['inputs'].float().to(self.device), data['labels'].float().to(self.device)
+                    inputs = data['inputs'].float().to(self.device)
+                    labels = data['labels'].float().to(self.device)
                     clip_ix = data['clip_ix'].int().to(self.device)
 
                     outputs = self.model(inputs)
@@ -51,9 +51,9 @@ class ThrnetTrainer(NNTrainer):
                 if gen_images:
                     img = segmented_img.clone().cpu().numpy()
                     img_score.add_array(img_obj.ground_truth, img)
-                    img = iu.remove_connected_comp(np.array(segmented_img, dtype=np.uint8),
-                                                   connected_comp_diam_limit=10)
-                    IMG.fromarray(img).save(
+                    # img = iu.remove_connected_comp(np.array(segmented_img, dtype=np.uint8),
+                    #                                connected_comp_diam_limit=10)
+                    IMG.fromarray(np.array(img, dtype=np.uint8)).save(
                         os.path.join(self.log_dir, img_obj.file_name.split('.')[0] + '.png'))
                 else:
                     img_score.add_tensor(segmented_img, gt)
