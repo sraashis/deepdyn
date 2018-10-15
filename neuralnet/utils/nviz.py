@@ -10,7 +10,7 @@ def plot(file=None, y=None, query=None, title='', save=False, x_tick_skip=None):
         df = pd.read_csv(file).query(query) if query else pd.read_csv(file)
         df_sample = df.copy()
         w = max(int(df.shape[0] / 1000), 5) if df.shape[0] >= 100 else 1
-        print(df.shape, w)
+
         df_sample[y] = df_sample[y].rolling(w, min_periods=1).mean()
 
         plt.rcParams["figure.figsize"] = [12, 6]
@@ -102,12 +102,11 @@ def xy_scatter(file=None, query=None, x=None, y=None, label=None, title='', save
 
 
 if __name__ == "__main__":
-    from neuralnet.torchtrainer import NNTrainer
-
+    from neuralnet.torchtrainer import NNTrainers
     # train = '/home/ak/PycharmProjects/ature/data/DRIVE_MAP/mapnet_logs/MAPNET-DRIVE-TRAIN.csv'
     # test = '/home/ak/PycharmProjects/ature/data/DRIVE_MAP/mapnet_logs/MAPNET-DRIVE-TEST.csv'
     # val = '/home/ak/PycharmProjects/ature/data/DRIVE_MAP/mapnet_logs/MAPNET-DRIVE-VAL.csv'
-    # NNTrainer.plot_train(file1, keys=['LOSS','F1'], batches_per_epochs=1368)
+    # NNTrainer.plot_train(train, keys=['LOSS','F1'], batches_per_epochs=1368)
     # NNTrainer.plot_val(file=val, batches_per_epoch=5)
     # NNTrainer.plot_test(test)
     pass
