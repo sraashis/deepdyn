@@ -38,7 +38,7 @@ class InceptionCrazyNet(nn.Module):
         self.inception10 = BasicConv2d(in_ch=512, out_ch=256, k=3, s=1, p=1)
         self.inception11 = BasicConv2d(in_ch=256, out_ch=128, k=3, s=1, p=1)
         self.inception12 = BasicConv2d(in_ch=128, out_ch=128, k=1, s=1, p=0)
-        self.out_conv = nn.Conv2d(in_channels=128, out_channels=1, kernel_size=1, stride=1, padding=0)
+        self.out_conv = nn.Conv2d(in_channels=128, out_channels=num_class, kernel_size=1, stride=1, padding=0)
         initialize_weights(self)
 
     def forward(self, x):
@@ -64,7 +64,7 @@ class InceptionCrazyNet(nn.Module):
         x_12 = self.inception12(x_11)
 
         out = self.out_conv(x_12)
-        return out
+        return F.log_softmax(out, dim=1)
 
 
 m = InceptionCrazyNet(num_channels=9, num_class=2)

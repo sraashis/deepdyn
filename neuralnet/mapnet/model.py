@@ -23,22 +23,21 @@ class InceptionMapNet(nn.Module):
         super(InceptionMapNet, self).__init__()
 
         self.inception1 = BasicConv2d(in_ch=num_channels, out_ch=64, k=3, s=1, p=1)
-        self.inception2 = BasicConv2d(in_ch=64, out_ch=128, k=3, s=1, p=1)
+        self.inception2 = BasicConv2d(in_ch=64, out_ch=64, k=3, s=1, p=1)
 
         self.inception3 = BasicConv2d(in_ch=num_channels, out_ch=64, k=1, s=1, p=0)
-        self.inception4 = BasicConv2d(in_ch=64, out_ch=128, k=1, s=1, p=0)
+        self.inception4 = BasicConv2d(in_ch=64, out_ch=64, k=1, s=1, p=0)
 
-        self.inception5 = BasicConv2d(in_ch=256, out_ch=128, k=3, s=1, p=1)
-        self.inception6 = BasicConv2d(in_ch=128, out_ch=256, k=3, s=1, p=1)
+        self.inception5 = BasicConv2d(in_ch=128, out_ch=128, k=3, s=1, p=1)
+        self.inception6 = BasicConv2d(in_ch=128, out_ch=128, k=3, s=1, p=1)
 
-        self.inception7 = BasicConv2d(in_ch=512, out_ch=512, k=3, s=1, p=1)
-        self.inception8 = BasicConv2d(in_ch=512, out_ch=256, k=3, s=1, p=1)
+        self.inception7 = BasicConv2d(in_ch=256, out_ch=256, k=3, s=1, p=1)
+        self.inception8 = BasicConv2d(in_ch=256, out_ch=256, k=3, s=1, p=1)
 
-        self.inception9 = BasicConv2d(in_ch=512, out_ch=512, k=3, s=1, p=1)
-        self.inception10 = BasicConv2d(in_ch=512, out_ch=256, k=3, s=1, p=1)
-        self.inception11 = BasicConv2d(in_ch=256, out_ch=128, k=3, s=1, p=1)
-        self.inception12 = BasicConv2d(in_ch=128, out_ch=128, k=1, s=1, p=0)
-        self.out_conv = nn.Conv2d(in_channels=128, out_channels=num_class, kernel_size=1, stride=1, padding=0)
+        self.inception9 = BasicConv2d(in_ch=384, out_ch=256, k=1, s=1, p=0)
+        self.inception10 = BasicConv2d(in_ch=256, out_ch=128, k=1, s=1, p=0)
+        self.inception11 = BasicConv2d(in_ch=128, out_ch=64, k=1, s=1, p=0)
+        self.out_conv = nn.Conv2d(in_channels=64, out_channels=num_class, kernel_size=1, stride=1, padding=0)
         initialize_weights(self)
 
     def forward(self, x):
@@ -61,9 +60,8 @@ class InceptionMapNet(nn.Module):
                       1))
         x_10 = self.inception10(x_9)
         x_11 = self.inception11(x_10)
-        x_12 = self.inception12(x_11)
 
-        out = self.out_conv(x_12)
+        out = self.out_conv(x_11)
         # print(out.size())
         # d = input()
         return F.log_softmax(out, dim=1)

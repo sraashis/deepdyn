@@ -6,7 +6,7 @@ DRIVE = {
     'Params': {
         'num_channels': 9,
         'num_classes': 2,
-        'batch_size': 6,
+        'batch_size': 8,
         'epochs': 100,
         'learning_rate': 0.001,
         'patch_shape': (64, 64),
