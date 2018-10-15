@@ -6,58 +6,26 @@ DRIVE = {
     'Params': {
         'num_channels': 9,
         'num_classes': 2,
-        'batch_size': 8,
-        'epochs': 100,
+        'batch_size': 6,
+        'epochs': 150,
         'learning_rate': 0.001,
-        'patch_shape': (32, 32),
-        # 'patch_offset': (14, 14),
-        # 'expand_patch_by': (16, 16),
+        'patch_shape': (64, 64),
+        'patch_offset': (40, 40),
+        'expand_patch_by': (36, 36),
         'use_gpu': True,
         'distribute': False,
         'shuffle': True,
-        'log_frequency': 100,
+        'log_frequency': 10,
         'validation_frequency': 1,
-        'mode': 'train',
+        'mode': 'test',
         'parallel_trained': False
     },
     'Dirs': {
-        'image': 'data' + sep + 'DRIVE_MAP' + sep + 'images',
+        'image': 'data' + sep + 'DRIVE' + sep + 'images',
         'mask': 'data' + sep + 'DRIVE' + sep + 'mask',
         'truth': 'data' + sep + 'DRIVE' + sep + 'manual',
-        'logs': 'data' + sep + 'DRIVE_MAP' + sep + 'crazy_logs',
-        'splits_json': 'data' + sep + 'DRIVE_MAP' + sep + 'mapnet_splits'
-    },
-
-    'Funcs': {
-        'truth_getter': lambda file_name: file_name.split('_')[0] + '_manual1.gif',
-        'mask_getter': lambda file_name: file_name.split('_')[0] + '_mask.gif'
-    }
-}
-
-DRIVEa = {
-    'Params': {
-        'num_channels': 9,
-        'num_classes': 2,
-        'batch_size': 8,
-        'epochs': 100,
-        'learning_rate': 0.001,
-        'patch_shape': (48, 48),
-        # 'patch_offset': (14, 14),
-        # 'expand_patch_by': (16, 16),
-        'use_gpu': True,
-        'distribute': False,
-        'shuffle': True,
-        'log_frequency': 100,
-        'validation_frequency': 1,
-        'mode': 'train',
-        'parallel_trained': False
-    },
-    'Dirs': {
-        'image': 'data' + sep + 'DRIVE_MAP' + sep + 'images',
-        'mask': 'data' + sep + 'DRIVE' + sep + 'mask',
-        'truth': 'data' + sep + 'DRIVE' + sep + 'manual',
-        'logs': 'data' + sep + 'DRIVE_MAP' + sep + 'crazy_logs',
-        'splits_json': 'data' + sep + 'DRIVE_MAP' + sep + 'mapnet_splits'
+        'logs': 'data' + sep + 'DRIVE' + sep + 'crazynet_logs',
+        'splits_json': 'data' + sep + 'DRIVE' + sep + 'unet_splits'
     },
 
     'Funcs': {
