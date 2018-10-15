@@ -4,14 +4,13 @@ sep = os.sep
 
 DRIVE = {
     'Params': {
-        'num_channels': 9,
+        'num_channels': 2,
         'num_classes': 2,
         'batch_size': 8,
         'epochs': 100,
         'learning_rate': 0.001,
-        'patch_shape': (64, 64),
-        # 'patch_offset': (14, 14),
-        'expand_patch_by': (36, 36),
+        'patch_shape': (32, 32),
+        'expand_patch_by': (0, 0),
         'use_gpu': True,
         'distribute': False,
         'shuffle': True,
@@ -22,6 +21,7 @@ DRIVE = {
     },
     'Dirs': {
         'image': 'data' + sep + 'DRIVE_MAP' + sep + 'images',
+        'image_orig': 'data' + sep + 'DRIVE' + sep + 'images',
         'mask': 'data' + sep + 'DRIVE' + sep + 'mask',
         'truth': 'data' + sep + 'DRIVE' + sep + 'manual',
         'logs': 'data' + sep + 'DRIVE_MAP' + sep + 'crazy_logs',

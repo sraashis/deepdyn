@@ -1,5 +1,3 @@
-import itertools
-
 import torch
 import torch.nn.functional as F
 from torch import nn
@@ -17,89 +15,59 @@ class BasicConv2d(nn.Module):
     def forward(self, x):
         x = self.conv(x)
         x = self.bn(x)
-        return F.relu(x, inplace=True)
-
-
-class Inception(nn.Module):
-    def __init__(self, in_ch=None, width=None, out_ch=128):
-        super(Inception, self).__init__()
-
-        _, _, s, p = self.get_wksp(w=width, w_match=width, k=3)
-        self.convA = BasicConv2d(in_ch=in_ch, out_ch=int(out_ch / 2), k=3, s=s, p=p)
-
-        _, _, s, p = self.get_wksp(w=width, w_match=width, k=1)
-        self.convB = BasicConv2d(in_ch=in_ch, out_ch=int(out_ch / 2), k=1, s=s, p=p)
-
-    def forward(self, x):
-        a = self.convA(x)
-        b = self.convB(x)
-        return torch.cat([a, b], 1)
-
-    @staticmethod
-    def out_w(w, k, s, p):
-        return ((w - k + 2 * p) / s) + 1
-
-    def get_wksp(self, w=None, w_match=None, k=None, strides=[1, 2, 3], paddings=[0, 1, 2, 3]):
-        all_sp = itertools.product(strides, paddings)
-        for (s, p) in all_sp:
-            w_out = self.out_w(w, k, s, p)
-            if w_out.is_integer() and w_match == int(w_out):
-                return w_out, k, s, p
-
-        raise LookupError('Solution not within range.')
+        return F.relu(x, inplace=False)
 
 
 class InceptionThrNet(nn.Module):
-    def __init__(self, input_ch, num_class):
+    def __init__(self, num_channels, num_class):
         super(InceptionThrNet, self).__init__()
 
-        self.inception1 = Inception(width=48, in_ch=input_ch, out_ch=128)
-        self.inception1a = Inception(width=48, in_ch=128, out_ch=256)
+        self.inception1 = BasicConv2d(in_ch=num_channels, out_ch=64, k=3, s=1, p=1)
+        self.inception2 = BasicConv2d(in_ch=64, out_ch=64, k=3, s=1, p=1)
 
-        self.inception2 = Inception(width=40, in_ch=256, out_ch=256)
-        self.inception2a = Inception(width=40, in_ch=256, out_ch=256)
+        self.inception3 = BasicConv2d(in_ch=num_channels, out_ch=64, k=1, s=1, p=0)
+        self.inception4 = BasicConv2d(in_ch=64, out_ch=64, k=1, s=1, p=0)
 
-        self.inception3 = Inception(width=32, in_ch=512, out_ch=512)
-        self.mxp_3 = nn.MaxPool2d(kernel_size=2, stride=2)
+        self.inception5 = BasicConv2d(in_ch=128, out_ch=128, k=3, s=1, p=1)
+        self.inception6 = BasicConv2d(in_ch=128, out_ch=128, k=3, s=1, p=1)
 
-        self.inception4 = Inception(width=16, in_ch=512, out_ch=384)
-        self.mxp_4 = nn.MaxPool2d(kernel_size=2, stride=2)
+        self.inception7 = BasicConv2d(in_ch=128, out_ch=256, k=3, s=1, p=1)
+        self.inception8 = BasicConv2d(in_ch=256, out_ch=256, k=3, s=1, p=1)
 
-        self.inception5 = Inception(width=8, in_ch=384, out_ch=256)
-        self.mxp_5 = nn.MaxPool2d(kernel_size=2, stride=2)
+        self.inception9 = BasicConv2d(in_ch=256, out_ch=128, k=3, s=1, p=1)
+        self.inception10 = BasicConv2d(in_ch=128, out_ch=128, k=3, s=1, p=1)
 
-        self.inception6 = Inception(width=4, in_ch=256, out_ch=128)
-        self.mxp_6 = nn.MaxPool2d(kernel_size=2, stride=2)
-
-        self.out_conv = BasicConv2d(in_ch=128, out_ch=32, k=1, s=1, p=0)
-
-        self.fc1 = nn.Linear(32 * 2 * 2, num_class)
+        self.inception11 = BasicConv2d(in_ch=128, out_ch=64, k=1, s=1, p=0)
+        self.out_conv = nn.Conv2d(in_channels=64, out_channels=32, kernel_size=1, stride=1, padding=0)
+        self.fc1 = nn.Linear(32 * 4 * 4, num_class)
         initialize_weights(self)
 
     def forward(self, x):
-        i1_out = self.inception1(x)
-        i1_out = self.inception1a(i1_out)
+        x_1 = self.inception1(x)
+        x_2 = self.inception2(x_1)
 
-        i2_out = self.inception2(i1_out[:, :, 4:44, 4:44])
-        i2_out = self.inception2a(i2_out)
+        x_3 = self.inception3(x)
+        x_4 = self.inception4(x_3)
 
-        i3_out = self.inception3(torch.cat([i1_out[:, :, 8:40, 8:40], i2_out[:, :, 4:36, 4:36]], 1))
-        i3_out = self.mxp_3(i3_out)
+        x_5 = self.inception5(torch.cat([x_2, x_4], 1))
+        x_6 = self.inception6(x_5)
+        x_6 = F.max_pool2d(x_6, kernel_size=2, stride=2, padding=0)
 
-        i4_out = self.inception4(i3_out)
-        i4_out = self.mxp_4(i4_out)
+        x_7 = self.inception7(x_6)
+        x_8 = self.inception8(x_7)
+        x_8 = F.max_pool2d(x_8, kernel_size=2, stride=2, padding=0)
 
-        i5_out = self.inception5(i4_out)
-        i5_out = self.mxp_5(i5_out)
+        x_9 = self.inception9(x_8)
+        x_10 = self.inception10(x_9)
+        x_10 = F.max_pool2d(x_10, kernel_size=2, stride=2, padding=0)
 
-        i6_out = self.inception6(i5_out)
-        i6_out = self.mxp_6(i6_out)
-        conv_out = self.out_conv(i6_out)
+        x_11 = self.inception11(x_10)
 
-        flat = conv_out.view(-1, 32 * 2 * 2)
+        out = self.out_conv(x_11)
+        flat = out.view(-1, 32 * 4 * 4)
         return self.fc1(flat)
 
 
-m = InceptionThrNet(input_ch=1, num_class=1)
+m = InceptionThrNet(num_channels=9, num_class=1)
 torch_total_params = sum(p.numel() for p in m.parameters() if p.requires_grad)
 print('Total Params:', torch_total_params)

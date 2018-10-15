@@ -2,16 +2,15 @@ import math
 import os
 from random import shuffle
 
-import cv2
 import numpy as np
 import torch
-import torchvision.transforms as tfm
 from scipy.ndimage.measurements import label
 from skimage.morphology import skeletonize
 
 import utils.img_utils as imgutils
 from commons.IMAGE import Image
 from neuralnet.datagen import Generator
+from neuralnet.utils.measurements import get_best_thr
 
 sep = os.sep
 
@@ -23,6 +22,7 @@ class PatchesGenerator(Generator):
         self.expand_by = self.run_conf.get('Params').get('expand_patch_by')
         self.est_thr = self.run_conf.get('Params').get('est_threshold', 20)
         self.component_diameter_limit = self.run_conf.get('Params').get('comp_diam_limit', 20)
+        self.orig_dir = self.run_conf.get('Dirs').get('image_orig')
         self._load_indices()
         print('Patches:', self.__len__())
 
@@ -38,6 +38,17 @@ class PatchesGenerator(Generator):
                                                     indices=all_pix_pos))
             for chunk_ix in all_patch_indices:
                 self.indices.append([ID] + chunk_ix)
+
+            # # Load equal number of background patches as well. But only for test set
+            # if self.mode == 'train':
+            #     all_bg_pix_pos = list(zip(*np.where(img_obj.res['seed_bg'] == 0)))
+            #     shuffle(all_bg_pix_pos)
+            #     all_bg_patch_indices = list(
+            #         imgutils.get_chunk_indices_by_index(img_obj.res['seed_bg'].shape, self.patch_shape,
+            #                                             indices=all_bg_pix_pos[0:len(all_patch_indices)]))
+            #
+            #     for chunk_ix in all_bg_patch_indices:
+            #         self.indices.append([ID] + chunk_ix)
 
             self.image_objects[ID] = img_obj
         if self.shuffle_indices:
@@ -55,6 +66,7 @@ class PatchesGenerator(Generator):
             img_obj.load_ground_truth(gt_dir=self.truth_dir,
                                       fget_ground_truth=self.truth_getter)
 
+        img_obj.res['orig'] = imgutils.get_image_as_array(self.orig_dir + os.sep + img_file.split('.')[0] + '.tif')
         if len(img_obj.image_arr.shape) == 3:
             img_obj.working_arr = img_obj.image_arr[:, :, 1]
         elif len(img_obj.image_arr.shape) == 2:
@@ -89,57 +101,45 @@ class PatchesGenerator(Generator):
 
         # <PREP4> Come up with a grid mask to select few possible pixels to reconstruct the vessels from
         sk_mask = np.zeros_like(seed)
-        sk_mask[::32] = 1
-        sk_mask[:, ::32] = 1
+        sk_mask[::15] = 1
+        sk_mask[:, ::15] = 1
 
         # <PREP5> Apply mask and save seed
         img_obj.res['seed'] = seed * sk_mask * 255
-        ks = []
-        for i in range(3):
-            for j in range(3):
-                k = np.zeros((3, 3))
-                if True:
-                    k[i, j] = 1
-                    ks.append(k)
 
-        img_obj.res['t9'] = np.zeros((len(ks), *img_obj.working_arr.shape))
-        for i in range(len(ks)):
-            img_obj.res['t9'][i] = cv2.filter2D(img_obj.working_arr, -1, ks[i])
+        # if self.mode == 'train':
+        #     # <PREP6> NOW WORK ON FINDING equal number of background patch indices
+        #     # No need tp generate background patches for test set
+        #     kernel = np.ones((10, 10), np.uint8)
+        #     dilated_estimate = cv2.dilate(raw_estimate, kernel, iterations=1)
+        #     dilated_estimate[img_obj.mask == 0] = 255
+        #     img_obj.res['seed_bg'] = dilated_estimate
 
         return img_obj
 
     def __getitem__(self, index):
         ID, row_from, row_to, col_from, col_to = self.indices[index]
 
-        img_arr = self.image_objects[ID].res['t9'].copy()
-        img_tensor = []
-        p, q, r, s, pad = imgutils.expand_and_mirror_patch(full_img_shape=self.image_objects[ID].working_arr.shape,
+        img_arr = self.image_objects[ID].working_arr.copy()
+        img_orig = self.image_objects[ID].res['orig'][:, :, 1].copy()
+        gt = self.image_objects[ID].ground_truth.copy()
+
+        prob_map = img_arr[row_from:row_to, col_from:col_to]
+        y = gt[row_from:row_to, col_from:col_to]
+
+        best_score1, best_thr1 = get_best_thr(prob_map, y, for_best='F1')
+
+        p, q, r, s, pad = imgutils.expand_and_mirror_patch(full_img_shape=img_arr.shape,
                                                            orig_patch_indices=[row_from, row_to, col_from, col_to],
                                                            expand_by=self.expand_by)
 
-        for i in range(self.image_objects[ID].res['t9'].shape[0]):
-            img_tensor.append(np.pad(img_arr[i][p:q, r:s], pad, 'reflect'))
+        img_tensor = np.zeros((2, *self.patch_shape))
+        img_tensor[0, :, :] = np.pad(img_arr[p:q, r:s], pad, 'reflect')
+        img_tensor[1, :, :] = np.pad(img_orig[p:q, r:s], pad, 'reflect')
 
-        img_tensor = np.array(img_tensor)
-
-        y = self.image_objects[ID].ground_truth.copy()[row_from:row_to, col_from:col_to]
         y[y == 255] = 1
         return {'inputs': torch.FloatTensor(img_tensor),
                 'clip_ix': np.array([row_from, row_to, col_from, col_to]),
+                'y_thresholds': best_thr1,
+                'prob_map': prob_map.copy(),
                 'labels': y.copy()}
-
-    @classmethod
-    def get_loader_per_img(cls, images, run_conf, mode=None):
-        loaders = []
-        for file in images:
-            gen = cls(
-                run_conf=run_conf,
-                images=[file],
-                transforms=tfm.Compose([tfm.ToPILImage(), tfm.ToTensor()]),
-                shuffle_indices=False,
-                mode=mode
-            )
-            loader = torch.utils.data.DataLoader(gen, batch_size=min(16, gen.__len__()),
-                                                 shuffle=False, num_workers=3, sampler=None)
-            loaders.append(loader)
-        return loaders

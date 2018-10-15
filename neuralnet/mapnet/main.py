@@ -23,7 +23,7 @@ from neuralnet.mapnet.runs import DRIVE, DRIVEa
 RUNS = [DRIVE]
 
 # RUNS = [STARE, VEVIO]  # DRIVE, WIDE]
-torch.cuda.set_device(1)
+torch.cuda.set_device(0)
 
 if __name__ == "__main__":
 

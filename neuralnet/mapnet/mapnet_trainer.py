@@ -31,7 +31,8 @@ class ThrnetTrainer(NNTrainer):
                 gt = torch.LongTensor(img_obj.ground_truth).to(self.device)
 
                 for i, data in enumerate(loader, 1):
-                    inputs, labels = data['inputs'].float().to(self.device), data['labels'].float().to(self.device)
+                    inputs = data['inputs'].float().to(self.device)
+                    labels = data['labels'].float().to(self.device)
                     clip_ix = data['clip_ix'].int().to(self.device)
 
                     outputs = self.model(inputs)

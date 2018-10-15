@@ -2,11 +2,9 @@ import math
 import os
 
 import PIL.Image as IMG
-import numpy as np
 import torch
 import torch.nn.functional as F
 
-import utils.img_utils as iu
 from neuralnet.torchtrainer import NNTrainer
 from neuralnet.utils.measurements import ScoreAccumulator
 
@@ -35,8 +33,8 @@ class ThrnetTrainer(NNTrainer):
             running_loss = 0.0
             self._adjust_learning_rate(optimizer=optimizer, epoch=epoch)
             for i, data in enumerate(data_loader, 1):
-                inputs, y_thresholds = data['inputs'].to(self.device), data['y_thresholds'].float().squeeze().to(
-                    self.device)
+                inputs = data['inputs'].to(self.device).float()
+                y_thresholds = data['y_thresholds'].squeeze().to(self.device).float()
 
                 optimizer.zero_grad()
                 thr_map = self.model(inputs).squeeze()
@@ -80,8 +78,9 @@ class ThrnetTrainer(NNTrainer):
                                                  img_obj.working_arr.shape[1]).fill_(0).to(self.device)
                 gt = torch.LongTensor(img_obj.ground_truth).to(self.device)
                 img_loss = 0.0
+                img_score = ScoreAccumulator()
                 for i, data in enumerate(loader, 1):
-                    inputs = data['inputs'].to(self.device)
+                    inputs = data['inputs'].to(self.device).float()
                     prob_map = data['prob_map'].to(self.device).float()
                     y_thresholds = data['y_thresholds'].to(self.device).squeeze().float()
                     clip_ix = data['clip_ix'].to(self.device).int()
@@ -94,7 +93,6 @@ class ThrnetTrainer(NNTrainer):
                     loss = F.mse_loss(thr_map, y_thresholds)
                     current_loss = math.sqrt(loss.item())
                     img_loss += current_loss
-
                     thr = thr_map[..., None][..., None]
                     segmented = (prob_map > thr).long()
                     # Reconstruct the image
@@ -104,21 +102,21 @@ class ThrnetTrainer(NNTrainer):
                     print('Batch: ', i, end='\r')
 
                 segmented_img[segmented_img > 0] = 255
-                img_score = ScoreAccumulator()
-
+                # img_score = ScoreAccumulator()
+                img_loss = img_loss / i
+                eval_score += img_loss
                 if gen_images:
                     img = segmented_img.cpu().numpy()
                     img_score.add_array(img_obj.ground_truth, img)
-                    img = iu.remove_connected_comp(np.array(img, dtype=np.uint8),
-                                                   connected_comp_diam_limit=5)
+                    # img = iu.remove_connected_comp(np.array(img, dtype=np.uint8),
+                    #                                connected_comp_diam_limit=5)
                     IMG.fromarray(img).save(
                         os.path.join(self.log_dir, img_obj.file_name.split('.')[0] + '.png'))
                 else:
                     img_score.add_tensor(segmented_img, gt)
-                    eval_score += img_score.get_prf1a()[2]
 
                 prf1a = img_score.get_prf1a()
-                print(img_obj.file_name, ' PRF1A', prf1a)
+                print(img_obj.file_name, ' PRF1A', prf1a, ' loss: ' + str(eval_score / len(data_loaders)))
                 self.flush(logger, ','.join(str(x) for x in [img_obj.file_name] + prf1a))
 
-            self._save_if_better(score=eval_score / len(data_loaders))
+            self._save_if_better(score=len(data_loaders) / eval_score)

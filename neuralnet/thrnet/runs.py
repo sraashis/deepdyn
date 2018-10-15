@@ -4,14 +4,13 @@ sep = os.sep
 
 DRIVE = {
     'Params': {
-        'num_channels': 1,
+        'num_channels': 2,
         'num_classes': 1,
         'batch_size': 16,
         'epochs': 250,
         'learning_rate': 0.001,
         'patch_shape': (32, 32),
-        # 'patch_offset': (14, 14),
-        'expand_patch_by': (16, 16),
+        'expand_patch_by': (0, 0),
         'use_gpu': True,
         'distribute': False,
         'shuffle': True,
@@ -22,9 +21,10 @@ DRIVE = {
     },
     'Dirs': {
         'image': 'data' + sep + 'DRIVE_MAP' + sep + 'images',
+        'image_orig': 'data' + sep + 'DRIVE' + sep + 'images',
         'mask': 'data' + sep + 'DRIVE' + sep + 'mask',
         'truth': 'data' + sep + 'DRIVE' + sep + 'manual',
-        'logs': 'data' + sep + 'DRIVE_MAP' + sep + 'thrnet_logs',
+        'logs': 'data' + sep + 'DRIVE_MAP' + sep + 'thrnet_2_logs',
         'splits_json': 'data' + sep + 'DRIVE_MAP' + sep + 'thrnet_splits'
     },
 
@@ -98,13 +98,13 @@ STARE = {
 
 VEVIO = {
     'Params': {
-        'num_channels': 1,
+        'num_channels': 2,
         'num_classes': 1,
         'batch_size': 12,
         'epochs': 40,
         'learning_rate': 0.001,
         'patch_shape': (32, 32),
-        'expand_patch_by': (16, 16),
+        'expand_patch_by': (0, 0),
         'use_gpu': True,
         'distribute': False,
         'shuffle': True,
