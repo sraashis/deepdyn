@@ -1,7 +1,5 @@
 absl-py==0.2.2
 alabaster==0.7.10
-anaconda-client==1.6.9
-anaconda-project==0.8.2
 asn1crypto==0.24.0
 astor==0.6.2
 astroid==1.6.1
@@ -12,7 +10,6 @@ backports.shutil-get-terminal-size==1.0.0
 beautifulsoup4==4.6.0
 bitarray==0.8.1
 bkcharts==0.2
-blaze==0.11.3
 bleach==1.5.0
 bokeh==0.12.13
 boto==2.48.0
@@ -22,7 +19,6 @@ cffi==1.11.4
 chardet==3.0.4
 click==6.7
 cloudpickle==0.5.2
-clyent==1.2.2
 colorama==0.3.9
 contextlib2==0.5.5
 cryptography==2.1.4
@@ -30,7 +26,6 @@ cycler==0.10.0
 Cython==0.27.3
 cytoolz==0.9.0
 dask==0.16.1
-datashape==0.5.4
 decorator==4.2.1
 distributed==1.20.2
 docutils==0.14
@@ -90,7 +85,6 @@ numba==0.36.2
 numexpr==2.6.4
 numpy==1.14.0
 numpydoc==0.7.0
-odo==0.5.1
 olefile==0.45.1
 opencv-python==3.4.0.12
 openpyxl==2.4.10
@@ -119,7 +113,6 @@ pycodestyle==2.3.1
 pycosat==0.6.3
 pycparser==2.18
 pycrypto==2.6.1
-pycurl==7.43.0.1
 pyflakes==1.6.0
 Pygments==2.2.0
 pylint==1.8.2
