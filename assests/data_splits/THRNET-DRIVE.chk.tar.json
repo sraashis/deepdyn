@@ -1,1 +1,0 @@
-{"train": ["14_test.tif", "03_test.tif", "07_test.tif", "09_test.tif", "12_test.tif", "16_test.tif", "05_test.tif", "10_test.tif",  "02_test.tif", "15_test.tif", "04_test.tif", "20_test.tif", "01_test.tif", "18_test.tif"], "validation": ["17_test.tif", "13_test.tif","11_test.tif"], "test": ["19_test.tif", "08_test.tif", "06_test.tif"]}

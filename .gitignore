@@ -12,3 +12,4 @@ data/
 logs/
 net_logs
 notebook/.ipynb_checkpoints/
+neuralnet/thrnet_pix
