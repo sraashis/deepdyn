@@ -10,12 +10,12 @@ DRIVE = {
         'epochs': 1,
         'learning_rate': 0.01,
         'patch_shape': (15, 15),
-        'use_gpu': True,
+        'use_gpu': False,
         'distribute': False,
         'shuffle': True,
-        'log_frequency': 50,
+        'log_frequency': 200,
         'validation_frequency': 1,
-        'mode': 'test',
+        'mode': 'train',
         'parallel_trained': False
     },
     'Dirs': {
