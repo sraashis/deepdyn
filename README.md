@@ -16,6 +16,4 @@
 #### 'ature/data' consists of four different dataset that I have been working on.
 #### 'ature/neuralnet' consists of all the neural network modules being used.
 
-# Dependencies in ature/assets/requirements.txt
-run $> pip install -r requirements.txt -U 
  
