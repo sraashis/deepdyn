@@ -60,6 +60,8 @@ class UNetNNTrainer(NNTrainer):
                     map_img = map_img.cpu().numpy()
                     predicted_img = predicted_img.cpu().numpy()
                     img_score.add_array(img_obj.ground_truth, predicted_img)
+                    IMG.fromarray(np.array(predicted_img, dtype=np.uint8)).save(
+                        os.path.join(self.log_dir, 'pred_' + img_obj.file_name.split('.')[0] + '.png'))
                     IMG.fromarray(np.array(map_img, dtype=np.uint8)).save(
                         os.path.join(self.log_dir, img_obj.file_name.split('.')[0] + '.png'))
                 else:

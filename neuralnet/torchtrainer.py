@@ -69,7 +69,6 @@ class NNTrainer:
                 optimizer.zero_grad()
                 outputs = self.model(inputs)
                 _, predicted = torch.max(outputs, 1)
-
                 loss = F.nll_loss(outputs, labels)
                 loss.backward()
                 optimizer.step()
