@@ -80,7 +80,7 @@ class TracknetTrainer(NNTrainer):
                 img_loss = 0.000001
                 for i, data in enumerate(loader, 1):
                     inputs, labels = data['inputs'].to(self.device), data['labels'].to(self.device)
-                    positions = data['POS']
+                    positions = data['POS'].to(self.device)
                     outputs = self.model(inputs).squeeze()
                     predicted = outputs + positions.float()
                     labels = labels + positions.float()
