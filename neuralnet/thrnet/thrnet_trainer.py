@@ -4,9 +4,11 @@ import os
 import PIL.Image as IMG
 import torch
 import torch.nn.functional as F
+import utils.img_utils as iu
 
 from neuralnet.torchtrainer import NNTrainer
 from neuralnet.utils.measurements import ScoreAccumulator
+import numpy as np
 
 sep = os.sep
 
@@ -86,9 +88,11 @@ class ThrnetTrainer(NNTrainer):
                     clip_ix = data['clip_ix'].to(self.device).int()
 
                     thr_map = self.model(inputs).squeeze()
-                    if True:
-                        print(torch.cat([y_thresholds[..., None], thr_map[..., None]], 1))
-                        print('-------------------------------------------------')
+                    # if True:
+                    #     print(torch.cat(
+                    #         [y_thresholds[..., None], thr_map[..., None], y_thresholds[..., None] - thr_map[..., None]],
+                    #         1))
+                    #     print('-------------------------------------------------')
 
                     loss = F.mse_loss(thr_map, y_thresholds)
                     current_loss = math.sqrt(loss.item())
@@ -108,9 +112,9 @@ class ThrnetTrainer(NNTrainer):
                 if gen_images:
                     img = segmented_img.cpu().numpy()
                     img_score.add_array(img_obj.ground_truth, img)
-                    # img = iu.remove_connected_comp(np.array(img, dtype=np.uint8),
-                    #                                connected_comp_diam_limit=5)
-                    IMG.fromarray(img).save(
+                    img = iu.remove_connected_comp(np.array(img, dtype=np.uint8),
+                                                   connected_comp_diam_limit=5)
+                    IMG.fromarray(np.array(img, dtype=np.uint8)).save(
                         os.path.join(self.log_dir, img_obj.file_name.split('.')[0] + '.png'))
                 else:
                     img_score.add_tensor(segmented_img, gt)

@@ -10,7 +10,7 @@ import utils.img_utils as imgutils
 from commons.IMAGE import Image
 from neuralnet.datagen import Generator
 from neuralnet.utils.measurements import get_best_thr
-from PIL import Image as IMG
+import PIL.Image as IMG
 
 sep = os.sep
 
@@ -20,8 +20,8 @@ class PatchesGenerator(Generator):
         super(PatchesGenerator, self).__init__(**kwargs)
         self.patch_shape = self.run_conf.get('Params').get('patch_shape')
         self.expand_by = self.run_conf.get('Params').get('expand_patch_by')
-        self.est_thr = self.run_conf.get('Params').get('est_threshold', 20)
-        self.component_diameter_limit = self.run_conf.get('Params').get('comp_diam_limit', 20)
+        self.est_thr = self.run_conf.get('Params').get('estimate_thr', 30)
+        self.component_diameter_limit = self.run_conf.get('Params').get('comp_diam_limit', 30)
         self.orig_dir = self.run_conf.get('Dirs').get('image_orig')
         self._load_indices()
         print('Patches:', self.__len__())
@@ -34,8 +34,7 @@ class PatchesGenerator(Generator):
             # Load the patch corners based on estimated pixel seed
             all_pix_pos = list(zip(*np.where(img_obj.res['seed'] == 255)))
             all_patch_indices = list(
-                imgutils.get_chunk_indices_by_index(img_obj.res['seed'].shape, self.patch_shape,
-                                                    indices=all_pix_pos))
+                imgutils.get_chunk_indices_by_index(img_obj.working_arr.shape, self.patch_shape, all_pix_pos))
             for chunk_ix in all_patch_indices:
                 self.indices.append([ID] + chunk_ix)
 
@@ -66,7 +65,6 @@ class PatchesGenerator(Generator):
             img_obj.load_ground_truth(gt_dir=self.truth_dir,
                                       fget_ground_truth=self.truth_getter)
 
-        img_obj.res['orig'] = imgutils.get_image_as_array(self.orig_dir + os.sep + img_file.split('.')[0] + '.tif')
         if len(img_obj.image_arr.shape) == 3:
             img_obj.working_arr = img_obj.image_arr[:, :, 1]
         elif len(img_obj.image_arr.shape) == 2:
@@ -76,12 +74,12 @@ class PatchesGenerator(Generator):
             x = np.logical_and(True, img_obj.mask == 255)
             img_obj.working_arr[img_obj.mask == 0] = img_obj.working_arr[x].mean()
 
-        # <PREP1> Segment with a low threshold and get a raw segmented image
+        # # <PREP1> Segment with a low threshold and get a raw segmented image
         img_obj.working_arr[img_obj.mask == 0] = 0
         raw_estimate = img_obj.working_arr.copy()
         raw_estimate[raw_estimate > self.est_thr] = 255
         raw_estimate[raw_estimate <= self.est_thr] = 0
-
+        #
         # <PREP2> Clear up small components(components less that 20px)
         structure = np.ones((3, 3), dtype=np.int)
         labeled, ncomponents = label(raw_estimate, structure)
@@ -98,11 +96,14 @@ class PatchesGenerator(Generator):
         seed = raw_estimate.copy()
         seed[seed == 255] = 1
         seed = skeletonize(seed).astype(np.uint8)
+        orig = imgutils.get_image_as_array(self.orig_dir + os.sep + img_file.split('.')[0] + '.tif')[:, :, 1]
+        orig[seed > 0] = 0
+        img_obj.res['orig'] = 255 - orig
 
         # <PREP4> Come up with a grid mask to select few possible pixels to reconstruct the vessels from
         sk_mask = np.zeros_like(seed)
-        sk_mask[::15] = 1
-        sk_mask[:, ::15] = 1
+        sk_mask[::16] = 1
+        sk_mask[:, ::16] = 1
 
         # <PREP5> Apply mask and save seed
         img_obj.res['seed'] = seed * sk_mask * 255
@@ -114,14 +115,14 @@ class PatchesGenerator(Generator):
         #     dilated_estimate = cv2.dilate(raw_estimate, kernel, iterations=1)
         #     dilated_estimate[img_obj.mask == 0] = 255
         #     img_obj.res['seed_bg'] = dilated_estimate
-
         return img_obj
 
     def __getitem__(self, index):
         ID, row_from, row_to, col_from, col_to = self.indices[index]
 
-        img_arr = self.image_objects[ID].working_arr.copy()
-        img_orig = self.image_objects[ID].res['orig'][:, :, 1].copy()
+        img_arr = self.image_objects[ID].working_arr
+        img_orig = self.image_objects[ID].res['orig']
+
         gt = self.image_objects[ID].ground_truth.copy()
 
         prob_map = img_arr[row_from:row_to, col_from:col_to]

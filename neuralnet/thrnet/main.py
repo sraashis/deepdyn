@@ -23,7 +23,7 @@ from neuralnet.thrnet.runs import DRIVE
 RUNS = [DRIVE]
 
 # RUNS = [STARE, VEVIO]  # DRIVE, WIDE]
-# torch.cuda.set_device(0)
+torch.cuda.set_device(0)
 
 if __name__ == "__main__":
 
