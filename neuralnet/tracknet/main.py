@@ -7,11 +7,11 @@ import os
 import sys
 
 try:
-    BASE_PROJECT_DIR = '/home/akhanal1/PycharmProjects/ature'
+    BASE_PROJECT_DIR = '/home/saeid/PycharmProjects/ature'
     sys.path.append(BASE_PROJECT_DIR)
     os.chdir(BASE_PROJECT_DIR)
 except:
-    BASE_PROJECT_DIR = '/home/akhanal1/ature'
+    BASE_PROJECT_DIR = '/home/smotevalialamoti1/ature'
     sys.path.append(BASE_PROJECT_DIR)
     os.chdir(BASE_PROJECT_DIR)
 
@@ -32,7 +32,7 @@ from neuralnet.utils import auto_split as asp
 import neuralnet.tracknet.runs as rs
 
 RUNS = [rs.DRIVE]
-# torch.cuda.set_device(0)
+torch.cuda.set_device(0)
 
 if __name__ == "__main__":
 

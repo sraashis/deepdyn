@@ -6,7 +6,6 @@ import torch
 import torch.nn.functional as F
 
 from neuralnet.torchtrainer import NNTrainer
-from neuralnet.utils.measurements import ScoreAccumulator
 import numpy as np
 
 sep = os.sep
@@ -34,7 +33,7 @@ class TracknetTrainer(NNTrainer):
             running_loss = 0.0
             self._adjust_learning_rate(optimizer=optimizer, epoch=epoch)
             for i, data in enumerate(data_loader, 1):
-                inputs, labels = data['inputs'].to(self.device), data['labels'].to(self.device)
+                inputs, labels = data['inputs'].to(self.device).float(), data['labels'].to(self.device)
 
                 optimizer.zero_grad()
                 thr_map = self.model(inputs).squeeze()
@@ -79,7 +78,7 @@ class TracknetTrainer(NNTrainer):
                                                  img_obj.working_arr.shape[1], 3).fill_(0).to(self.device)
                 img_loss = 0.000001
                 for i, data in enumerate(loader, 1):
-                    inputs, labels = data['inputs'].to(self.device), data['labels'].to(self.device)
+                    inputs, labels = data['inputs'].to(self.device).float(), data['labels'].to(self.device)
                     positions = data['POS'].to(self.device)
                     outputs = self.model(inputs).squeeze()
                     predicted = outputs + positions.float()
