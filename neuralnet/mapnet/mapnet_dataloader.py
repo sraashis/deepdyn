@@ -11,8 +11,10 @@ import utils.img_utils as imgutils
 from commons.IMAGE import Image
 from neuralnet.datagen import Generator
 from neuralnet.utils.measurements import get_best_thr
+import cv2
 
 sep = os.sep
+import PIL.Image as IMG
 
 
 class PatchesGenerator(Generator):
@@ -34,8 +36,8 @@ class PatchesGenerator(Generator):
             # Load the patch corners based on estimated pixel seed
             all_pix_pos = list(zip(*np.where(img_obj.res['seed'] == 255)))
             all_patch_indices = list(
-                imgutils.get_chunk_indices_by_index(img_obj.res['seed'].shape, self.patch_shape,
-                                                    indices=all_pix_pos))
+                imgutils.get_chunk_indexes(img_obj.res['seed'].shape, self.patch_shape,
+                                           (12, 12)))
             for chunk_ix in all_patch_indices:
                 self.indices.append([ID] + chunk_ix)
 
@@ -66,7 +68,6 @@ class PatchesGenerator(Generator):
             img_obj.load_ground_truth(gt_dir=self.truth_dir,
                                       fget_ground_truth=self.truth_getter)
 
-        img_obj.res['orig'] = imgutils.get_image_as_array(self.orig_dir + os.sep + img_file.split('.')[0] + '.tif')
         if len(img_obj.image_arr.shape) == 3:
             img_obj.working_arr = img_obj.image_arr[:, :, 1]
         elif len(img_obj.image_arr.shape) == 2:
@@ -98,6 +99,9 @@ class PatchesGenerator(Generator):
         seed = raw_estimate.copy()
         seed[seed == 255] = 1
         seed = skeletonize(seed).astype(np.uint8)
+        img_obj.res['orig'] = imgutils.get_image_as_array(self.orig_dir + os.sep + img_file.split('.')[0] + '.tif')
+        img_obj.res['orig'][seed > 0] = 0
+        IMG.fromarray(img_obj.res['orig']).save('tatata.png')
 
         # <PREP4> Come up with a grid mask to select few possible pixels to reconstruct the vessels from
         sk_mask = np.zeros_like(seed)
@@ -121,7 +125,7 @@ class PatchesGenerator(Generator):
         ID, row_from, row_to, col_from, col_to = self.indices[index]
 
         img_arr = self.image_objects[ID].working_arr.copy()
-        img_orig = self.image_objects[ID].res['orig'][:, :, 1].copy()
+        img_orig = 255 - self.image_objects[ID].res['orig'][:, :, 1].copy()
         gt = self.image_objects[ID].ground_truth.copy()
 
         prob_map = img_arr[row_from:row_to, col_from:col_to]
@@ -133,7 +137,7 @@ class PatchesGenerator(Generator):
                                                            orig_patch_indices=[row_from, row_to, col_from, col_to],
                                                            expand_by=self.expand_by)
 
-        img_tensor = np.zeros((2, *self.patch_shape))
+        img_tensor = np.zeros((4, 32, 32))
         img_tensor[0, :, :] = np.pad(img_arr[p:q, r:s], pad, 'reflect')
         img_tensor[1, :, :] = np.pad(img_orig[p:q, r:s], pad, 'reflect')
 

@@ -143,9 +143,9 @@ class NNTrainer:
 
         self._save_if_better(score=eval_score / len(data_loaders))
 
-    def resume_from_checkpoint(self, parallel_trained=False):
+    def resume_from_checkpoint(self, parallel_trained=False, best=True):
         try:
-            self.checkpoint = torch.load(self.checkpoint_file)
+            self.checkpoint = torch.load(self.checkpoint_file if best else self.temp_chk_file)
             if parallel_trained:
                 from collections import OrderedDict
                 new_state_dict = OrderedDict()
@@ -156,7 +156,7 @@ class NNTrainer:
                 self.model.load_state_dict(new_state_dict)
             else:
                 self.model.load_state_dict(self.checkpoint['state'])
-            print('RESUMED FROM CHECKPOINT: ' + self.checkpoint_file)
+            print('RESUMED FROM CHECKPOINT: ' + self.checkpoint_file if best else self.temp_chk_file)
         except Exception as e:
             print('ERROR: ' + str(e))
 
