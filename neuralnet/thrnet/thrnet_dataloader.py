@@ -10,7 +10,6 @@ import utils.img_utils as imgutils
 from commons.IMAGE import Image
 from neuralnet.datagen import Generator
 from neuralnet.utils.measurements import get_best_thr
-import PIL.Image as IMG
 
 sep = os.sep
 
@@ -74,6 +73,8 @@ class PatchesGenerator(Generator):
             x = np.logical_and(True, img_obj.mask == 255)
             img_obj.working_arr[img_obj.mask == 0] = img_obj.working_arr[x].mean()
 
+        img_obj.res['orig'] = \
+            imgutils.get_image_as_array(self.orig_dir + os.sep + img_file.split('.')[0] + '.tif')[:, :, 1]
         # # <PREP1> Segment with a low threshold and get a raw segmented image
         img_obj.working_arr[img_obj.mask == 0] = 0
         raw_estimate = img_obj.working_arr.copy()
@@ -96,9 +97,6 @@ class PatchesGenerator(Generator):
         seed = raw_estimate.copy()
         seed[seed == 255] = 1
         seed = skeletonize(seed).astype(np.uint8)
-        orig = imgutils.get_image_as_array(self.orig_dir + os.sep + img_file.split('.')[0] + '.tif')[:, :, 1]
-        orig[seed > 0] = 0
-        img_obj.res['orig'] = 255 - orig
 
         # <PREP4> Come up with a grid mask to select few possible pixels to reconstruct the vessels from
         sk_mask = np.zeros_like(seed)
