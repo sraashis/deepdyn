@@ -6,8 +6,8 @@
 
 import json
 import os
-import sys
 import random
+import sys
 
 try:
     BASE_PROJECT_DIR = '/home/ak/PycharmProjects/ature'
@@ -29,23 +29,39 @@ def load_split_json(json_file):
         print(json_file + ' FILE NOT LOADED !!!')
 
 
-def create_splits(files, test_count, val_count, file_name):
-    for i in range(0, len(files), test_count):
-        test = files[i:i + test_count]
-        print(len(test))
-        t_val = [item for item in files if item not in test]
-        validation = t_val[0:val_count]
-        train = [item for item in t_val if item not in validation]
-        configuration = {
-            'train': train,
-            'validation': validation,
-            'test': test
-        }
-        f = open(str(i) + file_name, "w")
-        f.write(json.dumps(configuration))
-        f.close()
+def create_splits(files, sep1=('', 0), sep2=('', 0), json_file=None):
+    """
+    :param files: List of files to split into three disjoint sets of any size
+    :param sep1: Key for the result of 1st set and number of items as (k, v)
+    :param sep2: Key for the result of 2nd set and number of items as (k, v)
+    :param json_file: name of a  file json to write the results to
+    :return: Json files with keys 'train', sep1[0], sep2[0] and list of files
+    """
+    confs = []
+    for i in range(0, len(files), sep1[1]):
+        sep1s = files[i:i + sep1[1]]
+        t_val = [item for item in files if item not in sep1s]
+        sep2s = t_val[0:sep2[1]]
+        train = [item for item in t_val if item not in sep2s]
 
-# import neuralnet.mapnet.runs as r
-# files = os.listdir((r.DRIVE['Dirs']['image']))
-# random.shuffle(files)
-# create_splits(files, 10, 10, 'THRNET-DRIVE.json')
+        configuration = {}
+        configuration['train'] = train
+        if sep1[1] > 0:
+            configuration[sep1[0]] = sep1s
+        if sep2[1] > 0:
+            configuration[sep2[0]] = sep2s
+        confs.append(configuration)
+        if json_file is not None:
+            f = open(str(i) + json_file, "w")
+            f.write(json.dumps(configuration))
+            f.close()
+
+    return confs if json_file is None else None
+
+
+if __name__ == "__main__":
+    from neuralnet.unet.runs import DRIVE as r
+
+    files = os.listdir((r['Dirs']['image']))
+    random.shuffle(files)
+    print(create_splits(files, ('validation', 5)))
