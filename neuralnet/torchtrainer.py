@@ -64,7 +64,7 @@ class NNTrainer:
             running_loss = 0.0
             self._adjust_learning_rate(optimizer=optimizer, epoch=epoch)
             for i, data in enumerate(data_loader, 1):
-                inputs, labels = data['inputs'].to(self.device), data['labels'].long().to(self.device)
+                inputs, labels = data['inputs'].to(self.device).float(), data['labels'].to(self.device).long()
 
                 optimizer.zero_grad()
                 outputs = self.model(inputs)
