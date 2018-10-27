@@ -68,11 +68,24 @@ class Generator(Dataset):
         return len(self.indices)
 
     @classmethod
-    def get_loader(cls, images, run_conf, transforms, mode=None):
+    def get_loader(cls, images, run_conf, transforms, mode, batch_sizes=[]):
+        """
+        ###### GET list dataloaders of different batch sizes as specified in batch_sizes
+        :param images: List of images for which the torch dataloader will be generated
+        :param run_conf: JSON file. see runs.py
+        :param transforms: torchvision composed transforms
+        :param mode: 'train' or 'test'
+        :param batch_sizes: Default will pick from runs.py. List of integers(batch_size)
+                will generate a loader for each batch size
+        :return: loader if batch_size is default else list of loaders
+        """
+        batch_sizes = [run_conf['Params']['batch_size']] if len(batch_sizes) == 0 else batch_sizes
         gen = cls(run_conf=run_conf, images=images, transforms=transforms, shuffle_indices=True, mode=mode)
-        return torch.utils.data.DataLoader(gen, batch_size=run_conf.get('Params').get('batch_size'),
-                                           shuffle=True, num_workers=5,
-                                           sampler=None)
+
+        dls = []
+        for bz in batch_sizes:
+            dls.append(torch.utils.data.DataLoader(gen, batch_size=bz, shuffle=True, num_workers=5, sampler=None))
+        return dls if len(dls) > 1 else dls[0]
 
     @classmethod
     def get_loader_per_img(cls, images, run_conf, mode=None):
@@ -85,7 +98,7 @@ class Generator(Dataset):
                 shuffle_indices=False,
                 mode=mode
             )
-            loader = torch.utils.data.DataLoader(gen, batch_size=min(64, gen.__len__()),
+            loader = torch.utils.data.DataLoader(gen, batch_size=min(run_conf['Params']['batch_size'], gen.__len__()),
                                                  shuffle=False, num_workers=3, sampler=None)
             loaders.append(loader)
         return loaders
