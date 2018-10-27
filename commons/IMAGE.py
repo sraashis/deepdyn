@@ -65,7 +65,12 @@ class Image:
 
     def apply_clahe(self, clip_limit=2.0, tile_shape=(8, 8)):
         enhancer = cv2.createCLAHE(clipLimit=clip_limit, tileGridSize=tile_shape)
-        self.working_arr = enhancer.apply(self.working_arr)
+        if len(self.working_arr.shape) == 2:
+            self.working_arr = enhancer.apply(self.working_arr)
+        elif len(self.working_arr.shape) == 3:
+            self.working_arr[:, :, 0] = enhancer.apply(self.working_arr[:, :, 0])
+            self.working_arr[:, :, 1] = enhancer.apply(self.working_arr[:, :, 1])
+            self.working_arr[:, :, 2] = enhancer.apply(self.working_arr[:, :, 2])
 
     def __copy__(self):
         copy_obj = Image()
