@@ -50,15 +50,9 @@ class Generator(Dataset):
             img_obj.load_ground_truth(gt_dir=self.truth_dir,
                                       fget_ground_truth=self.truth_getter)
 
-        if len(img_obj.image_arr.shape) == 3:
-            img_obj.working_arr = img_obj.image_arr[:, :, 1]
-        elif len(img_obj.image_arr.shape) == 2:
-            img_obj.working_arr = img_obj.image_arr
-
+        img_obj.working_arr = img_obj.image_arr
         img_obj.apply_clahe()
-        if img_obj.mask is not None:
-            x = np.logical_and(True, img_obj.mask == 255)
-            img_obj.working_arr[img_obj.mask == 0] = img_obj.working_arr[x].mean()
+        img_obj.apply_mask()
         return img_obj
 
     def __getitem__(self, index):
