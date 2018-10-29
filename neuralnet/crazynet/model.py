@@ -104,8 +104,7 @@ class UUNet(nn.Module):
         self.up3 = nn.ConvTranspose2d(128, 64, kernel_size=2, stride=2)
         self.dc3 = _DoubleConvolution(64, 64, 64)
 
-        self.uu_dc1 = _DoubleConvolution(128, 64, 64)
-        self.unet = nn.Conv2d(64, num_classes, 1, 1)
+        self.unet = nn.Conv2d(128, num_classes, 3, 1, 1)
         initialize_weights(self)
 
     def forward(self, x):
@@ -140,9 +139,7 @@ class UUNet(nn.Module):
         unet = torch.cat([r1, r2], 2)
 
         all = torch.cat([mid, unet], 1)
-        all = F.dropout2d(all, 0.4)
 
-        all = self.uu_dc1(all)
         return F.log_softmax(self.unet(all), 1)
 
 
