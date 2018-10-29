@@ -26,7 +26,7 @@ class BabyUNet(nn.Module):
     def __init__(self, num_channels, num_classes):
         super(BabyUNet, self).__init__()
 
-        reduce_by = 2
+        reduce_by = 4
 
         self.A1_ = _DoubleConvolution(num_channels, int(64 / reduce_by), int(64 / reduce_by))
         self.A2_ = _DoubleConvolution(int(64 / reduce_by), int(128 / reduce_by), int(128 / reduce_by))
@@ -87,24 +87,24 @@ class BabyUNet(nn.Module):
 class UUNet(nn.Module):
     def __init__(self, num_channels, num_classes):
         super(UUNet, self).__init__()
-        self.unet0 = BabyUNet(num_channels, 128)
-        self.unet1 = BabyUNet(num_channels, 128)
-        self.unet2 = BabyUNet(num_channels, 128)
-        self.unet3 = BabyUNet(num_channels, 128)
+        self.unet0 = BabyUNet(num_channels, 256)
+        self.unet1 = BabyUNet(num_channels, 256)
+        self.unet2 = BabyUNet(num_channels, 256)
+        self.unet3 = BabyUNet(num_channels, 256)
 
-        self.up0 = nn.ConvTranspose2d(512, 256, kernel_size=2, stride=2)
-        self.dc0 = _DoubleConvolution(512, 256, 256)
+        self.up0 = nn.ConvTranspose2d(256, 256, kernel_size=2, stride=2)
+        self.dc0 = _DoubleConvolution(384, 256, 512)
 
-        self.up1 = nn.ConvTranspose2d(256, 256, kernel_size=2, stride=2)
-        self.dc1 = _DoubleConvolution(384, 128, 128)
+        self.up1 = nn.ConvTranspose2d(512, 512, kernel_size=2, stride=2)
+        self.dc1 = _DoubleConvolution(576, 512, 256)
 
-        self.up2 = nn.ConvTranspose2d(128, 128, kernel_size=2, stride=2)
-        self.dc2 = _DoubleConvolution(192, 128, 128)
+        self.up2 = nn.ConvTranspose2d(256, 256, kernel_size=2, stride=2)
+        self.dc2 = _DoubleConvolution(288, 128, 128)
 
         self.up3 = nn.ConvTranspose2d(128, 128, kernel_size=2, stride=2)
-        self.dc3 = _DoubleConvolution(128, 128, 128)
+        self.dc3 = _DoubleConvolution(128, 128, 64)
 
-        self.unet = nn.Conv2d(256, num_classes, 3, 1, 1)
+        self.unet = nn.Conv2d(320, num_classes, 3, 1, 1)
         initialize_weights(self)
 
     def forward(self, x):
