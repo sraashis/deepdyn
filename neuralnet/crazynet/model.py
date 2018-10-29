@@ -87,10 +87,10 @@ class BabyUNet(nn.Module):
 class UUNet(nn.Module):
     def __init__(self, num_channels, num_classes):
         super(UUNet, self).__init__()
-        self.unet0 = BabyUNet(num_channels, 64)
-        self.unet1 = BabyUNet(num_channels, 64)
-        self.unet2 = BabyUNet(num_channels, 64)
-        self.unet3 = BabyUNet(num_channels, 64)
+        self.unet0 = BabyUNet(num_channels, 128)
+        self.unet1 = BabyUNet(num_channels, 128)
+        self.unet2 = BabyUNet(num_channels, 128)
+        self.unet3 = BabyUNet(num_channels, 128)
 
         self.up0 = nn.ConvTranspose2d(512, 256, kernel_size=2, stride=2)
         self.dc0 = _DoubleConvolution(512, 256, 256)
@@ -101,10 +101,10 @@ class UUNet(nn.Module):
         self.up2 = nn.ConvTranspose2d(128, 128, kernel_size=2, stride=2)
         self.dc2 = _DoubleConvolution(192, 128, 128)
 
-        self.up3 = nn.ConvTranspose2d(128, 64, kernel_size=2, stride=2)
-        self.dc3 = _DoubleConvolution(64, 64, 64)
+        self.up3 = nn.ConvTranspose2d(128, 128, kernel_size=2, stride=2)
+        self.dc3 = _DoubleConvolution(128, 128, 128)
 
-        self.unet = nn.Conv2d(128, num_classes, 3, 1, 1)
+        self.unet = nn.Conv2d(256, num_classes, 3, 1, 1)
         initialize_weights(self)
 
     def forward(self, x):
@@ -139,7 +139,7 @@ class UUNet(nn.Module):
         unet = torch.cat([r1, r2], 2)
 
         all = torch.cat([mid, unet], 1)
-        all = F.dropout2d(all, 0.3)
+        all = F.dropout2d(all, 0.2)
 
         return F.log_softmax(self.unet(all), 1)
 
