@@ -138,10 +138,9 @@ class UUNet(nn.Module):
         r2 = torch.cat([unet2, unet3], 3)
         unet = torch.cat([r1, r2], 2)
 
-        all = torch.cat([mid, unet], 1)
-        all = F.dropout2d(all, 0.2)
+        alll = torch.cat([mid, unet], 1)
 
-        return F.log_softmax(self.unet(all), 1)
+        return F.log_softmax(self.unet(alll), 1)
 
 
 m = UUNet(1, 2)

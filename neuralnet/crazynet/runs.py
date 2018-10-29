@@ -7,8 +7,8 @@ DRIVE = {
         'num_channels': 1,
         'num_classes': 2,
         'batch_size': 2,
-        'epochs': 500,
-        'learning_rate': 0.003,
+        'epochs': 1000,
+        'learning_rate': 0.0005,
         'patch_shape': (288, 288),
         'patch_offset': (288, 288),
         'expand_patch_by': (0, 0),
@@ -17,7 +17,7 @@ DRIVE = {
         'shuffle': True,
         'log_frequency': 1,
         'validation_frequency': 1,
-        'mode': 'train',
+        'mode': 'test',
         'parallel_trained': False
     },
     'Dirs': {
