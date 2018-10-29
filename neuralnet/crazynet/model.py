@@ -77,18 +77,18 @@ class UUNet(nn.Module):
         super(UUNet, self).__init__()
         unets = []
         for i in range(9):
-            unets.append(BabyUNet(num_channels, 32))
+            unets.append(BabyUNet(num_channels, 128))
 
         self.unets = nn.Sequential(*unets)
 
-        self.a3_1up = nn.ConvTranspose2d(128, 256, kernel_size=2, stride=2)
-        self.a3_1 = _DoubleConvolution(256, 128, 128)
+        self.a3_1up = nn.ConvTranspose2d(128, 128, kernel_size=2, stride=2)
+        self.a3_1 = _DoubleConvolution(128, 256, 256)
 
-        self.a3_2up = nn.ConvTranspose2d(128, 128, kernel_size=2, stride=2)
-        self.a3_2 = _DoubleConvolution(128, 64, 32)
+        self.a3_2up = nn.ConvTranspose2d(256, 256, kernel_size=2, stride=2)
+        self.a3_2 = _DoubleConvolution(256, 128, 128)
 
-        self.joiner = _DoubleConvolution(64, 64, 32, p=1)
-        self.out = nn.Conv2d(32, num_classes, 1, 1)
+        self.joiner = _DoubleConvolution(256, 128, 64, p=1)
+        self.out = nn.Conv2d(64, num_classes, 1, 1)
         initialize_weights(self)
 
     def forward(self, x):
