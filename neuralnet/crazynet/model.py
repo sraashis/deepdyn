@@ -77,18 +77,17 @@ class UUNet(nn.Module):
         super(UUNet, self).__init__()
         unets = []
         for i in range(9):
-            unets.append(BabyUNet(num_channels, 64))
+            unets.append(BabyUNet(num_channels, 16))
 
         self.unets = nn.Sequential(*unets)
 
-        self.a3_1up = nn.ConvTranspose2d(256, 256, kernel_size=2, stride=2)
-        self.a3_1 = _DoubleConvolution(256, 128, 128)
+        self.a3_1up = nn.ConvTranspose2d(256, 128, kernel_size=2, stride=2)
+        self.a3_1 = _DoubleConvolution(128, 64, 64)
 
-        self.a3_2up = nn.ConvTranspose2d(128, 128, kernel_size=2, stride=2)
-        self.a3_2 = _DoubleConvolution(128, 64, 64)
+        self.a3_2up = nn.ConvTranspose2d(64, 32, kernel_size=2, stride=2)
+        self.a3_2 = _DoubleConvolution(32, 16, 16)
 
-        self.glue = _DoubleConvolution(128, 64, 64, p=1)
-        self.out = nn.Conv2d(64, num_classes, 1, 1)
+        self.out = nn.Conv2d(32, num_classes, 3, 1, 1)
         initialize_weights(self)
 
     def forward(self, x):
@@ -120,8 +119,7 @@ class UUNet(nn.Module):
         unet_r3 = torch.cat([baby_unets[6][3], baby_unets[7][3], baby_unets[8][3]], 3)
         unet = torch.cat([unet_r1, unet_r2, unet_r3], 2)
 
-        glued = self.glue(BabyUNet.match_and_concat(a3, unet))
-        return F.log_softmax(self.out(glued), 1)
+        return F.log_softmax(self.out(BabyUNet.match_and_concat(a3, unet)), 1)
 
 
 m = UUNet(1, 2)
