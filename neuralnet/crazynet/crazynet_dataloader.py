@@ -68,9 +68,9 @@ class PatchesGenerator(Generator):
             img_obj.mask = np.flip(img_obj.mask, 0)
 
         if self.mode == 'train' and random.uniform(0, 1) <= 0.5:
-            img_obj.working_arr = np.flip(img_obj.working_arr, 0)
-            img_obj.ground_truth = np.flip(img_obj.ground_truth, 0)
-            img_obj.mask = np.flip(img_obj.mask, 0)
+            img_obj.working_arr = np.flip(img_obj.working_arr, 1)
+            img_obj.ground_truth = np.flip(img_obj.ground_truth, 1)
+            img_obj.mask = np.flip(img_obj.mask, 1)
 
         arr = np.zeros((9, self.patch_shape[0] + self.expand_by[0], self.patch_shape[1] + self.expand_by[1]))
         for i, orig_ix in enumerate(chunks):
