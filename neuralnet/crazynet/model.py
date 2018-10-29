@@ -26,20 +26,21 @@ class BabyUNet(nn.Module):
     def __init__(self, num_channels, num_classes):
         super(BabyUNet, self).__init__()
 
-        self.A1_ = _DoubleConvolution(num_channels, 32, 32)
-        self.A2_ = _DoubleConvolution(32, 64, 64)
-        self.A3_ = _DoubleConvolution(64, 128, 128)
+        self.A1_ = _DoubleConvolution(num_channels, 64, 64)
+        self.A2_ = _DoubleConvolution(64, 128, 128)
+        self.A3_ = _DoubleConvolution(128, 256, 256)
 
-        self.A_mid = _DoubleConvolution(128, 256, 256)
+        self.A_mid = _DoubleConvolution(256, 512, 512)
 
-        self.A3_up = nn.ConvTranspose2d(256, 128, kernel_size=2, stride=2)
-        self._A3 = _DoubleConvolution(256, 128, 128)
+        self.A3_up = nn.ConvTranspose2d(512, 256, kernel_size=2, stride=2)
+        self._A3 = _DoubleConvolution(512, 256, 256)
 
-        self.A2_up = nn.ConvTranspose2d(128, 64, kernel_size=2, stride=2)
-        self._A2 = _DoubleConvolution(128, 64, 64)
+        self.A2_up = nn.ConvTranspose2d(256, 128, kernel_size=2, stride=2)
+        self._A2 = _DoubleConvolution(256, 128, 128)
 
-        self.A1_up = nn.ConvTranspose2d(64, 32, kernel_size=2, stride=2)
-        self._A1 = _DoubleConvolution(64, 32, num_classes)
+        self.A1_up = nn.ConvTranspose2d(128, 64, kernel_size=2, stride=2)
+        self._A1 = _DoubleConvolution(128, 64, 64)
+        self.out = nn.Conv2d(64, num_classes, 1, 1)
 
     def forward(self, x):
         a1_ = self.A1_(x)
@@ -62,7 +63,7 @@ class BabyUNet(nn.Module):
         a1_up = self.A1_up(_a2)
         _a1 = self._A1(BabyUNet.match_and_concat(a1_, a1_up))
 
-        return [a_mid, _a3, _a2, _a1]
+        return self.out(_a1)
 
     @staticmethod
     def match_and_concat(bypass, upsampled, crop=True):
@@ -77,18 +78,9 @@ class UUNet(nn.Module):
         super(UUNet, self).__init__()
         unets = []
         for i in range(9):
-            unets.append(BabyUNet(num_channels, 128))
+            unets.append(BabyUNet(num_channels, num_classes))
 
         self.unets = nn.Sequential(*unets)
-
-        self.a3_1up = nn.ConvTranspose2d(128, 128, kernel_size=2, stride=2)
-        self.a3_1 = _DoubleConvolution(128, 256, 256)
-
-        self.a3_2up = nn.ConvTranspose2d(256, 256, kernel_size=2, stride=2)
-        self.a3_2 = _DoubleConvolution(256, 128, 128)
-
-        self.joiner = _DoubleConvolution(256, 128, 64, p=1)
-        self.out = nn.Conv2d(64, num_classes, 1, 1)
         initialize_weights(self)
 
     def forward(self, x):
@@ -97,31 +89,12 @@ class UUNet(nn.Module):
         for i in range(9):
             baby_unets.append(self.unets[i](x[:, i, :, :].unsqueeze(1)))
 
-        # mid_r1 = torch.cat([baby_unets[0][0], baby_unets[1][0], baby_unets[2][0]], 3)
-        # mid_r2 = torch.cat([baby_unets[3][0], baby_unets[4][0], baby_unets[5][0]], 3)
-        # mid_r3 = torch.cat([baby_unets[6][0], baby_unets[7][0], baby_unets[8][0]], 3)
-        # mid = torch.cat([mid_r1, mid_r2, mid_r3], 2)
-
-        a3_r1 = torch.cat([baby_unets[0][1], baby_unets[1][1], baby_unets[2][1]], 3)
-        a3_r2 = torch.cat([baby_unets[3][1], baby_unets[4][1], baby_unets[5][1]], 3)
-        a3_r3 = torch.cat([baby_unets[6][1], baby_unets[7][1], baby_unets[8][1]], 3)
-        a3 = torch.cat([a3_r1, a3_r2, a3_r3], 2)
-
-        a3 = self.a3_1(self.a3_1up(a3))
-        a3 = self.a3_2(self.a3_2up(a3))
-
-        # a2_r1 = torch.cat([baby_unets[0][2], baby_unets[1][2], baby_unets[2][2]], 3)
-        # a2_r2 = torch.cat([baby_unets[3][2], baby_unets[4][2], baby_unets[5][2]], 3)
-        # a2_r3 = torch.cat([baby_unets[6][2], baby_unets[7][2], baby_unets[8][2]], 3)
-        # a2 = torch.cat([a2_r1, a2_r2, a2_r3], 2)
-
-        unet_r1 = torch.cat([baby_unets[0][3], baby_unets[1][3], baby_unets[2][3]], 3)
-        unet_r2 = torch.cat([baby_unets[3][3], baby_unets[4][3], baby_unets[5][3]], 3)
-        unet_r3 = torch.cat([baby_unets[6][3], baby_unets[7][3], baby_unets[8][3]], 3)
+        unet_r1 = torch.cat([baby_unets[0], baby_unets[1], baby_unets[2]], 3)
+        unet_r2 = torch.cat([baby_unets[3], baby_unets[4], baby_unets[5]], 3)
+        unet_r3 = torch.cat([baby_unets[6], baby_unets[7], baby_unets[8]], 3)
         unet = torch.cat([unet_r1, unet_r2, unet_r3], 2)
 
-        joinned = self.joiner(BabyUNet.match_and_concat(a3, unet))
-        return F.log_softmax(self.out(joinned), 1)
+        return F.log_softmax(unet, 1)
 
 
 m = UUNet(1, 2)
