@@ -49,9 +49,9 @@ class PatchesGenerator(Generator):
             img_obj.load_ground_truth(gt_dir=self.truth_dir,
                                       fget_ground_truth=self.truth_getter)
 
-        img_obj.working_arr = imgutils.fix_pad(img_obj.image_arr[:, :, 1], (576, 576))
-        img_obj.ground_truth = imgutils.fix_pad(img_obj.ground_truth, (576, 576))
-        img_obj.mask = imgutils.fix_pad(img_obj.mask, (576, 576))
+        img_obj.working_arr = imgutils.fix_pad(img_obj.image_arr[:, :, 1], (588, 588))
+        img_obj.ground_truth = imgutils.fix_pad(img_obj.ground_truth, (588, 588))
+        img_obj.mask = imgutils.fix_pad(img_obj.mask, (588, 588))
         img_obj.apply_clahe()
         img_obj.apply_mask()
 
@@ -60,16 +60,16 @@ class PatchesGenerator(Generator):
     def __getitem__(self, index):
         ID, chunks = self.indices[index]
 
-        img = self.image_objects[ID].working_arr
-        arr, gts = np.zeros((4, *self.patch_shape)), np.zeros((4, *self.patch_shape))
-        for i, (a, b, c, d) in enumerate(chunks):
-            arr[i] = img[a:b, c:d]
+        arr = np.zeros((9, self.patch_shape[0] + self.expand_by[0], self.patch_shape[1] + self.expand_by[1]))
+        for i, orig_ix in enumerate(chunks):
+            p, q, r, s, pad = imgutils.expand_and_mirror_patch(full_img_shape=self.image_objects[ID].working_arr.shape,
+                                                               orig_patch_indices=orig_ix,
+                                                               expand_by=self.expand_by)
+            arr[i] = np.pad(self.image_objects[ID].working_arr[p:q, r:s], pad, 'reflect')
 
-        gt = self.image_objects[ID].ground_truth
-        gt[gt == 255] = 1
         return {'id': ID,
-                'inputs': arr,
-                'labels': gt}
+                'inputs': arr.copy(),
+                'labels': self.image_objects[ID].ground_truth / 255}
 
     @classmethod
     def get_loader_per_img(cls, images, run_conf, mode=None):
