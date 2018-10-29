@@ -84,72 +84,6 @@ class BabyUNet(nn.Module):
         return torch.cat((upsampled, bypass), 1)
 
 
-class UNet(nn.Module):
-    def __init__(self, num_channels, num_classes):
-        super(UNet, self).__init__()
-
-        reduce_by = 4
-
-        self.A1_ = _DoubleConvolution(num_channels, int(64 / reduce_by), int(64 / reduce_by))
-        self.A2_ = _DoubleConvolution(int(64 / reduce_by), int(128 / reduce_by), int(128 / reduce_by))
-        self.A3_ = _DoubleConvolution(int(128 / reduce_by), int(256 / reduce_by), int(256 / reduce_by))
-        self.A4_ = _DoubleConvolution(int(256 / reduce_by), int(512 / reduce_by), int(512 / reduce_by))
-
-        self.A_mid = _DoubleConvolution(int(512 / reduce_by), int(1024 / reduce_by), int(1024 / reduce_by))
-
-        self.A4_up = nn.ConvTranspose2d(int(1024 / reduce_by), int(512 / reduce_by), kernel_size=2, stride=2)
-        self._A4 = _DoubleConvolution(int(1024 / reduce_by), int(512 / reduce_by), int(512 / reduce_by))
-
-        self.A3_up = nn.ConvTranspose2d(int(512 / reduce_by), int(256 / reduce_by), kernel_size=2, stride=2)
-        self._A3 = _DoubleConvolution(int(512 / reduce_by), int(256 / reduce_by), int(256 / reduce_by))
-
-        self.A2_up = nn.ConvTranspose2d(int(256 / reduce_by), int(128 / reduce_by), kernel_size=2, stride=2)
-        self._A2 = _DoubleConvolution(int(256 / reduce_by), int(128 / reduce_by), int(128 / reduce_by))
-
-        self.A1_up = nn.ConvTranspose2d(int(128 / reduce_by), int(64 / reduce_by), kernel_size=2, stride=2)
-        self._A1 = _DoubleConvolution(int(128 / reduce_by), int(64 / reduce_by), int(64 / reduce_by))
-
-        self.final = nn.Conv2d(int(64 / reduce_by), num_classes, kernel_size=1)
-        initialize_weights(self)
-
-    def forward(self, x):
-        a1_ = self.A1_(x)
-        a1_dwn = F.max_pool2d(a1_, kernel_size=2, stride=2)
-
-        a2_ = self.A2_(a1_dwn)
-        a2_dwn = F.max_pool2d(a2_, kernel_size=2, stride=2)
-
-        a3_ = self.A3_(a2_dwn)
-        a3_dwn = F.max_pool2d(a3_, kernel_size=2, stride=2)
-
-        a4_ = self.A4_(a3_dwn)
-        a4_dwn = F.max_pool2d(a4_, kernel_size=2, stride=2)
-
-        a_mid = self.A_mid(a4_dwn)
-
-        a4_up = self.A4_up(a_mid)
-        _a4 = self._A4(UNet.match_and_concat(a4_, a4_up))
-
-        a3_up = self.A3_up(_a4)
-        _a3 = self._A3(UNet.match_and_concat(a3_, a3_up))
-
-        a2_up = self.A2_up(_a3)
-        _a2 = self._A2(UNet.match_and_concat(a2_, a2_up))
-
-        a1_up = self.A1_up(_a2)
-        _a1 = self._A1(UNet.match_and_concat(a1_, a1_up))
-
-        final = self.final(_a1)
-        return F.log_softmax(final, dim=1)
-
-    @staticmethod
-    def match_and_concat(bypass, upsampled, crop=True):
-        if crop:
-            c = (bypass.size()[2] - upsampled.size()[2]) // 2
-            bypass = F.pad(bypass, (-c, -c, -c, -c))
-        return torch.cat((upsampled, bypass), 1)
-
-
 class UUNet(nn.Module):
     def __init__(self, num_channels, num_classes):
         super(UUNet, self).__init__()
@@ -171,7 +105,7 @@ class UUNet(nn.Module):
         self.dc3 = _DoubleConvolution(64, 64, 64)
 
         self.uu_dc1 = _DoubleConvolution(128, 64, 64)
-        self.unet = UNet(64, num_classes)
+        self.unet = nn.Conv2d(64, num_classes, 1, 1)
         initialize_weights(self)
 
     def forward(self, x):
@@ -188,31 +122,28 @@ class UUNet(nn.Module):
         a4_2 = torch.cat([unet2_a4, unet3_a4], 3)
         a4 = torch.cat([a4_1, a4_2], 2)
         mid = self.dc0(torch.cat([a4, self.up0(mid)], 1))
-        mid = F.dropout2d(mid, 0.2)
 
         a3_1 = torch.cat([unet0_a3, unet1_a3], 3)
         a3_2 = torch.cat([unet2_a3, unet3_a3], 3)
         a3 = torch.cat([a3_1, a3_2], 2)
         mid = self.dc1(torch.cat([a3, self.up1(mid)], 1))
-        mid = F.dropout2d(mid, 0.2)
 
         a2_1 = torch.cat([unet0_a2, unet1_a2], 3)
         a2_2 = torch.cat([unet2_a2, unet3_a2], 3)
         a2 = torch.cat([a2_1, a2_2], 2)
         mid = self.dc2(torch.cat([a2, self.up2(mid)], 1))
-        mid = F.dropout2d(mid, 0.2)
 
         mid = self.dc3(self.up3(mid))
 
         r1 = torch.cat([unet0, unet1], 3)
         r2 = torch.cat([unet2, unet3], 3)
         unet = torch.cat([r1, r2], 2)
-        unet = F.dropout2d(unet, 0.2)
 
         all = torch.cat([mid, unet], 1)
+        all = F.dropout2d(all, 0.4)
 
         all = self.uu_dc1(all)
-        return self.unet(all)
+        return F.log_softmax(self.unet(all), 1)
 
 
 m = UUNet(1, 2)
