@@ -8,7 +8,7 @@ DRIVE = {
         'num_classes': 2,
         'batch_size': 2,
         'epochs': 500,
-        'learning_rate': 0.001,
+        'learning_rate': 0.003,
         'patch_shape': (288, 288),
         'patch_offset': (288, 288),
         'expand_patch_by': (0, 0),
