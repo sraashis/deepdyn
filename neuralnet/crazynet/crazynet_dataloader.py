@@ -5,6 +5,7 @@
 """
 
 import os
+import random
 from random import shuffle
 
 import numpy as np
@@ -60,16 +61,27 @@ class PatchesGenerator(Generator):
     def __getitem__(self, index):
         ID, chunks = self.indices[index]
 
+        img_obj = self.image_objects[ID]
+        if self.mode == 'train' and random.uniform(0, 1) <= 0.5:
+            img_obj.working_arr = np.flip(img_obj.working_arr, 0)
+            img_obj.ground_truth = np.flip(img_obj.ground_truth, 0)
+            img_obj.mask = np.flip(img_obj.mask, 0)
+
+        if self.mode == 'train' and random.uniform(0, 1) <= 0.5:
+            img_obj.working_arr = np.flip(img_obj.working_arr, 0)
+            img_obj.ground_truth = np.flip(img_obj.ground_truth, 0)
+            img_obj.mask = np.flip(img_obj.mask, 0)
+
         arr = np.zeros((9, self.patch_shape[0] + self.expand_by[0], self.patch_shape[1] + self.expand_by[1]))
         for i, orig_ix in enumerate(chunks):
-            p, q, r, s, pad = imgutils.expand_and_mirror_patch(full_img_shape=self.image_objects[ID].working_arr.shape,
+            p, q, r, s, pad = imgutils.expand_and_mirror_patch(full_img_shape=img_obj.working_arr.shape,
                                                                orig_patch_indices=orig_ix,
                                                                expand_by=self.expand_by)
-            arr[i] = np.pad(self.image_objects[ID].working_arr[p:q, r:s], pad, 'reflect')
+            arr[i] = np.pad(img_obj.working_arr[p:q, r:s], pad, 'reflect')
 
         return {'id': ID,
                 'inputs': arr.copy(),
-                'labels': self.image_objects[ID].ground_truth / 255}
+                'labels': img_obj.ground_truth.copy() / 255}
 
     @classmethod
     def get_loader_per_img(cls, images, run_conf, mode=None):
