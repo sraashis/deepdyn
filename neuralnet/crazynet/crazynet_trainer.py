@@ -50,12 +50,10 @@ class UNetNNTrainer(NNTrainer):
                 img_score = ScoreAccumulator()
                 map_img = torch.exp(map_img) * 255
                 predicted_img = predicted_img * 255
-                import utils.img_utils as iu
                 if gen_images:
                     map_img = map_img.cpu().numpy()
                     predicted_img = predicted_img.cpu().numpy()
                     img_score.add_array(img_obj.ground_truth, predicted_img)
-                    predicted_img = iu.remove_connected_comp(predicted_img.squeeze(), 10)
                     IMG.fromarray(np.array(predicted_img.squeeze(), dtype=np.uint8)).save(
                         os.path.join(self.log_dir, 'pred_' + img_obj.file_name.split('.')[0] + '.png'))
                     IMG.fromarray(np.array(map_img.squeeze(), dtype=np.uint8)).save(
