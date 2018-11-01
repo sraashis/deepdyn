@@ -63,7 +63,7 @@ class BabyUNet(nn.Module):
         a1_up = self.A1_up(_a2)
         _a1 = self._A1(BabyUNet.match_and_concat(a1_, a1_up))
 
-        return _a1, _a3
+        return F.dropout2d(_a1, 0.2), F.dropout2d(_a3, 0.2)
 
     @staticmethod
     def match_and_concat(bypass, upsampled, crop=True):
@@ -77,23 +77,23 @@ class UUNet(nn.Module):
     def __init__(self, num_channels, num_classes):
         super(UUNet, self).__init__()
 
-        self.unet0 = BabyUNet(num_channels, 64)
-        self.unet1 = BabyUNet(num_channels, 64)
-        self.unet2 = BabyUNet(num_channels, 64)
-        self.unet3 = BabyUNet(num_channels, 64)
-        self.unet4 = BabyUNet(num_channels, 64)
-        self.unet5 = BabyUNet(num_channels, 64)
-        self.unet6 = BabyUNet(num_channels, 64)
-        self.unet7 = BabyUNet(num_channels, 64)
-        self.unet8 = BabyUNet(num_channels, 64)
+        self.unet0 = BabyUNet(num_channels, 128)
+        self.unet1 = BabyUNet(num_channels, 128)
+        self.unet2 = BabyUNet(num_channels, 128)
+        self.unet3 = BabyUNet(num_channels, 128)
+        self.unet4 = BabyUNet(num_channels, 128)
+        self.unet5 = BabyUNet(num_channels, 128)
+        self.unet6 = BabyUNet(num_channels, 128)
+        self.unet7 = BabyUNet(num_channels, 128)
+        self.unet8 = BabyUNet(num_channels, 128)
 
-        self.a3_up1 = nn.ConvTranspose2d(256, 256, kernel_size=2, stride=2)
-        self.a3 = _DoubleConvolution(256, 128, 128, p=1)
+        self.a3_up1 = nn.ConvTranspose2d(256, 512, kernel_size=2, stride=2)
+        self.a3 = _DoubleConvolution(512, 256, 128, p=1)
 
-        self.a3_up2 = nn.ConvTranspose2d(128, 64, kernel_size=2, stride=2)
+        self.a3_up2 = nn.ConvTranspose2d(128, 256, kernel_size=2, stride=2)
 
-        self.cleaner = _DoubleConvolution(128, 64, 32, p=1)
-        self.out = nn.Conv2d(32, num_classes, 1, 1)
+        self.cleaner = _DoubleConvolution(384, 128, 64, p=1)
+        self.out = nn.Conv2d(64, num_classes, 1, 1)
         initialize_weights(self)
 
     def forward(self, x):
