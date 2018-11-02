@@ -41,11 +41,11 @@ class ThrnetTrainer(NNTrainer):
                 thr_map = self.model(inputs).squeeze()
 
                 loss = F.mse_loss(thr_map, y_thresholds)
-                loss.backward(retain_graph=True)
+                loss.backward()
                 optimizer.step()
-                # if True:
-                #     print(torch.cat([y_thresholds[..., None], thr_map[..., None]], 1))
-                #     print('-------------------------------------------------')
+                if True:
+                    print(torch.cat([y_thresholds, thr_map], 1))
+                    print('-------------------------------------------------')
 
                 current_loss = math.sqrt(loss.item())
                 running_loss += current_loss
@@ -95,7 +95,7 @@ class ThrnetTrainer(NNTrainer):
 
                     loss = F.mse_loss(thr_map, y_thresholds)
                     img_mse += math.sqrt(loss.item())
-                    thr = thr_map[..., None][..., None]
+                    thr = thr_map[:, 0][..., None][..., None]
                     segmented = (prob_map > thr).long()
                     # Reconstruct the image
                     for j in range(segmented.shape[0]):
@@ -107,8 +107,10 @@ class ThrnetTrainer(NNTrainer):
 
                 img_score = ScoreAccumulator()
                 if gen_images:
+
                     img = segmented_img.cpu().numpy()
-                    img_score.add_array(img_obj.ground_truth, img)
+                    img = np.maximum(img, img_obj.res['seg'])
+                    img_score.add_array(img_obj.res['seg'], img_obj.ground_truth)
                     IMG.fromarray(np.array(img, dtype=np.uint8)).save(
                         os.path.join(self.log_dir, img_obj.file_name.split('.')[0] + '.png'))
                 else:

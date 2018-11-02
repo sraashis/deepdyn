@@ -50,7 +50,7 @@ class ThrnetTrainer(NNTrainer):
 
                 if gen_images:
                     img = segmented_img.clone().cpu().numpy()
-                    img_score.add_array(img_obj.ground_truth, img)
+                    img_score.add_array(img, img_obj.ground_truth)
                     # img = iu.remove_connected_comp(np.array(segmented_img, dtype=np.uint8),
                     #                                connected_comp_diam_limit=10)
                     IMG.fromarray(np.array(img, dtype=np.uint8)).save(

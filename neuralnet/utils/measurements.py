@@ -56,7 +56,7 @@ class ScoreAccumulator:
         self.fn += fn
         return self
 
-    def add_tensor(self, y_true_tensor, y_pred_tensor):
+    def add_tensor(self, y_pred_tensor, y_true_tensor):
 
         y_true = y_true_tensor.clone().view(1, -1).squeeze()
         y_pred = y_pred_tensor.clone().view(1, -1).squeeze()

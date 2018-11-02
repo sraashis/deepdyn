@@ -50,10 +50,11 @@ class UNetNNTrainer(NNTrainer):
                 img_score = ScoreAccumulator()
                 map_img = torch.exp(map_img) * 255
                 predicted_img = predicted_img * 255
+                gen_images = True
                 if gen_images:
                     map_img = map_img.cpu().numpy()
                     predicted_img = predicted_img.cpu().numpy()
-                    img_score.add_array(img_obj.ground_truth, predicted_img)
+                    img_score.add_array(predicted_img, img_obj.ground_truth)
                     IMG.fromarray(np.array(predicted_img.squeeze(), dtype=np.uint8)).save(
                         os.path.join(self.log_dir, 'pred_' + img_obj.file_name.split('.')[0] + '.png'))
                     IMG.fromarray(np.array(map_img.squeeze(), dtype=np.uint8)).save(
@@ -61,6 +62,8 @@ class UNetNNTrainer(NNTrainer):
                 else:
                     img_score.add_tensor(predicted_img, gt.long())
                     eval_score += img_score.get_prf1a()[2]
+                img_score.add_array(predicted_img, img_obj.ground_truth)
+                eval_score += img_score.get_prf1a()[2]
 
                 prf1a = img_score.get_prf1a()
                 print(img_obj.file_name, ' PRF1A', prf1a)

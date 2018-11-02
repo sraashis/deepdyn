@@ -75,7 +75,7 @@ class NNTrainer:
 
                 current_loss = loss.item()
                 running_loss += current_loss
-                p, r, f1, a = score_acc.reset().add_tensor(labels, predicted).get_prf1a()
+                p, r, f1, a = score_acc.reset().add_tensor(predicted, labels).get_prf1a()
                 if i % self.log_frequency == 0:
                     print('Epochs[%d/%d] Batch[%d/%d] loss:%.5f pre:%.3f rec:%.3f f1:%.3f acc:%.3f' %
                           (
@@ -134,7 +134,7 @@ class NNTrainer:
                     IMG.fromarray(np.array(img, dtype=np.uint8)).save(
                         os.path.join(self.log_dir, img_obj.file_name.split('.')[0] + '.png'))
                 else:
-                    img_score.add_tensor(segmented_img, gt)
+                    img_score.add_tensor(gt, segmented_img)
                     eval_score += img_score.get_prf1a()[2]
 
                 prf1a = img_score.get_prf1a()

@@ -6,7 +6,7 @@ DRIVE = {
     'Params': {
         'num_channels': 1,
         'num_classes': 2,
-        'batch_size': 6,
+        'batch_size': 4,
         'epochs': 200,
         'learning_rate': 0.001,
         'patch_shape': (388, 388),
@@ -17,14 +17,15 @@ DRIVE = {
         'shuffle': True,
         'log_frequency': 5,
         'validation_frequency': 1,
-        'mode': 'test',
+        'mode': 'train',
         'parallel_trained': False
     },
     'Dirs': {
         'image': 'data' + sep + 'DRIVE' + sep + 'images',
+        'image_seed': 'data' + sep + 'DRIVE_MAP' + sep + 'images',
         'mask': 'data' + sep + 'DRIVE' + sep + 'mask',
         'truth': 'data' + sep + 'DRIVE' + sep + 'manual',
-        'logs': 'data' + sep + 'DRIVE' + sep + 'unet_logs',
+        'logs': 'data' + sep + 'DRIVE' + sep + 'unet_del_logs',
         'splits_json': 'data' + sep + 'DRIVE' + sep + 'unet_splits'
     },
 
