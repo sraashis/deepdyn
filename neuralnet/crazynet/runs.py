@@ -13,7 +13,7 @@ DRIVE = {
         'patch_offset': (196, 196),
         'expand_patch_by': (88, 88),
         'use_gpu': True,
-        'distribute': False,
+        'distribute': True,
         'shuffle': True,
         'log_frequency': 1,
         'validation_frequency': 1,

@@ -1,8 +1,8 @@
 import torch
 import torch.nn.functional as F
 from torch import nn
-import neuralnet.utils.tensorshow as ts
 
+import neuralnet.utils.tensorshow as ts
 from neuralnet.utils.weights_utils import initialize_weights
 
 
@@ -56,19 +56,15 @@ class BabyUNet(nn.Module):
         a_mid = self.A_mid(a3_dwn)
 
         a3_up = self.A3_up(a_mid)
-        a3_up = F.dropout2d(a3_up, 0.4)
         _a3 = self._A3(BabyUNet.match_and_concat(a3_, a3_up))
 
         a2_up = self.A2_up(_a3)
-        a2_up = F.dropout2d(a2_up, 0.4)
         _a2 = self._A2(BabyUNet.match_and_concat(a2_, a2_up))
 
         a1_up = self.A1_up(_a2)
-        a1_up = F.dropout2d(a1_up, 0.4)
         _a1 = self._A1(BabyUNet.match_and_concat(a1_, a1_up))
-        ts.save_as_img(_a1, to_dir='a1')
 
-        return _a1, a_mid, _a2, _a3
+        return _a1
 
     @staticmethod
     def match_and_concat(bypass, upsampled, crop=True):
@@ -92,48 +88,38 @@ class UUNet(nn.Module):
         self.unet7 = BabyUNet(num_channels, 32)
         self.unet8 = BabyUNet(num_channels, 32)
 
-        # self.mid_up1 = nn.ConvTranspose2d(640, 256, kernel_size=2, stride=2)
-        # self.mid_up2 = nn.ConvTranspose2d(512, 256, kernel_size=2, stride=2)
+        self.clean1 = nn.Conv2d(32, 64, 3, 1, 1)
+        self.bn_c1 = nn.BatchNorm2d(64)
+
+        self.clean2 = nn.Conv2d(64, 32, 3, 1, 1)
+        self.bn_c2 = nn.BatchNorm2d(32)
 
         self.out = nn.Conv2d(32, num_classes, 1, 1)
         initialize_weights(self)
 
     def forward(self, x):
-        unet0, mid0, a2_0, a3_0 = self.unet0(x[:, 0, :, :].unsqueeze(1))
-        unet1, mid1, a2_1, a3_1 = self.unet1(x[:, 1, :, :].unsqueeze(1))
-        unet2, mid2, a2_2, a3_2 = self.unet2(x[:, 2, :, :].unsqueeze(1))
-        unet3, mid3, a2_3, a3_3 = self.unet3(x[:, 3, :, :].unsqueeze(1))
-        unet4, mid4, a2_4, a3_4 = self.unet4(x[:, 4, :, :].unsqueeze(1))
-        unet5, mid5, a2_5, a3_5 = self.unet5(x[:, 5, :, :].unsqueeze(1))
-        unet6, mid6, a2_6, a3_6 = self.unet6(x[:, 6, :, :].unsqueeze(1))
-        unet7, mid7, a2_7, a3_7 = self.unet7(x[:, 7, :, :].unsqueeze(1))
-        unet8, mid8, a2_8, a3_8 = self.unet8(x[:, 8, :, :].unsqueeze(1))
+        unet0 = self.unet0(x[:, 0, :, :].unsqueeze(1))
+        unet1 = self.unet1(x[:, 1, :, :].unsqueeze(1))
+        unet2 = self.unet2(x[:, 2, :, :].unsqueeze(1))
+        unet3 = self.unet3(x[:, 3, :, :].unsqueeze(1))
+        unet4 = self.unet4(x[:, 4, :, :].unsqueeze(1))
+        unet5 = self.unet5(x[:, 5, :, :].unsqueeze(1))
+        unet6 = self.unet6(x[:, 6, :, :].unsqueeze(1))
+        unet7 = self.unet7(x[:, 7, :, :].unsqueeze(1))
+        unet8 = self.unet8(x[:, 8, :, :].unsqueeze(1))
 
         unet_r1 = torch.cat([unet0, unet1, unet2], 3)
         unet_r2 = torch.cat([unet3, unet4, unet5], 3)
         unet_r3 = torch.cat([unet6, unet7, unet8], 3)
         unet = torch.cat([unet_r1, unet_r2, unet_r3], 2)
-        # unet = F.dropout2d(unet, p=0.2)
 
-        # mid_r1 = torch.cat([mid0, mid1, mid2], 3)
-        # mid_r2 = torch.cat([mid3, mid4, mid5], 3)
-        # mid_r3 = torch.cat([mid6, mid7, mid8], 3)
-        # mid = torch.cat([mid_r1, mid_r2, mid_r3], 2)
-        #
-        # a2_r1 = torch.cat([a2_0, a2_1, a2_2], 3)
-        # a2_r2 = torch.cat([a2_3, a2_4, a2_5], 3)
-        # a2_r3 = torch.cat([a2_6, a2_7, a2_8], 3)
-        # a2 = torch.cat([a2_r1, a2_r2, a2_r3], 2)
-        # mid = self.mid_up1(BabyUNet.match_and_concat(a2, mid))
-        # mid = F.dropout2d(mid, p=0.2)
-        #
-        # a3_r1 = torch.cat([a3_0, a3_1, a3_2], 3)
-        # a3_r2 = torch.cat([a3_3, a3_4, a3_5], 3)
-        # a3_r3 = torch.cat([a3_6, a3_7, a3_8], 3)
-        # a3 = torch.cat([a3_r1, a3_r2, a3_r3], 2)
-        # mid = self.mid_up2(BabyUNet.match_and_concat(a3, mid))
+        # ts.save_as_img(unet, to_dir='unet_tf')
+        out = F.relu(self.bn_c1(self.clean1(unet)))
+        out = F.relu(self.bn_c2(self.clean2(out)))
+        # ts.save_as_img(out, to_dir='clean_tf')
 
-        return F.log_softmax(self.out(unet), 1)
+        out = self.out(out)
+        return F.log_softmax(out, 1)
 
 
 m = UUNet(1, 2)

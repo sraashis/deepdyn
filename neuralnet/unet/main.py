@@ -32,7 +32,7 @@ from neuralnet.utils import auto_split as asp
 import neuralnet.unet.runs  as rs
 
 RUNS = [rs.DRIVE]  # , rs.WIDE, rs.STARE, rs.VEVIO]
-torch.cuda.set_device(0)
+torch.cuda.set_device(1)
 
 if __name__ == "__main__":
 
@@ -68,7 +68,7 @@ if __name__ == "__main__":
 
                 drive_trainer.resume_from_checkpoint(parallel_trained=R.get('Params').get('parallel_trained'))
                 test_loader = PatchesGenerator.get_loader_per_img(run_conf=R,
-                                                                  images=splits['train'] + splits['validation'], mode='test')
+                                                                  images=splits['test'], mode='test')
 
                 logger = drive_trainer.get_logger(drive_trainer.test_log_file,
                                                   header='ID,PRECISION,RECALL,F1,ACCURACY')

@@ -31,6 +31,7 @@ class PatchesGenerator(Generator):
         for ID, img_file in enumerate(self.images):
 
             img_obj = self._get_image_obj(img_file)
+            img_obj.working_arr = img_obj.working_arr[:, :, 1]  # Just use green channel
             for chunk_ix in imgutils.get_chunk_indexes(img_obj.working_arr.shape, self.patch_shape,
                                                        self.patch_offset):
                 self.indices.append([ID] + chunk_ix)
@@ -77,7 +78,7 @@ class PatchesGenerator(Generator):
                 shuffle_indices=False,
                 mode=mode
             )
-            loader = torch.utils.data.DataLoader(gen, batch_size=min(2, gen.__len__()),
+            loader = torch.utils.data.DataLoader(gen, batch_size=min(1, gen.__len__()),
                                                  shuffle=False, num_workers=3, sampler=None)
             loaders.append(loader)
         return loaders

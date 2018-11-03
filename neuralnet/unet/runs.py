@@ -17,7 +17,7 @@ DRIVE = {
         'shuffle': True,
         'log_frequency': 5,
         'validation_frequency': 1,
-        'mode': 'train',
+        'mode': 'test',
         'parallel_trained': False
     },
     'Dirs': {
