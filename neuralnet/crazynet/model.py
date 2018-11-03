@@ -1,6 +1,7 @@
 import torch
 import torch.nn.functional as F
 from torch import nn
+import neuralnet.utils.tensorshow as ts
 
 from neuralnet.utils.weights_utils import initialize_weights
 
@@ -55,13 +56,17 @@ class BabyUNet(nn.Module):
         a_mid = self.A_mid(a3_dwn)
 
         a3_up = self.A3_up(a_mid)
+        a3_up = F.dropout2d(a3_up, 0.4)
         _a3 = self._A3(BabyUNet.match_and_concat(a3_, a3_up))
 
         a2_up = self.A2_up(_a3)
+        a2_up = F.dropout2d(a2_up, 0.4)
         _a2 = self._A2(BabyUNet.match_and_concat(a2_, a2_up))
 
         a1_up = self.A1_up(_a2)
+        a1_up = F.dropout2d(a1_up, 0.4)
         _a1 = self._A1(BabyUNet.match_and_concat(a1_, a1_up))
+        ts.save_as_img(_a1, to_dir='a1')
 
         return _a1, a_mid, _a2, _a3
 
@@ -77,21 +82,20 @@ class UUNet(nn.Module):
     def __init__(self, num_channels, num_classes):
         super(UUNet, self).__init__()
 
-        self.unet0 = BabyUNet(num_channels, 64)
-        self.unet1 = BabyUNet(num_channels, 64)
-        self.unet2 = BabyUNet(num_channels, 64)
-        self.unet3 = BabyUNet(num_channels, 64)
-        self.unet4 = BabyUNet(num_channels, 64)
-        self.unet5 = BabyUNet(num_channels, 64)
-        self.unet6 = BabyUNet(num_channels, 64)
-        self.unet7 = BabyUNet(num_channels, 64)
-        self.unet8 = BabyUNet(num_channels, 64)
+        self.unet0 = BabyUNet(num_channels, 32)
+        self.unet1 = BabyUNet(num_channels, 32)
+        self.unet2 = BabyUNet(num_channels, 32)
+        self.unet3 = BabyUNet(num_channels, 32)
+        self.unet4 = BabyUNet(num_channels, 32)
+        self.unet5 = BabyUNet(num_channels, 32)
+        self.unet6 = BabyUNet(num_channels, 32)
+        self.unet7 = BabyUNet(num_channels, 32)
+        self.unet8 = BabyUNet(num_channels, 32)
 
         # self.mid_up1 = nn.ConvTranspose2d(640, 256, kernel_size=2, stride=2)
         # self.mid_up2 = nn.ConvTranspose2d(512, 256, kernel_size=2, stride=2)
 
-        self.cleaner = _DoubleConvolution(64, 128, 64, p=1)
-        self.out = nn.Conv2d(64, num_classes, 1, 1)
+        self.out = nn.Conv2d(32, num_classes, 1, 1)
         initialize_weights(self)
 
     def forward(self, x):
@@ -109,7 +113,7 @@ class UUNet(nn.Module):
         unet_r2 = torch.cat([unet3, unet4, unet5], 3)
         unet_r3 = torch.cat([unet6, unet7, unet8], 3)
         unet = torch.cat([unet_r1, unet_r2, unet_r3], 2)
-        unet = F.dropout2d(unet, p=0.2)
+        # unet = F.dropout2d(unet, p=0.2)
 
         # mid_r1 = torch.cat([mid0, mid1, mid2], 3)
         # mid_r2 = torch.cat([mid3, mid4, mid5], 3)
@@ -129,8 +133,7 @@ class UUNet(nn.Module):
         # a3 = torch.cat([a3_r1, a3_r2, a3_r3], 2)
         # mid = self.mid_up2(BabyUNet.match_and_concat(a3, mid))
 
-        clean = self.cleaner(unet)
-        return F.log_softmax(self.out(clean), 1)
+        return F.log_softmax(self.out(unet), 1)
 
 
 m = UUNet(1, 2)

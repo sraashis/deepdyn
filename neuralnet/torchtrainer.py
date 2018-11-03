@@ -7,6 +7,7 @@
 import os
 import sys
 import threading
+from random import randint
 
 import PIL.Image as IMG
 import numpy as np
