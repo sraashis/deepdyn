@@ -25,7 +25,7 @@ DRIVE = {
         'image_seed': 'data' + sep + 'DRIVE_MAP' + sep + 'images',
         'mask': 'data' + sep + 'DRIVE' + sep + 'mask',
         'truth': 'data' + sep + 'DRIVE' + sep + 'manual',
-        'logs': 'data' + sep + 'DRIVE' + sep + 'unet_del_logs',
+        'logs': 'data' + sep + 'DRIVE' + sep + 'unet_FINAL_logs',
         'splits_json': 'data' + sep + 'DRIVE' + sep + 'unet_splits'
     },
 

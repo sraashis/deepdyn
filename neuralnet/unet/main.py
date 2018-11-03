@@ -32,7 +32,7 @@ from neuralnet.utils import auto_split as asp
 import neuralnet.unet.runs  as rs
 
 RUNS = [rs.DRIVE]  # , rs.WIDE, rs.STARE, rs.VEVIO]
-torch.cuda.set_device(1)
+torch.cuda.set_device(0)
 
 if __name__ == "__main__":
 
