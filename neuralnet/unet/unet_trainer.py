@@ -5,12 +5,13 @@
 """
 
 import os
+from random import randint
 
 import numpy as np
 import torch
+import torch.nn.functional as F
 from PIL import Image as IMG
 
-import neuralnet.utils.loss as L
 from neuralnet.torchtrainer import NNTrainer
 from neuralnet.utils.measurements import ScoreAccumulator
 
@@ -47,7 +48,9 @@ class UNetNNTrainer(NNTrainer):
                 outputs = self.model(inputs)
                 _, predicted = torch.max(outputs, 1)
 
-                loss = L.dice_loss(outputs[:, 1, :, :], labels, beta=1)
+                # Balancing imbalanced class as per computed weights from the dataset
+                w = torch.tensor([randint(1, 1000), randint(1, 1000)]).float().to(self.device)
+                loss = F.nll_loss(outputs, labels, weight=w)
                 loss.backward()
                 optimizer.step()
 
@@ -106,7 +109,7 @@ class UNetNNTrainer(NNTrainer):
                     print('Batch: ', i, end='\r')
 
                 img_score = ScoreAccumulator()
-                map_img = map_img * 255
+                map_img = torch.exp(map_img) * 255
                 predicted_img = predicted_img * 255
 
                 if gen_images:
