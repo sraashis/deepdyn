@@ -24,14 +24,21 @@ class BabyUNet(nn.Module):
     def __init__(self, num_channels, num_classes):
         super(BabyUNet, self).__init__()
 
-        self.A1 = _DoubleConvolution(num_channels, 32, 128, p=1)
-        self.A2 = _DoubleConvolution(128, 128, 64, p=1)
+        self.A1 = _DoubleConvolution(num_channels, 32, 64, p=1)
+        self.A2 = _DoubleConvolution(64, 64, 128, p=1)
+        self.Aup = nn.ConvTranspose2d(128, 128, 2, 2)
+        self.A3 = _DoubleConvolution(192, 128, 64, p=1)
         self.out = nn.Conv2d(64, num_classes, 1, 1)
 
     def forward(self, x):
         a1 = self.A1(x)
-        a2 = self.A2(a1)
-        out = self.out(a2)
+
+        a1_up = F.max_pool2d(a1, 2, 2)
+        a2 = self.A2(a1_up)
+        aup = self.Aup(a2)
+
+        a3 = self.A3(torch.cat([a1, aup], 1))
+        out = self.out(a3)
 
         return F.softmax(out, 1)
 

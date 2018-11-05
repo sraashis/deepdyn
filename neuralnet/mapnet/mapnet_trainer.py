@@ -5,12 +5,14 @@
 """
 
 import os
+import random
 
 import numpy as np
 import torch
 from PIL import Image as IMG
 
 import neuralnet.utils.loss as l
+import utils.img_utils as iu
 from neuralnet.torchtrainer import NNTrainer
 from neuralnet.utils.measurements import ScoreAccumulator
 
@@ -47,17 +49,13 @@ class MapnetTrainer(NNTrainer):
                 outputs = self.model(inputs)
                 _, predicted = torch.max(outputs, 1)
 
-                # w = torch.tensor([it(1, 1000), it(1, 1000)]).to(self.device).float()
-                # loss = F.nll_loss(outputs, labels, weight=w)
-
-                loss = l.dice_loss(outputs, labels)
+                loss = l.dice_loss(outputs[:, 1, :, :], labels, beta=1.2)
                 loss.backward()
                 optimizer.step()
 
                 current_loss = loss.item()
                 running_loss += current_loss
 
-                labels = labels[:, 1, :, :]
                 p, r, f1, a = score_acc.reset().add_tensor(predicted, labels).get_prfa()
                 if i % self.log_frequency == 0:
                     print('Epochs[%d/%d] Batch[%d/%d] loss:%.5f pre:%.3f rec:%.3f f1:%.3f acc:%.3f' %
@@ -112,6 +110,7 @@ class MapnetTrainer(NNTrainer):
                 if gen_images:
                     predicted_img[predicted_img != fill_in] = 255
                     predicted_img = predicted_img.cpu().numpy()
+                    predicted_img = iu.remove_connected_comp(predicted_img, 5)
                     img_score.add_array(predicted_img, img_obj.ground_truth)
                     IMG.fromarray(np.array(predicted_img, dtype=np.uint8)).save(
                         os.path.join(self.log_dir, 'pred_' + img_obj.file_name.split('.')[0] + '.png'))

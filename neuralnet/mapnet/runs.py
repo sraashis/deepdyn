@@ -4,19 +4,19 @@ sep = os.sep
 
 DRIVE = {
     'Params': {
-        'num_channels': 1,
+        'num_channels': 2,
         'num_classes': 2,
         'batch_size': 16,
-        'epochs': 250,
+        'epochs': 200,
         'learning_rate': 0.001,
-        'patch_shape': (32, 32),
+        'patch_shape': (16, 16),
         'expand_patch_by': (0, 0),
         'use_gpu': True,
         'distribute': False,
         'shuffle': True,
         'log_frequency': 50,
         'validation_frequency': 1,
-        'mode': 'train',
+        'mode': 'test',
         'parallel_trained': False
     },
     'Dirs': {
@@ -24,7 +24,7 @@ DRIVE = {
         'image_unet': 'data' + sep + 'DRIVE' + sep + 'unet_del_logs',
         'mask': 'data' + sep + 'DRIVE' + sep + 'mask',
         'truth': 'data' + sep + 'DRIVE' + sep + 'manual',
-        'logs': 'data' + sep + 'DRIVE' + sep + 'baby_unet_logs',
+        'logs': 'data' + sep + 'DRIVE' + sep + 'map_unet_logs',
         'splits_json': 'data' + sep + 'DRIVE' + sep + 'unet_splits'
     },
 

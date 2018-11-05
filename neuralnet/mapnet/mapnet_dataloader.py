@@ -58,7 +58,7 @@ class PatchesGenerator(Generator):
         img_obj.apply_clahe()
         img_obj.apply_mask()
 
-        sup, res = 20, 235
+        sup, res = 10, 245
 
         img_obj.res['unet'] = iu.get_image_as_array(self.unet_dir + sep + img_obj.file_name.split('.')[0] + '.png', 1)
 
@@ -115,8 +115,8 @@ class PatchesGenerator(Generator):
 
         y_mid[y_mid == 255] = 1
         return {'id': ID,
-                'inputs': np.array([mid_patch]),
-                'labels': np.array([1 - y_mid, y_mid]),
+                'inputs': np.array([mid_patch, unet_patch]),
+                'labels': y_mid,
                 'clip_ix': np.array([row_from, row_to, col_from, col_to]), }
 
     @classmethod
