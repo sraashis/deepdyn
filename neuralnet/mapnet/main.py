@@ -13,17 +13,17 @@ except:
 
 import torch
 import torch.optim as optim
-from neuralnet.mapnet.model import InceptionMapNet
+from neuralnet.mapnet.model import BabyUNet
 from neuralnet.mapnet.mapnet_dataloader import PatchesGenerator
-from neuralnet.mapnet.mapnet_trainer import ThrnetTrainer
+from neuralnet.mapnet.mapnet_trainer import MapnetTrainer
 import torchvision.transforms as transforms
 from neuralnet.utils import auto_split as asp
-from neuralnet.mapnet.runs import DRIVE, DRIVEa
+from neuralnet.mapnet.runs import DRIVE
 
 RUNS = [DRIVE]
 
 # RUNS = [STARE, VEVIO]  # DRIVE, WIDE]
-torch.cuda.set_device(0)
+torch.cuda.set_device(1)
 
 if __name__ == "__main__":
 
@@ -40,7 +40,7 @@ if __name__ == "__main__":
             splits = asp.load_split_json(os.path.join(R['Dirs']['splits_json'], split))
             R['checkpoint_file'] = split + '.tar'
 
-            model = InceptionMapNet(R['Params']['num_channels'], R['Params']['num_classes'])
+            model = BabyUNet(R['Params']['num_channels'], R['Params']['num_classes'])
             optimizer = optim.Adam(model.parameters(), lr=R['Params']['learning_rate'])
             if R['Params']['distribute']:
                 model = torch.nn.DataParallel(model)
@@ -48,7 +48,7 @@ if __name__ == "__main__":
                 optimizer = optim.Adam(model.module.parameters(), lr=R['Params']['learning_rate'])
 
             try:
-                drive_trainer = ThrnetTrainer(model=model, run_conf=R)
+                drive_trainer = MapnetTrainer(model=model, run_conf=R)
 
                 if R.get('Params').get('mode') == 'train':
                     train_loader = PatchesGenerator.get_loader(run_conf=R, images=splits['train'], transforms=transform,

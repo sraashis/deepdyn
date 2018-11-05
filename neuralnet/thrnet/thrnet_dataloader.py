@@ -82,16 +82,7 @@ class PatchesGenerator(Generator):
         raw_estimate[raw_estimate <= self.est_thr] = 0
         #
         # <PREP2> Clear up small components(components less that 20px)
-        structure = np.ones((3, 3), dtype=np.int)
-        labeled, ncomponents = label(raw_estimate, structure)
-        for i in range(ncomponents):
-            ixy = np.array(list(zip(*np.where(labeled == i))))
-            x1, y1 = ixy[0]
-            x2, y2 = ixy[-1]
-            dst = math.sqrt((x2 - x1) ** 2 + (y2 - y1) ** 2)
-            if dst < self.component_diameter_limit:
-                for u, v in ixy:
-                    raw_estimate[u, v] = 0
+        # todo
 
         # <PREP3> Binarize the image and extract skeleton
         seed = raw_estimate.copy()

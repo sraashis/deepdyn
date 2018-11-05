@@ -7,6 +7,7 @@
 import os
 import sys
 import threading
+from random import randint
 
 import PIL.Image as IMG
 import numpy as np
@@ -64,7 +65,7 @@ class NNTrainer:
             running_loss = 0.0
             self._adjust_learning_rate(optimizer=optimizer, epoch=epoch)
             for i, data in enumerate(data_loader, 1):
-                inputs, labels = data['inputs'].to(self.device), data['labels'].long().to(self.device)
+                inputs, labels = data['inputs'].to(self.device).float(), data['labels'].to(self.device).long()
 
                 optimizer.zero_grad()
                 outputs = self.model(inputs)
@@ -75,7 +76,7 @@ class NNTrainer:
 
                 current_loss = loss.item()
                 running_loss += current_loss
-                p, r, f1, a = score_acc.reset().add_tensor(labels, predicted).get_prf1a()
+                p, r, f1, a = score_acc.reset().add_tensor(predicted, labels).get_prfa()
                 if i % self.log_frequency == 0:
                     print('Epochs[%d/%d] Batch[%d/%d] loss:%.5f pre:%.3f rec:%.3f f1:%.3f acc:%.3f' %
                           (
@@ -134,10 +135,10 @@ class NNTrainer:
                     IMG.fromarray(np.array(img, dtype=np.uint8)).save(
                         os.path.join(self.log_dir, img_obj.file_name.split('.')[0] + '.png'))
                 else:
-                    img_score.add_tensor(segmented_img, gt)
-                    eval_score += img_score.get_prf1a()[2]
+                    img_score.add_tensor(gt, segmented_img)
+                    eval_score += img_score.get_prfa()[2]
 
-                prf1a = img_score.get_prf1a()
+                prf1a = img_score.get_prfa()
                 print(img_obj.file_name, ' PRF1A', prf1a)
                 self.flush(logger, ','.join(str(x) for x in [img_obj.file_name] + prf1a))
 
