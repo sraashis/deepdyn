@@ -65,6 +65,7 @@ class PatchesGenerator(Generator):
         return {'id': ID,
                 'inputs': img_tensor,
                 'labels': y.copy(),
+                'dice_labels': np.array([1 - y, y]),
                 'clip_ix': np.array([row_from, row_to, col_from, col_to]), }
 
     @classmethod

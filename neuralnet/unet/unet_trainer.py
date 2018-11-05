@@ -47,7 +47,7 @@ class UNetNNTrainer(NNTrainer):
                 outputs = self.model(inputs)
                 _, predicted = torch.max(outputs, 1)
 
-                loss = L.dice_loss(outputs[:, 1, :, :], labels)
+                loss = L.dice_loss(outputs[:, 1, :, :], labels, beta=1)
                 loss.backward()
                 optimizer.step()
 
