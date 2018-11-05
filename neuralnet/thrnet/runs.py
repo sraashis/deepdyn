@@ -9,7 +9,7 @@ DRIVE = {
         'batch_size': 16,
         'epochs': 200,
         'learning_rate': 0.001,
-        'patch_shape': (16, 16),
+        'patch_shape': (32, 32),
         'expand_patch_by': (0, 0),
         'use_gpu': True,
         'distribute': False,

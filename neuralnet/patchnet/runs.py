@@ -4,28 +4,27 @@ sep = os.sep
 
 DRIVE = {
     'Params': {
-        'num_channels': 1,
+        'num_channels': 3,
         'num_classes': 2,
-        'batch_size': 32,
-        'epochs': 30,
+        'batch_size': 16,
+        'epochs': 10,
         'learning_rate': 0.001,
-        'patch_shape': (51, 51),
-        # 'patch_offset': (14, 14),
-        'expand_patch_by': (0, 0),
+        'patch_shape': (21, 21),
         'use_gpu': True,
         'distribute': False,
         'shuffle': True,
-        'checkpoint_file': 'PATCHNET-DRIVE.chk.tar',
         'log_frequency': 500,
         'validation_frequency': 1,
-        'mode': 'train',
+        'mode': 'test',
         'parallel_trained': False
     },
     'Dirs': {
         'image': 'data' + sep + 'DRIVE' + sep + 'images',
+        'image_unet': 'data' + sep + 'DRIVE' + sep + 'unet_del_logs',
         'mask': 'data' + sep + 'DRIVE' + sep + 'mask',
         'truth': 'data' + sep + 'DRIVE' + sep + 'manual',
-        'logs': 'data' + sep + 'DRIVE' + sep + 'patchnet_logs'
+        'logs': 'data' + sep + 'DRIVE' + sep + 'patchnet__logs',
+        'splits_json': 'data' + sep + 'DRIVE' + sep + 'unet_splits'
     },
 
     'Funcs': {

@@ -117,7 +117,7 @@ class ThrnetTrainer(NNTrainer):
                     img_score.add_tensor(segmented_img, gt)
 
                 eval_mse += img_mse / loader.__len__()
-                prf1a = img_score.get_prf1a()
+                prf1a = img_score.get_prfa()
                 print(img_obj.file_name, ' PRF1A', prf1a, ' loss: ' + str(img_mse / loader.__len__()))
                 self.flush(logger, ','.join(str(x) for x in [img_obj.file_name] + prf1a))
 

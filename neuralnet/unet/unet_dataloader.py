@@ -10,10 +10,10 @@ from random import shuffle
 
 import numpy as np
 import torch
+import torchvision.transforms as tfm
 
 import utils.img_utils as imgutils
 from neuralnet.datagen import Generator
-import torchvision.transforms as tfm
 
 sep = os.sep
 
@@ -64,7 +64,7 @@ class PatchesGenerator(Generator):
 
         return {'id': ID,
                 'inputs': img_tensor,
-                'labels': torch.LongTensor(y.copy()),
+                'labels': y.copy(),
                 'clip_ix': np.array([row_from, row_to, col_from, col_to]), }
 
     @classmethod

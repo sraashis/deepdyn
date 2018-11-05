@@ -10,9 +10,9 @@ import numpy as np
 import torch
 from PIL import Image as IMG
 
+import neuralnet.utils.loss as L
 from neuralnet.torchtrainer import NNTrainer
 from neuralnet.utils.measurements import ScoreAccumulator
-import torch.nn.functional as F
 
 sep = os.sep
 
@@ -47,15 +47,13 @@ class UNetNNTrainer(NNTrainer):
                 outputs = self.model(inputs)
                 _, predicted = torch.max(outputs, 1)
 
-                # Balancing imbalanced class as per computed weights from the dataset
-                w = torch.tensor([0.1, 1]).to(self.device)
-                loss = F.nll_loss(outputs, labels, weight=w)
+                loss = L.dice_loss(outputs[:, 1, :, :], labels)
                 loss.backward()
                 optimizer.step()
 
                 current_loss = loss.item()
                 running_loss += current_loss
-                p, r, f1, a = score_acc.reset().add_tensor(predicted, labels).get_prf1a()
+                p, r, f1, a = score_acc.reset().add_tensor(predicted, labels).get_prfa()
                 if i % self.log_frequency == 0:
                     print('Epochs[%d/%d] Batch[%d/%d] loss:%.5f pre:%.3f rec:%.3f f1:%.3f acc:%.3f' %
                           (
@@ -108,7 +106,7 @@ class UNetNNTrainer(NNTrainer):
                     print('Batch: ', i, end='\r')
 
                 img_score = ScoreAccumulator()
-                map_img = torch.exp(map_img) * 255
+                map_img = map_img * 255
                 predicted_img = predicted_img * 255
 
                 if gen_images:
@@ -121,9 +119,9 @@ class UNetNNTrainer(NNTrainer):
                         os.path.join(self.log_dir, img_obj.file_name.split('.')[0] + '.png'))
                 else:
                     img_score.add_tensor(predicted_img, gt)
-                    eval_score += img_score.get_prf1a()[2]
+                    eval_score += img_score.get_prfa()[2]
 
-                prf1a = img_score.get_prf1a()
+                prf1a = img_score.get_prfa()
                 print(img_obj.file_name, ' PRF1A', prf1a)
                 self.flush(logger, ','.join(str(x) for x in [img_obj.file_name] + prf1a))
 

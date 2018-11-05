@@ -4,13 +4,13 @@ sep = os.sep
 
 DRIVE = {
     'Params': {
-        'num_channels': 4,
+        'num_channels': 1,
         'num_classes': 2,
-        'batch_size': 6,
-        'epochs': 100,
+        'batch_size': 16,
+        'epochs': 250,
         'learning_rate': 0.001,
-        'patch_shape': (20, 20),
-        'expand_patch_by': (12, 12),
+        'patch_shape': (32, 32),
+        'expand_patch_by': (0, 0),
         'use_gpu': True,
         'distribute': False,
         'shuffle': True,
@@ -20,44 +20,12 @@ DRIVE = {
         'parallel_trained': False
     },
     'Dirs': {
-        'image': 'data' + sep + 'DRIVE_MAP' + sep + 'images',
-        'image_orig': 'data' + sep + 'DRIVE' + sep + 'images',
+        'image': 'data' + sep + 'DRIVE' + sep + 'images',
+        'image_unet': 'data' + sep + 'DRIVE' + sep + 'unet_del_logs',
         'mask': 'data' + sep + 'DRIVE' + sep + 'mask',
         'truth': 'data' + sep + 'DRIVE' + sep + 'manual',
-        'logs': 'data' + sep + 'DRIVE_MAP' + sep + 'crazy_logs',
-        'splits_json': 'data' + sep + 'DRIVE_MAP' + sep + 'mapnet_splits'
-    },
-
-    'Funcs': {
-        'truth_getter': lambda file_name: file_name.split('_')[0] + '_manual1.gif',
-        'mask_getter': lambda file_name: file_name.split('_')[0] + '_mask.gif'
-    }
-}
-
-DRIVEa = {
-    'Params': {
-        'num_channels': 9,
-        'num_classes': 2,
-        'batch_size': 8,
-        'epochs': 100,
-        'learning_rate': 0.001,
-        'patch_shape': (48, 48),
-        # 'patch_offset': (14, 14),
-        # 'expand_patch_by': (16, 16),
-        'use_gpu': True,
-        'distribute': False,
-        'shuffle': True,
-        'log_frequency': 100,
-        'validation_frequency': 1,
-        'mode': 'train',
-        'parallel_trained': False
-    },
-    'Dirs': {
-        'image': 'data' + sep + 'DRIVE_MAP' + sep + 'images',
-        'mask': 'data' + sep + 'DRIVE' + sep + 'mask',
-        'truth': 'data' + sep + 'DRIVE' + sep + 'manual',
-        'logs': 'data' + sep + 'DRIVE_MAP' + sep + 'crazy_logs',
-        'splits_json': 'data' + sep + 'DRIVE_MAP' + sep + 'mapnet_splits'
+        'logs': 'data' + sep + 'DRIVE' + sep + 'baby_unet_logs',
+        'splits_json': 'data' + sep + 'DRIVE' + sep + 'unet_splits'
     },
 
     'Funcs': {
@@ -70,25 +38,26 @@ WIDE = {
     'Params': {
         'num_channels': 1,
         'num_classes': 2,
-        'batch_size': 12,
-        'epochs': 40,
+        'batch_size': 4,
+        'epochs': 200,
         'learning_rate': 0.001,
-        'patch_shape': (32, 32),
-        'expand_patch_by': (16, 16),
+        'patch_shape': (388, 388),
+        'patch_offset': (150, 150),
+        'expand_patch_by': (184, 184),
         'use_gpu': True,
         'distribute': False,
         'shuffle': True,
-        'log_frequency': 50,
+        'log_frequency': 5,
         'validation_frequency': 1,
-        'mode': 'train',
+        'mode': 'test',
         'parallel_trained': False
     },
     'Dirs': {
-        'image': 'data' + sep + 'AV-WIDE_MAP' + sep + 'images',
+        'image': 'data' + sep + 'AV-WIDE' + sep + 'images',
         'mask': 'data' + sep + 'AV-WIDE' + sep + 'mask',
         'truth': 'data' + sep + 'AV-WIDE' + sep + 'manual',
-        'logs': 'data' + sep + 'AV-WIDE_MAP' + sep + 'mapnet_logs',
-        'splits_json': 'data' + sep + 'AV-WIDE_MAP' + sep + 'thrnet_splits'
+        'logs': 'data' + sep + 'AV-WIDE' + sep + 'unet_logs',
+        'splits_json': 'data' + sep + 'AV-WIDE' + sep + 'unet_splits'
     },
 
     'Funcs': {
@@ -101,24 +70,25 @@ STARE = {
     'Params': {
         'num_channels': 1,
         'num_classes': 2,
-        'batch_size': 12,
-        'epochs': 40,
+        'batch_size': 4,
+        'epochs': 200,
         'learning_rate': 0.001,
-        'patch_shape': (32, 32),
-        'expand_patch_by': (16, 16),
+        'patch_shape': (388, 388),
+        'patch_offset': (150, 150),
+        'expand_patch_by': (184, 184),
         'use_gpu': True,
         'distribute': False,
         'shuffle': True,
-        'log_frequency': 50,
+        'log_frequency': 5,
         'validation_frequency': 1,
         'mode': 'train',
         'parallel_trained': False
     },
     'Dirs': {
-        'image': 'data' + sep + 'STARE_MAP' + sep + 'images',
+        'image': 'data' + sep + 'STARE' + sep + 'stare-images',
         'truth': 'data' + sep + 'STARE' + sep + 'labels-ah',
-        'logs': 'data' + sep + 'STARE_MAP' + sep + 'mapnet_logs',
-        'splits_json': 'data' + sep + 'STARE_MAP' + sep + 'mapnet_splits'
+        'logs': 'data' + sep + 'STARE' + sep + 'unet_logs',
+        'splits_json': 'data' + sep + 'STARE' + sep + 'unet_splits'
     },
 
     'Funcs': {
@@ -127,30 +97,30 @@ STARE = {
     }
 }
 
-
 VEVIO = {
     'Params': {
         'num_channels': 1,
         'num_classes': 2,
-        'batch_size': 12,
-        'epochs': 40,
+        'batch_size': 4,
+        'epochs': 200,
         'learning_rate': 0.001,
-        'patch_shape': (32, 32),
-        'expand_patch_by': (16, 16),
+        'patch_shape': (388, 388),
+        'patch_offset': (150, 150),
+        'expand_patch_by': (184, 184),
         'use_gpu': True,
         'distribute': False,
         'shuffle': True,
-        'log_frequency': 50,
+        'log_frequency': 5,
         'validation_frequency': 1,
-        'mode': 'train',
+        'mode': 'test',
         'parallel_trained': False
     },
     'Dirs': {
-        'image': 'data' + sep + 'VEVIO_MAP' + sep + 'images',
+        'image': 'data' + sep + 'VEVIO' + sep + 'mosaics',
         'mask': 'data' + sep + 'VEVIO' + sep + 'mosaics_masks',
         'truth': 'data' + sep + 'VEVIO' + sep + 'mosaics_manual_01_bw',
-        'logs': 'data' + sep + 'VEVIO_MAP' + sep + 'mapnet_logs',
-        'splits_json': 'data' + sep + 'VEVIO_MAP' + sep + 'mapnet_splits'
+        'logs': 'data' + sep + 'VEVIO' + sep + 'unet_logs',
+        'splits_json': 'data' + sep + 'VEVIO' + sep + 'unet_splits'
     },
 
     'Funcs': {
