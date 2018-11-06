@@ -7,7 +7,7 @@ DRIVE = {
         'num_channels': 2,
         'num_classes': 2,
         'batch_size': 16,
-        'epochs': 3,
+        'epochs': 10,
         'learning_rate': 0.01,
         'patch_shape': (21, 21),
         'use_gpu': True,
