@@ -3,39 +3,24 @@
 ### sraashis@gmail.com
 ### date: 9/10/2018
 """
-import os
-import sys
-
-try:
-    BASE_PROJECT_DIR = '/home/ak/PycharmProjects/ature'
-    sys.path.append(BASE_PROJECT_DIR)
-    os.chdir(BASE_PROJECT_DIR)
-except:
-    BASE_PROJECT_DIR = '/home/akhanal1/ature'
-    sys.path.append(BASE_PROJECT_DIR)
-    os.chdir(BASE_PROJECT_DIR)
 
 import os
-import sys
 import traceback
-
-sys.path.append(BASE_PROJECT_DIR)
-os.chdir(BASE_PROJECT_DIR)
 
 import torch
 import torch.optim as optim
+import torchvision.transforms as transforms
+
+import neuralnet.unet.runs  as rs
 from neuralnet.unet.model import UNet
 from neuralnet.unet.unet_dataloader import PatchesGenerator
 from neuralnet.unet.unet_trainer import UNetNNTrainer
-import torchvision.transforms as transforms
 from neuralnet.utils import auto_split as asp
-import neuralnet.unet.runs  as rs
 
-RUNS = [rs.DRIVE]  # , rs.WIDE, rs.STARE, rs.VEVIO]
-torch.cuda.set_device(1)
+RUNS = [rs.WIDE, rs.STARE, rs.VEVIO]  # [rs.DRIVE]
 
-if __name__ == "__main__":
 
+def main():
     transform = transforms.Compose([
         transforms.ToPILImage(),
         transforms.ToTensor()
@@ -68,7 +53,8 @@ if __name__ == "__main__":
 
                 drive_trainer.resume_from_checkpoint(parallel_trained=R.get('Params').get('parallel_trained'))
                 test_loader = PatchesGenerator.get_loader_per_img(run_conf=R,
-                                                                  images=splits['test'], mode='test')
+                                                                  images=splits['test'] + splits['train'] + splits[
+                                                                      'validation'], mode='test')
 
                 logger = drive_trainer.get_logger(drive_trainer.test_log_file,
                                                   header='ID,PRECISION,RECALL,F1,ACCURACY')
@@ -77,3 +63,7 @@ if __name__ == "__main__":
                 logger.close()
             except Exception as e:
                 traceback.print_exc()
+
+
+if __name__ == "__main__":
+    main()

@@ -1,30 +1,19 @@
 import os
-import sys
 import traceback
-
-try:
-    BASE_PROJECT_DIR = '/home/ak/PycharmProjects/ature'
-    sys.path.append(BASE_PROJECT_DIR)
-    os.chdir(BASE_PROJECT_DIR)
-except:
-    BASE_PROJECT_DIR = '/home/akhanal1/ature'
-    sys.path.append(BASE_PROJECT_DIR)
-    os.chdir(BASE_PROJECT_DIR)
 
 import torch
 import torch.optim as optim
+import torchvision.transforms as transforms
+
 from neuralnet.thrnet.model import UNet
+from neuralnet.thrnet.runs import DRIVE
 from neuralnet.thrnet.thrnet_dataloader import PatchesGenerator
 from neuralnet.thrnet.thrnet_trainer import ThrnetTrainer
-import torchvision.transforms as transforms
 from neuralnet.utils import auto_split as asp
-from neuralnet.thrnet.runs import DRIVE
 
 RUNS = [DRIVE]
 
 # RUNS = [STARE, VEVIO]  # DRIVE, WIDE]
-torch.cuda.set_device(1)
-
 if __name__ == "__main__":
 
     transform = transforms.Compose([

@@ -2,12 +2,12 @@ import os
 
 sep = os.sep
 
-DRIVE = {
+DRIVE16_CH1 = {
     'Params': {
-        'num_channels': 2,
+        'num_channels': 1,
         'num_classes': 2,
         'batch_size': 16,
-        'epochs': 200,
+        'epochs': 100,
         'learning_rate': 0.001,
         'patch_shape': (16, 16),
         'expand_patch_by': (0, 0),
@@ -16,16 +16,16 @@ DRIVE = {
         'shuffle': True,
         'log_frequency': 50,
         'validation_frequency': 1,
-        'mode': 'test',
+        'mode': 'train',
         'parallel_trained': False
     },
     'Dirs': {
         'image': 'data' + sep + 'DRIVE' + sep + 'images',
-        'image_unet': 'data' + sep + 'DRIVE' + sep + 'unet_del_logs',
+        'image_unet': 'data' + sep + 'DRIVE' + sep + 'UNET_LOGS',
         'mask': 'data' + sep + 'DRIVE' + sep + 'mask',
         'truth': 'data' + sep + 'DRIVE' + sep + 'manual',
-        'logs': 'data' + sep + 'DRIVE' + sep + 'map_unet_logs',
-        'splits_json': 'data' + sep + 'DRIVE' + sep + 'unet_splits'
+        'logs': 'data' + sep + 'DRIVE' + sep + 'MAPNET_LOGS_16CH1',
+        'splits_json': 'data' + sep + 'DRIVE' + sep + 'splits'
     },
 
     'Funcs': {
@@ -34,6 +34,103 @@ DRIVE = {
     }
 }
 
+DRIVE16_CH2 = {
+    'Params': {
+        'num_channels': 2,
+        'num_classes': 2,
+        'batch_size': 16,
+        'epochs': 100,
+        'learning_rate': 0.001,
+        'patch_shape': (16, 16),
+        'expand_patch_by': (0, 0),
+        'use_gpu': True,
+        'distribute': False,
+        'shuffle': True,
+        'log_frequency': 50,
+        'validation_frequency': 1,
+        'mode': 'train',
+        'parallel_trained': False
+    },
+    'Dirs': {
+        'image': 'data' + sep + 'DRIVE' + sep + 'images',
+        'image_unet': 'data' + sep + 'DRIVE' + sep + 'UNET_LOGS',
+        'mask': 'data' + sep + 'DRIVE' + sep + 'mask',
+        'truth': 'data' + sep + 'DRIVE' + sep + 'manual',
+        'logs': 'data' + sep + 'DRIVE' + sep + 'MAPNET_LOGS_16CH2',
+        'splits_json': 'data' + sep + 'DRIVE' + sep + 'splits'
+    },
+
+    'Funcs': {
+        'truth_getter': lambda file_name: file_name.split('_')[0] + '_manual1.gif',
+        'mask_getter': lambda file_name: file_name.split('_')[0] + '_mask.gif'
+    }
+}
+
+DRIVE32_CH1 = {
+    'Params': {
+        'num_channels': 1,
+        'num_classes': 2,
+        'batch_size': 8,
+        'epochs': 100,
+        'learning_rate': 0.001,
+        'patch_shape': (32, 32),
+        'expand_patch_by': (0, 0),
+        'use_gpu': True,
+        'distribute': False,
+        'shuffle': True,
+        'log_frequency': 50,
+        'validation_frequency': 1,
+        'mode': 'train',
+        'parallel_trained': False
+    },
+    'Dirs': {
+        'image': 'data' + sep + 'DRIVE' + sep + 'images',
+        'image_unet': 'data' + sep + 'DRIVE' + sep + 'UNET_LOGS',
+        'mask': 'data' + sep + 'DRIVE' + sep + 'mask',
+        'truth': 'data' + sep + 'DRIVE' + sep + 'manual',
+        'logs': 'data' + sep + 'DRIVE' + sep + 'MAPNET_LOGS_32CH1',
+        'splits_json': 'data' + sep + 'DRIVE' + sep + 'splits'
+    },
+
+    'Funcs': {
+        'truth_getter': lambda file_name: file_name.split('_')[0] + '_manual1.gif',
+        'mask_getter': lambda file_name: file_name.split('_')[0] + '_mask.gif'
+    }
+}
+
+DRIVE32_CH2 = {
+    'Params': {
+        'num_channels': 1,
+        'num_classes': 2,
+        'batch_size': 8,
+        'epochs': 100,
+        'learning_rate': 0.001,
+        'patch_shape': (32, 32),
+        'expand_patch_by': (0, 0),
+        'use_gpu': True,
+        'distribute': False,
+        'shuffle': True,
+        'log_frequency': 50,
+        'validation_frequency': 1,
+        'mode': 'train',
+        'parallel_trained': False
+    },
+    'Dirs': {
+        'image': 'data' + sep + 'DRIVE' + sep + 'images',
+        'image_unet': 'data' + sep + 'DRIVE' + sep + 'UNET_LOGS',
+        'mask': 'data' + sep + 'DRIVE' + sep + 'mask',
+        'truth': 'data' + sep + 'DRIVE' + sep + 'manual',
+        'logs': 'data' + sep + 'DRIVE' + sep + 'MAPNET_LOGS_32CH2',
+        'splits_json': 'data' + sep + 'DRIVE' + sep + 'splits'
+    },
+
+    'Funcs': {
+        'truth_getter': lambda file_name: file_name.split('_')[0] + '_manual1.gif',
+        'mask_getter': lambda file_name: file_name.split('_')[0] + '_mask.gif'
+    }
+}
+
+## TODO after we verify for DRIVE
 WIDE = {
     'Params': {
         'num_channels': 1,

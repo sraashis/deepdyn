@@ -26,6 +26,7 @@ class PatchesGenerator(Generator):
         self.expand_by = self.run_conf.get('Params').get('expand_patch_by')
         self.patch_offset = self.run_conf.get('Params').get('patch_offset')
         self.unet_dir = self.run_conf['Dirs']['image_unet']
+        self.input_image_ext = '.png'
         self._load_indices()
         print('Patches:', self.__len__())
 
@@ -44,8 +45,7 @@ class PatchesGenerator(Generator):
 
     def _get_image_obj(self, img_file=None):
         img_obj = Image()
-        img_obj.load_file(data_dir=self.image_dir,
-                          file_name=img_file)
+        img_obj.load_file(data_dir=self.image_dir, file_name=img_file)
         if self.mask_getter is not None:
             img_obj.load_mask(mask_dir=self.mask_dir,
                               fget_mask=self.mask_getter,
@@ -60,7 +60,8 @@ class PatchesGenerator(Generator):
 
         sup, res = 10, 245
 
-        img_obj.res['unet'] = iu.get_image_as_array(self.unet_dir + sep + img_obj.file_name.split('.')[0] + '.png', 1)
+        img_obj.res['unet'] = iu.get_image_as_array(
+            self.unet_dir + sep + img_obj.file_name.split('.')[0] + self.input_image_ext, 1)
 
         img_obj.res['indices'] = list(zip(*np.where((img_obj.res['unet'] >= sup) & (img_obj.res['unet'] <= res))))
 
@@ -114,8 +115,13 @@ class PatchesGenerator(Generator):
         unet_patch = np.pad(unet_map[p:q, r:s], pad, 'reflect')
 
         y_mid[y_mid == 255] = 1
+        if self.run_conf['Params']['num_channels'] == 1:
+            img_tensor = np.array([mid_patch])
+        else:
+            img_tensor = np.array([mid_patch, unet_patch])
+
         return {'id': ID,
-                'inputs': np.array([mid_patch, unet_patch]),
+                'inputs': img_tensor,
                 'labels': y_mid,
                 'clip_ix': np.array([row_from, row_to, col_from, col_to]), }
 
