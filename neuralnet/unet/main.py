@@ -31,11 +31,11 @@ import torchvision.transforms as transforms
 from neuralnet.utils import auto_split as asp
 import neuralnet.unet.runs  as rs
 
-RUNS = [rs.DRIVE]  # , rs.WIDE, rs.STARE, rs.VEVIO]
+RUNS = [rs.WIDE, rs.STARE, rs.VEVIO]  # [rs.DRIVE]
 torch.cuda.set_device(1)
 
-if __name__ == "__main__":
 
+def main():
     transform = transforms.Compose([
         transforms.ToPILImage(),
         transforms.ToTensor()
@@ -77,3 +77,7 @@ if __name__ == "__main__":
                 logger.close()
             except Exception as e:
                 traceback.print_exc()
+
+
+if __name__ == "__main__":
+    main()

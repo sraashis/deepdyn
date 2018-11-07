@@ -7,7 +7,7 @@ DRIVE = {
         'num_channels': 1,
         'num_classes': 2,
         'batch_size': 4,
-        'epochs': 200,
+        'epochs': 250,
         'learning_rate': 0.001,
         'patch_shape': (388, 388),
         'patch_offset': (150, 150),
@@ -24,7 +24,7 @@ DRIVE = {
         'image': 'data' + sep + 'DRIVE' + sep + 'images',
         'mask': 'data' + sep + 'DRIVE' + sep + 'mask',
         'truth': 'data' + sep + 'DRIVE' + sep + 'manual',
-        'logs': 'data' + sep + 'DRIVE' + sep + 'unet_prime_logs',
+        'logs': 'data' + sep + 'DRIVE' + sep + 'UNET_LOGS',
         'splits_json': 'data' + sep + 'DRIVE' + sep + 'unet_splits'
     },
 
@@ -49,15 +49,15 @@ WIDE = {
         'shuffle': True,
         'log_frequency': 5,
         'validation_frequency': 1,
-        'mode': 'test',
+        'mode': 'train',
         'parallel_trained': False
     },
     'Dirs': {
         'image': 'data' + sep + 'AV-WIDE' + sep + 'images',
         'mask': 'data' + sep + 'AV-WIDE' + sep + 'mask',
         'truth': 'data' + sep + 'AV-WIDE' + sep + 'manual',
-        'logs': 'data' + sep + 'AV-WIDE' + sep + 'unet_logs',
-        'splits_json': 'data' + sep + 'AV-WIDE' + sep + 'unet_splits'
+        'logs': 'data' + sep + 'AV-WIDE' + sep + 'UNET_LOGS',
+        'splits_json': 'data' + sep + 'AV-WIDE' + sep + 'splits'
     },
 
     'Funcs': {
@@ -87,8 +87,8 @@ STARE = {
     'Dirs': {
         'image': 'data' + sep + 'STARE' + sep + 'stare-images',
         'truth': 'data' + sep + 'STARE' + sep + 'labels-ah',
-        'logs': 'data' + sep + 'STARE' + sep + 'unet_logs',
-        'splits_json': 'data' + sep + 'STARE' + sep + 'unet_splits'
+        'logs': 'data' + sep + 'STARE' + sep + 'UNET_LOGS',
+        'splits_json': 'data' + sep + 'STARE' + sep + 'splits'
     },
 
     'Funcs': {
@@ -119,8 +119,8 @@ VEVIO = {
         'image': 'data' + sep + 'VEVIO' + sep + 'mosaics',
         'mask': 'data' + sep + 'VEVIO' + sep + 'mosaics_masks',
         'truth': 'data' + sep + 'VEVIO' + sep + 'mosaics_manual_01_bw',
-        'logs': 'data' + sep + 'VEVIO' + sep + 'unet_logs',
-        'splits_json': 'data' + sep + 'VEVIO' + sep + 'unet_splits'
+        'logs': 'data' + sep + 'VEVIO' + sep + 'UNET_LOGS',
+        'splits_json': 'data' + sep + 'VEVIO' + sep + 'splits'
     },
 
     'Funcs': {
