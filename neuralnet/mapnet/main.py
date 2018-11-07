@@ -1,32 +1,20 @@
 import os
-import sys
 import traceback
-
-try:
-    BASE_PROJECT_DIR = '/home/ak/PycharmProjects/ature'
-    sys.path.append(BASE_PROJECT_DIR)
-    os.chdir(BASE_PROJECT_DIR)
-except:
-    BASE_PROJECT_DIR = '/home/akhanal1/ature'
-    sys.path.append(BASE_PROJECT_DIR)
-    os.chdir(BASE_PROJECT_DIR)
 
 import torch
 import torch.optim as optim
-from neuralnet.mapnet.model import BabyUNet
+import torchvision.transforms as transforms
+
 from neuralnet.mapnet.mapnet_dataloader import PatchesGenerator
 from neuralnet.mapnet.mapnet_trainer import MapnetTrainer
-import torchvision.transforms as transforms
+from neuralnet.mapnet.model import BabyUNet
+from neuralnet.mapnet.runs import DRIVE16_CH1, DRIVE16_CH2, DRIVE32_CH1, DRIVE32_CH2
 from neuralnet.utils import auto_split as asp
-from neuralnet.mapnet.runs import DRIVE
 
-RUNS = [DRIVE]
+RUNS = [DRIVE16_CH1, DRIVE16_CH2, DRIVE32_CH1, DRIVE32_CH2]
 
 # RUNS = [STARE, VEVIO]  # DRIVE, WIDE]
-torch.cuda.set_device(1)
-
-if __name__ == "__main__":
-
+def main():
     transform = transforms.Compose([
         transforms.ToPILImage(),
         transforms.ToTensor()
@@ -67,3 +55,7 @@ if __name__ == "__main__":
                 drive_trainer.plot_test(file=drive_trainer.test_log_file)
             except Exception as e:
                 traceback.print_exc()
+
+
+if __name__ == "__main__":
+    main()

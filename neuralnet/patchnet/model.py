@@ -18,16 +18,16 @@ class BasicConv2d(nn.Module):
 class PatchNet(nn.Module):
     def __init__(self, in_channels, num_classes=2):
         super(PatchNet, self).__init__()
-        self.conv1 = BasicConv2d(in_ch=in_channels, out_ch=64, k=3, s=1, p=1)
-        self.conv2 = BasicConv2d(in_ch=64, out_ch=128, k=3, s=1, p=0)
-        self.conv3 = BasicConv2d(in_ch=128, out_ch=256, k=3, s=2, p=1)
+        self.conv1 = BasicConv2d(in_ch=in_channels, out_ch=32, k=3, s=1, p=1)
+        self.conv2 = BasicConv2d(in_ch=32, out_ch=64, k=3, s=1, p=0)
+        self.conv3 = BasicConv2d(in_ch=64, out_ch=128, k=3, s=2, p=1)
 
         self.maxp3 = nn.MaxPool2d(kernel_size=2, stride=2)
 
-        self.conv4 = BasicConv2d(in_ch=256, out_ch=128, k=3, s=1, p=0)
-        self.conv5 = BasicConv2d(in_ch=128, out_ch=64, k=1, s=1, p=0)
+        self.conv4 = BasicConv2d(in_ch=128, out_ch=64, k=3, s=1, p=0)
+        self.conv5 = BasicConv2d(in_ch=64, out_ch=32, k=1, s=1, p=0)
 
-        self.fc1 = nn.Linear(64 * 3 * 3, 128)
+        self.fc1 = nn.Linear(32 * 3 * 3, 128)
         self.fc2 = nn.Linear(128, 64)
         self.fc_out = nn.Linear(64, num_classes)
 
@@ -40,7 +40,7 @@ class PatchNet(nn.Module):
         conv4 = self.conv4(conv3)
         conv5 = self.conv5(conv4)
 
-        conv_out = conv5.view(-1, 64 * 3 * 3)
+        conv_out = conv5.view(-1, 32 * 3 * 3)
         fc1 = F.relu(self.fc1(conv_out))
         fc2 = F.relu(self.fc2(fc1))
         out = self.fc_out(fc2)

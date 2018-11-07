@@ -62,6 +62,7 @@ def create_splits(files, sep1=('', 0), sep2=('', 0), json_file=None):
 if __name__ == "__main__":
     from neuralnet.unet.runs import DRIVE as r
 
-    files = os.listdir((r['Dirs']['image']))
+    sp = load_split_json(r['Dirs']['splits_json'] + '/' 'UNET-DRIVE.json')
+    files = sp['train'] + sp['validation']
     random.shuffle(files)
-    print(create_splits(files, ('validation', 5)))
+    create_splits(files, ('validation', 5), json_file='UNET-DRIVE.json')

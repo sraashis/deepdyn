@@ -17,7 +17,7 @@ DRIVE = {
         'shuffle': True,
         'log_frequency': 5,
         'validation_frequency': 1,
-        'mode': 'train',
+        'mode': 'test',
         'parallel_trained': False
     },
     'Dirs': {
@@ -25,7 +25,7 @@ DRIVE = {
         'mask': 'data' + sep + 'DRIVE' + sep + 'mask',
         'truth': 'data' + sep + 'DRIVE' + sep + 'manual',
         'logs': 'data' + sep + 'DRIVE' + sep + 'UNET_LOGS',
-        'splits_json': 'data' + sep + 'DRIVE' + sep + 'unet_splits'
+        'splits_json': 'data' + sep + 'DRIVE' + sep + 'splits'
     },
 
     'Funcs': {
@@ -112,7 +112,7 @@ VEVIO = {
         'shuffle': True,
         'log_frequency': 5,
         'validation_frequency': 1,
-        'mode': 'test',
+        'mode': 'train',
         'parallel_trained': False
     },
     'Dirs': {
