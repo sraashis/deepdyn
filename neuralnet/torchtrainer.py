@@ -5,9 +5,7 @@
 """
 
 import os
-import sys
 import threading
-from random import randint
 
 import PIL.Image as IMG
 import numpy as np
@@ -36,6 +34,7 @@ class NNTrainer:
         self.train_log_file = os.path.join(self.log_dir, self.log_key + '-TRAIN.csv')
         self.test_log_file = os.path.join(self.log_dir, self.log_key + '-TEST.csv')
         self.validation_log_file = os.path.join(self.log_dir, self.log_key + '-VAL.csv')
+        self.mode = self.run_conf.get('Params').get('mode', 'test')
 
         if torch.cuda.is_available():
             self.device = torch.device("cuda" if self.use_gpu else "cpu")
@@ -162,6 +161,10 @@ class NNTrainer:
             print('ERROR: ' + str(e))
 
     def _save_if_better(self, score=None):
+
+        if self.mode == 'test':
+            return
+
         score = round(score, 5)
         current_epoch = self.checkpoint['epochs'] + self.validation_frequency
         current_chk = {'state': self.model.state_dict(),
@@ -185,9 +188,9 @@ class NNTrainer:
 
         if os.path.isfile(log_file):
             print('### CRITICAL!!! ' + log_file + '" already exists. OVERRIDE [Y/N]?')
-            ui = input()
-            if ui == 'N' or ui == 'n':
-                sys.exit(1)
+            # ui = input()
+            # if ui == 'N' or ui == 'n':
+            #     sys.exit(1)
 
         file = open(log_file, 'w')
         NNTrainer.flush(file, header)
