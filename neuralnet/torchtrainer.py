@@ -14,6 +14,7 @@ import torch.nn.functional as F
 
 import neuralnet.utils.nviz as plt
 from neuralnet.utils.measurements import ScoreAccumulator
+import sys
 
 
 class NNTrainer:
@@ -188,9 +189,9 @@ class NNTrainer:
 
         if os.path.isfile(log_file):
             print('### CRITICAL!!! ' + log_file + '" already exists. OVERRIDE [Y/N]?')
-            # ui = input()
-            # if ui == 'N' or ui == 'n':
-            #     sys.exit(1)
+            ui = input()
+            if ui == 'N' or ui == 'n':
+                sys.exit(1)
 
         file = open(log_file, 'w')
         NNTrainer.flush(file, header)
