@@ -6,12 +6,13 @@ import torch.optim as optim
 import torchvision.transforms as transforms
 
 from neuralnet.mapnet.mapnet_dataloader import PatchesGenerator
-from neuralnet.mapnet.mapnet_trainer import MapnetTrainer
-from neuralnet.mapnet.model import BabyUNet
-from neuralnet.mapnet.runs import DRIVE16_CH1, DRIVE16_CH2, DRIVE32_CH1, DRIVE32_CH2
+from neuralnet.mapnet.mapnet_trainer import MAPNetTrainer
+from neuralnet.mapnet.model import MapUNet
+from neuralnet.mapnet.runs import DRIVE
 from neuralnet.utils import auto_split as asp
 
-RUNS = [DRIVE16_CH1, DRIVE16_CH2, DRIVE32_CH1, DRIVE32_CH2]
+
+# RUNS = [DRIVE16_CH1, DRIVE16_CH2, DRIVE32_CH1, DRIVE32_CH2]
 
 # RUNS = [STARE, VEVIO]  # DRIVE, WIDE]
 def main():
@@ -20,7 +21,7 @@ def main():
         transforms.ToTensor()
     ])
 
-    for R in RUNS:
+    for R in [DRIVE]:
         for k, folder in R['Dirs'].items():
             os.makedirs(folder, exist_ok=True)
 
@@ -28,7 +29,7 @@ def main():
             splits = asp.load_split_json(os.path.join(R['Dirs']['splits_json'], split))
             R['checkpoint_file'] = split + '.tar'
 
-            model = BabyUNet(R['Params']['num_channels'], R['Params']['num_classes'])
+            model = MapUNet(R['Params']['num_channels'], R['Params']['num_classes'])
             optimizer = optim.Adam(model.parameters(), lr=R['Params']['learning_rate'])
             if R['Params']['distribute']:
                 model = torch.nn.DataParallel(model)
@@ -36,7 +37,7 @@ def main():
                 optimizer = optim.Adam(model.module.parameters(), lr=R['Params']['learning_rate'])
 
             try:
-                drive_trainer = MapnetTrainer(model=model, run_conf=R)
+                drive_trainer = MAPNetTrainer(model=model, run_conf=R)
 
                 if R.get('Params').get('mode') == 'train':
                     train_loader = PatchesGenerator.get_loader(run_conf=R, images=splits['train'], transforms=transform,
@@ -46,6 +47,7 @@ def main():
                     drive_trainer.train(optimizer=optimizer, data_loader=train_loader, validation_loader=val_loader)
 
                 drive_trainer.resume_from_checkpoint(parallel_trained=R.get('Params').get('parallel_trained'))
+                print(drive_trainer.checkpoint['score'], ' :SCORE')
                 test_loader = PatchesGenerator.get_loader_per_img(run_conf=R, images=splits['test'], mode='test')
 
                 logger = drive_trainer.get_logger(drive_trainer.test_log_file,

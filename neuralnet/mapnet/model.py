@@ -2,6 +2,8 @@ import torch
 import torch.nn.functional as F
 from torch import nn
 
+from neuralnet.utils.weights_utils import initialize_weights
+
 
 class _DoubleConvolution(nn.Module):
     def __init__(self, in_channels, middle_channel, out_channels, p=0):
@@ -20,27 +22,43 @@ class _DoubleConvolution(nn.Module):
         return self.encode(x)
 
 
-class BabyUNet(nn.Module):
+class MapUNet(nn.Module):
     def __init__(self, num_channels, num_classes):
-        super(BabyUNet, self).__init__()
+        super(MapUNet, self).__init__()
 
-        self.A1 = _DoubleConvolution(num_channels, 32, 64, p=1)
-        self.A2 = _DoubleConvolution(64, 64, 128, p=1)
-        self.Aup = nn.ConvTranspose2d(128, 128, 2, 2)
-        self.A3 = _DoubleConvolution(192, 128, 64, p=1)
-        self.out = nn.Conv2d(64, num_classes, 1, 1)
+        reduce_by = 4
+
+        self.A3_ = _DoubleConvolution(num_channels, int(256 / reduce_by), int(256 / reduce_by))
+        self.A4_ = _DoubleConvolution(int(256 / reduce_by), int(512 / reduce_by), int(512 / reduce_by))
+
+        self.A_mid = _DoubleConvolution(int(512 / reduce_by), int(1024 / reduce_by), int(1024 / reduce_by))
+
+        self.A4_up = nn.ConvTranspose2d(int(1024 / reduce_by), int(512 / reduce_by), kernel_size=2, stride=2)
+        self._A4 = _DoubleConvolution(int(1024 / reduce_by), int(512 / reduce_by), int(512 / reduce_by))
+
+        self.A3_up = nn.ConvTranspose2d(int(512 / reduce_by), int(256 / reduce_by), kernel_size=2, stride=2)
+        self._A3 = _DoubleConvolution(int(512 / reduce_by), int(256 / reduce_by), int(256 / reduce_by))
+
+        self.final = nn.Conv2d(int(256 / reduce_by), num_classes, kernel_size=1)
+        initialize_weights(self)
 
     def forward(self, x):
-        a1 = self.A1(x)
+        a3_ = self.A3_(x)
+        a3_dwn = F.max_pool2d(a3_, kernel_size=2, stride=2)
 
-        a1_up = F.max_pool2d(a1, 2, 2)
-        a2 = self.A2(a1_up)
-        aup = self.Aup(a2)
+        a4_ = self.A4_(a3_dwn)
+        a4_dwn = F.max_pool2d(a4_, kernel_size=2, stride=2)
 
-        a3 = self.A3(torch.cat([a1, aup], 1))
-        out = self.out(a3)
+        a_mid = self.A_mid(a4_dwn)
 
-        return F.softmax(out, 1)
+        a4_up = self.A4_up(a_mid)
+        _a4 = self._A4(MapUNet.match_and_concat(a4_, a4_up))
+
+        a3_up = self.A3_up(_a4)
+        _a3 = self._A3(MapUNet.match_and_concat(a3_, a3_up))
+
+        final = self.final(_a3)
+        return F.log_softmax(final, 1)
 
     @staticmethod
     def match_and_concat(bypass, upsampled, crop=True):
@@ -50,6 +68,6 @@ class BabyUNet(nn.Module):
         return torch.cat((upsampled, bypass), 1)
 
 
-m = BabyUNet(1, 2)
+m = MapUNet(1, 2)
 torch_total_params = sum(p.numel() for p in m.parameters() if p.requires_grad)
 print('Total Params:', torch_total_params)

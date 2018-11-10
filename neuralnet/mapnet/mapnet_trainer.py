@@ -5,21 +5,19 @@
 """
 
 import os
-import random
 
 import numpy as np
 import torch
+import torch.nn.functional as F
 from PIL import Image as IMG
 
-import neuralnet.utils.loss as l
-import utils.img_utils as iu
 from neuralnet.torchtrainer import NNTrainer
 from neuralnet.utils.measurements import ScoreAccumulator
 
 sep = os.sep
 
 
-class MapnetTrainer(NNTrainer):
+class MAPNetTrainer(NNTrainer):
     def __init__(self, **kwargs):
         NNTrainer.__init__(self, **kwargs)
         self.patch_shape = self.run_conf.get('Params').get('patch_shape')
@@ -43,19 +41,19 @@ class MapnetTrainer(NNTrainer):
             running_loss = 0.0
             self._adjust_learning_rate(optimizer=optimizer, epoch=epoch)
             for i, data in enumerate(data_loader, 1):
-                inputs, labels = data['inputs'].to(self.device).float(), data['labels'].to(self.device).float()
+                inputs, labels = data['inputs'].to(self.device).float(), data['labels'].to(self.device).long()
 
                 optimizer.zero_grad()
                 outputs = self.model(inputs)
                 _, predicted = torch.max(outputs, 1)
 
-                loss = l.dice_loss(outputs[:, 1, :, :], labels, beta=1.2)
+                # Balancing imbalanced class as per computed weights from the dataset
+                loss = F.nll_loss(outputs, labels, weight=torch.FloatTensor(2).random_(1, 100).to(self.device))
                 loss.backward()
                 optimizer.step()
 
                 current_loss = loss.item()
                 running_loss += current_loss
-
                 p, r, f1, a = score_acc.reset().add_tensor(predicted, labels).get_prfa()
                 if i % self.log_frequency == 0:
                     print('Epochs[%d/%d] Batch[%d/%d] loss:%.5f pre:%.3f rec:%.3f f1:%.3f acc:%.3f' %
@@ -88,10 +86,9 @@ class MapnetTrainer(NNTrainer):
 
             for loader in data_loaders:
                 img_obj = loader.dataset.image_objects[0]
-                predicted_img = torch.LongTensor(*img_obj.working_arr.shape).fill_(0).to(self.device)
-                gt = torch.LongTensor(img_obj.ground_truth).to(self.device)
-                fill_in = torch.LongTensor(img_obj.res['fill_in']).to(self.device)
-                gt_mid = torch.LongTensor(img_obj.res['gt_mid']).to(self.device)
+                x, y = img_obj.working_arr.shape[0], img_obj.working_arr.shape[1]
+                predicted_img = torch.FloatTensor(x, y).fill_(0).to(self.device)
+                gt_mid = torch.tensor(img_obj.res['gt_mid']).float().to(self.device)
 
                 for i, data in enumerate(loader, 1):
                     inputs, labels = data['inputs'].to(self.device).float(), data['labels'].to(self.device).float()
@@ -107,13 +104,14 @@ class MapnetTrainer(NNTrainer):
                     print('Batch: ', i, end='\r')
 
                 img_score = ScoreAccumulator()
+                predicted_img = predicted_img * 255
+
                 if gen_images:
-                    predicted_img[predicted_img != fill_in] = 255
                     predicted_img = predicted_img.cpu().numpy()
-                    predicted_img = iu.remove_connected_comp(predicted_img, 5)
+                    predicted_img[img_obj.res['fill_in'] == 1] = 255
                     img_score.add_array(predicted_img, img_obj.ground_truth)
                     IMG.fromarray(np.array(predicted_img, dtype=np.uint8)).save(
-                        os.path.join(self.log_dir, 'pred_' + img_obj.file_name.split('.')[0] + '.png'))
+                        os.path.join(self.log_dir, img_obj.file_name.split('.')[0] + '.png'))
                 else:
                     img_score.add_tensor(predicted_img, gt_mid)
                     eval_score += img_score.get_prfa()[2]
