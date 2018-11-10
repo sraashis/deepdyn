@@ -8,13 +8,12 @@ import torchvision.transforms as transforms
 from neuralnet.mapnet.mapnet_dataloader import PatchesGenerator
 from neuralnet.mapnet.mapnet_trainer import MAPNetTrainer
 from neuralnet.mapnet.model import MapUNet
-from neuralnet.mapnet.runs import DRIVE
+from neuralnet.mapnet.runs import DRIVE, WIDE, STARE, VEVIO
 from neuralnet.utils import auto_split as asp
 
+RUNS = [DRIVE, WIDE, STARE, VEVIO]
 
-# RUNS = [DRIVE16_CH1, DRIVE16_CH2, DRIVE32_CH1, DRIVE32_CH2]
 
-# RUNS = [STARE, VEVIO]  # DRIVE, WIDE]
 def main():
     transform = transforms.Compose([
         transforms.ToPILImage(),
@@ -47,7 +46,6 @@ def main():
                     drive_trainer.train(optimizer=optimizer, data_loader=train_loader, validation_loader=val_loader)
 
                 drive_trainer.resume_from_checkpoint(parallel_trained=R.get('Params').get('parallel_trained'))
-                print(drive_trainer.checkpoint['score'], ' :SCORE')
                 test_loader = PatchesGenerator.get_loader_per_img(run_conf=R, images=splits['test'], mode='test')
 
                 logger = drive_trainer.get_logger(drive_trainer.test_log_file,
