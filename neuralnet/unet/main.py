@@ -17,7 +17,7 @@ from neuralnet.unet.unet_dataloader import PatchesGenerator
 from neuralnet.unet.unet_trainer import UNetNNTrainer
 from neuralnet.utils import auto_split as asp
 
-RUNS = [rs.DRIVE, rs.WIDE, rs.STARE, rs.VEVIO]  #
+RUNS = [rs.DRIVE, rs.STARE, rs.WIDE, rs.VEVIO]  #
 
 
 def main():
