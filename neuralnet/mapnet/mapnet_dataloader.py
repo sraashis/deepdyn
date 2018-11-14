@@ -37,6 +37,8 @@ class PatchesGenerator(Generator):
             all_pix_pos = list(zip(*np.where(img_obj.res['seed'] == 255)))
             all_patch_indices = list(
                 iu.get_chunk_indices_by_index(img_obj.working_arr.shape, self.patch_shape, all_pix_pos))
+            # all_patch_indices = list(
+            #     iu.get_chunk_indexes(img_obj.working_arr.shape, self.patch_shape, self.patch_shape))
             for chunk_ix in all_patch_indices:
                 self.indices.append([ID] + chunk_ix)
             self.image_objects[ID] = img_obj
@@ -58,7 +60,7 @@ class PatchesGenerator(Generator):
         img_obj.apply_clahe()
         img_obj.apply_mask()
 
-        sup, res = 10, 245
+        sup, res = 20, 235
 
         img_obj.res['unet'] = iu.get_image_as_array(
             self.unet_dir + sep + img_obj.file_name.split('.')[0] + self.input_image_ext, 1)
@@ -91,8 +93,8 @@ class PatchesGenerator(Generator):
 
         # <PREP4> Come up with a grid mask to select few possible pixels to reconstruct the vessels from
         sk_mask = np.zeros_like(seed)
-        sk_mask[::int(self.patch_shape[0] / 2)] = 1
-        sk_mask[:, ::int(self.patch_shape[0] / 2)] = 1
+        sk_mask[::60] = 1
+        sk_mask[:, ::60] = 1
 
         # <PREP5> Apply mask and save seed
         img_obj.res['seed'] = seed * sk_mask * 255

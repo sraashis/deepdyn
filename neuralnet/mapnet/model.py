@@ -26,7 +26,7 @@ class MapUNet(nn.Module):
     def __init__(self, num_channels, num_classes):
         super(MapUNet, self).__init__()
 
-        reduce_by = 4
+        reduce_by = 2
 
         self.A3_ = _DoubleConvolution(num_channels, int(256 / reduce_by), int(256 / reduce_by))
         self.A4_ = _DoubleConvolution(int(256 / reduce_by), int(512 / reduce_by), int(512 / reduce_by))

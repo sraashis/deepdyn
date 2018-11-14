@@ -13,6 +13,7 @@ from PIL import Image as IMG
 
 from neuralnet.torchtrainer import NNTrainer
 from neuralnet.utils.measurements import ScoreAccumulator
+import neuralnet.utils.loss as l
 
 sep = os.sep
 
@@ -42,13 +43,17 @@ class MAPNetTrainer(NNTrainer):
             self._adjust_learning_rate(optimizer=optimizer, epoch=epoch)
             for i, data in enumerate(data_loader, 1):
                 inputs, labels = data['inputs'].to(self.device).float(), data['labels'].to(self.device).long()
+                # weights = data['weights'].to(self.device)
 
                 optimizer.zero_grad()
                 outputs = self.model(inputs)
                 _, predicted = torch.max(outputs, 1)
 
                 # Balancing imbalanced class as per computed weights from the dataset
-                loss = F.nll_loss(outputs, labels, weight=torch.FloatTensor(2).random_(1, 100).to(self.device))
+                w = torch.FloatTensor(2).random_(1, 100).to(self.device)
+                # wd = torch.FloatTensor(*labels.shape).uniform_(0.1, 2).to(self.device)
+                # loss = l.dice_loss(outputs[:, 1, :, :], labels, beta=1.2)
+                loss = F.nll_loss(outputs, labels, weight=w)
                 loss.backward()
                 optimizer.step()
 
