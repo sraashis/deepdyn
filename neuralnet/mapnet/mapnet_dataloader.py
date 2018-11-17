@@ -15,6 +15,7 @@ from skimage.morphology import skeletonize
 import utils.img_utils as iu
 from commons.IMAGE import Image
 from neuralnet.datagen import Generator
+import random
 
 sep = os.sep
 
@@ -116,6 +117,18 @@ class PatchesGenerator(Generator):
         mid_patch = np.pad(mid_pix[p:q, r:s], pad, 'reflect')
         unet_patch = np.pad(unet_map[p:q, r:s], pad, 'reflect')
 
+        if self.mode == 'train' and random.uniform(0, 1) <= 0.5:
+            orig_patch = np.flip(orig_patch, 0)
+            unet_patch = np.flip(unet_patch, 0)
+            mid_patch = np.flip(mid_patch, 0)
+            y_mid = np.flip(y_mid, 0)
+
+        if self.mode == 'train' and random.uniform(0, 1) <= 0.5:
+            orig_patch = np.flip(orig_patch, 1)
+            unet_patch = np.flip(unet_patch, 1)
+            mid_patch = np.flip(mid_patch, 1)
+            y_mid = np.flip(y_mid, 1)
+
         y_mid[y_mid == 255] = 1
         if self.run_conf['Params']['num_channels'] == 1:
             img_tensor = np.array([mid_patch])
@@ -124,7 +137,7 @@ class PatchesGenerator(Generator):
 
         return {'id': ID,
                 'inputs': img_tensor,
-                'labels': y_mid,
+                'labels': y_mid.copy(),
                 'clip_ix': np.array([row_from, row_to, col_from, col_to]), }
 
     @classmethod

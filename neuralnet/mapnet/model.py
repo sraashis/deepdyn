@@ -26,7 +26,7 @@ class MapUNet(nn.Module):
     def __init__(self, num_channels, num_classes):
         super(MapUNet, self).__init__()
 
-        reduce_by = 2
+        reduce_by = 4
 
         self.A3_ = _DoubleConvolution(num_channels, int(256 / reduce_by), int(256 / reduce_by))
         self.A4_ = _DoubleConvolution(int(256 / reduce_by), int(512 / reduce_by), int(512 / reduce_by))
@@ -58,7 +58,7 @@ class MapUNet(nn.Module):
         _a3 = self._A3(MapUNet.match_and_concat(a3_, a3_up))
 
         final = self.final(_a3)
-        return F.log_softmax(final, 1)
+        return F.softmax(final, 1)
 
     @staticmethod
     def match_and_concat(bypass, upsampled, crop=True):
