@@ -20,7 +20,7 @@ def main():
         transforms.ToTensor()
     ])
 
-    for R in [DRIVE]:
+    for R in RUNS:
         for k, folder in R['Dirs'].items():
             os.makedirs(folder, exist_ok=True)
 
