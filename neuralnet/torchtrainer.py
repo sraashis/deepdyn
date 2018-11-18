@@ -5,9 +5,7 @@
 """
 
 import os
-import sys
 import threading
-from random import randint
 
 import PIL.Image as IMG
 import numpy as np
@@ -16,6 +14,7 @@ import torch.nn.functional as F
 
 import neuralnet.utils.nviz as plt
 from neuralnet.utils.measurements import ScoreAccumulator
+import sys
 
 
 class NNTrainer:
@@ -36,6 +35,7 @@ class NNTrainer:
         self.train_log_file = os.path.join(self.log_dir, self.log_key + '-TRAIN.csv')
         self.test_log_file = os.path.join(self.log_dir, self.log_key + '-TEST.csv')
         self.validation_log_file = os.path.join(self.log_dir, self.log_key + '-VAL.csv')
+        self.mode = self.run_conf.get('Params').get('mode', 'test')
 
         if torch.cuda.is_available():
             self.device = torch.device("cuda" if self.use_gpu else "cpu")
@@ -162,6 +162,10 @@ class NNTrainer:
             print('ERROR: ' + str(e))
 
     def _save_if_better(self, score=None):
+
+        if self.mode == 'test':
+            return
+
         score = round(score, 5)
         current_epoch = self.checkpoint['epochs'] + self.validation_frequency
         current_chk = {'state': self.model.state_dict(),

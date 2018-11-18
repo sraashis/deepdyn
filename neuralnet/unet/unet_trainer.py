@@ -48,7 +48,7 @@ class UNetNNTrainer(NNTrainer):
                 _, predicted = torch.max(outputs, 1)
 
                 # Balancing imbalanced class as per computed weights from the dataset
-                loss = F.nll_loss(outputs, labels, weight=torch.FloatTensor(2).random_(1, 1000).to(self.device))
+                loss = F.nll_loss(outputs, labels, weight=torch.FloatTensor(2).random_(1, 100).to(self.device))
                 loss.backward()
                 optimizer.step()
 

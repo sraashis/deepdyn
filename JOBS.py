@@ -5,5 +5,5 @@ import neuralnet.unet.main as unet
 
 if __name__ == "__main__":
     torch.cuda.set_device(1)
-    mapnet.main()
     unet.main()
+    # mapnet.main()
