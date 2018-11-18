@@ -41,7 +41,7 @@ class MAPNetTrainer(NNTrainer):
             self.model.train()
             score_acc = ScoreAccumulator()
             running_loss = 0.0
-            self._adjust_learning_rate(optimizer=optimizer, epoch=epoch)
+            # self._adjust_learning_rate(optimizer=optimizer, epoch=epoch)
             for i, data in enumerate(data_loader, 1):
                 inputs, labels = data['inputs'].to(self.device).float(), data['labels'].to(self.device).long()
                 # weights = data['weights'].to(self.device)
@@ -51,9 +51,9 @@ class MAPNetTrainer(NNTrainer):
                 _, predicted = torch.max(outputs, 1)
 
                 # Balancing imbalanced class as per computed weights from the dataset
-                w = torch.FloatTensor(2).random_(1, 100).to(self.device)
+                # w = torch.FloatTensor(2).random_(1, 100).to(self.device)
                 # wd = torch.FloatTensor(*labels.shape).uniform_(0.1, 2).to(self.device)
-                loss = l.dice_loss(outputs[:, 1, :, :], labels, beta=1.2)
+                loss = l.dice_loss(outputs[:, 1, :, :], labels, beta=rd.choice(np.arange(1, 2, 0.1).tolist()))
                 # loss = F.nll_loss(outputs, labels, weight=w)
                 loss.backward()
                 optimizer.step()

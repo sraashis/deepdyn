@@ -6,7 +6,7 @@ DRIVE = {
     'Params': {
         'num_channels': 2,
         'num_classes': 2,
-        'batch_size': 8,
+        'batch_size': 4,
         'epochs': 31,
         'learning_rate': 0.001,
         'patch_shape': (100, 100),
@@ -16,7 +16,7 @@ DRIVE = {
         'shuffle': True,
         'log_frequency': 20,
         'validation_frequency': 1,
-        'mode': 'train',
+        'mode': 'test',
         'parallel_trained': False
     },
     'Dirs': {
