@@ -52,7 +52,8 @@ WIDE = {
         'parallel_trained': False
     },
     'Dirs': {
-        'image': 'data' + sep + 'AV-WIDE' + sep + 'UNET_LOGS',
+        'image': 'data' + sep + 'AV-WIDE' + sep + 'images',
+        'image_unet': 'data' + sep + 'AV-WIDE' + sep + 'UNET_LOGS',
         'mask': 'data' + sep + 'AV-WIDE' + sep + 'mask',
         'truth': 'data' + sep + 'AV-WIDE' + sep + 'manual',
         'logs': 'data' + sep + 'AV-WIDE' + sep + 'MAPNET_LOGS',
@@ -83,7 +84,8 @@ STARE = {
         'parallel_trained': False
     },
     'Dirs': {
-        'image': 'data' + sep + 'STARE' + sep + 'UNET_LOGS',
+        'image': 'data' + sep + 'STARE' + sep + 'stare-images',
+        'image_unet': 'data' + sep + 'STARE' + sep + 'UNET_LOGS',
         'truth': 'data' + sep + 'STARE' + sep + 'labels-ah',
         'logs': 'data' + sep + 'STARE' + sep + 'MAPNET_LOGS',
         'splits_json': 'data' + sep + 'STARE' + sep + 'splits'
@@ -113,7 +115,8 @@ VEVIO = {
         'parallel_trained': False
     },
     'Dirs': {
-        'image': 'data' + sep + 'VEVIO' + sep + 'UNET_LOGS',
+        'image': 'data' + sep + 'VEVIO' + sep + 'mosaics',
+        'image_unet': 'data' + sep + 'VEVIO' + sep + 'UNET_LOGS',
         'mask': 'data' + sep + 'VEVIO' + sep + 'mosaics_masks',
         'truth': 'data' + sep + 'VEVIO' + sep + 'mosaics_manual_01_bw',
         'logs': 'data' + sep + 'VEVIO' + sep + 'MAPNET_LOGS',

@@ -11,7 +11,7 @@ from neuralnet.mapnet.model import MapUNet
 from neuralnet.mapnet.runs import DRIVE, WIDE, STARE, VEVIO
 from neuralnet.utils import auto_split as asp
 
-RUNS = [DRIVE, WIDE, STARE, VEVIO]
+RUNS = [STARE, WIDE, VEVIO]  # DRIVE Done,
 
 
 def main():
