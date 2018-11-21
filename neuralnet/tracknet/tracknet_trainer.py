@@ -84,10 +84,12 @@ class TracknetTrainer(NNTrainer):
                     outputs = self.model(inputs).squeeze()
                     predicted = outputs + positions.float()
                     labels = labels + positions.float()
-                    loss = F.mse_loss(outputs, labels)
+                    loss = F.mse_loss(outputs.squeeze(), labels.squeeze())
                     current_loss = math.sqrt(loss.item())
                     img_loss += current_loss
 
+                    if len(outputs.shape) == 1:
+                        outputs = outputs[None, ...]
                     for j in range(outputs.shape[0]):
                         x, y = int(labels[j][0]), int(labels[j][1])
                         x_pred, y_pred = int(predicted[j][0]), int(predicted[j][1])

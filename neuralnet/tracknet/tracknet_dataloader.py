@@ -35,7 +35,11 @@ class PatchesGenerator(Generator):
             img_obj.file_name = img_file
             img_obj.image_arr = I
             img_obj.working_arr = I[:, :, 1]
-            img_obj.res['2d'] = np.array([T, I[:, :, 1]])
+            img_obj.res['2d'] = np.array([T, 255-I[:, :, 1]])
+
+
+
+
             img_obj.load_mask(self.mask_dir, self.mask_getter)
 
             self.image_objects[ID] = img_obj
@@ -43,9 +47,11 @@ class PatchesGenerator(Generator):
             path_index = mat_file.get_graph('pathNode')
             vessel_pathidx = np.where(path_index == 1)[0]
             u_pos_input = V[vessel_pathidx, :]
+            u_pos_input_prev = np.append(u_pos_input[0][None, ...], u_pos_input[:-1], 0)
+
             print('vessel_pathidx', vessel_pathidx)
             b = vessel_pathidx.copy()
-            a = vessel_pathidx.copy()
+            # a = vessel_pathidx.copy()
             for i, src in enumerate(vessel_pathidx):
                 b[i] = np.where(A[src, :])[0][0]
             b_pos_output = V[b, :]
@@ -55,9 +61,9 @@ class PatchesGenerator(Generator):
 
             u_pos_input = u_pos_input.astype(np.int)
             b_pos_output = b_pos_output.astype(np.int)
-            for (i, j), output in zip(u_pos_input, b_pos_output - u_pos_input):
-                row_from, row_to = i - self.k_half, i + self.k_half + 1
-                col_from, col_to = j - self.k_half, j + self.k_half + 1
+            for (p, q), (i, j), output in zip(u_pos_input_prev, u_pos_input, b_pos_output - u_pos_input):
+                row_from, row_to = int(i - self.k_half), int(i + self.k_half + 1)
+                col_from, col_to = int(j - self.k_half), int(j + self.k_half + 1)
                 if row_from < 0 or col_from < 0:
                     continue
                 if row_to >= img_obj.working_arr.shape[0] or col_to >= img_obj.working_arr.shape[1]:
@@ -65,10 +71,34 @@ class PatchesGenerator(Generator):
                 if np.isin(0, img_obj.mask[row_from:row_to, col_from:col_to]):
                     continue
 
-                self.indices.append([ID, [i, j], output.tolist()])
+                row_from, row_to = int(p - self.k_half), int(p + self.k_half + 1)
+                col_from, col_to = int(q - self.k_half), int(q + self.k_half + 1)
+                if row_from < 0 or col_from < 0:
+                    continue
+                if row_to >= img_obj.working_arr.shape[0] or col_to >= img_obj.working_arr.shape[1]:
+                    continue
+                if np.isin(0, img_obj.mask[row_from:row_to, col_from:col_to]):
+                    continue
+
+                self.indices.append([ID, [p, q], [i, j], output.tolist()])
 
     def __getitem__(self, index):
-        ID, (i, j), out = self.indices[index]
+        ID, (p, q), (i, j), out = self.indices[index]
+
+        row_from, row_to = p - self.k_half, p + self.k_half + 1
+        col_from, col_to = q - self.k_half, q + self.k_half + 1
+
+        row_from = int(row_from)
+        row_to = int(row_to)
+        col_from = int(col_from)
+        col_to = int(col_to)
+        prev_patches = self.image_objects[ID].res['2d'][:, row_from:row_to, col_from:col_to]
+        # Simplification 1: Make the target pixel white
+        try:
+            prev_patches[out[0], out[1], 0] = 255
+        except:
+            out = [0, 0]
+            prev_patches[out[0], out[1], 0] = 255
 
         row_from, row_to = i - self.k_half, i + self.k_half + 1
         col_from, col_to = j - self.k_half, j + self.k_half + 1
@@ -77,13 +107,13 @@ class PatchesGenerator(Generator):
         row_to = int(row_to)
         col_from = int(col_from)
         col_to = int(col_to)
-        img_tensor = self.image_objects[ID].res['2d'][:, row_from:row_to, col_from:col_to]
-
-        # Simplification 1: Make the target pixel white
+        input_patches = self.image_objects[ID].res['2d'][:, row_from:row_to, col_from:col_to]
         try:
-            img_tensor[out[0], out[1], 0] = 255
+            input_patches[out[0], out[1], 0] = 255
         except:
             out = [0, 0]
-            img_tensor[out[0], out[1], 0] = 255
+            input_patches[out[0], out[1], 0] = 255
 
-        return {'IDs': ID, 'POS': np.array([i, j]), 'inputs': np.array(img_tensor), 'labels': torch.FloatTensor(out)}
+        input_tensor = np.append(prev_patches, input_patches, 0)
+        return {'IDs': ID, 'POS': np.array([i, j]), 'inputs': input_tensor,
+                'labels': torch.FloatTensor(out)}

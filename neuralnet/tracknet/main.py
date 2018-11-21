@@ -18,8 +18,9 @@ from neuralnet.tracknet.tracknet_trainer import TracknetTrainer
 from neuralnet.utils import auto_split as asp
 
 RUNS = [rs.DRIVE]
-if __name__ == "__main__":
 
+
+def main():
     transform = transforms.Compose([
         transforms.ToPILImage(),
         transforms.ToTensor()
@@ -61,3 +62,7 @@ if __name__ == "__main__":
                 logger.close()
             except Exception as e:
                 traceback.print_exc()
+
+
+if __name__ == "__main__":
+    main()

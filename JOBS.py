@@ -1,9 +1,6 @@
 import torch
-
-import neuralnet.mapnet.main as mapnet
-import neuralnet.unet.main as unet
+import neuralnet.tracknet.main as tracknet
 
 if __name__ == "__main__":
     torch.cuda.set_device(1)
-    unet.main()
-    # mapnet.main()
+    tracknet.main()

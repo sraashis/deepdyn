@@ -4,10 +4,10 @@ sep = os.sep
 
 DRIVE = {
     'Params': {
-        'num_channels': 2,
+        'num_channels': 4,
         'num_classes': 2,
         'batch_size': 16,
-        'epochs': 10,
+        'epochs': 20,
         'learning_rate': 0.01,
         'patch_shape': (21, 21),
         'use_gpu': True,
