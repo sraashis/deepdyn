@@ -41,7 +41,7 @@ class Image:
                 self.image_arr = imgutil.get_image_as_array(os.path.join(self.data_dir, self.file_name),
                                                             channels=3 if num_channels == 1 else 1)
             except Exception as e1:
-                print('Error Loading file: ' + self.file_name)
+                print('### Error Loading file: ' + self.file_name)
                 print(str(e1))
 
     def load_mask(self, mask_dir=None, fget_mask=None, erode=False, channels=1):
@@ -51,10 +51,13 @@ class Image:
             if erode:
                 self.mask = cv2.erode(self.mask, kernel=fu.get_chosen_mask_erode_kernel(), iterations=5)
         except Exception as e:
-            print('Fail to load mask: ' + str(e))
+            print('### Fail to load mask: ' + str(e))
 
     def apply_mask(self):
-        self.working_arr = cv2.bitwise_and(self.working_arr, self.working_arr, mask=self.mask)
+        if self.mask is not None:
+            self.working_arr = cv2.bitwise_and(self.working_arr, self.working_arr, mask=self.mask)
+        else:
+            print('### Mask not found. ', self.file_name)
 
     def load_ground_truth(self, gt_dir=None, fget_ground_truth=None, channels=1):
         try:
@@ -65,7 +68,12 @@ class Image:
 
     def apply_clahe(self, clip_limit=2.0, tile_shape=(8, 8)):
         enhancer = cv2.createCLAHE(clipLimit=clip_limit, tileGridSize=tile_shape)
-        self.working_arr = enhancer.apply(self.working_arr)
+        if len(self.working_arr.shape) == 2:
+            self.working_arr = enhancer.apply(self.working_arr)
+        elif len(self.working_arr.shape) == 3:
+            self.working_arr[:, :, 0] = enhancer.apply(self.working_arr[:, :, 0])
+            self.working_arr[:, :, 1] = enhancer.apply(self.working_arr[:, :, 1])
+            self.working_arr[:, :, 2] = enhancer.apply(self.working_arr[:, :, 2])
 
     def __copy__(self):
         copy_obj = Image()

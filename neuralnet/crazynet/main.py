@@ -13,17 +13,18 @@ except:
 
 import torch
 import torch.optim as optim
-from neuralnet.crazynet.model import InceptionCrazyNet
+from neuralnet.crazynet.model import UUNet
 from neuralnet.crazynet.crazynet_dataloader import PatchesGenerator
-from neuralnet.crazynet.crazynet_trainer import ThrnetTrainer
+from neuralnet.crazynet.crazynet_trainer import UNetNNTrainer
 import torchvision.transforms as transforms
 from neuralnet.utils import auto_split as asp
 from neuralnet.crazynet.runs import DRIVE
+import utils.img_utils as iu
 
 RUNS = [DRIVE]
 
 # RUNS = [STARE, VEVIO]  # DRIVE, WIDE]
-# torch.cuda.set_device(1)
+torch.cuda.set_device(1)
 
 if __name__ == "__main__":
 
@@ -40,7 +41,7 @@ if __name__ == "__main__":
             splits = asp.load_split_json(os.path.join(R['Dirs']['splits_json'], split))
             R['checkpoint_file'] = split + '.tar'
 
-            model = InceptionCrazyNet(R['Params']['num_channels'], R['Params']['num_classes'])
+            model = UUNet(R['Params']['num_channels'], R['Params']['num_classes'])
             optimizer = optim.Adam(model.parameters(), lr=R['Params']['learning_rate'])
             if R['Params']['distribute']:
                 model = torch.nn.DataParallel(model)
@@ -48,18 +49,20 @@ if __name__ == "__main__":
                 optimizer = optim.Adam(model.module.parameters(), lr=R['Params']['learning_rate'])
 
             try:
-                drive_trainer = ThrnetTrainer(model=model, run_conf=R)
+                drive_trainer = UNetNNTrainer(model=model, run_conf=R)
 
                 if R.get('Params').get('mode') == 'train':
-                    # drive_trainer.resume_from_checkpoint(parallel_trained=R.get('Params').get('parallel_trained'))
-                    train_loader = PatchesGenerator.get_loader(run_conf=R, images=splits['train'], transforms=transform,
-                                                               mode='train')
+                    train_loaders = PatchesGenerator.get_loader(run_conf=R, images=splits['train'],
+                                                                transforms=transform,
+                                                                mode='train')
+
                     val_loader = PatchesGenerator.get_loader_per_img(run_conf=R, images=splits['validation'],
                                                                      mode='validation')
-                    drive_trainer.train(optimizer=optimizer, data_loader=train_loader, validation_loader=val_loader)
+
+                    drive_trainer.train(optimizer=optimizer, data_loader=train_loaders, validation_loader=val_loader)
 
                 drive_trainer.resume_from_checkpoint(parallel_trained=R.get('Params').get('parallel_trained'))
-                test_loader = PatchesGenerator.get_loader_per_img(run_conf=R, images=splits['test']+splits['validation']+splits['train'], mode='test')
+                test_loader = PatchesGenerator.get_loader_per_img(run_conf=R, images=splits['test'], mode='test')
 
                 logger = drive_trainer.get_logger(drive_trainer.test_log_file,
                                                   header='ID,PRECISION,RECALL,F1,ACCURACY')

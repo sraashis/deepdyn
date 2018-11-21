@@ -56,10 +56,10 @@ class ScoreAccumulator:
         self.fn += fn
         return self
 
-    def add_tensor(self, y_true_tensor, y_pred_tensor):
+    def add_tensor(self, y_pred_tensor, y_true_tensor):
 
-        y_true = y_true_tensor.clone().view(1, -1).squeeze()
-        y_pred = y_pred_tensor.clone().view(1, -1).squeeze()
+        y_true = y_true_tensor.clone().int().view(1, -1).squeeze()
+        y_pred = y_pred_tensor.clone().int().view(1, -1).squeeze()
 
         y_true[y_true == 255] = 1
         y_pred[y_pred == 255] = 1
@@ -95,7 +95,7 @@ class ScoreAccumulator:
         self.tn, self.fp, self.fn, self.tp = [0] * 4
         return self
 
-    def get_prf1a(self):
+    def get_prfa(self, beta=1):
         try:
             p = self.tp / (self.tp + self.fp)
         except ZeroDivisionError:
@@ -105,14 +105,14 @@ class ScoreAccumulator:
         except ZeroDivisionError:
             r = 0
         try:
-            f1 = 2 * p * r / (p + r)
+            f = (1 + beta ** 2) * p * r / (((beta ** 2) * p) + r)
         except ZeroDivisionError:
-            f1 = 0
+            f = 0
         try:
             a = (self.tp + self.tn) / (self.tp + self.fp + self.fn + self.tn)
         except ZeroDivisionError:
             a = 0
-        return [round(p, 3), round(r, 3), round(f1, 3), round(a, 3)]
+        return [round(p, 5), round(r, 5), round(f, 5), round(a, 5)]
 
 
 class AverageMeter(object):

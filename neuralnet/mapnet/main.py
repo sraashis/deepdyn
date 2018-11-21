@@ -1,32 +1,20 @@
 import os
-import sys
 import traceback
-
-try:
-    BASE_PROJECT_DIR = '/home/ak/PycharmProjects/ature'
-    sys.path.append(BASE_PROJECT_DIR)
-    os.chdir(BASE_PROJECT_DIR)
-except:
-    BASE_PROJECT_DIR = '/home/akhanal1/ature'
-    sys.path.append(BASE_PROJECT_DIR)
-    os.chdir(BASE_PROJECT_DIR)
 
 import torch
 import torch.optim as optim
-from neuralnet.mapnet.model import InceptionMapNet
-from neuralnet.mapnet.mapnet_dataloader import PatchesGenerator
-from neuralnet.mapnet.mapnet_trainer import ThrnetTrainer
 import torchvision.transforms as transforms
+
+from neuralnet.mapnet.mapnet_dataloader import PatchesGenerator
+from neuralnet.mapnet.mapnet_trainer import MAPNetTrainer
+from neuralnet.mapnet.model import MapUNet
+from neuralnet.mapnet.runs import DRIVE, WIDE, STARE, VEVIO
 from neuralnet.utils import auto_split as asp
-from neuralnet.mapnet.runs import DRIVE, DRIVEa
 
-RUNS = [DRIVE]
+RUNS = [STARE, WIDE, VEVIO]  # DRIVE Done,
 
-# RUNS = [STARE, VEVIO]  # DRIVE, WIDE]
-torch.cuda.set_device(0)
 
-if __name__ == "__main__":
-
+def main():
     transform = transforms.Compose([
         transforms.ToPILImage(),
         transforms.ToTensor()
@@ -40,7 +28,7 @@ if __name__ == "__main__":
             splits = asp.load_split_json(os.path.join(R['Dirs']['splits_json'], split))
             R['checkpoint_file'] = split + '.tar'
 
-            model = InceptionMapNet(R['Params']['num_channels'], R['Params']['num_classes'])
+            model = MapUNet(R['Params']['num_channels'], R['Params']['num_classes'])
             optimizer = optim.Adam(model.parameters(), lr=R['Params']['learning_rate'])
             if R['Params']['distribute']:
                 model = torch.nn.DataParallel(model)
@@ -48,7 +36,7 @@ if __name__ == "__main__":
                 optimizer = optim.Adam(model.module.parameters(), lr=R['Params']['learning_rate'])
 
             try:
-                drive_trainer = ThrnetTrainer(model=model, run_conf=R)
+                drive_trainer = MAPNetTrainer(model=model, run_conf=R)
 
                 if R.get('Params').get('mode') == 'train':
                     train_loader = PatchesGenerator.get_loader(run_conf=R, images=splits['train'], transforms=transform,
@@ -67,3 +55,7 @@ if __name__ == "__main__":
                 drive_trainer.plot_test(file=drive_trainer.test_log_file)
             except Exception as e:
                 traceback.print_exc()
+
+
+if __name__ == "__main__":
+    main()

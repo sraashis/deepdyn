@@ -2,6 +2,7 @@ import math
 import os
 
 import PIL.Image as IMG
+import numpy as np
 import torch
 import torch.nn.functional as F
 
@@ -40,11 +41,11 @@ class ThrnetTrainer(NNTrainer):
                 thr_map = self.model(inputs).squeeze()
 
                 loss = F.mse_loss(thr_map, y_thresholds)
-                loss.backward(retain_graph=True)
+                loss.backward()
                 optimizer.step()
-                # if True:
-                #     print(torch.cat([y_thresholds[..., None], thr_map[..., None]], 1))
-                #     print('-------------------------------------------------')
+                if True:
+                    print(torch.cat([y_thresholds, thr_map], 1))
+                    print('-------------------------------------------------')
 
                 current_loss = math.sqrt(loss.item())
                 running_loss += current_loss
@@ -70,15 +71,15 @@ class ThrnetTrainer(NNTrainer):
 
         print('\nEvaluating...')
         with torch.no_grad():
-            eval_score = 0.0
+            eval_mse = 0.0
             for loader in data_loaders:
                 img_obj = loader.dataset.image_objects[0]
 
                 segmented_img = torch.LongTensor(img_obj.working_arr.shape[0],
                                                  img_obj.working_arr.shape[1]).fill_(0).to(self.device)
                 gt = torch.LongTensor(img_obj.ground_truth).to(self.device)
-                img_loss = 0.0
-                img_score = ScoreAccumulator()
+
+                img_mse = 0
                 for i, data in enumerate(loader, 1):
                     inputs = data['inputs'].to(self.device).float()
                     prob_map = data['prob_map'].to(self.device).float()
@@ -86,14 +87,15 @@ class ThrnetTrainer(NNTrainer):
                     clip_ix = data['clip_ix'].to(self.device).int()
 
                     thr_map = self.model(inputs).squeeze()
-                    if True:
-                        print(torch.cat([y_thresholds[..., None], thr_map[..., None]], 1))
-                        print('-------------------------------------------------')
+                    # if True:
+                    #     print(torch.cat(
+                    #         [y_thresholds[..., None], thr_map[..., None], y_thresholds[..., None] - thr_map[..., None]],
+                    #         1))
+                    #     print('-------------------------------------------------')
 
                     loss = F.mse_loss(thr_map, y_thresholds)
-                    current_loss = math.sqrt(loss.item())
-                    img_loss += current_loss
-                    thr = thr_map[..., None][..., None]
+                    img_mse += math.sqrt(loss.item())
+                    thr = thr_map[:, 0][..., None][..., None]
                     segmented = (prob_map > thr).long()
                     # Reconstruct the image
                     for j in range(segmented.shape[0]):
@@ -102,21 +104,21 @@ class ThrnetTrainer(NNTrainer):
                     print('Batch: ', i, end='\r')
 
                 segmented_img[segmented_img > 0] = 255
-                # img_score = ScoreAccumulator()
-                img_loss = img_loss / i
-                eval_score += img_loss
+
+                img_score = ScoreAccumulator()
                 if gen_images:
+
                     img = segmented_img.cpu().numpy()
-                    img_score.add_array(img_obj.ground_truth, img)
-                    # img = iu.remove_connected_comp(np.array(img, dtype=np.uint8),
-                    #                                connected_comp_diam_limit=5)
-                    IMG.fromarray(img).save(
+                    img = np.maximum(img, img_obj.res['seg'])
+                    img_score.add_array(img_obj.res['seg'], img_obj.ground_truth)
+                    IMG.fromarray(np.array(img, dtype=np.uint8)).save(
                         os.path.join(self.log_dir, img_obj.file_name.split('.')[0] + '.png'))
                 else:
                     img_score.add_tensor(segmented_img, gt)
 
-                prf1a = img_score.get_prf1a()
-                print(img_obj.file_name, ' PRF1A', prf1a, ' loss: ' + str(eval_score / len(data_loaders)))
+                eval_mse += img_mse / loader.__len__()
+                prf1a = img_score.get_prfa()
+                print(img_obj.file_name, ' PRF1A', prf1a, ' loss: ' + str(img_mse / loader.__len__()))
                 self.flush(logger, ','.join(str(x) for x in [img_obj.file_name] + prf1a))
 
-            self._save_if_better(score=len(data_loaders) / eval_score)
+            self._save_if_better(score=len(data_loaders) / eval_mse)

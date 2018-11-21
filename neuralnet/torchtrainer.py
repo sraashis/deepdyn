@@ -5,7 +5,6 @@
 """
 
 import os
-import sys
 import threading
 
 import PIL.Image as IMG
@@ -15,6 +14,7 @@ import torch.nn.functional as F
 
 import neuralnet.utils.nviz as plt
 from neuralnet.utils.measurements import ScoreAccumulator
+import sys
 
 
 class NNTrainer:
@@ -35,6 +35,7 @@ class NNTrainer:
         self.train_log_file = os.path.join(self.log_dir, self.log_key + '-TRAIN.csv')
         self.test_log_file = os.path.join(self.log_dir, self.log_key + '-TEST.csv')
         self.validation_log_file = os.path.join(self.log_dir, self.log_key + '-VAL.csv')
+        self.mode = self.run_conf.get('Params').get('mode', 'test')
 
         if torch.cuda.is_available():
             self.device = torch.device("cuda" if self.use_gpu else "cpu")
@@ -64,7 +65,7 @@ class NNTrainer:
             running_loss = 0.0
             self._adjust_learning_rate(optimizer=optimizer, epoch=epoch)
             for i, data in enumerate(data_loader, 1):
-                inputs, labels = data['inputs'].to(self.device), data['labels'].long().to(self.device)
+                inputs, labels = data['inputs'].to(self.device).float(), data['labels'].to(self.device).long()
 
                 optimizer.zero_grad()
                 outputs = self.model(inputs)
@@ -75,7 +76,7 @@ class NNTrainer:
 
                 current_loss = loss.item()
                 running_loss += current_loss
-                p, r, f1, a = score_acc.reset().add_tensor(labels, predicted).get_prf1a()
+                p, r, f1, a = score_acc.reset().add_tensor(predicted, labels).get_prfa()
                 if i % self.log_frequency == 0:
                     print('Epochs[%d/%d] Batch[%d/%d] loss:%.5f pre:%.3f rec:%.3f f1:%.3f acc:%.3f' %
                           (
@@ -134,18 +135,18 @@ class NNTrainer:
                     IMG.fromarray(np.array(img, dtype=np.uint8)).save(
                         os.path.join(self.log_dir, img_obj.file_name.split('.')[0] + '.png'))
                 else:
-                    img_score.add_tensor(segmented_img, gt)
-                    eval_score += img_score.get_prf1a()[2]
+                    img_score.add_tensor(gt, segmented_img)
+                    eval_score += img_score.get_prfa()[2]
 
-                prf1a = img_score.get_prf1a()
+                prf1a = img_score.get_prfa()
                 print(img_obj.file_name, ' PRF1A', prf1a)
                 self.flush(logger, ','.join(str(x) for x in [img_obj.file_name] + prf1a))
 
         self._save_if_better(score=eval_score / len(data_loaders))
 
-    def resume_from_checkpoint(self, parallel_trained=False):
+    def resume_from_checkpoint(self, parallel_trained=False, best=True):
         try:
-            self.checkpoint = torch.load(self.checkpoint_file)
+            self.checkpoint = torch.load(self.checkpoint_file if best else self.temp_chk_file)
             if parallel_trained:
                 from collections import OrderedDict
                 new_state_dict = OrderedDict()
@@ -156,11 +157,15 @@ class NNTrainer:
                 self.model.load_state_dict(new_state_dict)
             else:
                 self.model.load_state_dict(self.checkpoint['state'])
-            print('RESUMED FROM CHECKPOINT: ' + self.checkpoint_file)
+            print('RESUMED FROM CHECKPOINT: ' + self.checkpoint_file if best else self.temp_chk_file)
         except Exception as e:
             print('ERROR: ' + str(e))
 
     def _save_if_better(self, score=None):
+
+        if self.mode == 'test':
+            return
+
         score = round(score, 5)
         current_epoch = self.checkpoint['epochs'] + self.validation_frequency
         current_chk = {'state': self.model.state_dict(),

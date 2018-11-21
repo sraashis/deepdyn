@@ -5,62 +5,69 @@ from torch import nn
 from neuralnet.utils.weights_utils import initialize_weights
 
 
-class BasicConv2d(nn.Module):
-
-    def __init__(self, in_ch, out_ch, k, s, p):
-        super(BasicConv2d, self).__init__()
-        self.conv = nn.Conv2d(in_channels=in_ch, out_channels=out_ch, kernel_size=k, stride=s, padding=p, bias=False)
-        self.bn = nn.BatchNorm2d(out_ch)
+class _DoubleConvolution(nn.Module):
+    def __init__(self, in_channels, middle_channel, out_channels, p=0):
+        super(_DoubleConvolution, self).__init__()
+        layers = [
+            nn.Conv2d(in_channels, middle_channel, kernel_size=3, padding=p),
+            nn.BatchNorm2d(middle_channel),
+            nn.ReLU(inplace=True),
+            nn.Conv2d(middle_channel, out_channels, kernel_size=3, padding=p),
+            nn.BatchNorm2d(out_channels),
+            nn.ReLU(inplace=True)
+        ]
+        self.encode = nn.Sequential(*layers)
 
     def forward(self, x):
-        x = self.conv(x)
-        x = self.bn(x)
-        return F.relu(x, inplace=False)
+        return self.encode(x)
 
 
-class InceptionMapNet(nn.Module):
-    def __init__(self, num_channels, num_class):
-        super(InceptionMapNet, self).__init__()
+class MapUNet(nn.Module):
+    def __init__(self, num_channels, num_classes):
+        super(MapUNet, self).__init__()
 
-        self.inception1 = BasicConv2d(in_ch=num_channels, out_ch=64, k=3, s=1, p=1)
-        self.inception2 = BasicConv2d(in_ch=64, out_ch=128, k=3, s=1, p=1)
+        reduce_by = 4
 
-        self.inception3 = BasicConv2d(in_ch=num_channels, out_ch=64, k=3, s=1, p=1)
-        self.inception4 = BasicConv2d(in_ch=64, out_ch=128, k=3, s=1, p=1)
+        self.A3_ = _DoubleConvolution(num_channels, int(256 / reduce_by), int(256 / reduce_by))
+        self.A4_ = _DoubleConvolution(int(256 / reduce_by), int(512 / reduce_by), int(512 / reduce_by))
 
-        self.inception5 = BasicConv2d(in_ch=256, out_ch=512, k=3, s=1, p=1)
-        self.inception6 = BasicConv2d(in_ch=512, out_ch=256, k=3, s=1, p=1)
+        self.A_mid = _DoubleConvolution(int(512 / reduce_by), int(1024 / reduce_by), int(1024 / reduce_by))
 
-        self.inception7 = BasicConv2d(in_ch=256, out_ch=512, k=3, s=1, p=1)
-        self.inception8 = BasicConv2d(in_ch=512, out_ch=256, k=3, s=1, p=1)
+        self.A4_up = nn.ConvTranspose2d(int(1024 / reduce_by), int(512 / reduce_by), kernel_size=2, stride=2)
+        self._A4 = _DoubleConvolution(int(1024 / reduce_by), int(512 / reduce_by), int(512 / reduce_by))
 
-        self.inception9 = BasicConv2d(in_ch=256, out_ch=128, k=3, s=1, p=1)
-        self.inception10 = BasicConv2d(in_ch=128, out_ch=64, k=3, s=1, p=1)
-        self.inception11 = BasicConv2d(in_ch=64, out_ch=32, k=3, s=1, p=1)
-        self.out_conv = nn.Conv2d(in_channels=32, out_channels=num_class, kernel_size=1, stride=1, padding=0)
+        self.A3_up = nn.ConvTranspose2d(int(512 / reduce_by), int(256 / reduce_by), kernel_size=2, stride=2)
+        self._A3 = _DoubleConvolution(int(512 / reduce_by), int(256 / reduce_by), int(256 / reduce_by))
+
+        self.final = nn.Conv2d(int(256 / reduce_by), num_classes, kernel_size=1)
         initialize_weights(self)
 
     def forward(self, x):
-        x_1 = self.inception1(x)
-        x_2 = self.inception2(x_1)
+        a3_ = self.A3_(x)
+        a3_dwn = F.max_pool2d(a3_, kernel_size=2, stride=2)
 
-        x_3 = self.inception3(x)
-        x_4 = self.inception4(x_3)
+        a4_ = self.A4_(a3_dwn)
+        a4_dwn = F.max_pool2d(a4_, kernel_size=2, stride=2)
 
-        x_5 = self.inception5(torch.cat([x_2, x_4], 1))
-        x_6 = self.inception6(x_5)
+        a_mid = self.A_mid(a4_dwn)
 
-        x_7 = self.inception7(x_6)
-        x_8 = self.inception8(x_7)
+        a4_up = self.A4_up(a_mid)
+        _a4 = self._A4(MapUNet.match_and_concat(a4_, a4_up))
 
-        x_9 = self.inception9(x_8)
-        x_10 = self.inception10(x_9)
-        x_11 = self.inception11(x_10)
+        a3_up = self.A3_up(_a4)
+        _a3 = self._A3(MapUNet.match_and_concat(a3_, a3_up))
 
-        out = self.out_conv(x_11)
-        return F.log_softmax(out, dim=1)
+        final = self.final(_a3)
+        return F.softmax(final, 1)
+
+    @staticmethod
+    def match_and_concat(bypass, upsampled, crop=True):
+        if crop:
+            c = (bypass.size()[2] - upsampled.size()[2]) // 2
+            bypass = F.pad(bypass, (-c, -c, -c, -c))
+        return torch.cat((upsampled, bypass), 1)
 
 
-m = InceptionMapNet(num_channels=9, num_class=2)
+m = MapUNet(1, 2)
 torch_total_params = sum(p.numel() for p in m.parameters() if p.requires_grad)
 print('Total Params:', torch_total_params)
