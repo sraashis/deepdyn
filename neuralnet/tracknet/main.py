@@ -18,7 +18,6 @@ from neuralnet.tracknet.tracknet_trainer import TracknetTrainer
 from neuralnet.utils import auto_split as asp
 
 RUNS = [rs.DRIVE]
-
 if __name__ == "__main__":
 
     transform = transforms.Compose([
