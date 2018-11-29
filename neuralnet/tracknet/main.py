@@ -16,6 +16,7 @@ from neuralnet.tracknet.model import TrackNet
 from neuralnet.tracknet.tracknet_dataloader import PatchesGenerator
 from neuralnet.tracknet.tracknet_trainer import TracknetTrainer
 from neuralnet.utils import auto_split as asp
+import neuralnet.utils.nviz as plt
 
 RUNS = [rs.DRIVE]
 
@@ -56,9 +57,10 @@ def main():
                                                                   images=splits['test'], mode='test')
 
                 logger = drive_trainer.get_logger(drive_trainer.test_log_file,
-                                                  header='ID,PRECISION,RECALL,F1,ACCURACY')
+                                                  header='ID,LOSS')
                 drive_trainer.evaluate(data_loaders=test_loader, logger=logger, gen_images=True)
-                drive_trainer.plot_test(file=drive_trainer.test_log_file)
+                # plt.plot(file=drive_trainer.test_log_file, y='LOSS', title='Test', x_tick_skip=len(val_loader),
+                #          save=True)
                 logger.close()
             except Exception as e:
                 traceback.print_exc()

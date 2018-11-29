@@ -9,7 +9,7 @@ def plot(file=None, y=None, query=None, title='', save=False, x_tick_skip=None):
     try:
         df = pd.read_csv(file).query(query) if query else pd.read_csv(file)
         df_sample = df.copy()
-        w = max(int(df.shape[0] / 1000), 5) if df.shape[0] >= 100 else 1
+        w = max(int(df.shape[0] / 1000), 10) if df.shape[0] >= 100 else 1
 
         df_sample[y] = df_sample[y].rolling(w, min_periods=1).mean()
 

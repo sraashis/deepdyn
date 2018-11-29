@@ -16,6 +16,7 @@ class TracknetTrainer(NNTrainer):
         NNTrainer.__init__(self, **kwargs)
         self.patch_shape = self.run_conf.get('Params').get('patch_shape')
         self.patch_offset = self.run_conf.get('Params').get('patch_offset')
+        self.log_counter = 0
 
     def train(self, optimizer=None, data_loader=None, validation_loader=None):
 
@@ -26,7 +27,7 @@ class TracknetTrainer(NNTrainer):
                                       header='ID,EPOCH,BATCH,LOSS')
 
         val_logger = NNTrainer.get_logger(self.validation_log_file,
-                                          header='ID,PRECISION,RECALL,F1,ACCURACY')
+                                          header='ID,LOSS')
         print('Training...')
         for epoch in range(1, self.epochs + 1):
             self.model.train()
@@ -95,18 +96,18 @@ class TracknetTrainer(NNTrainer):
                         x_pred, y_pred = int(predicted[j][0]), int(predicted[j][1])
                         segmented_img[:, :, :][x, y] = 255
                         segmented_img[:, :, 0][x_pred, y_pred] = 255
-                    print('Batch: ', i, ' MSE:' + str(current_loss))
+                    self.flush(logger,
+                               ','.join(str(x) for x in [img_obj.file_name] + [current_loss]))
+
+                img_loss = img_loss / loader.__len__()
+                print(img_obj.file_name + ' loss: ' + str(img_loss))
+                eval_score += img_loss
 
                 segmented_img[segmented_img > 0] = 255
                 if gen_images:
                     img = segmented_img.cpu().numpy()
                     IMG.fromarray(np.array(img, np.uint8)).save(
-                        os.path.join(self.log_dir, img_obj.file_name.split('.')[0] + '.png'))
-
-                img_loss = img_loss / i
-                eval_score += img_loss
-                print(' loss: ' + str(eval_score / len(data_loaders)))
-                self.flush(logger,
-                           ','.join(str(x) for x in [img_obj.file_name] + [str(eval_score / len(data_loaders))]))
+                        os.path.join(self.log_dir, str(self.log_counter) + img_obj.file_name.split('.')[0] + '.png'))
+                    self.log_counter += 1
 
             self._save_if_better(score=len(data_loaders) / eval_score)
