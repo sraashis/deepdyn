@@ -84,8 +84,8 @@ class TracknetTrainer(NNTrainer):
                     positions = data['POS'].to(self.device)
                     outputs = self.model(inputs).squeeze()
                     predicted = outputs + positions.float()
-                    labels = labels + positions.float()
                     loss = F.mse_loss(outputs.squeeze(), labels.squeeze())
+
                     current_loss = math.sqrt(loss.item())
                     img_loss += current_loss
 
