@@ -15,6 +15,7 @@ from skimage.morphology import skeletonize
 import utils.img_utils as iu
 from commons.IMAGE import Image
 from neuralnet.datagen import Generator
+import random
 
 sep = os.sep
 
@@ -37,6 +38,8 @@ class PatchesGenerator(Generator):
             all_pix_pos = list(zip(*np.where(img_obj.res['seed'] == 255)))
             all_patch_indices = list(
                 iu.get_chunk_indices_by_index(img_obj.working_arr.shape, self.patch_shape, all_pix_pos))
+            # all_patch_indices = list(
+            #     iu.get_chunk_indexes(img_obj.working_arr.shape, self.patch_shape, self.patch_shape))
             for chunk_ix in all_patch_indices:
                 self.indices.append([ID] + chunk_ix)
             self.image_objects[ID] = img_obj
@@ -58,7 +61,7 @@ class PatchesGenerator(Generator):
         img_obj.apply_clahe()
         img_obj.apply_mask()
 
-        sup, res = 10, 245
+        sup, res = 20, 235
 
         img_obj.res['unet'] = iu.get_image_as_array(
             self.unet_dir + sep + img_obj.file_name.split('.')[0] + self.input_image_ext, 1)
@@ -91,8 +94,8 @@ class PatchesGenerator(Generator):
 
         # <PREP4> Come up with a grid mask to select few possible pixels to reconstruct the vessels from
         sk_mask = np.zeros_like(seed)
-        sk_mask[::int(self.patch_shape[0] / 2)] = 1
-        sk_mask[:, ::int(self.patch_shape[0] / 2)] = 1
+        sk_mask[::int(0.6 * self.patch_shape[0])] = 1
+        sk_mask[:, ::int(0.6 * self.patch_shape[0])] = 1
 
         # <PREP5> Apply mask and save seed
         img_obj.res['seed'] = seed * sk_mask * 255
@@ -114,6 +117,18 @@ class PatchesGenerator(Generator):
         mid_patch = np.pad(mid_pix[p:q, r:s], pad, 'reflect')
         unet_patch = np.pad(unet_map[p:q, r:s], pad, 'reflect')
 
+        if self.mode == 'train' and random.uniform(0, 1) <= 0.5:
+            orig_patch = np.flip(orig_patch, 0)
+            unet_patch = np.flip(unet_patch, 0)
+            mid_patch = np.flip(mid_patch, 0)
+            y_mid = np.flip(y_mid, 0)
+
+        if self.mode == 'train' and random.uniform(0, 1) <= 0.5:
+            orig_patch = np.flip(orig_patch, 1)
+            unet_patch = np.flip(unet_patch, 1)
+            mid_patch = np.flip(mid_patch, 1)
+            y_mid = np.flip(y_mid, 1)
+
         y_mid[y_mid == 255] = 1
         if self.run_conf['Params']['num_channels'] == 1:
             img_tensor = np.array([mid_patch])
@@ -122,7 +137,7 @@ class PatchesGenerator(Generator):
 
         return {'id': ID,
                 'inputs': img_tensor,
-                'labels': y_mid,
+                'labels': y_mid.copy(),
                 'clip_ix': np.array([row_from, row_to, col_from, col_to]), }
 
     @classmethod

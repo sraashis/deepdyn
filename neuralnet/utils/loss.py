@@ -1,4 +1,4 @@
-def dice_loss(outputs, target, weights=1, beta=1):
+def dice_loss(outputs=None, target=None, beta=1, weights=None,):
     """
     :param weights: element-wise weights
     :param outputs:
@@ -7,6 +7,10 @@ def dice_loss(outputs, target, weights=1, beta=1):
     :return:
     """
     smooth = 1.
+    if weights is not None:
+        weights = weights.contiguous().float().view(-1)
+    else:
+        weights = 1
 
     iflat = outputs.contiguous().float().view(-1)
     tflat = target.contiguous().float().view(-1)
