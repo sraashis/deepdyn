@@ -25,6 +25,7 @@ class PatchesGenerator(Generator):
         self.expand_by = self.run_conf.get('Params').get('expand_patch_by')
         self.patch_offset = self.run_conf.get('Params').get('patch_offset')
         self._load_indices()
+        self.gen_class_weights()
         print('Patches:', self.__len__())
 
     def _load_indices(self):
