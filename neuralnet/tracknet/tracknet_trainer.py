@@ -7,6 +7,8 @@ import torch.nn.functional as F
 
 from neuralnet.torchtrainer import NNTrainer
 import numpy as np
+from scipy import spatial
+
 
 sep = os.sep
 
@@ -43,11 +45,16 @@ class TracknetTrainer(NNTrainer):
                 #     print(torch.cat([labels[..., None].squeeze(), thr_map[..., None].squeeze()], 1))
                 #     print('-------------------------------------------------')
 
+                # print('thr_map labels', thr_map, 'labels', labels)
+                # print('thr_map typppeeeee', type(thr_map), type(labels))
                 loss = F.mse_loss(thr_map, labels)
                 loss.backward(retain_graph=True)
                 optimizer.step()
-
                 current_loss = math.sqrt(loss.item())
+
+                # result = 1 - spatial.distance.cosine(thr_map, labels)
+                # print('resullllt', result)
+
                 running_loss += current_loss
                 if i % self.log_frequency == 0:
                     print('Epochs[%d/%d] Batch[%d/%d] mse:%.5f' %
@@ -83,8 +90,12 @@ class TracknetTrainer(NNTrainer):
 
                     positions = data['POS'].to(self.device)
                     outputs = self.model(inputs).squeeze()
-                    predicted = outputs + positions.float()
 
+
+                    print('thr_map labels', outputs, 'labels', labels)
+                    print('thr_map typppeeeee', type(outputs), type(labels))
+
+                    predicted = outputs + positions.float()
                     loss = F.mse_loss(outputs.squeeze(), labels.squeeze())
                     current_loss = math.sqrt(loss.item())
                     img_loss += current_loss
