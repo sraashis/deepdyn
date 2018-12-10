@@ -54,9 +54,10 @@ def main():
                 drive_trainer.resume_from_checkpoint(parallel_trained=R.get('Params').get('parallel_trained'))
                 # print('SCORE: ', drive_trainer.checkpoint['score'])
                 # continue
+                images = splits['test'] + splits['train'] + splits['validation'] if 'DRIVE' in R['Dirs']['image'] else \
+                splits['test']
                 test_loader = PatchesGenerator.get_loader_per_img(run_conf=R,
-                                                                  images=splits['test'] + splits['train'] + splits[
-                                                                      'validation'], mode='test')
+                                                                  images=images, mode='test')
 
                 logger = drive_trainer.get_logger(drive_trainer.test_log_file,
                                                   header='ID,PRECISION,RECALL,F1,ACCURACY')

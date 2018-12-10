@@ -13,18 +13,18 @@ DRIVE = {
         'patch_offset': (150, 150),
         'expand_patch_by': (184, 184),
         'use_gpu': True,
-        'distribute': False,
+        'distribute': True,
         'shuffle': True,
         'log_frequency': 5,
         'validation_frequency': 1,
-        'mode': 'train',
+        'mode': 'test',
         'parallel_trained': False
     },
     'Dirs': {
         'image': 'data' + sep + 'DRIVE' + sep + 'images',
         'mask': 'data' + sep + 'DRIVE' + sep + 'mask',
         'truth': 'data' + sep + 'DRIVE' + sep + 'manual',
-        'logs': 'data' + sep + 'DRIVE' + sep + 'UNET_LOGS',
+        'logs': 'data' + sep + 'DRIVE' + sep + 'PLAIN_UNET_LOGS',
         'splits_json': 'data' + sep + 'DRIVE' + sep + 'splits'
     },
 
@@ -45,7 +45,7 @@ WIDE = {
         'patch_offset': (150, 150),
         'expand_patch_by': (184, 184),
         'use_gpu': True,
-        'distribute': False,
+        'distribute': True,
         'shuffle': True,
         'log_frequency': 5,
         'validation_frequency': 1,
@@ -56,7 +56,7 @@ WIDE = {
         'image': 'data' + sep + 'AV-WIDE' + sep + 'images',
         'mask': 'data' + sep + 'AV-WIDE' + sep + 'mask',
         'truth': 'data' + sep + 'AV-WIDE' + sep + 'manual',
-        'logs': 'data' + sep + 'AV-WIDE' + sep + 'UNET_LOGS',
+        'logs': 'data' + sep + 'AV-WIDE' + sep + 'PLAIN_UNET_LOGS',
         'splits_json': 'data' + sep + 'AV-WIDE' + sep + 'splits'
     },
 
@@ -77,7 +77,7 @@ STARE = {
         'patch_offset': (150, 150),
         'expand_patch_by': (184, 184),
         'use_gpu': True,
-        'distribute': False,
+        'distribute': True,
         'shuffle': True,
         'log_frequency': 5,
         'validation_frequency': 1,
@@ -87,7 +87,7 @@ STARE = {
     'Dirs': {
         'image': 'data' + sep + 'STARE' + sep + 'stare-images',
         'truth': 'data' + sep + 'STARE' + sep + 'labels-ah',
-        'logs': 'data' + sep + 'STARE' + sep + 'UNET_LOGS',
+        'logs': 'data' + sep + 'STARE' + sep + 'PLAIN_UNET_LOGS',
         'splits_json': 'data' + sep + 'STARE' + sep + 'splits'
     },
 
@@ -108,7 +108,7 @@ VEVIO = {
         'patch_offset': (150, 150),
         'expand_patch_by': (184, 184),
         'use_gpu': True,
-        'distribute': False,
+        'distribute': True,
         'shuffle': True,
         'log_frequency': 5,
         'validation_frequency': 1,
@@ -119,7 +119,7 @@ VEVIO = {
         'image': 'data' + sep + 'VEVIO' + sep + 'mosaics',
         'mask': 'data' + sep + 'VEVIO' + sep + 'mosaics_masks',
         'truth': 'data' + sep + 'VEVIO' + sep + 'mosaics_manual_01_bw',
-        'logs': 'data' + sep + 'VEVIO' + sep + 'UNET_LOGS',
+        'logs': 'data' + sep + 'VEVIO' + sep + 'PLAIN_UNET_LOGS',
         'splits_json': 'data' + sep + 'VEVIO' + sep + 'splits'
     },
 

@@ -12,6 +12,7 @@ import torchvision.transforms as tfm
 from torch.utils.data.dataset import Dataset
 
 from commons.IMAGE import Image
+import neuralnet.utils.data_utils as dutils
 
 
 class Generator(Dataset):
@@ -60,6 +61,19 @@ class Generator(Dataset):
 
     def __len__(self):
         return len(self.indices)
+
+    def gen_class_weights(self):
+
+        if self.mode != 'train':
+            return
+
+        self.run_conf['Params']['cls_weights'] = [0, 0]
+        for _, obj in self.image_objects.items():
+            self.run_conf['Params']['cls_weights'][0] += dutils.get_class_weights(obj.ground_truth)[0]
+            self.run_conf['Params']['cls_weights'][1] += dutils.get_class_weights(obj.ground_truth)[255]
+
+        self.run_conf['Params']['cls_weights'][0] = self.run_conf['Params']['cls_weights'][0] / len(self.image_objects)
+        self.run_conf['Params']['cls_weights'][1] = self.run_conf['Params']['cls_weights'][1] / len(self.image_objects)
 
     @classmethod
     def get_loader(cls, images, run_conf, transforms, mode, batch_sizes=[]):
