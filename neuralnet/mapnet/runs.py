@@ -12,7 +12,7 @@ DRIVE = {
         'patch_shape': (100, 100),
         'expand_patch_by': (40, 40),
         'use_gpu': True,
-        'distribute': False,
+        'distribute': True,
         'shuffle': True,
         'log_frequency': 20,
         'validation_frequency': 1,
@@ -21,10 +21,10 @@ DRIVE = {
     },
     'Dirs': {
         'image': 'data' + sep + 'DRIVE' + sep + 'images',
-        'image_unet': 'data' + sep + 'DRIVE' + sep + 'UNET_LOGS',
+        'image_unet': 'data' + sep + 'DRIVE' + sep + 'PLAIN_UNET_LOGS',
         'mask': 'data' + sep + 'DRIVE' + sep + 'mask',
         'truth': 'data' + sep + 'DRIVE' + sep + 'manual',
-        'logs': 'data' + sep + 'DRIVE' + sep + 'MAPNET_LOGS',
+        'logs': 'data' + sep + 'DRIVE' + sep + 'PLAIN_MAPNET_LOGS',
         'splits_json': 'data' + sep + 'DRIVE' + sep + 'splits'
     },
 
@@ -44,7 +44,7 @@ WIDE = {
         'patch_shape': (100, 100),
         'expand_patch_by': (40, 40),
         'use_gpu': True,
-        'distribute': False,
+        'distribute': True,
         'shuffle': True,
         'log_frequency': 50,
         'validation_frequency': 1,
@@ -53,10 +53,10 @@ WIDE = {
     },
     'Dirs': {
         'image': 'data' + sep + 'AV-WIDE' + sep + 'images',
-        'image_unet': 'data' + sep + 'AV-WIDE' + sep + 'UNET_LOGS',
+        'image_unet': 'data' + sep + 'AV-WIDE' + sep + 'PLAIN_UNET_LOGS',
         'mask': 'data' + sep + 'AV-WIDE' + sep + 'mask',
         'truth': 'data' + sep + 'AV-WIDE' + sep + 'manual',
-        'logs': 'data' + sep + 'AV-WIDE' + sep + 'MAPNET_LOGS',
+        'logs': 'data' + sep + 'AV-WIDE' + sep + 'PLAIN_MAPNET_LOGS',
         'splits_json': 'data' + sep + 'AV-WIDE' + sep + 'splits'
     },
 
@@ -76,7 +76,7 @@ STARE = {
         'patch_shape': (100, 100),
         'expand_patch_by': (40, 40),
         'use_gpu': True,
-        'distribute': False,
+        'distribute': True,
         'shuffle': True,
         'log_frequency': 50,
         'validation_frequency': 1,
@@ -85,9 +85,9 @@ STARE = {
     },
     'Dirs': {
         'image': 'data' + sep + 'STARE' + sep + 'stare-images',
-        'image_unet': 'data' + sep + 'STARE' + sep + 'UNET_LOGS',
+        'image_unet': 'data' + sep + 'STARE' + sep + 'PLAIN_UNET_LOGS',
         'truth': 'data' + sep + 'STARE' + sep + 'labels-ah',
-        'logs': 'data' + sep + 'STARE' + sep + 'MAPNET_LOGS',
+        'logs': 'data' + sep + 'STARE' + sep + 'PLAIN_MAPNET_LOGS',
         'splits_json': 'data' + sep + 'STARE' + sep + 'splits'
     },
 
@@ -107,7 +107,7 @@ VEVIO = {
         'patch_shape': (100, 100),
         'expand_patch_by': (40, 40),
         'use_gpu': True,
-        'distribute': False,
+        'distribute': True,
         'shuffle': True,
         'log_frequency': 50,
         'validation_frequency': 1,
@@ -116,10 +116,10 @@ VEVIO = {
     },
     'Dirs': {
         'image': 'data' + sep + 'VEVIO' + sep + 'mosaics',
-        'image_unet': 'data' + sep + 'VEVIO' + sep + 'UNET_LOGS',
+        'image_unet': 'data' + sep + 'VEVIO' + sep + 'PLAIN_UNET_LOGS',
         'mask': 'data' + sep + 'VEVIO' + sep + 'mosaics_masks',
         'truth': 'data' + sep + 'VEVIO' + sep + 'mosaics_manual_01_bw',
-        'logs': 'data' + sep + 'VEVIO' + sep + 'MAPNET_LOGS',
+        'logs': 'data' + sep + 'VEVIO' + sep + 'PLAIN_MAPNET_LOGS',
         'splits_json': 'data' + sep + 'VEVIO' + sep + 'splits'
     },
 
