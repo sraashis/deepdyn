@@ -80,6 +80,8 @@ class PatchesGenerator(Generator):
                 if np.isin(0, img_obj.mask[row_from:row_to, col_from:col_to]):
                     continue
 
+
+
                 self.indices.append([ID, [p, q], [i, j], output.tolist()])
 
     def __getitem__(self, index):
@@ -94,11 +96,11 @@ class PatchesGenerator(Generator):
         col_to = int(col_to)
         prev_patches = self.image_objects[ID].res['2d'][:, row_from:row_to, col_from:col_to]
         # Simplification 1: Make the target pixel white
-        try:
-            prev_patches[out[0], out[1], 0] = 255
-        except:
-            out = [0, 0]
-            prev_patches[out[0], out[1], 0] = 255
+        # try:
+        #     prev_patches[out[0], out[1], 0] = 255
+        # except:
+        #     out = [0, 0]
+        #     prev_patches[out[0], out[1], 0] = 255
 
         row_from, row_to = i - self.k_half, i + self.k_half + 1
         col_from, col_to = j - self.k_half, j + self.k_half + 1
@@ -108,11 +110,15 @@ class PatchesGenerator(Generator):
         col_from = int(col_from)
         col_to = int(col_to)
         input_patches = self.image_objects[ID].res['2d'][:, row_from:row_to, col_from:col_to]
-        try:
-            input_patches[out[0], out[1], 0] = 255
-        except:
-            out = [0, 0]
-            input_patches[out[0], out[1], 0] = 255
+        # print(input_patches.shape)
+        # print('oooouuuutttt', out)
+        # try:
+        #     input_patches[:, out[0], out[1]] = 255
+        # except:
+        #     out = [0, 0]
+        #     input_patches[:, out[0], out[1]] = 255
+        # print('outtt', out)
+        # print('input_patches[out[0], out[1], 0] ', input_patches[out[0], out[1], 0] )
 
         input_tensor = np.append(prev_patches, input_patches, 0)
         return {'IDs': ID, 'POS': np.array([i, j]), 'inputs': input_tensor,

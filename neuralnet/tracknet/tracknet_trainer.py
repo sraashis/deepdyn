@@ -44,9 +44,10 @@ class TracknetTrainer(NNTrainer):
                 # if True:
                 #     print(torch.cat([labels[..., None].squeeze(), thr_map[..., None].squeeze()], 1))
                 #     print('-------------------------------------------------')
-
-                # print('thr_map labels Training', thr_map, 'labels', labels)
+                # print('thr_map', thr_map)
+                # print('labels', labels)
                 # print('thr_map typppeeeee', type(thr_map), type(labels))
+
                 loss = F.mse_loss(thr_map, labels)
                 loss.backward(retain_graph=True)
                 optimizer.step()
@@ -92,8 +93,8 @@ class TracknetTrainer(NNTrainer):
                     outputs = self.model(inputs).squeeze()
 
 
-                    print('thr_map labels Evaluation', outputs, 'labels', labels)
-                    print('thr_map typppeeeee', type(outputs), type(labels))
+                    # print('thr_map labels Evaluation', outputs, 'labels', labels)
+                    # print('thr_map typppeeeee', type(outputs), type(labels))
 
                     predicted = outputs + positions.float()
                     loss = F.mse_loss(outputs.squeeze(), labels.squeeze())
