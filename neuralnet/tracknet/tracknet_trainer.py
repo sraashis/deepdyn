@@ -90,6 +90,7 @@ class TracknetTrainer(NNTrainer):
                     inputs, labels = data['inputs'].to(self.device).float(), data['labels'].to(self.device)
 
                     positions = data['POS'].to(self.device)
+                    prev_positions = data['PREV'].to(self.device)
                     outputs = self.model(inputs).squeeze()
 
 
@@ -105,10 +106,18 @@ class TracknetTrainer(NNTrainer):
 
                     labels = labels + positions.float()
                     for j in range(outputs.shape[0]):
+                        if j > 0:
+                            continue
                         x, y = int(labels[j][0]), int(labels[j][1])
+                        p, q = int(positions[j][0]), int(positions[j][1])
+                        r, s = int(prev_positions[j][0]), int(prev_positions[j][1])
                         x_pred, y_pred = int(predicted[j][0]), int(predicted[j][1])
                         segmented_img[:, :, :][x, y] = 255
                         segmented_img[:, :, 0][x_pred, y_pred] = 255
+                        segmented_img[:, :, 1][p, q] = 255
+                        segmented_img[:, :, 2][r, s] = 255
+
+
                     self.flush(logger,
                                ','.join(str(x) for x in [img_obj.file_name] + [current_loss]))
 

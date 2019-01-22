@@ -121,5 +121,5 @@ class PatchesGenerator(Generator):
         # print('input_patches[out[0], out[1], 0] ', input_patches[out[0], out[1], 0] )
 
         input_tensor = np.append(prev_patches, input_patches, 0)
-        return {'IDs': ID, 'POS': np.array([i, j]), 'inputs': input_tensor,
+        return {'IDs': ID, 'POS': np.array([i, j]), 'PREV': np.array([p,q]), 'inputs': input_tensor,
                 'labels': torch.FloatTensor(out)}
