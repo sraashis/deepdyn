@@ -117,7 +117,6 @@ class TracknetTrainer(NNTrainer):
                         segmented_img[:, :, 1][p, q] = 255
                         segmented_img[:, :, 2][r, s] = 255
 
-
                     self.flush(logger,
                                ','.join(str(x) for x in [img_obj.file_name] + [current_loss]))
 
