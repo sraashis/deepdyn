@@ -53,6 +53,7 @@ class TracknetTrainer(NNTrainer):
                 optimizer.step()
                 current_loss = math.sqrt(loss.item())
 
+                print(torch.cat([labels, thr_map], 1))
                 # result = 1 - spatial.distance.cosine(thr_map, labels)
                 # print('resullllt', result)
 
@@ -85,6 +86,7 @@ class TracknetTrainer(NNTrainer):
 
                 segmented_img = torch.LongTensor(img_obj.working_arr.shape[0],
                                                  img_obj.working_arr.shape[1], 3).fill_(0).to(self.device)
+                # segmented_img[:, :, 1] = torch.LongTensor(img_obj.working_arr).to(self.device)
                 img_loss = 0.000001
                 for i, data in enumerate(loader, 1):
                     inputs, labels = data['inputs'].to(self.device).float(), data['labels'].to(self.device)
@@ -104,6 +106,7 @@ class TracknetTrainer(NNTrainer):
                     if len(outputs.shape) == 1:
                         outputs = outputs[None, ...]
 
+                    # print(torch.cat([labels, outputs], 1))
                     labels = labels + positions.float()
                     for j in range(outputs.shape[0]):
                         if j > 0:
@@ -113,9 +116,9 @@ class TracknetTrainer(NNTrainer):
                         r, s = int(prev_positions[j][0]), int(prev_positions[j][1])
                         x_pred, y_pred = int(predicted[j][0]), int(predicted[j][1])
                         segmented_img[:, :, :][x, y] = 255
-                        segmented_img[:, :, 0][x_pred, y_pred] = 255
+                        segmented_img[:, :, 2][x_pred, y_pred] = 255
                         segmented_img[:, :, 1][p, q] = 255
-                        segmented_img[:, :, 2][r, s] = 255
+                        segmented_img[:, :, 0][r, s] = 255
 
                     self.flush(logger,
                                ','.join(str(x) for x in [img_obj.file_name] + [current_loss]))
