@@ -1,8 +1,8 @@
 import pandas as pd
 import os, glob
+import sys
 
-path = 'data/DRIVE/UNET_LOGS'
-
+path = sys.argv[1]
 files = [f for f in os.listdir(path) if '-TEST.csv' in f]
 gl = glob.glob(os.path.join(path, "*-TEST.csv"))
 for f in gl:
