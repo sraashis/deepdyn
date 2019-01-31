@@ -13,6 +13,8 @@ from PIL import Image as IMG
 
 from neuralnet.torchtrainer import NNTrainer
 from neuralnet.utils.measurements import ScoreAccumulator
+import random as rd
+import math
 
 sep = os.sep
 
@@ -22,6 +24,7 @@ class UNetNNTrainer(NNTrainer):
         NNTrainer.__init__(self, **kwargs)
         self.patch_shape = self.run_conf.get('Params').get('patch_shape')
         self.patch_offset = self.run_conf.get('Params').get('patch_offset')
+        self.dparm = self.run_conf.get("Funcs").get('dparm')
 
     def train(self, optimizer=None, data_loader=None, validation_loader=None):
 
@@ -40,6 +43,9 @@ class UNetNNTrainer(NNTrainer):
             score_acc = ScoreAccumulator()
             running_loss = 0.0
             self._adjust_learning_rate(optimizer=optimizer, epoch=epoch)
+
+            # w = [self.run_conf['Params']['cls_weights'][0], self.run_conf['Params']['cls_weights'][1]]
+            p, r = 1, 1
             for i, data in enumerate(data_loader, 1):
                 inputs, labels = data['inputs'].to(self.device).float(), data['labels'].to(self.device).long()
 
@@ -47,16 +53,14 @@ class UNetNNTrainer(NNTrainer):
                 outputs = self.model(inputs)
                 _, predicted = torch.max(outputs, 1)
 
-                # Balancing imbalanced class as per computed weights from the dataset
-                # w = torch.FloatTensor(2).random_(1, 100).to(self.device)
-                w = [self.run_conf['Params']['cls_weights'][0], self.run_conf['Params']['cls_weights'][1]]
-                loss = F.nll_loss(outputs, labels, weight=torch.FloatTensor(w).to(self.device))
+                loss = F.nll_loss(outputs, labels, weight=torch.FloatTensor(self.dparm(p, r)).to(self.device))
                 loss.backward()
                 optimizer.step()
 
                 current_loss = loss.item()
                 running_loss += current_loss
                 p, r, f1, a = score_acc.reset().add_tensor(predicted, labels).get_prfa()
+
                 if i % self.log_frequency == 0:
                     print('Epochs[%d/%d] Batch[%d/%d] loss:%.5f pre:%.3f rec:%.3f f1:%.3f acc:%.3f' %
                           (
