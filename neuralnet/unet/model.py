@@ -61,18 +61,21 @@ class UNet(nn.Module):
         a3_dwn = F.max_pool2d(a3_, kernel_size=2, stride=2)
 
         a4_ = self.A4_(a3_dwn)
+        # a4_ = F.dropout(a4_, p=0.2)
         a4_dwn = F.max_pool2d(a4_, kernel_size=2, stride=2)
 
         a_mid = self.A_mid(a4_dwn)
 
         a4_up = self.A4_up(a_mid)
         _a4 = self._A4(UNet.match_and_concat(a4_, a4_up))
+        # _a4 = F.dropout(_a4, p=0.2)
 
         a3_up = self.A3_up(_a4)
         _a3 = self._A3(UNet.match_and_concat(a3_, a3_up))
 
         a2_up = self.A2_up(_a3)
         _a2 = self._A2(UNet.match_and_concat(a2_, a2_up))
+        # _a2 = F.dropout(_a2, p=0.2)
 
         a1_up = self.A1_up(_a2)
         _a1 = self._A1(UNet.match_and_concat(a1_, a1_up))

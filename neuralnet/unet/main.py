@@ -17,7 +17,9 @@ from neuralnet.unet.unet_dataloader import PatchesGenerator
 from neuralnet.unet.unet_trainer import UNetNNTrainer
 from neuralnet.utils import auto_split as asp
 
-RUNS = [rs.DRIVE, rs.STARE, rs.WIDE, rs.VEVIO]  #
+RUNS = [rs.DRIVE2, rs.STARE, rs.STARE1, rs.STARE2, rs.WIDE, rs.WIDE1,
+        rs.WIDE2, rs.VEVIO,
+        rs.VEVIO1, rs.VEVIO2]
 
 
 def main():
@@ -45,6 +47,7 @@ def main():
                 drive_trainer = UNetNNTrainer(model=model, run_conf=R)
 
                 if R.get('Params').get('mode') == 'train':
+                    # drive_trainer.resume_from_checkpoint(parallel_trained=R.get('Params').get('parallel_trained'))
                     train_loader = PatchesGenerator.get_loader(run_conf=R, images=splits['train'], transforms=transform,
                                                                mode='train')
                     val_loader = PatchesGenerator.get_loader_per_img(run_conf=R, images=splits['validation'],
@@ -55,7 +58,7 @@ def main():
                 # print('SCORE: ', drive_trainer.checkpoint['score'])
                 # continue
                 images = splits['test'] + splits['train'] + splits['validation'] if 'DRIVE' in R['Dirs']['image'] else \
-                splits['test']
+                    splits['test']
                 test_loader = PatchesGenerator.get_loader_per_img(run_conf=R,
                                                                   images=images, mode='test')
 
