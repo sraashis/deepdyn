@@ -11,14 +11,13 @@ import torch
 import torch.optim as optim
 import torchvision.transforms as transforms
 
-import neuralnet.unet.runs  as rs
+import neuralnet.unet.runs as rs
 from neuralnet.unet.model import UNet
 from neuralnet.unet.unet_dataloader import PatchesGenerator
 from neuralnet.unet.unet_trainer import UNetNNTrainer
 from neuralnet.utils import auto_split as asp
 
-RUNS = [rs.DRIVE2, rs.STARE, rs.STARE1, rs.STARE2, rs.WIDE, rs.WIDE1,
-        rs.WIDE2, rs.VEVIO,
+RUNS = [rs.DRIVE, rs.DRIVE1, rs.DRIVE2, rs.STARE, rs.STARE1, rs.STARE2, rs.WIDE, rs.WIDE1, rs.WIDE2, rs.VEVIO,
         rs.VEVIO1, rs.VEVIO2]
 
 
