@@ -53,9 +53,40 @@ class TracknetTrainer(NNTrainer):
                 optimizer.step()
                 current_loss = math.sqrt(loss.item())
 
-                print(torch.cat([labels, thr_map], 1))
+                # print(torch.cat([labels, thr_map], 1))
+                # print('thr_map', thr_map, len(thr_map))
+                # print('lables', labels, len(labels))
+                # thr_map = thr_map.data.numpy()
+                # thr_map = thr_map.var.detach().numpy()
+                # labels = labels.var.detach().numpy()
+                # labels = labels.data.numpy()
+                # print('type1', type(thr_map))
+                # print('type2', type(labels))
+                # print('thr_map0', thr_map[:, 0])
+                # print('thr_map1', thr_map[:, 1])
+                # print('thr_map', thr_map)
+                # print('labels', labels)
+
+                # x = thr_map[:, 0]
+                # y = thr_map[:, 1]
+                # rho = torch.sqrt(x ** 2 + y ** 2)
+                # phi = torch.atan2(x, y)
+                # print('rho', rho)
+                # print('phi', phi)
+
+                # rho = np.sqrt(thr_map[:, 0] ** 2 + thr_map[:, 1] ** 2)
+                # phi = np.arctan2(thr_map[:, 1], thr_map[:, 0])
                 # result = 1 - spatial.distance.cosine(thr_map, labels)
+                # spatial.distance.cosine()
                 # print('resullllt', result)
+
+                # Calculate cosine similarity when use polar coordinate
+                # print('output', thr_map.shape)
+                # print('lables', labels.shape)
+                # result = F.cosine_similarity((outputs[:, 1], labels[:, 1]), dim = 1)
+                # print('theta', labels[:, 1])
+                result = thr_map[:, 1] - labels[:, 1]
+                print('result', result)
 
                 running_loss += current_loss
                 if i % self.log_frequency == 0:
@@ -89,15 +120,11 @@ class TracknetTrainer(NNTrainer):
                 # segmented_img[:, :, 1] = torch.LongTensor(img_obj.working_arr).to(self.device)
                 img_loss = 0.000001
                 for i, data in enumerate(loader, 1):
-                    inputs, labels = data['inputs'].to(self.device).float(), data['labels'].to(self.device)
+                    inputs, labels = data['inputs'].to(self.device).float(), data['labels'].to(self.device).squeeze()
 
                     positions = data['POS'].to(self.device)
                     prev_positions = data['PREV'].to(self.device)
                     outputs = self.model(inputs).squeeze()
-
-
-                    # print('thr_map labels Evaluation', outputs, 'labels', labels)
-                    # print('thr_map typppeeeee', type(outputs), type(labels))
 
                     predicted = outputs + positions.float()
                     loss = F.mse_loss(outputs.squeeze(), labels.squeeze())

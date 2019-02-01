@@ -55,12 +55,15 @@ class PatchesGenerator(Generator):
             for i, src in enumerate(vessel_pathidx):
                 b[i] = np.where(A[src, :])[0][0]
             b_pos_output = V[b, :]
+
             # for i, src in enumerate(vessel_pathidx):
             #     a[i] = np.where(A[:, src])[0][0]
             # a_pos_output = V[a, :]
 
             u_pos_input = u_pos_input.astype(np.int)
-            b_pos_output = b_pos_output.astype(np.int)
+
+            # we need the following line for x, y coordinate
+            # b_pos_output = b_pos_output.astype(np.int)
             for (p, q), (i, j), output in zip(u_pos_input_prev, u_pos_input, b_pos_output - u_pos_input):
                 row_from, row_to = int(i - self.k_half), int(i + self.k_half + 1)
                 col_from, col_to = int(j - self.k_half), int(j + self.k_half + 1)
@@ -80,9 +83,11 @@ class PatchesGenerator(Generator):
                 if np.isin(0, img_obj.mask[row_from:row_to, col_from:col_to]):
                     continue
 
-
-
-                self.indices.append([ID, [p, q], [i, j], output.tolist()])
+                rho = np.sqrt(output[0] ** 2 + output[1] ** 2)
+                phi = math.degrees(np.arctan2(output[0] / output[1]))
+                # print('maxx', np.max(phi), np.min(phi))
+                self.indices.append([ID, [p, q], [i, j], [rho, phi]])
+                # self.indices.append([ID, [p, q], [i, j], output.tolist()])
 
     def __getitem__(self, index):
         ID, (p, q), (i, j), out = self.indices[index]
