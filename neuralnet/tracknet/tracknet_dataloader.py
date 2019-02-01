@@ -83,9 +83,11 @@ class PatchesGenerator(Generator):
                 if np.isin(0, img_obj.mask[row_from:row_to, col_from:col_to]):
                     continue
 
+                print('output[0], output[1])', output[0], output[1])
                 rho = np.sqrt(output[0] ** 2 + output[1] ** 2)
-                phi = math.degrees(np.arctan2(output[0] / output[1]))
+                # phi = math.degrees(np.arctan2(output[0], output[1]))
                 # print('maxx', np.max(phi), np.min(phi))
+                phi = np.arctan2(output[0], output[1])
                 self.indices.append([ID, [p, q], [i, j], [rho, phi]])
                 # self.indices.append([ID, [p, q], [i, j], output.tolist()])
 
