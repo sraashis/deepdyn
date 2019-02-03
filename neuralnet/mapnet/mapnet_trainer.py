@@ -42,7 +42,6 @@ class MAPNetTrainer(NNTrainer):
             score_acc = ScoreAccumulator()
             running_loss = 0.0
             # self._adjust_learning_rate(optimizer=optimizer, epoch=epoch)
-            p, r = 0, 0
             for i, data in enumerate(data_loader, 1):
                 inputs, labels = data['inputs'].to(self.device).float(), data['labels'].to(self.device).long()
                 # weights = data['weights'].to(self.device)
@@ -54,8 +53,8 @@ class MAPNetTrainer(NNTrainer):
                 # Balancing imbalanced class as per computed weights from the dataset
                 # w = torch.FloatTensor(2).random_(1, 100).to(self.device)
                 # wd = torch.FloatTensor(*labels.shape).uniform_(0.1, 2).to(self.device)
-                loss = l.dice_loss(outputs[:, 1, :, :], labels, beta=1-(p-r))
-                # loss = F.nll_loss(outputs, labels, weight=w)
+
+                loss = l.dice_loss(outputs[:, 1, :, :], labels, beta=rd.choice(np.arange(1, 2, 0.1).tolist()))
                 loss.backward()
                 optimizer.step()
 
@@ -74,6 +73,8 @@ class MAPNetTrainer(NNTrainer):
             self.plot_train(file=self.train_log_file, batches_per_epochs=data_loader.__len__(), keys=['LOSS', 'F1'])
             if epoch % self.validation_frequency == 0:
                 self.evaluate(data_loaders=validation_loader, logger=val_logger, gen_images=False)
+                if self.early_stop(epoch):
+                    return
 
             self.plot_val(self.validation_log_file, batches_per_epoch=len(validation_loader))
 
@@ -86,10 +87,10 @@ class MAPNetTrainer(NNTrainer):
     def evaluate(self, data_loaders=None, logger=None, gen_images=False):
         assert (logger is not None), 'Please Provide a logger'
         self.model.eval()
+        eval_score = ScoreAccumulator()
 
         print('\nEvaluating...')
         with torch.no_grad():
-            eval_score = 0.0
 
             for loader in data_loaders:
                 img_obj = loader.dataset.image_objects[0]
@@ -117,14 +118,18 @@ class MAPNetTrainer(NNTrainer):
                     predicted_img = predicted_img.cpu().numpy()
                     predicted_img[img_obj.res['fill_in'] == 1] = 255
                     img_score.add_array(predicted_img, img_obj.ground_truth)
+
+                    # Global score accumulator
+                    self.run_conf['acc'].accumulate(img_score)
+
                     IMG.fromarray(np.array(predicted_img, dtype=np.uint8)).save(
                         os.path.join(self.log_dir, img_obj.file_name.split('.')[0] + '.png'))
                 else:
                     img_score.add_tensor(predicted_img, gt_mid)
-                    eval_score += img_score.get_prfa()[2]
+                    eval_score.accumulate(img_score)
 
                 prf1a = img_score.get_prfa()
                 print(img_obj.file_name, ' PRF1A', prf1a)
                 self.flush(logger, ','.join(str(x) for x in [img_obj.file_name] + prf1a))
 
-        self._save_if_better(score=eval_score / len(data_loaders))
+        self._save_if_better(score=eval_score.get_prfa()[2])

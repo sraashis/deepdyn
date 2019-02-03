@@ -10,8 +10,9 @@ from neuralnet.mapnet.mapnet_trainer import MAPNetTrainer
 from neuralnet.mapnet.model import MapUNet
 from neuralnet.mapnet.runs import DRIVE, WIDE, STARE, VEVIO
 from neuralnet.utils import auto_split as asp
+from neuralnet.utils.measurements import ScoreAccumulator
 
-RUNS = [DRIVE, STARE, WIDE, VEVIO]
+RUNS = [STARE]
 
 
 def main():
@@ -24,6 +25,7 @@ def main():
         for k, folder in R['Dirs'].items():
             os.makedirs(folder, exist_ok=True)
 
+        R['acc'] = ScoreAccumulator()
         for split in os.listdir(R['Dirs']['splits_json']):
             splits = asp.load_split_json(os.path.join(R['Dirs']['splits_json'], split))
             R['checkpoint_file'] = split + '.tar'
@@ -55,6 +57,11 @@ def main():
                 drive_trainer.plot_test(file=drive_trainer.test_log_file)
             except Exception as e:
                 traceback.print_exc()
+
+        print(R['acc'].get_prfa())
+        f = open(R['Dirs']['logs'] + os.sep + 'score.txt', "w")
+        f.write(', '.join(str(s) for s in R['acc'].get_prfa()))
+        f.close()
 
 
 if __name__ == "__main__":

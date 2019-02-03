@@ -37,11 +37,12 @@ class UNetNNTrainer(NNTrainer):
 
         print('Training...')
         for epoch in range(1, self.epochs + 1):
+
             self.model.train()
             score_acc = ScoreAccumulator()
             running_loss = 0.0
             self._adjust_learning_rate(optimizer=optimizer, epoch=epoch)
-
+            self.checkpoint['total_epochs'] = epoch
             # w = [self.run_conf['Params']['cls_weights'][0], self.run_conf['Params']['cls_weights'][1]]
             p, r = 1, 1
             for i, data in enumerate(data_loader, 1):
@@ -71,6 +72,8 @@ class UNetNNTrainer(NNTrainer):
             self.plot_train(file=self.train_log_file, batches_per_epochs=data_loader.__len__(), keys=['LOSS', 'F1'])
             if epoch % self.validation_frequency == 0:
                 self.evaluate(data_loaders=validation_loader, logger=val_logger, gen_images=False)
+                if self.early_stop(epoch):
+                    return
 
             self.plot_val(self.validation_log_file, batches_per_epoch=len(validation_loader))
 
