@@ -85,10 +85,10 @@ class UNetNNTrainer(NNTrainer):
     def evaluate(self, data_loaders=None, logger=None, gen_images=False):
         assert (logger is not None), 'Please Provide a logger'
         self.model.eval()
+        eval_score = ScoreAccumulator()
 
         print('\nEvaluating...')
         with torch.no_grad():
-            eval_score = 0.0
 
             for loader in data_loaders:
                 img_obj = loader.dataset.image_objects[0]
@@ -120,16 +120,18 @@ class UNetNNTrainer(NNTrainer):
                     map_img = map_img.cpu().numpy()
                     predicted_img = predicted_img.cpu().numpy()
                     img_score.add_array(predicted_img, img_obj.ground_truth)
+                    self.run_conf['acc'].accumulate(img_score)  # Global score
+
                     IMG.fromarray(np.array(predicted_img, dtype=np.uint8)).save(
                         os.path.join(self.log_dir, 'pred_' + img_obj.file_name.split('.')[0] + '.png'))
                     IMG.fromarray(np.array(map_img, dtype=np.uint8)).save(
                         os.path.join(self.log_dir, img_obj.file_name.split('.')[0] + '.png'))
                 else:
                     img_score.add_tensor(predicted_img, gt)
-                    eval_score += img_score.get_prfa()[2]
 
+                eval_score.accumulate(img_score)
                 prf1a = img_score.get_prfa()
                 print(img_obj.file_name, ' PRF1A', prf1a)
                 self.flush(logger, ','.join(str(x) for x in [img_obj.file_name] + prf1a))
 
-        self._save_if_better(score=eval_score / len(data_loaders))
+        self._save_if_better(score=eval_score.get_prfa()[2])

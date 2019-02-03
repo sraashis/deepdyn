@@ -2,7 +2,6 @@ import os
 
 sep = os.sep
 import numpy as np
-import math
 
 DRIVE = {
     'Params': {
@@ -26,7 +25,7 @@ DRIVE = {
         'image': 'data' + sep + 'DRIVE' + sep + 'images',
         'mask': 'data' + sep + 'DRIVE' + sep + 'mask',
         'truth': 'data' + sep + 'DRIVE' + sep + 'manual',
-        'logs': 'LOGS_2019' + sep + 'DRIVE' + sep + 'UNET',
+        'logs': 'LOGS_2019' + sep + 'DRIVE' + sep + 'UNET_1_1',
         'splits_json': 'data' + sep + 'DRIVE' + sep + 'splits'
     },
 
@@ -70,39 +69,6 @@ DRIVE1 = {
     }
 }
 
-DRIVE2 = {
-    'Params': {
-        'num_channels': 1,
-        'num_classes': 2,
-        'batch_size': 4,
-        'epochs': 250,
-        'learning_rate': 0.001,
-        'patch_shape': (388, 388),
-        'patch_offset': (150, 150),
-        'expand_patch_by': (184, 184),
-        'use_gpu': True,
-        'distribute': True,
-        'shuffle': True,
-        'log_frequency': 5,
-        'validation_frequency': 1,
-        'mode': 'train',
-        'parallel_trained': False,
-    },
-    'Dirs': {
-        'image': 'data' + sep + 'DRIVE' + sep + 'images',
-        'mask': 'data' + sep + 'DRIVE' + sep + 'mask',
-        'truth': 'data' + sep + 'DRIVE' + sep + 'manual',
-        'logs': 'LOGS_2019' + sep + 'DRIVE' + sep + 'UNET_PR',
-        'splits_json': 'data' + sep + 'DRIVE' + sep + 'splits'
-    },
-
-    'Funcs': {
-        'truth_getter': lambda file_name: file_name.split('_')[0] + '_manual1.gif',
-        'mask_getter': lambda file_name: file_name.split('_')[0] + '_mask.gif',
-        'dparm': lambda p, r: [math.exp(1 / p), math.exp(1 / r)]
-    }
-}
-
 WIDE = {
     'Params': {
         'num_channels': 1,
@@ -118,14 +84,14 @@ WIDE = {
         'shuffle': True,
         'log_frequency': 5,
         'validation_frequency': 1,
-        'mode': 'train',
+        'mode': 'test',
         'parallel_trained': False
     },
     'Dirs': {
         'image': 'data' + sep + 'AV-WIDE' + sep + 'images',
         'mask': 'data' + sep + 'AV-WIDE' + sep + 'mask',
         'truth': 'data' + sep + 'AV-WIDE' + sep + 'manual',
-        'logs': 'LOGS_2019' + sep + 'AV-WIDE' + sep + 'UNET',
+        'logs': 'data' + sep + 'AV-WIDE' + sep + 'POST_UNET_1_1',
         'splits_json': 'data' + sep + 'AV-WIDE' + sep + 'splits'
     },
 
@@ -169,39 +135,6 @@ WIDE1 = {
     }
 }
 
-WIDE2 = {
-    'Params': {
-        'num_channels': 1,
-        'num_classes': 2,
-        'batch_size': 4,
-        'epochs': 200,
-        'learning_rate': 0.001,
-        'patch_shape': (388, 388),
-        'patch_offset': (150, 150),
-        'expand_patch_by': (184, 184),
-        'use_gpu': True,
-        'distribute': True,
-        'shuffle': True,
-        'log_frequency': 5,
-        'validation_frequency': 1,
-        'mode': 'train',
-        'parallel_trained': False
-    },
-    'Dirs': {
-        'image': 'data' + sep + 'AV-WIDE' + sep + 'images',
-        'mask': 'data' + sep + 'AV-WIDE' + sep + 'mask',
-        'truth': 'data' + sep + 'AV-WIDE' + sep + 'manual',
-        'logs': 'LOGS_2019' + sep + 'AV-WIDE' + sep + 'UNET_PR',
-        'splits_json': 'data' + sep + 'AV-WIDE' + sep + 'splits'
-    },
-
-    'Funcs': {
-        'truth_getter': lambda file_name: file_name.split('.')[0] + '_vessels.png',
-        'mask_getter': None,
-        'dparm': lambda p, r: [math.exp(1 / p), math.exp(1 / r)]
-    }
-}
-
 STARE = {
     'Params': {
         'num_channels': 1,
@@ -217,14 +150,14 @@ STARE = {
         'shuffle': True,
         'log_frequency': 5,
         'validation_frequency': 1,
-        'mode': 'train',
+        'mode': 'test',
         'parallel_trained': False
 
     },
     'Dirs': {
         'image': 'data' + sep + 'STARE' + sep + 'stare-images',
         'truth': 'data' + sep + 'STARE' + sep + 'labels-ah',
-        'logs': 'LOGS_2019' + sep + 'STARE' + sep + 'UNET',
+        'logs': 'data' + sep + 'STARE' + sep + 'POST_UNET_LOGS_1_10_rand',
         'splits_json': 'data' + sep + 'STARE' + sep + 'splits'
     },
 
@@ -240,7 +173,7 @@ STARE1 = {
         'num_channels': 1,
         'num_classes': 2,
         'batch_size': 4,
-        'epochs': 200,
+        'epochs': 250,
         'learning_rate': 0.001,
         'patch_shape': (388, 388),
         'patch_offset': (150, 150),
@@ -256,7 +189,7 @@ STARE1 = {
     'Dirs': {
         'image': 'data' + sep + 'STARE' + sep + 'stare-images',
         'truth': 'data' + sep + 'STARE' + sep + 'labels-ah',
-        'logs': 'LOGS_2019' + sep + 'STARE' + sep + 'UNET_1_100_1',
+        'logs': 'LOGS_2019' + sep + 'STARE' + sep + 'UNET_ONE',
         'splits_json': 'data' + sep + 'STARE' + sep + 'splits'
     },
 
@@ -264,38 +197,6 @@ STARE1 = {
         'truth_getter': lambda file_name: file_name.split('.')[0] + '.ah.pgm',
         'mask_getter': None,
         'dparm': lambda p, r: np.random.choice(np.arange(1, 101, 1), 2)
-    }
-}
-
-STARE2 = {
-    'Params': {
-        'num_channels': 1,
-        'num_classes': 2,
-        'batch_size': 4,
-        'epochs': 200,
-        'learning_rate': 0.001,
-        'patch_shape': (388, 388),
-        'patch_offset': (150, 150),
-        'expand_patch_by': (184, 184),
-        'use_gpu': True,
-        'distribute': True,
-        'shuffle': True,
-        'log_frequency': 5,
-        'validation_frequency': 1,
-        'mode': 'train',
-        'parallel_trained': False
-    },
-    'Dirs': {
-        'image': 'data' + sep + 'STARE' + sep + 'stare-images',
-        'truth': 'data' + sep + 'STARE' + sep + 'labels-ah',
-        'logs': 'LOGS_2019' + sep + 'STARE' + sep + 'UNET_PR',
-        'splits_json': 'data' + sep + 'STARE' + sep + 'splits'
-    },
-
-    'Funcs': {
-        'truth_getter': lambda file_name: file_name.split('.')[0] + '.ah.pgm',
-        'mask_getter': None,
-        'dparm': lambda p, r: [math.exp(1 / p), math.exp(1 / r)]
     }
 }
 
@@ -314,14 +215,14 @@ VEVIO = {
         'shuffle': True,
         'log_frequency': 5,
         'validation_frequency': 1,
-        'mode': 'train',
+        'mode': 'test',
         'parallel_trained': False
     },
     'Dirs': {
         'image': 'data' + sep + 'VEVIO' + sep + 'mosaics',
         'mask': 'data' + sep + 'VEVIO' + sep + 'mosaics_masks',
         'truth': 'data' + sep + 'VEVIO' + sep + 'mosaics_manual_01_bw',
-        'logs': 'LOGS_2019' + sep + 'VEVIO' + sep + 'UNET',
+        'logs': 'data' + sep + 'VEVIO' + sep + 'POST_UNET_LOGS_1_1',
         'splits_json': 'data' + sep + 'VEVIO' + sep + 'splits'
     },
 
@@ -362,38 +263,5 @@ VEVIO1 = {
         'truth_getter': lambda file_name: 'bw_' + file_name.split('.')[0] + '_black.png',
         'mask_getter': lambda file_name: 'mask_' + file_name,
         'dparm': lambda p, r: np.random.choice(np.arange(1, 101, 1), 2)
-    }
-}
-
-VEVIO2 = {
-    'Params': {
-        'num_channels': 1,
-        'num_classes': 2,
-        'batch_size': 4,
-        'epochs': 200,
-        'learning_rate': 0.001,
-        'patch_shape': (388, 388),
-        'patch_offset': (150, 150),
-        'expand_patch_by': (184, 184),
-        'use_gpu': True,
-        'distribute': True,
-        'shuffle': True,
-        'log_frequency': 5,
-        'validation_frequency': 1,
-        'mode': 'train',
-        'parallel_trained': False
-    },
-    'Dirs': {
-        'image': 'data' + sep + 'VEVIO' + sep + 'mosaics',
-        'mask': 'data' + sep + 'VEVIO' + sep + 'mosaics_masks',
-        'truth': 'data' + sep + 'VEVIO' + sep + 'mosaics_manual_01_bw',
-        'logs': 'LOGS_2019' + sep + 'VEVIO' + sep + 'UNET_PR',
-        'splits_json': 'data' + sep + 'VEVIO' + sep + 'splits'
-    },
-
-    'Funcs': {
-        'truth_getter': lambda file_name: 'bw_' + file_name.split('.')[0] + '_black.png',
-        'mask_getter': lambda file_name: 'mask_' + file_name,
-        'dparm': lambda p, r: [math.exp(1 / p), math.exp(1 / r)]
     }
 }
