@@ -16,9 +16,9 @@ from neuralnet.unet.model import UNet
 from neuralnet.unet.unet_dataloader import PatchesGenerator
 from neuralnet.unet.unet_trainer import UNetNNTrainer
 from neuralnet.utils import auto_split as asp
+from neuralnet.utils.measurements import ScoreAccumulator
 
-RUNS = [rs.DRIVE, rs.DRIVE1, rs.STARE, rs.STARE1, rs.WIDE, rs.WIDE1, rs.VEVIO,
-        rs.VEVIO1]
+RUNS = [rs.DRIVE]
 
 
 def main():
@@ -31,6 +31,7 @@ def main():
         for k, folder in R['Dirs'].items():
             os.makedirs(folder, exist_ok=True)
 
+        R['acc'] = ScoreAccumulator()
         for split in os.listdir(R['Dirs']['splits_json']):
             splits = asp.load_split_json(os.path.join(R['Dirs']['splits_json'], split))
 
@@ -44,9 +45,7 @@ def main():
 
             try:
                 drive_trainer = UNetNNTrainer(model=model, run_conf=R)
-
                 if R.get('Params').get('mode') == 'train':
-                    # drive_trainer.resume_from_checkpoint(parallel_trained=R.get('Params').get('parallel_trained'))
                     train_loader = PatchesGenerator.get_loader(run_conf=R, images=splits['train'], transforms=transform,
                                                                mode='train')
                     val_loader = PatchesGenerator.get_loader_per_img(run_conf=R, images=splits['validation'],
@@ -54,10 +53,8 @@ def main():
                     drive_trainer.train(optimizer=optimizer, data_loader=train_loader, validation_loader=val_loader)
 
                 drive_trainer.resume_from_checkpoint(parallel_trained=R.get('Params').get('parallel_trained'))
-                # print('SCORE: ', drive_trainer.checkpoint['score'])
-                # continue
-                images = splits['test'] + splits['train'] + splits['validation'] if 'DRIVE' in R['Dirs']['image'] else \
-                    splits['test']
+
+                images = splits['test']
                 test_loader = PatchesGenerator.get_loader_per_img(run_conf=R,
                                                                   images=images, mode='test')
 
@@ -68,6 +65,11 @@ def main():
                 logger.close()
             except Exception as e:
                 traceback.print_exc()
+
+        print(R['acc'].get_prfa())
+        f = open(R['Dirs']['logs'] + os.sep + 'score.txt', "w")
+        f.write(', '.join(str(s) for s in R['acc'].get_prfa()))
+        f.close()
 
 
 if __name__ == "__main__":

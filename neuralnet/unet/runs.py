@@ -25,7 +25,7 @@ DRIVE = {
         'image': 'data' + sep + 'DRIVE' + sep + 'images',
         'mask': 'data' + sep + 'DRIVE' + sep + 'mask',
         'truth': 'data' + sep + 'DRIVE' + sep + 'manual',
-        'logs': 'LOGS_2019' + sep + 'DRIVE' + sep + 'UNET',
+        'logs': 'LOGS_2019' + sep + 'DRIVE' + sep + 'UNET_1_1',
         'splits_json': 'data' + sep + 'DRIVE' + sep + 'splits'
     },
 
@@ -84,14 +84,14 @@ WIDE = {
         'shuffle': True,
         'log_frequency': 5,
         'validation_frequency': 1,
-        'mode': 'train',
+        'mode': 'test',
         'parallel_trained': False
     },
     'Dirs': {
         'image': 'data' + sep + 'AV-WIDE' + sep + 'images',
         'mask': 'data' + sep + 'AV-WIDE' + sep + 'mask',
         'truth': 'data' + sep + 'AV-WIDE' + sep + 'manual',
-        'logs': 'LOGS_2019' + sep + 'AV-WIDE' + sep + 'UNET',
+        'logs': 'data' + sep + 'AV-WIDE' + sep + 'POST_UNET_1_1',
         'splits_json': 'data' + sep + 'AV-WIDE' + sep + 'splits'
     },
 
@@ -150,14 +150,14 @@ STARE = {
         'shuffle': True,
         'log_frequency': 5,
         'validation_frequency': 1,
-        'mode': 'train',
+        'mode': 'test',
         'parallel_trained': False
 
     },
     'Dirs': {
         'image': 'data' + sep + 'STARE' + sep + 'stare-images',
         'truth': 'data' + sep + 'STARE' + sep + 'labels-ah',
-        'logs': 'LOGS_2019' + sep + 'STARE' + sep + 'UNET',
+        'logs': 'data' + sep + 'STARE' + sep + 'POST_UNET_LOGS_1_10_rand',
         'splits_json': 'data' + sep + 'STARE' + sep + 'splits'
     },
 
@@ -173,7 +173,7 @@ STARE1 = {
         'num_channels': 1,
         'num_classes': 2,
         'batch_size': 4,
-        'epochs': 200,
+        'epochs': 250,
         'learning_rate': 0.001,
         'patch_shape': (388, 388),
         'patch_offset': (150, 150),
@@ -189,7 +189,7 @@ STARE1 = {
     'Dirs': {
         'image': 'data' + sep + 'STARE' + sep + 'stare-images',
         'truth': 'data' + sep + 'STARE' + sep + 'labels-ah',
-        'logs': 'LOGS_2019' + sep + 'STARE' + sep + 'UNET_1_100_1',
+        'logs': 'LOGS_2019' + sep + 'STARE' + sep + 'UNET_ONE',
         'splits_json': 'data' + sep + 'STARE' + sep + 'splits'
     },
 
@@ -215,14 +215,14 @@ VEVIO = {
         'shuffle': True,
         'log_frequency': 5,
         'validation_frequency': 1,
-        'mode': 'train',
+        'mode': 'test',
         'parallel_trained': False
     },
     'Dirs': {
         'image': 'data' + sep + 'VEVIO' + sep + 'mosaics',
         'mask': 'data' + sep + 'VEVIO' + sep + 'mosaics_masks',
         'truth': 'data' + sep + 'VEVIO' + sep + 'mosaics_manual_01_bw',
-        'logs': 'LOGS_2019' + sep + 'VEVIO' + sep + 'UNET',
+        'logs': 'data' + sep + 'VEVIO' + sep + 'POST_UNET_LOGS_1_1',
         'splits_json': 'data' + sep + 'VEVIO' + sep + 'splits'
     },
 
