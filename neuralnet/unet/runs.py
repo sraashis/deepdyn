@@ -74,7 +74,7 @@ WIDE = {
         'num_channels': 1,
         'num_classes': 2,
         'batch_size': 4,
-        'epochs': 200,
+        'epochs': 250,
         'learning_rate': 0.001,
         'patch_shape': (388, 388),
         'patch_offset': (150, 150),
@@ -91,7 +91,7 @@ WIDE = {
         'image': 'data' + sep + 'AV-WIDE' + sep + 'images',
         'mask': 'data' + sep + 'AV-WIDE' + sep + 'mask',
         'truth': 'data' + sep + 'AV-WIDE' + sep + 'manual',
-        'logs': 'data' + sep + 'AV-WIDE' + sep + 'POST_UNET_1_1',
+        'logs': 'LOGS_2019' + sep + 'AV-WIDE' + sep + 'UNET_1_1',
         'splits_json': 'data' + sep + 'AV-WIDE' + sep + 'splits'
     },
 
@@ -107,7 +107,7 @@ WIDE1 = {
         'num_channels': 1,
         'num_classes': 2,
         'batch_size': 4,
-        'epochs': 200,
+        'epochs': 250,
         'learning_rate': 0.001,
         'patch_shape': (388, 388),
         'patch_offset': (150, 150),
@@ -157,7 +157,7 @@ STARE = {
     'Dirs': {
         'image': 'data' + sep + 'STARE' + sep + 'stare-images',
         'truth': 'data' + sep + 'STARE' + sep + 'labels-ah',
-        'logs': 'data' + sep + 'STARE' + sep + 'POST_UNET_LOGS_1_10_rand',
+        'logs': 'LOGS_2019' + sep + 'STARE' + sep + 'UNET_1_1',
         'splits_json': 'data' + sep + 'STARE' + sep + 'splits'
     },
 
@@ -189,7 +189,7 @@ STARE1 = {
     'Dirs': {
         'image': 'data' + sep + 'STARE' + sep + 'stare-images',
         'truth': 'data' + sep + 'STARE' + sep + 'labels-ah',
-        'logs': 'LOGS_2019' + sep + 'STARE' + sep + 'UNET_ONE',
+        'logs': 'LOGS_2019' + sep + 'STARE' + sep + 'UNET_1_100_1',
         'splits_json': 'data' + sep + 'STARE' + sep + 'splits'
     },
 
@@ -222,7 +222,7 @@ VEVIO = {
         'image': 'data' + sep + 'VEVIO' + sep + 'mosaics',
         'mask': 'data' + sep + 'VEVIO' + sep + 'mosaics_masks',
         'truth': 'data' + sep + 'VEVIO' + sep + 'mosaics_manual_01_bw',
-        'logs': 'data' + sep + 'VEVIO' + sep + 'POST_UNET_LOGS_1_1',
+        'logs': 'LOGS_2019' + sep + 'VEVIO' + sep + 'UNET_1_1',
         'splits_json': 'data' + sep + 'VEVIO' + sep + 'splits'
     },
 

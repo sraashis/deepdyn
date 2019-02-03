@@ -18,7 +18,7 @@ from neuralnet.unet.unet_trainer import UNetNNTrainer
 from neuralnet.utils import auto_split as asp
 from neuralnet.utils.measurements import ScoreAccumulator
 
-RUNS = [rs.DRIVE]
+RUNS = [rs.DRIVE, rs.DRIVE1]
 
 
 def main():
