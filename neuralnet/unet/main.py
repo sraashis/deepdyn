@@ -19,7 +19,10 @@ from neuralnet.utils import auto_split as asp
 from neuralnet.utils.measurements import ScoreAccumulator
 
 # RUNS = [rs.DRIVE]
-RUNS = [rs.DRIVE, rs.DRIVE1, rs.STARE, rs.STARE1, rs.WIDE, rs.WIDE1, rs.VEVIO, rs.VEVIO1]
+RUNS = [rs.DRIVE, rs.DRIVE1, rs.DRIVE2, rs.DRIVE3,
+        rs.STARE, rs.STARE1, rs.STARE2, rs.STARE3,
+        rs.WIDE, rs.WIDE1, rs.WIDE2, rs.WIDE3,
+        rs.VEVIO, rs.VEVIO1, rs.VEVIO2, rs.VEVIO3]
 
 
 def main():
