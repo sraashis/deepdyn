@@ -174,7 +174,7 @@ class NNTrainer:
                        'model': str(self.model)}
 
         # Save a running version of checkpoint with a different name
-        torch.save(current_chk, self.temp_chk_file)
+        # torch.save(current_chk, self.temp_chk_file)
 
         if score > self.checkpoint['score']:
             torch.save(current_chk, self.checkpoint_file)
