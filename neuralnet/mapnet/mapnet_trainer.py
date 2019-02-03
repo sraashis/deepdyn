@@ -41,7 +41,8 @@ class MAPNetTrainer(NNTrainer):
             self.model.train()
             score_acc = ScoreAccumulator()
             running_loss = 0.0
-            # self._adjust_learning_rate(optimizer=optimizer, epoch=epoch)
+            self._adjust_learning_rate(optimizer=optimizer, epoch=epoch)
+            self.checkpoint['total_epochs'] = epoch
             for i, data in enumerate(data_loader, 1):
                 inputs, labels = data['inputs'].to(self.device).float(), data['labels'].to(self.device).long()
                 # weights = data['weights'].to(self.device)
@@ -73,7 +74,7 @@ class MAPNetTrainer(NNTrainer):
             self.plot_train(file=self.train_log_file, batches_per_epochs=data_loader.__len__(), keys=['LOSS', 'F1'])
             if epoch % self.validation_frequency == 0:
                 self.evaluate(data_loaders=validation_loader, logger=val_logger, gen_images=False)
-                if self.early_stop(epoch):
+                if self.early_stop(patience=10):
                     return
 
             self.plot_val(self.validation_log_file, batches_per_epoch=len(validation_loader))
