@@ -44,6 +44,7 @@ class NNTrainer:
             self.device = torch.device("cpu")
 
         self.model = model.to(self.device)
+        self.model_trace = []
 
         self.checkpoint = {'epochs': 0, 'state': None, 'score': 0.0, 'model': 'EMPTY'}
 
@@ -184,14 +185,15 @@ class NNTrainer:
         else:
             print('Score did not improve:' + str(score) + ' BEST: ' + str(self.checkpoint['score']))
 
+    def early_stop(self, epoch=0, patience=35):
+        return epoch - self.checkpoint['epochs'] >= patience * self.validation_frequency
+
     @staticmethod
     def get_logger(log_file=None, header=''):
 
         if os.path.isfile(log_file):
-            print('### CRITICAL!!! ' + log_file + '" already exists. OVERRIDE [Y/N]?')
-            ui = input()
-            if ui == 'N' or ui == 'n':
-                sys.exit(1)
+            print('### CRITICAL!!! ' + log_file + '" already exists. PLEASE BACKUP. Exiting..')
+            sys.exit(1)
 
         file = open(log_file, 'w')
         NNTrainer.flush(file, header)
