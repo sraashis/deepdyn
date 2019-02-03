@@ -13,8 +13,6 @@ from PIL import Image as IMG
 
 from neuralnet.torchtrainer import NNTrainer
 from neuralnet.utils.measurements import ScoreAccumulator
-import random as rd
-import math
 
 sep = os.sep
 
