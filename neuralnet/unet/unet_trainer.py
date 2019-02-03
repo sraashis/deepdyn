@@ -13,8 +13,6 @@ from PIL import Image as IMG
 
 from neuralnet.torchtrainer import NNTrainer
 from neuralnet.utils.measurements import ScoreAccumulator
-import random as rd
-import math
 
 sep = os.sep
 
@@ -128,8 +126,8 @@ class UNetNNTrainer(NNTrainer):
                         os.path.join(self.log_dir, img_obj.file_name.split('.')[0] + '.png'))
                 else:
                     img_score.add_tensor(predicted_img, gt)
+                    eval_score.accumulate(img_score)
 
-                eval_score.accumulate(img_score)
                 prf1a = img_score.get_prfa()
                 print(img_obj.file_name, ' PRF1A', prf1a)
                 self.flush(logger, ','.join(str(x) for x in [img_obj.file_name] + prf1a))
