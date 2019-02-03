@@ -42,7 +42,7 @@ class UNetNNTrainer(NNTrainer):
             score_acc = ScoreAccumulator()
             running_loss = 0.0
             self._adjust_learning_rate(optimizer=optimizer, epoch=epoch)
-
+            self.checkpoint['total_epochs'] = epoch
             # w = [self.run_conf['Params']['cls_weights'][0], self.run_conf['Params']['cls_weights'][1]]
             p, r = 1, 1
             for i, data in enumerate(data_loader, 1):

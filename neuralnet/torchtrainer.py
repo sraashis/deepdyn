@@ -29,7 +29,6 @@ class NNTrainer:
         self.validation_frequency = self.run_conf.get('Params').get('validation_frequency', 1)
 
         self.checkpoint_file = os.path.join(self.log_dir, self.run_conf.get('checkpoint_file'))
-        self.temp_chk_file = os.path.join(self.log_dir, 'RUNNING' + self.run_conf.get('checkpoint_file'))
 
         self.log_key = self.run_conf.get('checkpoint_file').split('.')[0]
         self.train_log_file = os.path.join(self.log_dir, self.log_key + '-TRAIN.csv')
@@ -46,7 +45,7 @@ class NNTrainer:
         self.model = model.to(self.device)
         self.model_trace = []
 
-        self.checkpoint = {'epochs': 0, 'state': None, 'score': 0.0, 'model': 'EMPTY'}
+        self.checkpoint = {'total_epochs:': 0, 'epochs': 0, 'state': None, 'score': 0.0, 'model': 'EMPTY'}
 
     def train(self, optimizer=None, data_loader=None, validation_loader=None):
 
@@ -167,26 +166,19 @@ class NNTrainer:
         if self.mode == 'test':
             return
 
-        score = round(score, 5)
-        current_epoch = self.checkpoint['epochs'] + self.validation_frequency
-        current_chk = {'state': self.model.state_dict(),
-                       'epochs': current_epoch,
-                       'score': score,
-                       'model': str(self.model)}
-
-        # Save a running version of checkpoint with a different name
-        # torch.save(current_chk, self.temp_chk_file)
-
         if score > self.checkpoint['score']:
-            torch.save(current_chk, self.checkpoint_file)
+            self.checkpoint['state'] = self.model.state_dict()
+            self.checkpoint['epochs'] = self.checkpoint['total_epochs']
+            self.checkpoint['score'] = score
+            self.checkpoint['model'] = str(self.model)
+            torch.save(self.checkpoint, self.checkpoint_file)
             print('Score improved: ',
                   str(self.checkpoint['score']) + ' to ' + str(score) + ' BEST CHECKPOINT SAVED')
-            self.checkpoint = current_chk
         else:
             print('Score did not improve:' + str(score) + ' BEST: ' + str(self.checkpoint['score']))
 
-    def early_stop(self, epoch=0, patience=35):
-        return epoch - self.checkpoint['epochs'] >= patience * self.validation_frequency
+    def early_stop(self, patience=35):
+        return self.checkpoint['total_epochs'] - self.checkpoint['epochs'] >= patience * self.validation_frequency
 
     @staticmethod
     def get_logger(log_file=None, header=''):
