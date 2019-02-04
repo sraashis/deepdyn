@@ -7,6 +7,7 @@
 import os
 
 import numpy as np
+import math
 import torch
 import torch.nn.functional as F
 from PIL import Image as IMG
@@ -44,6 +45,7 @@ class UNetNNTrainer(NNTrainer):
             self._adjust_learning_rate(optimizer=optimizer, epoch=epoch)
             self.checkpoint['total_epochs'] = epoch
 
+            p, r = 1, 1
             for i, data in enumerate(data_loader, 1):
                 inputs, labels = data['inputs'].to(self.device).float(), data['labels'].to(self.device).long()
 
