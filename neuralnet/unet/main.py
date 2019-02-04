@@ -18,11 +18,15 @@ from neuralnet.unet.unet_trainer import UNetNNTrainer
 from neuralnet.utils import auto_split as asp
 from neuralnet.utils.measurements import ScoreAccumulator
 
-# RUNS = [rs.DRIVE]
-RUNS = [rs.DRIVE, rs.DRIVE1, rs.DRIVE2, rs.DRIVE3,
-        rs.STARE, rs.STARE1, rs.STARE2, rs.STARE3,
-        rs.WIDE, rs.WIDE1, rs.WIDE2, rs.WIDE3,
-        rs.VEVIO, rs.VEVIO1, rs.VEVIO2, rs.VEVIO3]
+RUNS1 = [rs.DRIVE1, rs.DRIVE2,
+         rs.STARE1, rs.STARE2,
+         rs.WIDE1, rs.WIDE2,
+         rs.VEVIO1, rs.VEVIO2]
+
+RUNS2 = [rs.DRIVE, rs.DRIVE3,
+         rs.STARE, rs.STARE3,
+         rs.WIDE, rs.WIDE3,
+         rs.VEVIO, rs.VEVIO3]
 
 
 def main():
@@ -31,7 +35,7 @@ def main():
         transforms.ToTensor()
     ])
 
-    for R in RUNS:
+    for R in RUNS2 + RUNS1:
         for k, folder in R['Dirs'].items():
             os.makedirs(folder, exist_ok=True)
 
