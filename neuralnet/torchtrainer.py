@@ -175,7 +175,8 @@ class NNTrainer:
             self.checkpoint['model'] = str(self.model)
             torch.save(self.checkpoint, self.checkpoint_file)
         else:
-            print('Score did not improve:' + str(score) + ' BEST: ' + str(self.checkpoint['score']))
+            print('Score did not improve:' + str(score) + ' BEST: ' + str(self.checkpoint['score']) + ' EP: ' + (
+             str(self.checkpoint['epochs'])))
 
     def early_stop(self, patience=35):
         return self.checkpoint['total_epochs'] - self.checkpoint['epochs'] >= patience * self.validation_frequency
