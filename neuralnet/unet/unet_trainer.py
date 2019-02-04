@@ -71,7 +71,7 @@ class UNetNNTrainer(NNTrainer):
             self.plot_train(file=self.train_log_file, batches_per_epochs=data_loader.__len__(), keys=['LOSS', 'F1'])
             if epoch % self.validation_frequency == 0:
                 self.evaluate(data_loaders=validation_loader, logger=val_logger, gen_images=False)
-                if self.early_stop(patience=50):
+                if self.early_stop(patience=65):
                     return
 
             self.plot_val(self.validation_log_file, batches_per_epoch=len(validation_loader))
