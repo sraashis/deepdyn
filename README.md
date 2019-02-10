@@ -2,7 +2,6 @@
 A super flexible framework based on py-torch for Convolutional Neural Network that is easy to customize for custom dataset. This framework is based on both pythonic and object oriented design. It consist of following major features:
 1. Customizable pytorch universal trainer module that takes in model and has:
   - Saving and resuming best model while training
-  - Genrating graphs with minimal changes
   - Extend torchtrainer.py to add custom functionality.
 2. Customizable dataloader that handles on-the-fly data loading. It comes in handy when we need to load a single loader for one patches of just one image. 
   -Extend datagen.py to add custom data load functionality.
