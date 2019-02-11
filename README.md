@@ -7,7 +7,7 @@ A super flexible framework based on py-torch for Convolutional Neural Network th
   - Automatically detects all GPUs and use all if specified.
 2. Customizable dataloader that handles on-the-fly data loading. It comes in handy when we need to load a single loader for one patches of just one image. 
   -Extend datagen.py to add custom data load functionality.
-3. Centralized configuration - All parameters are centralized in on file runs.py.
+3. Centralized configuration - All parameters are centralized in one file runs.py.
 4. Consist of working implementation of u-net. A popular CNN architecture that gives state-of-the-art results for biomedical image segmentation.
 5. Metrics like precision, recall, f1 and accuracy is super easy to work with with ScoreAccumulator.py which can accumulate scores from both numpy array and pytorch tensors.
 6. Centralized class Image.py for loading /processing image, their mask, ground truth and many more.
