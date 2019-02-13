@@ -83,12 +83,13 @@ class PatchesGenerator(Generator):
                 if np.isin(0, img_obj.mask[row_from:row_to, col_from:col_to]):
                     continue
 
-                print('output[0], output[1])', output[0], output[1])
                 rho = np.sqrt(output[0] ** 2 + output[1] ** 2)
-                # phi = math.degrees(np.arctan2(output[0], output[1]))
-                # print('maxx', np.max(phi), np.min(phi))
                 phi = np.arctan2(output[0], output[1])
-                self.indices.append([ID, [p, q], [i, j], [rho, phi]])
+                if phi < 0:
+                    phi = (2 * math.pi) + phi
+                # print('maxx', np.max(phi), np.min(phi))
+                # self.indices.append([ID, [p, q], [i, j], [phi, 0]])
+                self.indices.append([ID, [p, q], [i, j], [phi]])
                 # self.indices.append([ID, [p, q], [i, j], output.tolist()])
 
     def __getitem__(self, index):
@@ -128,5 +129,5 @@ class PatchesGenerator(Generator):
         # print('input_patches[out[0], out[1], 0] ', input_patches[out[0], out[1], 0] )
 
         input_tensor = np.append(prev_patches, input_patches, 0)
-        return {'IDs': ID, 'POS': np.array([i, j]), 'PREV': np.array([p,q]), 'inputs': input_tensor,
+        return {'IDs': ID, 'POS': np.array([i, j]), 'PREV': np.array([p, q]), 'inputs': input_tensor,
                 'labels': torch.FloatTensor(out)}
