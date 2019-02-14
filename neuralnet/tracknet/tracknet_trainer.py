@@ -97,22 +97,6 @@ class TracknetTrainer(NNTrainer):
                     current_loss = loss.item()
                     print('current_loss', current_loss)
                     img_loss += current_loss
-                    # labels = labels + positions.float()
-                    # for j in range(outputs.shape[0]):
-                    #     if j > 0:
-                    #         continue
-                    #     # x, y = int(labels[j][0]), int(labels[j][1])
-                    #     x = int(labels[j][0])
-                    #     p, q = int(positions[j][0]), int(positions[j][1])
-                    #     r, s = int(prev_positions[j][0]), int(prev_positions[j][1])
-                    #     # x_pred, y_pred = int(predicted[j][0]), int(predicted[j][1])
-                    #     x_pred = int(predicted[j][0])
-                    #     # segmented_img[:, :, :][x, y] = 255
-                    #     segmented_img[:, :, :][x] = 255
-                    #     # segmented_img[:, :, 2][x_pred, y_pred] = 255
-                    #     # segmented_img[:, :, 2][x_pred] = 255
-                    #     segmented_img[:, :, 1][p, q] = 255
-                    #     segmented_img[:, :, 0][r, s] = 255
 
                     self.flush(logger,
                                ','.join(str(x) for x in [img_obj.file_name] + [current_loss]))
