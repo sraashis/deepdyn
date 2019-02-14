@@ -41,61 +41,16 @@ class TracknetTrainer(NNTrainer):
                 optimizer.zero_grad()
                 thr_map = self.model(inputs).squeeze()
 
-
-                # if True:
-                #     print(torch.cat([labels[..., None].squeeze(), thr_map[..., None].squeeze()], 1))
-                #     print('-------------------------------------------------')
-                # print('thr_map', thr_map)
-                # print('labels', labels)
-                # print('thr_map typppeeeee', type(thr_map), type(labels))
-
                 labels = labels.squeeze()
                 thr_map = thr_map.squeeze()
-                # thr_map = torch.cat([thr_map[..., None], torch.zeros_like(thr_map[..., None])], 1)
-                # loss = F.mse_loss(thr_map, labels)
-                # print('loss = min', min(abs(thr_map-labels), abs(labels-thr_map)))
                 diff = thr_map-labels
                 diff[diff > math.pi] -= 2*math.pi
                 loss = torch.abs(diff).mean()
                 print(torch.cat([labels[..., None], thr_map[..., None], diff.abs()[..., None]], 1))
-                # for counter, dat in enumerate(loss):
-                #     print('counnter', counter, dat)
-                #     if dat > math.pi:
-                #         loss.data[counter] = dat - 2 * math.pi
-                #     if dat < math.pi:
-                #         loss.data[counter] = dat + 2 * math.pi
 
-                # for MSE loss
-                # loss = F.mse_loss(thr_map, labels)
                 loss.backward()
                 optimizer.step()
-
-                # print('loss', loss)
-                # current_loss = math.sqrt(loss.item())
                 current_loss = loss.item()
-                # thr_map = thr_map.data.numpy()
-                # thr_map = thr_map.var.detach().numpy()
-                # labels = labels.var.detach().numpy()
-                # labels = labels.data.numpy()
-
-                # x = thr_map[:, 0]
-                # y = thr_map[:, 1]
-                # rho = torch.sqrt(x ** 2 + y ** 2)
-                # phi = torch.atan2(x, y)
-
-                # rho = np.sqrt(thr_map[:, 0] ** 2 + thr_map[:, 1] ** 2)
-                # phi = np.arctan2(thr_map[:, 1], thr_map[:, 0])
-                # result = 1 - spatial.distance.cosine(thr_map, labels)
-                # spatial.distance.cosine()
-
-                # Calculate cosine similarity when use polar coordinate
-                # print('output', thr_map.shape)
-                # print('lables', labels.shape)
-                # result = F.cosine_similarity((outputs[:, 1], labels[:, 1]), dim = 1)
-                # print('labels', labels)
-                # print('estimate', thr_map)
-                # result = thr_map[:, 1] - labels[:, 1]
-                # print('result', result)
 
                 running_loss += current_loss
                 if i % self.log_frequency == 0:
@@ -135,34 +90,13 @@ class TracknetTrainer(NNTrainer):
                     positions = data['POS'].to(self.device)
                     prev_positions = data['PREV'].to(self.device)
                     outputs = self.model(inputs).squeeze()
-
-                    # predicted = outputs + positions.float()
-                    # predicted = outputs
-
-                    # outputs = outputs.squeeze()
-                    # if len(thr_map.shape) <= 0:
-                    #     continue
-                    # outputs = torch.cat([thr_map[..., None], torch.zeros_like(thr_map[..., None])], 1)
                     diff = outputs - labels
                     diff[diff > math.pi] -= 2 * math.pi
                     diff = diff.abs()
                     loss = diff.mean()
-                    # print('valida', torch.cat([labels[..., None], outputs[..., None]], 1))
-                    # loss = F.mse_loss(outputs.squeeze(), labels.squeeze())
-                    # loss = (labels - outputs).sum()
-
-                    # print('lables', labels)
-                    # print('output', outputs)
-                    # print('loss', loss)
-
-                    # current_loss = math.sqrt(loss.item())
                     current_loss = loss.item()
                     print('current_loss', current_loss)
                     img_loss += current_loss
-                    # if len(outputs.shape) == 1:
-                    #     outputs = outputs[None, ...]
-
-                    # print(torch.cat([labels, outputs], 1))
                     # labels = labels + positions.float()
                     # for j in range(outputs.shape[0]):
                     #     if j > 0:
