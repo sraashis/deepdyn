@@ -37,9 +37,6 @@ class PatchesGenerator(Generator):
             img_obj.working_arr = I[:, :, 1]
             img_obj.res['2d'] = np.array([T, 255-I[:, :, 1]])
 
-
-
-
             img_obj.load_mask(self.mask_dir, self.mask_getter)
 
             self.image_objects[ID] = img_obj
@@ -85,8 +82,10 @@ class PatchesGenerator(Generator):
 
                 rho = np.sqrt(output[0] ** 2 + output[1] ** 2)
                 phi = np.arctan2(output[0], output[1])
+
                 if phi < 0:
                     phi = (2 * math.pi) + phi
+
                 # print('maxx', np.max(phi), np.min(phi))
                 # self.indices.append([ID, [p, q], [i, j], [phi, 0]])
                 self.indices.append([ID, [p, q], [i, j], [phi]])
