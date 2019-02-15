@@ -62,8 +62,7 @@ class TracknetTrainer(NNTrainer):
                 self.flush(logger, ','.join(str(x) for x in [0, epoch, i, current_loss]))
             self.plot_train(file=self.train_log_file, batches_per_epochs=data_loader.__len__(), keys=['LOSS'])
             if epoch % self.validation_frequency == 0:
-                pass
-                # self.evaluate(data_loaders=validation_loader, logger=val_logger, gen_images=False)
+                self.evaluate(data_loaders=validation_loader, logger=val_logger, gen_images=False)
             self.plot_val(self.validation_log_file, batches_per_epoch=len(validation_loader))
         try:
             logger.close()

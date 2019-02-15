@@ -77,7 +77,7 @@ class PatchesGenerator(Generator):
 
                 if phi < 0:
                     phi = (2 * math.pi) + phi
-                # phi = phi * 180 / math.pi
+                phi = phi * 180 / math.pi
                 self.indices.append([ID, [p, q], [i, j], [phi]])
 
     def __getitem__(self, index):
