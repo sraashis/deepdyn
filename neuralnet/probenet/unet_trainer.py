@@ -90,7 +90,6 @@ class UNetNNTrainer(NNTrainer):
             for loader in data_loaders:
                 img_obj = loader.dataset.image_objects[0]
                 x, y = img_obj.working_arr.shape[0], img_obj.working_arr.shape[1]
-                predicted_img = torch.FloatTensor(x, y).fill_(0).to(self.device)
                 map_img = torch.FloatTensor(x, y).fill_(0).to(self.device)
 
                 img_loss = 0.0

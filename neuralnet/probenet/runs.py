@@ -6,7 +6,7 @@ GREY_HIGH = {
         'num_channels': 1,
         'num_classes': 1,
         'batch_size': 4,
-        'epochs': 1,
+        'epochs': 10,
         'learning_rate': 0.001,
         'patch_shape': (388, 388),
         'patch_offset': (150, 150),
