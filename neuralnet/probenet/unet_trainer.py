@@ -51,7 +51,7 @@ class UNetNNTrainer(NNTrainer):
                 outputs = self.model(inputs)
                 _, predicted = torch.max(outputs, 1)
 
-                loss = F.mse_loss(outputs, labels)
+                loss = F.mse_loss(outputs.squeeze(), labels.squeeze())
                 loss.backward()
                 optimizer.step()
 
@@ -99,7 +99,7 @@ class UNetNNTrainer(NNTrainer):
                     clip_ix = data['clip_ix'].to(self.device).int()
 
                     outputs = self.model(inputs)
-                    loss = F.mse_loss(outputs, labels).item()
+                    loss = F.mse_loss(outputs.squeeze(), labels.squeeze()).item()
 
                     img_loss += loss
 
@@ -111,10 +111,6 @@ class UNetNNTrainer(NNTrainer):
 
                 if gen_images:
                     map_img = map_img.cpu().numpy()
-                    predicted_img = predicted_img.cpu().numpy()
-
-                    IMG.fromarray(np.array(predicted_img, dtype=np.uint8)).save(
-                        os.path.join(self.log_dir, 'pred_' + img_obj.file_name.split('.')[0] + '.png'))
                     IMG.fromarray(np.array(map_img, dtype=np.uint8)).save(
                         os.path.join(self.log_dir, img_obj.file_name.split('.')[0] + '.png'))
                 else:
@@ -123,4 +119,4 @@ class UNetNNTrainer(NNTrainer):
 
                 self.flush(logger, ','.join(str(x) for x in [img_obj.file_name, img_loss / loader.__len__()]))
 
-        self._save_if_better(score=len(data_loaders/eval_loss))
+        self._save_if_better(score=len(data_loaders)/eval_loss)
