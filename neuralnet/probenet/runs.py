@@ -4,7 +4,7 @@ sep = os.sep
 GREY_HIGH = {
     'Params': {
         'num_channels': 1,
-        'num_classes': 2,
+        'num_classes': 1,
         'batch_size': 4,
         'epochs': 150,
         'learning_rate': 0.001,
