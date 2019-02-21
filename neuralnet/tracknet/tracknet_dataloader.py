@@ -26,6 +26,8 @@ class PatchesGenerator(Generator):
         for ID, img_file in enumerate(self.images):
             mat_file = Mat(mat_file=self.image_dir + sep + img_file)
 
+
+
             V = mat_file.get_graph('V')
             A = mat_file.get_graph('A')
             I = mat_file.get_image('I')
@@ -35,7 +37,7 @@ class PatchesGenerator(Generator):
             img_obj.file_name = img_file
             img_obj.image_arr = I
             img_obj.working_arr = I[:, :, 1]
-            img_obj.res['2d'] = np.array([T, 255-I[:, :, 1]])
+            img_obj.res['2d'] = np.array([T, 255 - I[:, :, 1]])
 
             img_obj.load_mask(self.mask_dir, self.mask_getter)
 
@@ -53,7 +55,8 @@ class PatchesGenerator(Generator):
             b_pos_output = V[b, :]
             u_pos_input = u_pos_input.astype(np.int)
 
-            for (p, q), (i, j), output in zip(u_pos_input_prev, u_pos_input, b_pos_output - u_pos_input):
+            temp = img_obj.working_arr.copy()
+            for (q, p), (j, i), output, b_out in zip(u_pos_input_prev, u_pos_input, b_pos_output - u_pos_input, b_pos_output):
                 row_from, row_to = int(i - self.k_half), int(i + self.k_half + 1)
                 col_from, col_to = int(j - self.k_half), int(j + self.k_half + 1)
                 if row_from < 0 or col_from < 0:
@@ -63,7 +66,8 @@ class PatchesGenerator(Generator):
                 if np.isin(0, img_obj.mask[row_from:row_to, col_from:col_to]):
                     continue
 
-                row_from, row_to = int(p - self.k_half), int(p + self.k_half + 1)
+                temp[int(i), int(j)] = 255
+                row_from, ro1w_to = int(p - self.k_half), int(p + self.k_half + 1)
                 col_from, col_to = int(q - self.k_half), int(q + self.k_half + 1)
                 if row_from < 0 or col_from < 0:
                     continue
@@ -73,15 +77,20 @@ class PatchesGenerator(Generator):
                     continue
 
                 rho = np.sqrt(output[0] ** 2 + output[1] ** 2)
-                phi = np.arctan2(output[0], output[1])
+                phi = np.arctan2(output[1], output[0])
+                # print(i, j, b_out, phi)
 
                 if phi < 0:
                     phi = (2 * math.pi) + phi
                 phi = phi * 180 / math.pi
-                self.indices.append([ID, [p, q], [i, j], [phi]])
+
+                # if phi == 0:
+                #     img_obj = 255
+                self.indices.append([ID, [p, q], [i, j], phi, b_out])
+            IMG.fromarray(temp).save('patches/'+img_file+'.png')
 
     def __getitem__(self, index):
-        ID, (p, q), (i, j), out = self.indices[index]
+        ID, (p, q), (i, j), out, b_pos = self.indices[index]
 
         row_from, row_to = p - self.k_half, p + self.k_half + 1
         col_from, col_to = q - self.k_half, q + self.k_half + 1
@@ -102,5 +111,9 @@ class PatchesGenerator(Generator):
         input_patches = self.image_objects[ID].res['2d'][:, row_from:row_to, col_from:col_to]
 
         input_tensor = np.append(prev_patches, input_patches, 0)
+        if out == 0:
+            # print('hhhss', out, i, j, b_pos)
+            # IMG.fromarray(img_obj)
+            # IMG.fromarray(input_patches[1, :, :]).save('patches/'+str(index) + '.png')
         return {'IDs': ID, 'POS': np.array([i, j]), 'PREV': np.array([p, q]), 'inputs': input_tensor,
-                'labels': torch.FloatTensor(out)}
+                'labels': torch.FloatTensor([out])}
