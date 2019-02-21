@@ -111,7 +111,7 @@ class PatchesGenerator(Generator):
         input_patches = self.image_objects[ID].res['2d'][:, row_from:row_to, col_from:col_to]
 
         input_tensor = np.append(prev_patches, input_patches, 0)
-        if out == 0:
+        # if out == 0:
             # print('hhhss', out, i, j, b_pos)
             # IMG.fromarray(img_obj)
             # IMG.fromarray(input_patches[1, :, :]).save('patches/'+str(index) + '.png')

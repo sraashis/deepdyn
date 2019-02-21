@@ -46,11 +46,12 @@ class TracknetTrainer(NNTrainer):
                 diff = thr_map-labels
                 diff[diff > math.pi] -= 2*math.pi
                 loss = torch.abs(diff).mean()
-                print(torch.cat([labels[..., None], thr_map[..., None], diff.abs()[..., None]], 1))
-
+                # print(torch.cat([labels[..., None], thr_map[..., None], diff.abs()[..., None]], 1))
                 loss.backward()
                 optimizer.step()
                 current_loss = loss.item()
+                # maxloss = max(current_loss)
+
 
                 running_loss += current_loss
                 if i % self.log_frequency == 0:
@@ -64,6 +65,8 @@ class TracknetTrainer(NNTrainer):
             if epoch % self.validation_frequency == 0:
                 self.evaluate(data_loaders=validation_loader, logger=val_logger, gen_images=False)
             self.plot_val(self.validation_log_file, batches_per_epoch=len(validation_loader))
+        # print('maxloss', maxloss)
+
         try:
             logger.close()
         except IOError:
@@ -94,14 +97,14 @@ class TracknetTrainer(NNTrainer):
                     diff = diff.abs()
                     loss = diff.mean()
                     current_loss = loss.item()
-                    print('current_loss', current_loss)
+                    # print('current_loss', current_loss)
                     img_loss += current_loss
 
                     self.flush(logger,
                                ','.join(str(x) for x in [img_obj.file_name] + [current_loss]))
 
                 img_loss = img_loss / loader.__len__()
-                print(img_obj.file_name + ' loss: ' + str(img_loss))
+                # print(img_obj.file_name + ' loss: ' + str(img_loss))
                 eval_score += img_loss
 
                 segmented_img[segmented_img > 0] = 255
