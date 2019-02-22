@@ -45,7 +45,6 @@ class UNetNNTrainer(NNTrainer):
             self._adjust_learning_rate(optimizer=optimizer, epoch=epoch)
             self.checkpoint['total_epochs'] = epoch
 
-            p, r = 1, 1
             for i, data in enumerate(data_loader, 1):
                 inputs, labels = data['inputs'].to(self.device).float(), data['labels'].to(self.device).long()
 
@@ -54,6 +53,7 @@ class UNetNNTrainer(NNTrainer):
                 _, predicted = torch.max(outputs, 1)
 
                 loss = F.nll_loss(outputs, labels, weight=torch.FloatTensor(self.dparm(self.run_conf)).to(self.device))
+                print('########### ',outputs.shape, labels.shape)
                 loss.backward()
                 optimizer.step()
 

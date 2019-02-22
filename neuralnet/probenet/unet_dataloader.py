@@ -45,9 +45,7 @@ class PatchesGenerator(Generator):
         img_obj.load_file(data_dir=self.image_dir,
                           file_name=img_file, num_channels=4)
         if self.mask_getter is not None:
-            img_obj.load_mask(mask_dir=self.mask_dir,
-                              fget_mask=self.mask_getter,
-                              erode=True)
+            img_obj.load_mask(mask_dir=self.mask_dir, fget_mask=self.mask_getter)
         if self.truth_getter is not None:
             img_obj.load_ground_truth(gt_dir=self.truth_dir,
                                       fget_ground_truth=self.truth_getter, channels=4)

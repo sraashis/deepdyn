@@ -2,7 +2,7 @@ import math as mth
 
 import networkx as nx
 
-import commons.constants as const
+import testing.constants as const
 from commons.timer import checktime
 
 

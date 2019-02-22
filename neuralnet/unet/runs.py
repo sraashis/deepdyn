@@ -411,11 +411,11 @@ VEVIO = {
         'mask': 'data' + sep + 'VEVIO' + sep + 'frames_masks',
         'truth': 'data' + sep + 'VEVIO' + sep + 'frames_manual_01_bw',
         'logs': 'LOGS_2019' + sep + 'VEVIO_FRAMES' + sep + 'UNET_1_100_1',
-        'splits_json': 'data' + sep + 'VEVIO' + sep + 'splits'
+        'splits_json': 'data' + sep + 'VEVIO' + sep + 'splits_frames'
     },
 
     'Funcs': {
-        'truth_getter': lambda file_name: 'bw_' + file_name.split('.')[0] + '_black.png',
+        'truth_getter': lambda file_name: 'bw_' + file_name.split('.')[0] + '_black.' + file_name.split('.')[1],
         'mask_getter': lambda file_name: 'mask_' + file_name,
         'dparm': lambda x: np.random.choice(np.arange(1, 101, 1), 2)
     }
@@ -443,11 +443,11 @@ VEVIO1 = {
         'mask': 'data' + sep + 'VEVIO' + sep + 'frames_masks',
         'truth': 'data' + sep + 'VEVIO' + sep + 'frames_manual_01_bw',
         'logs': 'LOGS_2019' + sep + 'VEVIO_FRAMES' + sep + 'UNET_1_1',
-        'splits_json': 'data' + sep + 'VEVIO' + sep + 'splits'
+        'splits_json': 'data' + sep + 'VEVIO' + sep + 'splits_frames'
     },
 
     'Funcs': {
-        'truth_getter': lambda file_name: 'bw_' + file_name.split('.')[0] + '_black.png',
+        'truth_getter': lambda file_name: 'bw_' + file_name.split('.')[0] + '_black.' + file_name.split('.')[1],
         'mask_getter': lambda file_name: 'mask_' + file_name,
         'dparm': lambda x: [1, 1]
     }
@@ -475,11 +475,11 @@ VEVIO2 = {
         'mask': 'data' + sep + 'VEVIO' + sep + 'frames_masks',
         'truth': 'data' + sep + 'VEVIO' + sep + 'frames_manual_01_bw',
         'logs': 'LOGS_2019' + sep + 'VEVIO_FRAMES' + sep + 'UNET_WEIGHTED',
-        'splits_json': 'data' + sep + 'VEVIO' + sep + 'splits'
+        'splits_json': 'data' + sep + 'VEVIO' + sep + 'splits_frames'
     },
 
     'Funcs': {
-        'truth_getter': lambda file_name: 'bw_' + file_name.split('.')[0] + '_black.png',
+        'truth_getter': lambda file_name: 'bw_' + file_name.split('.')[0] + '_black.' + file_name.split('.')[1],
         'mask_getter': lambda file_name: 'mask_' + file_name,
         'dparm': lambda x: [x['Params']['cls_weights'][0], x['Params']['cls_weights'][1]]
     }

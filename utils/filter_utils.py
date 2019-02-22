@@ -10,7 +10,7 @@ import cv2 as ocv
 import matplotlib.pyplot as plt
 import numpy as np
 
-import commons.constants as const
+import testing.constants as const
 
 
 def build_filter_bank(k_size, sigma=None, lambd=None, gamma=None, psi=None,

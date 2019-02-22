@@ -12,9 +12,6 @@ import cv2 as ocv
 import networkx as nx
 import numpy as np
 
-import commons.constants as const
-import utils.filter_utils as filutils
-import utils.filter_utils as fu
 import utils.img_utils as imgutil
 from commons.MAT import Mat
 from commons.timer import checktime
@@ -44,12 +41,10 @@ class Image:
                 print('### Error Loading file: ' + self.file_name)
                 print(str(e1))
 
-    def load_mask(self, mask_dir=None, fget_mask=None, erode=False, channels=1):
+    def load_mask(self, mask_dir=None, fget_mask=None, channels=1):
         try:
             mask_file = fget_mask(self.file_name)
             self.mask = imgutil.get_image_as_array(os.path.join(mask_dir, mask_file), channels)
-            if erode:
-                self.mask = cv2.erode(self.mask, kernel=fu.get_chosen_mask_erode_kernel(), iterations=5)
         except Exception as e:
             print('### Fail to load mask: ' + str(e))
 
@@ -92,8 +87,8 @@ class SegmentedImage(Image):
         super().__init__()
 
     @checktime
-    def apply_bilateral(self, k_size=const.BILATERAL_KERNEL_SIZE, sig_color=const.BILATERAL_SIGMA_COLOR,
-                        sig_space=const.BILATERAL_SIGMA_SPACE):
+    def apply_bilateral(self, k_size=None, sig_color=None,
+                        sig_space=None):
         self.res['bilateral'] = ocv.bilateralFilter(self.working_arr, k_size,
                                                     sigmaColor=sig_color,
                                                     sigmaSpace=sig_space)
@@ -101,7 +96,7 @@ class SegmentedImage(Image):
         self.working_arr = self.res['diff_bilateral'].copy()
 
     @checktime
-    def apply_gabor(self, filter_bank=filutils.get_chosen_gabor_bank()):
+    def apply_gabor(self, filter_bank=None):
         self.res['gabor'] = np.zeros_like(self.working_arr)
         for kern in filter_bank:
             final_image = ocv.filter2D(255 - self.working_arr, ocv.CV_8UC3, kern)
@@ -126,7 +121,7 @@ class SegmentedImage(Image):
                 graph.add_edge(n0, n4)
 
     @checktime
-    def generate_lattice_graph(self, eight_connected=const.IMG_LATTICE_EIGHT_CONNECTED):
+    def generate_lattice_graph(self, eight_connected=False):
         self.res['lattice'] = nx.grid_2d_graph(self.working_arr.shape[0], self.working_arr.shape[1])
         if eight_connected:
             self._connect_8(graph=self.res['lattice'])

@@ -6,7 +6,7 @@ import sys
 sys.path.append('/home/ak/PycharmProjects/ature')
 os.chdir('/home/ak/PycharmProjects/ature')
 
-from commons.segmentation import AtureTest
+from testing.segmentation import AtureTest
 
 sep = os.sep
 Dirs = {}

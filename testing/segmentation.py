@@ -11,7 +11,7 @@ import cv2
 import numpy as np
 from PIL import Image as IMG
 
-import commons.fast_mst as fmst
+import testing.fast_mst as fmst
 import utils.filter_utils as fu
 import utils.img_utils as imgutils
 from commons.IMAGE import SegmentedImage, MatSegmentedImage
@@ -80,7 +80,7 @@ class AtureTest:
             img_obj.res['orig'] = img_obj.working_arr
 
             img_obj.working_arr = imgutils.get_image_as_array(Dirs['segmented'] + sep + file_name + '.png', channels=1)
-            img_obj.load_mask(mask_dir=Dirs['mask'], fget_mask=fget_mask, erode=True)
+            img_obj.load_mask(mask_dir=Dirs['mask'], fget_mask=fget_mask)
             img_obj.load_ground_truth(gt_dir=Dirs['truth'], fget_ground_truth=fget_gt)
             img_obj.apply_mask()
             img_obj.generate_lattice_graph()
@@ -158,7 +158,7 @@ class AtureTestMat(AtureTest):
             img_obj.res['orig'] = img_obj.image_arr[:, :, 1]
             img_obj.working_arr = img_obj.image_arr[:, :, 1]
 
-            img_obj.load_mask(mask_dir=mask_path, fget_mask=fget_mask, erode=True)
+            img_obj.load_mask(mask_dir=mask_path, fget_mask=fget_mask)
             img_obj.load_ground_truth(gt_dir=gt_path, fget_ground_truth=fget_gt)
 
             img_obj.apply_mask()

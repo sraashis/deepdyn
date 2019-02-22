@@ -60,9 +60,8 @@ def create_splits(files, sep1=('', 0), sep2=('', 0), json_file=None):
 
 
 if __name__ == "__main__":
-    from neuralnet.unet.runs import DRIVE as r
+    from neuralnet.unet.runs import VEVIO as r
 
-    sp = load_split_json(r['Dirs']['splits_json'] + '/' 'UNET-DRIVE.json')
-    files = sp['train'] + sp['validation']
+    files = os.listdir(r['Dirs']['image'])
     random.shuffle(files)
-    create_splits(files, ('validation', 5), json_file='UNET-DRIVE.json')
+    create_splits(files, ('validation', 4), ('test', 4), json_file='UNET-VEVIO.json')
