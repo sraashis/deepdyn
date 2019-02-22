@@ -387,6 +387,7 @@ STARE3 = {
     }
 }
 
+
 VEVIO = {
     'Params': {
         'num_channels': 1,
@@ -406,10 +407,10 @@ VEVIO = {
         'parallel_trained': False
     },
     'Dirs': {
-        'image': 'data' + sep + 'VEVIO' + sep + 'mosaics',
-        'mask': 'data' + sep + 'VEVIO' + sep + 'mosaics_masks',
-        'truth': 'data' + sep + 'VEVIO' + sep + 'mosaics_manual_01_bw',
-        'logs': 'LOGS_2019' + sep + 'VEVIO' + sep + 'UNET_1_100_1',
+        'image': 'data' + sep + 'VEVIO' + sep + 'frames',
+        'mask': 'data' + sep + 'VEVIO' + sep + 'frames_masks',
+        'truth': 'data' + sep + 'VEVIO' + sep + 'frames_manual_01_bw',
+        'logs': 'LOGS_2019' + sep + 'VEVIO_FRAMES' + sep + 'UNET_1_100_1',
         'splits_json': 'data' + sep + 'VEVIO' + sep + 'splits'
     },
 
@@ -438,10 +439,10 @@ VEVIO1 = {
         'parallel_trained': False
     },
     'Dirs': {
-        'image': 'data' + sep + 'VEVIO' + sep + 'mosaics',
-        'mask': 'data' + sep + 'VEVIO' + sep + 'mosaics_masks',
-        'truth': 'data' + sep + 'VEVIO' + sep + 'mosaics_manual_01_bw',
-        'logs': 'LOGS_2019' + sep + 'VEVIO' + sep + 'UNET_1_1',
+        'image': 'data' + sep + 'VEVIO' + sep + 'frames',
+        'mask': 'data' + sep + 'VEVIO' + sep + 'frames_masks',
+        'truth': 'data' + sep + 'VEVIO' + sep + 'frames_manual_01_bw',
+        'logs': 'LOGS_2019' + sep + 'VEVIO_FRAMES' + sep + 'UNET_1_1',
         'splits_json': 'data' + sep + 'VEVIO' + sep + 'splits'
     },
 
@@ -470,10 +471,10 @@ VEVIO2 = {
         'parallel_trained': False
     },
     'Dirs': {
-        'image': 'data' + sep + 'VEVIO' + sep + 'mosaics',
-        'mask': 'data' + sep + 'VEVIO' + sep + 'mosaics_masks',
-        'truth': 'data' + sep + 'VEVIO' + sep + 'mosaics_manual_01_bw',
-        'logs': 'LOGS_2019' + sep + 'VEVIO' + sep + 'UNET_WEIGHTED',
+        'image': 'data' + sep + 'VEVIO' + sep + 'frames',
+        'mask': 'data' + sep + 'VEVIO' + sep + 'frames_masks',
+        'truth': 'data' + sep + 'VEVIO' + sep + 'frames_manual_01_bw',
+        'logs': 'LOGS_2019' + sep + 'VEVIO_FRAMES' + sep + 'UNET_WEIGHTED',
         'splits_json': 'data' + sep + 'VEVIO' + sep + 'splits'
     },
 
@@ -481,37 +482,5 @@ VEVIO2 = {
         'truth_getter': lambda file_name: 'bw_' + file_name.split('.')[0] + '_black.png',
         'mask_getter': lambda file_name: 'mask_' + file_name,
         'dparm': lambda x: [x['Params']['cls_weights'][0], x['Params']['cls_weights'][1]]
-    }
-}
-VEVIO3 = {
-    'Params': {
-        'num_channels': 1,
-        'num_classes': 2,
-        'batch_size': 4,
-        'epochs': 350,
-        'learning_rate': 0.001,
-        'patch_shape': (388, 388),
-        'patch_offset': (150, 150),
-        'expand_patch_by': (184, 184),
-        'use_gpu': True,
-        'distribute': True,
-        'shuffle': True,
-        'log_frequency': 5,
-        'validation_frequency': 1,
-        'mode': 'train',
-        'parallel_trained': False
-    },
-    'Dirs': {
-        'image': 'data' + sep + 'VEVIO' + sep + 'mosaics',
-        'mask': 'data' + sep + 'VEVIO' + sep + 'mosaics_masks',
-        'truth': 'data' + sep + 'VEVIO' + sep + 'mosaics_manual_01_bw',
-        'logs': 'LOGS_2019' + sep + 'VEVIO' + sep + 'UNET_1_10_1',
-        'splits_json': 'data' + sep + 'VEVIO' + sep + 'splits'
-    },
-
-    'Funcs': {
-        'truth_getter': lambda file_name: 'bw_' + file_name.split('.')[0] + '_black.png',
-        'mask_getter': lambda file_name: 'mask_' + file_name,
-        'dparm': lambda x: np.random.choice(np.arange(1, 10, 1), 2)
     }
 }
