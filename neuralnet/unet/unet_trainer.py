@@ -53,7 +53,6 @@ class UNetNNTrainer(NNTrainer):
                 _, predicted = torch.max(outputs, 1)
 
                 loss = F.nll_loss(outputs, labels, weight=torch.FloatTensor(self.dparm(self.run_conf)).to(self.device))
-                print('########### ',outputs.shape, labels.shape)
                 loss.backward()
                 optimizer.step()
 

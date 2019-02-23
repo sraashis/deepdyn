@@ -12,8 +12,8 @@ import numpy as np
 from PIL import Image as IMG
 
 import testing.fast_mst as fmst
-import utils.filter_utils as fu
-import utils.img_utils as imgutils
+import commons.filter_utils as fu
+import imgcommons.helper as imgutils
 from commons.IMAGE import SegmentedImage, MatSegmentedImage
 from commons.timer import checktime
 

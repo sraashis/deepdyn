@@ -6,12 +6,11 @@
 
 import os
 
-import numpy as np
 import torch
 import torchvision.transforms as tfm
 from torch.utils.data.dataset import Dataset
 
-from commons.IMAGE import Image
+from imgcommons.containers import Image
 import neuralnet.utils.data_utils as dutils
 
 
@@ -41,13 +40,11 @@ class Generator(Dataset):
 
     def _get_image_obj(self, img_file=None):
         img_obj = Image()
-        img_obj.load_file(data_dir=self.image_dir,
-                          file_name=img_file)
+        img_obj.load_file(data_dir=self.image_dir, file_name=img_file)
         if self.mask_getter is not None:
             img_obj.load_mask(mask_dir=self.mask_dir, fget_mask=self.mask_getter)
         if self.truth_getter is not None:
-            img_obj.load_ground_truth(gt_dir=self.truth_dir,
-                                      fget_ground_truth=self.truth_getter)
+            img_obj.load_ground_truth(gt_dir=self.truth_dir, fget_ground_truth=self.truth_getter)
 
         img_obj.working_arr = img_obj.image_arr
         img_obj.apply_clahe()

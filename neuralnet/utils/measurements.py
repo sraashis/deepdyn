@@ -11,7 +11,7 @@ import numpy as np
 import torch
 from sklearn.metrics import confusion_matrix
 
-import utils.img_utils as imgutils
+import imgcommons.utils as imgutils
 
 
 def plot_confusion_matrix(y_pred=None, y_true=None, classes=None, normalize=False, cmap=plt.cm.Greens):

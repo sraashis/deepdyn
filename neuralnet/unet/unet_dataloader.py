@@ -7,15 +7,17 @@
 import os
 import random
 from random import shuffle
+from PIL import Image as IMG
 
 import numpy as np
 import torch
 import torchvision.transforms as tfm
 
-import utils.img_utils as imgutils
+import imgcommons.utils as imgutils
 from neuralnet.datagen import Generator
 
 sep = os.sep
+import sys
 
 
 class PatchesGenerator(Generator):
@@ -32,6 +34,7 @@ class PatchesGenerator(Generator):
         for ID, img_file in enumerate(self.images):
 
             img_obj = self._get_image_obj(img_file)
+            print(img_obj.file_name, np.unique(img_obj.ground_truth))
             img_obj.working_arr = img_obj.working_arr[:, :, 1]  # Just use green channel
             for chunk_ix in imgutils.get_chunk_indexes(img_obj.working_arr.shape, self.patch_shape,
                                                        self.patch_offset):
@@ -60,13 +63,13 @@ class PatchesGenerator(Generator):
 
         img_tensor = img_tensor[..., None]
         y[y == 255] = 1
+        print(np.unique(y))
         if self.transforms is not None:
             img_tensor = self.transforms(img_tensor)
 
         return {'id': ID,
                 'inputs': img_tensor,
                 'labels': y.copy(),
-                'dice_labels': np.array([1 - y, y]),
                 'clip_ix': np.array([row_from, row_to, col_from, col_to]), }
 
     @classmethod

@@ -12,8 +12,8 @@ import torch
 import torchvision.transforms as tfm
 from skimage.morphology import skeletonize
 
-import utils.img_utils as iu
-from commons.IMAGE import Image
+import imgcommons.utils as iu
+from imgcommons.containers import Image
 from neuralnet.datagen import Generator
 import random
 
@@ -52,8 +52,7 @@ class PatchesGenerator(Generator):
         if self.mask_getter is not None:
             img_obj.load_mask(mask_dir=self.mask_dir, fget_mask=self.mask_getter)
         if self.truth_getter is not None:
-            img_obj.load_ground_truth(gt_dir=self.truth_dir,
-                                      fget_ground_truth=self.truth_getter)
+            img_obj.load_ground_truth(gt_dir=self.truth_dir, fget_ground_truth=self.truth_getter)
 
         img_obj.working_arr = img_obj.image_arr[:, :, 1]
         img_obj.apply_clahe()

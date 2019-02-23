@@ -6,8 +6,7 @@ import torch
 from neuralnet.datagen import Generator
 import math
 from commons.MAT import Mat
-from commons.IMAGE import Image
-from PIL import Image as IMG
+from imgcommons.containers import Image
 
 sep = os.sep
 
