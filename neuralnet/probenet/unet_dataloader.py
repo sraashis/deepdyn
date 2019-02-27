@@ -12,9 +12,9 @@ import numpy as np
 import torch
 import torchvision.transforms as tfm
 
-import utils.img_utils as imgutils
+import imgcommons.utils as imgutils
 from neuralnet.datagen import Generator
-from commons.IMAGE import Image
+from imgcommons.containers import Image
 
 sep = os.sep
 
@@ -42,13 +42,11 @@ class PatchesGenerator(Generator):
 
     def _get_image_obj(self, img_file=None):
         img_obj = Image()
-        img_obj.load_file(data_dir=self.image_dir,
-                          file_name=img_file, num_channels=4)
+        img_obj.load_file(data_dir=self.image_dir, file_name=img_file)
         if self.mask_getter is not None:
             img_obj.load_mask(mask_dir=self.mask_dir, fget_mask=self.mask_getter)
         if self.truth_getter is not None:
-            img_obj.load_ground_truth(gt_dir=self.truth_dir,
-                                      fget_ground_truth=self.truth_getter, channels=4)
+            img_obj.load_ground_truth(gt_dir=self.truth_dir, fget_ground_truth=self.truth_getter)
 
         # Somehow images are saved
         img_obj.working_arr = img_obj.image_arr[:, :, 0]

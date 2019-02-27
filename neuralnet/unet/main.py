@@ -37,7 +37,7 @@ def main():
         transforms.ToTensor()
     ])
 
-    for R in RUNS:
+    for R in [rs.VEVIO]:
         for k, folder in R['Dirs'].items():
             os.makedirs(folder, exist_ok=True)
 
