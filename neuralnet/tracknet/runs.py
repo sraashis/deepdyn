@@ -4,7 +4,8 @@ sep = os.sep
 
 DRIVE = {
     'Params': {
-        'num_channels': 4,
+        # 'previous_visit': 5,
+        'num_channels': 14,
         'num_classes': 1,
         'batch_size': 16,
         'epochs': 1,
