@@ -74,7 +74,7 @@ class MAPNetTrainer(NNTrainer):
             self.plot_train(file=self.train_log_file, batches_per_epochs=data_loader.__len__(), keys=['LOSS', 'F1'])
             if epoch % self.validation_frequency == 0:
                 self.evaluate(data_loaders=validation_loader, logger=val_logger, gen_images=False)
-                if self.early_stop(patience=10):
+                if self.early_stop(patience=20):
                     return
 
             self.plot_val(self.validation_log_file, batches_per_epoch=len(validation_loader))
@@ -97,7 +97,7 @@ class MAPNetTrainer(NNTrainer):
                 img_obj = loader.dataset.image_objects[0]
                 x, y = img_obj.working_arr.shape[0], img_obj.working_arr.shape[1]
                 predicted_img = torch.FloatTensor(x, y).fill_(0).to(self.device)
-                gt_mid = torch.tensor(img_obj.res['gt_mid']).float().to(self.device)
+                gt_mid = torch.tensor(img_obj.extra['gt_mid']).float().to(self.device)
 
                 for i, data in enumerate(loader, 1):
                     inputs, labels = data['inputs'].to(self.device).float(), data['labels'].to(self.device).float()
@@ -117,7 +117,7 @@ class MAPNetTrainer(NNTrainer):
 
                 if gen_images:
                     predicted_img = predicted_img.cpu().numpy()
-                    predicted_img[img_obj.res['fill_in'] == 1] = 255
+                    predicted_img[img_obj.extra['fill_in'] == 1] = 255
                     img_score.add_array(predicted_img, img_obj.ground_truth)
 
                     # Global score accumulator
