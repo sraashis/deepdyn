@@ -8,11 +8,11 @@ import torchvision.transforms as transforms
 from neuralnet.mapnet.mapnet_dataloader import PatchesGenerator
 from neuralnet.mapnet.mapnet_trainer import MAPNetTrainer
 from neuralnet.mapnet.model import MapUNet
-from neuralnet.mapnet.runs import DRIVE, WIDE, STARE, VEVIO
+from neuralnet.mapnet.runs import DRIVE, WIDE, STARE, VEVIO, VEVIO1
 from neuralnet.utils import auto_split as asp
 from neuralnet.utils.measurements import ScoreAccumulator
 
-RUNS = [STARE]
+RUNS = [VEVIO, VEVIO1]
 
 
 def main():

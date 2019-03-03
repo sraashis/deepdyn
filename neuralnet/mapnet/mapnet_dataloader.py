@@ -35,7 +35,7 @@ class PatchesGenerator(Generator):
         for ID, img_file in enumerate(self.images):
 
             img_obj = self._get_image_obj(img_file)
-            all_pix_pos = list(zip(*np.where(img_obj.res['seed'] == 255)))
+            all_pix_pos = list(zip(*np.where(img_obj.extra['seed'] == 255)))
             all_patch_indices = list(
                 iu.get_chunk_indices_by_index(img_obj.working_arr.shape, self.patch_shape, all_pix_pos))
             # all_patch_indices = list(
@@ -60,24 +60,24 @@ class PatchesGenerator(Generator):
 
         sup, res = 20, 235
 
-        img_obj.res['unet'] = iu.get_image_as_array(
+        img_obj.extra['unet'] = iu.get_image_as_array(
             self.unet_dir + sep + img_obj.file_name.split('.')[0] + self.input_image_ext, 1)
 
-        img_obj.res['indices'] = list(zip(*np.where((img_obj.res['unet'] >= sup) & (img_obj.res['unet'] <= res))))
+        img_obj.extra['indices'] = list(zip(*np.where((img_obj.extra['unet'] >= sup) & (img_obj.extra['unet'] <= res))))
 
-        img_obj.res['fill_in'] = np.zeros_like(img_obj.working_arr)
-        img_obj.res['fill_in'][img_obj.res['unet'] > res] = 1
+        img_obj.extra['fill_in'] = np.zeros_like(img_obj.working_arr)
+        img_obj.extra['fill_in'][img_obj.extra['unet'] > res] = 1
 
-        img_obj.res['mid_pix'] = img_obj.res['unet'].copy()
-        img_obj.res['mid_pix'][img_obj.res['mid_pix'] < sup] = 0
-        img_obj.res['mid_pix'][img_obj.res['mid_pix'] > res] = 0
+        img_obj.extra['mid_pix'] = img_obj.extra['unet'].copy()
+        img_obj.extra['mid_pix'][img_obj.extra['mid_pix'] < sup] = 0
+        img_obj.extra['mid_pix'][img_obj.extra['mid_pix'] > res] = 0
 
-        img_obj.res['gt_mid'] = img_obj.ground_truth.copy()
-        img_obj.res['gt_mid'][img_obj.res['unet'] > res] = 0
-        img_obj.res['gt_mid'][img_obj.res['unet'] < sup] = 0
+        img_obj.extra['gt_mid'] = img_obj.ground_truth.copy()
+        img_obj.extra['gt_mid'][img_obj.extra['unet'] > res] = 0
+        img_obj.extra['gt_mid'][img_obj.extra['unet'] < sup] = 0
 
         # <PREP1> Segment with a low threshold and get a raw segmented image
-        raw_estimate = img_obj.res['unet'].copy()
+        raw_estimate = img_obj.extra['unet'].copy()
         raw_estimate[raw_estimate > sup] = 255
         raw_estimate[raw_estimate <= sup] = 0
 
@@ -95,7 +95,7 @@ class PatchesGenerator(Generator):
         sk_mask[:, ::int(0.6 * self.patch_shape[0])] = 1
 
         # <PREP5> Apply mask and save seed
-        img_obj.res['seed'] = seed * sk_mask * 255
+        img_obj.extra['seed'] = seed * sk_mask * 255
 
         return img_obj
 
@@ -103,10 +103,10 @@ class PatchesGenerator(Generator):
         ID, row_from, row_to, col_from, col_to = self.indices[index]
 
         orig = self.image_objects[ID].working_arr
-        unet_map = 255 - self.image_objects[ID].res['unet']
-        mid_pix = 255 - self.image_objects[ID].res['mid_pix']
+        unet_map = 255 - self.image_objects[ID].extra['unet']
+        mid_pix = 255 - self.image_objects[ID].extra['mid_pix']
 
-        y_mid = self.image_objects[ID].res['gt_mid'][row_from:row_to, col_from:col_to]
+        y_mid = self.image_objects[ID].extra['gt_mid'][row_from:row_to, col_from:col_to]
         p, q, r, s, pad = iu.expand_and_mirror_patch(full_img_shape=self.image_objects[ID].working_arr.shape,
                                                      orig_patch_indices=[row_from, row_to, col_from, col_to],
                                                      expand_by=self.expand_by)
