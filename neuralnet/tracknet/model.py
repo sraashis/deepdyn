@@ -3,7 +3,6 @@ from torch import nn
 
 
 class BasicConv2d(nn.Module):
-
     def __init__(self, in_ch, out_ch, k, s, p):
         super(BasicConv2d, self).__init__()
         self.conv = nn.Conv2d(in_channels=in_ch, out_channels=out_ch, kernel_size=k, stride=s, padding=p, bias=False)
@@ -18,13 +17,21 @@ class BasicConv2d(nn.Module):
 class TrackNet(nn.Module):
     def __init__(self, num_channels, num_class):
         super(TrackNet, self).__init__()
-
         self.conv1 = BasicConv2d(in_ch=num_channels, out_ch=64, k=3, s=1, p=1)
+        o1 = self.output(111, 5, 1, 1)
+        print('o1', o1)
         self.conv2 = BasicConv2d(in_ch=64, out_ch=256, k=3, s=2, p=1)
+        o2 = self.output(o1, 3, 0, 1) / 2
+        print('o2', o2)
         self.conv3 = BasicConv2d(in_ch=256, out_ch=256, k=3, s=1, p=1)
+        o3 = self.output(o2, 3, 1, 1)
+        print('o3', o3)
         self.conv4 = BasicConv2d(in_ch=256, out_ch=128, k=3, s=1, p=1)
+        o4 = self.output(o3, 3, 1, 1) / 2
+        print('o4', o4)
         self.conv5 = BasicConv2d(in_ch=128, out_ch=64, k=3, s=1, p=1)
-
+        o5 = self.output(o4, 3, 1, 1)
+        print('o5', o5)
         self.linearWidth = 64 * 2 * 2
         self.fc1 = nn.Linear(self.linearWidth, 64)
         self.out = nn.Linear(64, num_class)
@@ -40,6 +47,10 @@ class TrackNet(nn.Module):
         x = x.view(-1, self.linearWidth)
         x = F.relu(self.fc1(x))
         return self.out(x)
+
+    def output(self, w, f, p, s):
+        result = (w - f + 2 * p) / (s + 1)
+        return result
 
 
 m = TrackNet(1, 2)
