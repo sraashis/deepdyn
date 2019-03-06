@@ -89,8 +89,8 @@ class UNetNNTrainer(NNTrainer):
         with torch.no_grad():
             for loader in data_loaders:
                 img_obj = loader.dataset.image_objects[0]
-                x, y = img_obj.working_arr.shape[0], img_obj.working_arr.shape[1]
-                map_img = torch.FloatTensor(x, y).fill_(0).to(self.device)
+                x, y, c = img_obj.working_arr.shape[0], img_obj.working_arr.shape[1], img_obj.working_arr.shape[2]
+                map_img = torch.FloatTensor(c, x, y).fill_(0).to(self.device)
 
                 img_loss = 0.0
                 for i, data in enumerate(loader, 1):
@@ -104,12 +104,13 @@ class UNetNNTrainer(NNTrainer):
 
                     for j in range(outputs.shape[0]):
                         p, q, r, s = clip_ix[j]
-                        map_img[p:q, r:s] = outputs[j]
+                        map_img[:, p:q, r:s] = outputs[j, :, :, :]
 
                     print('Batch: ', i, end='\r')
 
                 if gen_images:
                     map_img = map_img.cpu().numpy()
+                    map_img = np.rollaxis(map_img, 0, 3)
                     IMG.fromarray(np.array(map_img, dtype=np.uint8)).save(
                         os.path.join(self.log_dir, img_obj.file_name.split('.')[0] + '.png'))
                 else:
