@@ -5,16 +5,15 @@
 """
 
 import os
-import random
 from random import shuffle
 
+import imgcommons.utils as imgutils
 import numpy as np
 import torch
 import torchvision.transforms as tfm
-
-import imgcommons.utils as imgutils
-from neuralnet.datagen import Generator
 from imgcommons.containers import Image
+
+from neuralnet.datagen import Generator
 
 sep = os.sep
 
@@ -32,8 +31,10 @@ class PatchesGenerator(Generator):
         for ID, img_file in enumerate(self.images):
 
             img_obj = self._get_image_obj(img_file)
-            img_obj.working_arr = img_obj.working_arr  # Just use green channel
-            for chunk_ix in imgutils.get_chunk_indexes(img_obj.working_arr.shape, self.patch_shape,
+
+            img_shape = img_obj.working_arr.shape[0], img_obj.working_arr.shape[1]
+
+            for chunk_ix in imgutils.get_chunk_indexes(img_shape, self.patch_shape,
                                                        self.patch_offset):
                 self.indices.append([ID] + chunk_ix)
             self.image_objects[ID] = img_obj
@@ -49,8 +50,8 @@ class PatchesGenerator(Generator):
             img_obj.load_ground_truth(gt_dir=self.truth_dir, fget_ground_truth=self.truth_getter)
 
         # Somehow images are saved
-        img_obj.working_arr = img_obj.image_arr[:, :, 0]
-        img_obj.ground_truth = img_obj.ground_truth[:, :, 0]
+        img_obj.working_arr = img_obj.image_arr[:, :, 0:3]
+        img_obj.ground_truth = img_obj.ground_truth[:, :, 0:3]
         img_obj.apply_clahe()
         img_obj.apply_mask()
         return img_obj
@@ -58,24 +59,28 @@ class PatchesGenerator(Generator):
     def __getitem__(self, index):
         ID, row_from, row_to, col_from, col_to = self.indices[index]
 
-        y = self.image_objects[ID].ground_truth[row_from:row_to, col_from:col_to]
-
-        p, q, r, s, pad = imgutils.expand_and_mirror_patch(full_img_shape=self.image_objects[ID].working_arr.shape,
+        img_obj = self.image_objects[ID]
+        img_shape = img_obj.working_arr.shape
+        p, q, r, s, pad = imgutils.expand_and_mirror_patch(full_img_shape=(img_shape[0], img_shape[1]),
                                                            orig_patch_indices=[row_from, row_to, col_from, col_to],
                                                            expand_by=self.expand_by)
-        img_tensor = np.pad(self.image_objects[ID].working_arr[p:q, r:s], pad, 'reflect')
 
-        if self.mode == 'train' and random.uniform(0, 1) <= 0.5:
-            img_tensor = np.flip(img_tensor, 0)
-            y = np.flip(y, 0)
+        img_tensor = np.zeros((3, 572, 572))
+        y = np.zeros((3, self.patch_shape[0], self.patch_shape[1]))
+        for i in range(img_shape[2]):
+            img_tensor[i, :, :] = np.pad(img_obj.working_arr[:, :, i][p:q, r:s], pad, 'reflect')
+            y[i, :, :] = img_obj.ground_truth[row_from:row_to, col_from:col_to, i]
 
-        if self.mode == 'train' and random.uniform(0, 1) <= 0.5:
-            img_tensor = np.flip(img_tensor, 1)
-            y = np.flip(y, 1)
+        # if self.mode == 'train' and random.uniform(0, 1) <= 0.5:
+        #     img_tensor = np.flip(img_tensor, 0)
+        #     y = np.flip(y, 0)
+        #
+        # if self.mode == 'train' and random.uniform(0, 1) <= 0.5:
+        #     img_tensor = np.flip(img_tensor, 1)
+        #     y = np.flip(y, 1)
 
-        img_tensor = img_tensor[..., None]
-        if self.transforms is not None:
-            img_tensor = self.transforms(img_tensor)
+        # if self.transforms is not None:
+        #     img_tensor = self.transforms(img_tensor)
 
         return {'id': ID,
                 'inputs': img_tensor,
