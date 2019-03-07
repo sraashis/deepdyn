@@ -164,15 +164,19 @@ class PatchesGenerator(Generator):
                 rho = np.sqrt(output[0] ** 2 + output[1] ** 2)
                 phi = np.arctan2(output[1], output[0])
                 # print(i, j, b_out, phi)
-                phi = abs(phi)
-                # if phi < 0:
-                    # phi = (2 * math.pi) + phi
+
+                #convert -pi-pi to 0-pi
+                # phi = abs(phi)
+                if phi < 0:
+                    phi = (2 * math.pi) + phi
                     # phi = math.pi + phi
 
+                # convert pi to degree
                 phi = phi * 180 / math.pi
 
-                if phi > 90:
-                    phi = 180 - phi
+                # convert 0-180 to 0-90
+                # if phi > 90:
+                #     phi = 180 - phi
                 # if phi > 30:
                 #     if phi < 165 or phi > 205:
                 #         continue
@@ -205,7 +209,7 @@ class PatchesGenerator(Generator):
                 # self.indices.append([ID, [e, f], [g, h], [m, n], [p, q], [i, j], phi, output])
             IMG.fromarray(temp).save('patches/'+img_file+'.png')
             # print('maxxiiimuum', maxout, maxoutput)
-            print('maxphi', maxphi)
+            # print('maxphi', maxphi)
             # print('getitem', self.indices[0])
 
     def __getitem__(self, index):

@@ -18,38 +18,45 @@ class TrackNet(nn.Module):
     def __init__(self, num_channels, num_class):
         super(TrackNet, self).__init__()
         self.conv1 = BasicConv2d(in_ch=num_channels, out_ch=64, k=3, s=1, p=1)
-        o1 = self.output(111, 5, 1, 1)
-        print('o1', o1)
+        o1 = self.output(111, 3, 1, 1)
+        # print('o1', o1)
         self.conv2 = BasicConv2d(in_ch=64, out_ch=256, k=3, s=2, p=1)
-        o2 = self.output(o1, 3, 0, 1) / 2
-        print('o2', o2)
-        self.conv3 = BasicConv2d(in_ch=256, out_ch=256, k=3, s=1, p=1)
+        o2 = self.output(o1, 3, 2, 1)/2
+        # print('o2', o2)
+        self.conv3 = BasicConv2d(in_ch=256, out_ch=256, k=3, s=2, p=1)
         o3 = self.output(o2, 3, 1, 1)
-        print('o3', o3)
-        self.conv4 = BasicConv2d(in_ch=256, out_ch=128, k=3, s=1, p=1)
-        o4 = self.output(o3, 3, 1, 1) / 2
-        print('o4', o4)
+        # print('o3', o3)
+        self.conv4 = BasicConv2d(in_ch=256, out_ch=128, k=3, s=3, p=1)
+        o4 = self.output(o3, 3, 1, 1)/2
+        # print('o4', o4)
         self.conv5 = BasicConv2d(in_ch=128, out_ch=64, k=3, s=1, p=1)
         o5 = self.output(o4, 3, 1, 1)
-        print('o5', o5)
+        # print('o5', o5)
         self.linearWidth = 64 * 2 * 2
         self.fc1 = nn.Linear(self.linearWidth, 64)
         self.out = nn.Linear(64, num_class)
 
     def forward(self, x):
         x = self.conv1(x)
+        print('conv1 shape:', x.shape)
         x = self.conv2(x)
+        print('conv2 /shape:', x.shape)
         x = F.max_pool2d(x, kernel_size=2, stride=2, padding=0)
+        print('conv shape:', x.shape)
         x = self.conv3(x)
+        print('conv3 shape:', x.shape)
         x = self.conv4(x)
+        print('conv4 shape:', x.shape)
         x = F.max_pool2d(x, kernel_size=2, stride=2, padding=0)
+        print('conv shape:', x.shape)
         x = self.conv5(x)
+        print('conv5 shape:', x.shape)
         x = x.view(-1, self.linearWidth)
         x = F.relu(self.fc1(x))
         return self.out(x)
 
     def output(self, w, f, p, s):
-        result = (w - f + 2 * p) / (s + 1)
+        result = (w - f + 2 * p) / s + 1
         return result
 
 
