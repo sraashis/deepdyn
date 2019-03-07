@@ -166,17 +166,17 @@ class PatchesGenerator(Generator):
                 # print(i, j, b_out, phi)
 
                 #convert -pi-pi to 0-pi
-                # phi = abs(phi)
-                if phi < 0:
-                    phi = (2 * math.pi) + phi
+                phi = abs(phi)
+                # if phi < 0:
+                    # phi = (2 * math.pi) + phi
                     # phi = math.pi + phi
 
                 # convert pi to degree
                 phi = phi * 180 / math.pi
 
                 # convert 0-180 to 0-90
-                # if phi > 90:
-                #     phi = 180 - phi
+                if phi > 90:
+                    phi = 180 - phi
                 # if phi > 30:
                 #     if phi < 165 or phi > 205:
                 #         continue
