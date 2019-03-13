@@ -44,14 +44,11 @@ class TracknetTrainer(NNTrainer):
                 labels = labels.squeeze()
                 thr_map = thr_map.squeeze()
                 diff = thr_map-labels
-                diff[diff > math.pi] -= 2*math.pi
+                diff[diff > 180] -= 360
                 loss = torch.abs(diff).mean()
-                # print(torch.cat([labels[..., None], thr_map[..., None], diff.abs()[..., None]], 1))
                 loss.backward()
                 optimizer.step()
                 current_loss = loss.item()
-                # maxloss = max(current_loss)
-
 
                 running_loss += current_loss
                 if i % self.log_frequency == 0:
@@ -89,13 +86,16 @@ class TracknetTrainer(NNTrainer):
                 for i, data in enumerate(loader, 1):
                     inputs, labels = data['inputs'].to(self.device).float(), data['labels'].to(self.device).squeeze()
 
-                    positions = data['POS'].to(self.device)
-                    prev_positions = data['PREV'].to(self.device)
+                    # positions = data['POS'].to(self.device)
+                    # prev_positions = data['PREV'].to(self.device)
                     outputs = self.model(inputs).squeeze()
-                    diff = outputs - labels
-                    diff[diff > math.pi] -= 2 * math.pi
-                    diff = diff.abs()
-                    loss = diff.mean()
+
+                    if gen_images:
+                        print(torch.cat([labels[..., None], outputs[..., None]], 1))
+
+                    diff = torch.abs(outputs - labels)
+                    diff[diff > 180] -= 360
+                    loss = diff.abs().mean()
                     current_loss = loss.item()
                     # print('current_loss', current_loss)
                     img_loss += current_loss

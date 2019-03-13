@@ -59,8 +59,8 @@ def main():
                 logger = drive_trainer.get_logger(drive_trainer.test_log_file,
                                                   header='ID,LOSS')
                 drive_trainer.evaluate(data_loaders=test_loader, logger=logger, gen_images=True)
-                # plt.plot(file=drive_trainer.test_log_file, y='LOSS', title='Test', x_tick_skip=len(val_loader),
-                #          save=True)
+                plt.plot(file=drive_trainer.test_log_file, y='LOSS', title='Test', x_tick_skip=len(val_loader),
+                         save=True)
                 logger.close()
             except Exception as e:
                 traceback.print_exc()

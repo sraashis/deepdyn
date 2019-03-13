@@ -20,13 +20,13 @@ class TrackNet(nn.Module):
         self.conv1 = BasicConv2d(in_ch=num_channels, out_ch=64, k=3, s=1, p=1)
         o1 = self.output(61, 3, 1, 1)
         # print('o1', o1)
-        self.conv2 = BasicConv2d(in_ch=64, out_ch=256, k=3, s=3, p=1)
+        self.conv2 = BasicConv2d(in_ch=64, out_ch=256, k=3, s=2, p=1)
         o2 = self.output(o1, 3, 2, 1)/2
         # print('o2', o2)
         self.conv3 = BasicConv2d(in_ch=256, out_ch=256, k=3, s=3, p=1)
         o3 = self.output(o2, 3, 1, 1)
         # print('o3', o3)
-        self.conv4 = BasicConv2d(in_ch=256, out_ch=128, k=3, s=3, p=1)
+        self.conv4 = BasicConv2d(in_ch=256, out_ch=128, k=3, s=1, p=1)
         o4 = self.output(o3, 3, 1, 1)/2
         # print('o4', o4)
         self.conv5 = BasicConv2d(in_ch=128, out_ch=64, k=3, s=1, p=1)
