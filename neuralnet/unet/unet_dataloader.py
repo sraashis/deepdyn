@@ -7,17 +7,15 @@
 import os
 import random
 from random import shuffle
-from PIL import Image as IMG
 
 import numpy as np
 import torch
 import torchvision.transforms as tfm
 
-import imgcommons.utils as imgutils
-from neuralnet.datagen import Generator
+import nnbee.utils.img_utils as imgutils
+from nnbee.datagen import Generator
 
 sep = os.sep
-import sys
 
 
 class PatchesGenerator(Generator):

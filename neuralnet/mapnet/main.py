@@ -6,11 +6,11 @@ import torch.optim as optim
 import torchvision.transforms as transforms
 
 from neuralnet.mapnet.mapnet_dataloader import PatchesGenerator
-from neuralnet.mapnet.mapnet_trainer import MAPNetTrainer
+from neuralnet.mapnet.mapnet_trainer import MAPNetBee
 from neuralnet.mapnet.model import MapUNet
-from neuralnet.mapnet.runs import DRIVE, WIDE, STARE, VEVIO, VEVIO1
-from neuralnet.utils import auto_split as asp
-from neuralnet.utils.measurements import ScoreAccumulator
+from neuralnet.mapnet.runs import VEVIO, VEVIO1
+from nnbee.utils import auto_split as asp
+from nnbee.utils.measurements import ScoreAccumulator
 
 RUNS = [VEVIO, VEVIO1]
 
@@ -38,23 +38,19 @@ def main():
                 optimizer = optim.Adam(model.module.parameters(), lr=R['Params']['learning_rate'])
 
             try:
-                drive_trainer = MAPNetTrainer(model=model, run_conf=R)
+                trainer = MAPNetBee(model=model, run_conf=R, optimizer=optimizer)
 
                 if R.get('Params').get('mode') == 'train':
                     train_loader = PatchesGenerator.get_loader(run_conf=R, images=splits['train'], transforms=transform,
                                                                mode='train')
                     val_loader = PatchesGenerator.get_loader_per_img(run_conf=R, images=splits['validation'],
                                                                      mode='validation')
-                    drive_trainer.train(optimizer=optimizer, data_loader=train_loader, validation_loader=val_loader)
+                    trainer.train(data_loader=train_loader, validation_loader=val_loader, epoch_run =trainer.epoch_dice_loss)
 
-                drive_trainer.resume_from_checkpoint(parallel_trained=R.get('Params').get('parallel_trained'))
+                trainer.resume_from_checkpoint(parallel_trained=R.get('Params').get('parallel_trained'))
                 test_loader = PatchesGenerator.get_loader_per_img(run_conf=R, images=splits['test'], mode='test')
 
-                logger = drive_trainer.get_logger(drive_trainer.test_log_file,
-                                                  header='ID,PRECISION,RECALL,F1,ACCURACY')
-                drive_trainer.evaluate(data_loaders=test_loader, logger=logger, gen_images=True)
-                logger.close()
-                drive_trainer.plot_test(file=drive_trainer.test_log_file)
+                trainer.test(data_loaders=test_loader, gen_images=True)
             except Exception as e:
                 traceback.print_exc()
 

@@ -17,6 +17,7 @@ GREY_HIGH = {
         'log_frequency': 5,
         'validation_frequency': 1,
         'mode': 'test',
+        'probe_mode': 'depth',
         'parallel_trained': False,
     },
     'Dirs': {

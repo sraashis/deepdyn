@@ -14,9 +14,9 @@ import torchvision.transforms as transforms
 import neuralnet.unet.runs as rs
 from neuralnet.unet.model import UNet
 from neuralnet.unet.unet_dataloader import PatchesGenerator
-from neuralnet.unet.unet_trainer import UNetNNTrainer
-from neuralnet.utils import auto_split as asp
-from neuralnet.utils.measurements import ScoreAccumulator
+from neuralnet.unet.unet_trainer import UNetBee
+from nnbee.utils import auto_split as asp
+from nnbee.utils.measurements import ScoreAccumulator
 
 # RUNS1 = [rs.DRIVE1, rs.DRIVE2,
 #          rs.STARE1, rs.STARE2,
@@ -54,7 +54,7 @@ def main():
                 optimizer = optim.Adam(model.module.parameters(), lr=R['Params']['learning_rate'])
 
             try:
-                drive_trainer = UNetNNTrainer(model=model, run_conf=R, optimizer=optimizer)
+                drive_trainer = UNetBee(model=model, run_conf=R, optimizer=optimizer)
                 if R.get('Params').get('mode') == 'train':
                     train_loader = PatchesGenerator.get_loader(run_conf=R, images=splits['train'], transforms=transform,
                                                                mode='train')

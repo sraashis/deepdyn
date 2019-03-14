@@ -102,7 +102,6 @@ def xy_scatter(file=None, query=None, x=None, y=None, label=None, title='', save
 
 
 if __name__ == "__main__":
-    from neuralnet.torchtrainer import NNTrainers
     # train = '/home/ak/PycharmProjects/ature/data/DRIVE_MAP/mapnet_logs/MAPNET-DRIVE-TRAIN.csv'
     # test = '/home/ak/PycharmProjects/ature/data/DRIVE_MAP/mapnet_logs/MAPNET-DRIVE-TEST.csv'
     # val = '/home/ak/PycharmProjects/ature/data/DRIVE_MAP/mapnet_logs/MAPNET-DRIVE-VAL.csv'

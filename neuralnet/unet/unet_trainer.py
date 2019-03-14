@@ -8,18 +8,17 @@ import os
 
 import numpy as np
 import torch
-import torch.nn.functional as F
 from PIL import Image as IMG
 
-from neuralnet.torchtrainer import NNTrainer
-from neuralnet.utils.measurements import ScoreAccumulator
+from nnbee.torchtrainer import NNBee
+from nnbee.utils.measurements import ScoreAccumulator
 
 sep = os.sep
 
 
-class UNetNNTrainer(NNTrainer):
+class UNetBee(NNBee):
     def __init__(self, **kwargs):
-        NNTrainer.__init__(self, **kwargs)
+        NNBee.__init__(self, **kwargs)
         self.patch_shape = self.conf.get('Params').get('patch_shape')
         self.patch_offset = self.conf.get('Params').get('patch_offset')
 

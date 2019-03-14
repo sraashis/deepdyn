@@ -11,7 +11,7 @@ import torchvision.transforms as tfm
 from torch.utils.data.dataset import Dataset
 
 from imgcommons.containers import Image
-import neuralnet.utils.data_utils as dutils
+import nnbee.utils.data_utils as dutils
 
 
 class Generator(Dataset):

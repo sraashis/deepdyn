@@ -7,13 +7,13 @@
 import os
 from random import shuffle
 
-import imgcommons.utils as imgutils
+import nnbee.utils.img_utils as imgutils
 import numpy as np
 import torch
 import torchvision.transforms as tfm
-from imgcommons.containers import Image
+from nnbee.utils.img_utils import Image
 
-from neuralnet.datagen import Generator
+from nnbee.datagen import Generator
 
 sep = os.sep
 
@@ -24,6 +24,7 @@ class PatchesGenerator(Generator):
         self.patch_shape = self.run_conf.get('Params').get('patch_shape')
         self.expand_by = self.run_conf.get('Params').get('expand_patch_by')
         self.patch_offset = self.run_conf.get('Params').get('patch_offset')
+        self.probe_mode = self.run_conf.get('Params').get('probe_mode')
         self._load_indices()
         print('Patches:', self.__len__())
 
@@ -49,9 +50,15 @@ class PatchesGenerator(Generator):
         if self.truth_getter is not None:
             img_obj.load_ground_truth(gt_dir=self.truth_dir, fget_ground_truth=self.truth_getter)
 
-        # Somehow images are saved
-        img_obj.working_arr = img_obj.image_arr[:, :, 0:3]
-        img_obj.ground_truth = img_obj.ground_truth[:, :, 0:3]
+        # Input images has four channels
+        if self.probe_mode == 'depth':
+            img_obj.working_arr = img_obj.image_arr[:, :, 0]
+            img_obj.ground_truth = img_obj.ground_truth[:, :, 0]
+
+        elif self.probe_mode == 'normal':
+            img_obj.working_arr = img_obj.image_arr[:, :, 0:3]
+            img_obj.ground_truth = img_obj.ground_truth[:, :, 0:3]
+
         img_obj.apply_clahe()
         img_obj.apply_mask()
         return img_obj
@@ -65,11 +72,16 @@ class PatchesGenerator(Generator):
                                                            orig_patch_indices=[row_from, row_to, col_from, col_to],
                                                            expand_by=self.expand_by)
 
-        img_tensor = np.zeros((3, 572, 572))
-        y = np.zeros((3, self.patch_shape[0], self.patch_shape[1]))
-        for i in range(img_shape[2]):
-            img_tensor[i, :, :] = np.pad(img_obj.working_arr[:, :, i][p:q, r:s], pad, 'reflect')
-            y[i, :, :] = img_obj.ground_truth[row_from:row_to, col_from:col_to, i]
+        if self.probe_mode == 'depth':
+            img_tensor = np.pad(img_obj.working_arr[p:q, r:s], pad, 'reflect')
+            y = img_obj.ground_truth[row_from:row_to, col_from:col_to]
+
+        elif self.probe_mode == 'normal':
+            img_tensor = np.zeros((3, 572, 572))
+            y = np.zeros((3, self.patch_shape[0], self.patch_shape[1]))
+            for i in range(img_shape[2]):
+                img_tensor[i, :, :] = np.pad(img_obj.working_arr[:, :, i][p:q, r:s], pad, 'reflect')
+                y[i, :, :] = img_obj.ground_truth[row_from:row_to, col_from:col_to, i]
 
         # if self.mode == 'train' and random.uniform(0, 1) <= 0.5:
         #     img_tensor = np.flip(img_tensor, 0)
