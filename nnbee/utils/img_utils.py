@@ -58,7 +58,7 @@ class Image:
             gt_file = fget_ground_truth(self.file_name)
             self.ground_truth = np.array(IMG.open(os.path.join(gt_dir, gt_file)))
         except Exception as e:
-            print('Fail to load ground truth: ' + str(e))
+            print('### Fail to load ground truth: ' + str(e))
 
     def apply_clahe(self, clip_limit=2.0, tile_shape=(8, 8)):
         enhancer = cv2.createCLAHE(clipLimit=clip_limit, tileGridSize=tile_shape)

@@ -54,18 +54,18 @@ def main():
                 optimizer = optim.Adam(model.module.parameters(), lr=R['Params']['learning_rate'])
 
             try:
-                drive_trainer = UNetBee(model=model, run_conf=R, optimizer=optimizer)
+                drive_trainer = UNetBee(model=model, conf=R, optimizer=optimizer)
                 if R.get('Params').get('mode') == 'train':
-                    train_loader = PatchesGenerator.get_loader(run_conf=R, images=splits['train'], transforms=transform,
+                    train_loader = PatchesGenerator.get_loader(conf=R, images=splits['train'], transforms=transform,
                                                                mode='train')
-                    val_loader = PatchesGenerator.get_loader_per_img(run_conf=R, images=splits['validation'],
+                    val_loader = PatchesGenerator.get_loader_per_img(conf=R, images=splits['validation'],
                                                                      mode='validation')
                     drive_trainer.train(data_loader=train_loader, validation_loader=val_loader,
                                         epoch_run=drive_trainer.epoch_ce_loss)
 
                 drive_trainer.resume_from_checkpoint(parallel_trained=R.get('Params').get('parallel_trained'))
 
-                test_loader = PatchesGenerator.get_loader_per_img(run_conf=R,
+                test_loader = PatchesGenerator.get_loader_per_img(conf=R,
                                                                   images=splits['test'], mode='test')
                 drive_trainer.test(test_loader)
             except Exception as e:

@@ -10,7 +10,7 @@ import numpy as np
 import torch
 from PIL import Image as IMG
 
-from nnbee.torchtrainer import NNBee
+from nnbee.torchbee import NNBee
 from nnbee.utils.measurements import ScoreAccumulator
 
 sep = os.sep
@@ -21,6 +21,13 @@ class MAPNetBee(NNBee):
         NNBee.__init__(self, **kwargs)
         self.patch_shape = self.conf.get('Params').get('patch_shape')
         self.patch_offset = self.conf.get('Params').get('patch_offset')
+
+    def log_header(self):
+        return {
+            'train': 'ID,EPOCH,BATCH,LOSS',
+            'validation': 'ID,LOSS',
+            'test': 'ID,LOSS'
+        }
 
     def _eval(self, data_loaders=None, logger=None, gen_images=False, score_acc=None):
         assert isinstance(score_acc, ScoreAccumulator)

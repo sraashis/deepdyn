@@ -23,10 +23,10 @@ sep = os.sep
 class PatchesGenerator(Generator):
     def __init__(self, **kwargs):
         super(PatchesGenerator, self).__init__(**kwargs)
-        self.patch_shape = self.run_conf.get('Params').get('patch_shape')
-        self.expand_by = self.run_conf.get('Params').get('expand_patch_by')
-        self.patch_offset = self.run_conf.get('Params').get('patch_offset')
-        self.unet_dir = self.run_conf['Dirs']['image_unet']
+        self.patch_shape = self.conf.get('Params').get('patch_shape')
+        self.expand_by = self.conf.get('Params').get('expand_patch_by')
+        self.patch_offset = self.conf.get('Params').get('patch_offset')
+        self.unet_dir = self.conf['Dirs']['image_unet']
         self.input_image_ext = '.png'
         self._load_indices()
         print('Patches:', self.__len__())
@@ -127,7 +127,7 @@ class PatchesGenerator(Generator):
             y_mid = np.flip(y_mid, 1)
 
         y_mid[y_mid == 255] = 1
-        if self.run_conf['Params']['num_channels'] == 1:
+        if self.conf['Params']['num_channels'] == 1:
             img_tensor = np.array([mid_patch])
         else:
             img_tensor = np.array([mid_patch, unet_patch])
@@ -138,11 +138,11 @@ class PatchesGenerator(Generator):
                 'clip_ix': np.array([row_from, row_to, col_from, col_to]), }
 
     @classmethod
-    def get_loader_per_img(cls, images, run_conf, mode=None):
+    def get_loader_per_img(cls, images, conf, mode=None):
         loaders = []
         for file in images:
             gen = cls(
-                run_conf=run_conf,
+                conf=conf,
                 images=[file],
                 transforms=tfm.Compose([tfm.ToPILImage(), tfm.ToTensor()]),
                 shuffle_indices=False,

@@ -21,9 +21,9 @@ sep = os.sep
 class PatchesGenerator(Generator):
     def __init__(self, **kwargs):
         super(PatchesGenerator, self).__init__(**kwargs)
-        self.patch_shape = self.run_conf.get('Params').get('patch_shape')
-        self.expand_by = self.run_conf.get('Params').get('expand_patch_by')
-        self.patch_offset = self.run_conf.get('Params').get('patch_offset')
+        self.patch_shape = self.conf.get('Params').get('patch_shape')
+        self.expand_by = self.conf.get('Params').get('expand_patch_by')
+        self.patch_offset = self.conf.get('Params').get('patch_offset')
         self._load_indices()
         self.gen_class_weights()
         print('Patches:', self.__len__())
@@ -32,7 +32,6 @@ class PatchesGenerator(Generator):
         for ID, img_file in enumerate(self.images):
 
             img_obj = self._get_image_obj(img_file)
-            print(img_obj.file_name, np.unique(img_obj.ground_truth))
             img_obj.working_arr = img_obj.working_arr[:, :, 1]  # Just use green channel
             for chunk_ix in imgutils.get_chunk_indexes(img_obj.working_arr.shape, self.patch_shape,
                                                        self.patch_offset):
@@ -61,7 +60,6 @@ class PatchesGenerator(Generator):
 
         img_tensor = img_tensor[..., None]
         y[y == 255] = 1
-        print(np.unique(y))
         if self.transforms is not None:
             img_tensor = self.transforms(img_tensor)
 
@@ -71,11 +69,11 @@ class PatchesGenerator(Generator):
                 'clip_ix': np.array([row_from, row_to, col_from, col_to]), }
 
     @classmethod
-    def get_loader_per_img(cls, images, run_conf, mode=None):
+    def get_loader_per_img(cls, images, conf, mode=None):
         loaders = []
         for file in images:
             gen = cls(
-                run_conf=run_conf,
+                conf=conf,
                 images=[file],
                 transforms=tfm.Compose([tfm.ToPILImage(), tfm.ToTensor()]),
                 shuffle_indices=False,

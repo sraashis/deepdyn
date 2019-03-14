@@ -21,10 +21,10 @@ sep = os.sep
 class PatchesGenerator(Generator):
     def __init__(self, **kwargs):
         super(PatchesGenerator, self).__init__(**kwargs)
-        self.patch_shape = self.run_conf.get('Params').get('patch_shape')
-        self.expand_by = self.run_conf.get('Params').get('expand_patch_by')
-        self.patch_offset = self.run_conf.get('Params').get('patch_offset')
-        self.probe_mode = self.run_conf.get('Params').get('probe_mode')
+        self.patch_shape = self.conf.get('Params').get('patch_shape')
+        self.expand_by = self.conf.get('Params').get('expand_patch_by')
+        self.patch_offset = self.conf.get('Params').get('patch_offset')
+        self.probe_mode = self.conf.get('Params').get('probe_mode')
         self._load_indices()
         print('Patches:', self.__len__())
 
@@ -94,17 +94,19 @@ class PatchesGenerator(Generator):
         # if self.transforms is not None:
         #     img_tensor = self.transforms(img_tensor)
 
+        if len(img_tensor.shape) == 2:
+            img_tensor = img_tensor[None, ...]
         return {'id': ID,
                 'inputs': img_tensor,
                 'labels': y.copy(),
                 'clip_ix': np.array([row_from, row_to, col_from, col_to]), }
 
     @classmethod
-    def get_loader_per_img(cls, images, run_conf, mode=None):
+    def get_loader_per_img(cls, images, conf, mode=None):
         loaders = []
         for file in images:
             gen = cls(
-                run_conf=run_conf,
+                conf=conf,
                 images=[file],
                 transforms=tfm.Compose([tfm.ToPILImage(), tfm.ToTensor()]),
                 shuffle_indices=False,

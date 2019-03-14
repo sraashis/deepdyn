@@ -38,17 +38,17 @@ def main():
                 optimizer = optim.Adam(model.module.parameters(), lr=R['Params']['learning_rate'])
 
             try:
-                trainer = MAPNetBee(model=model, run_conf=R, optimizer=optimizer)
+                trainer = MAPNetBee(model=model, conf=R, optimizer=optimizer)
 
                 if R.get('Params').get('mode') == 'train':
-                    train_loader = PatchesGenerator.get_loader(run_conf=R, images=splits['train'], transforms=transform,
+                    train_loader = PatchesGenerator.get_loader(conf=R, images=splits['train'], transforms=transform,
                                                                mode='train')
-                    val_loader = PatchesGenerator.get_loader_per_img(run_conf=R, images=splits['validation'],
+                    val_loader = PatchesGenerator.get_loader_per_img(conf=R, images=splits['validation'],
                                                                      mode='validation')
                     trainer.train(data_loader=train_loader, validation_loader=val_loader, epoch_run =trainer.epoch_dice_loss)
 
                 trainer.resume_from_checkpoint(parallel_trained=R.get('Params').get('parallel_trained'))
-                test_loader = PatchesGenerator.get_loader_per_img(run_conf=R, images=splits['test'], mode='test')
+                test_loader = PatchesGenerator.get_loader_per_img(conf=R, images=splits['test'], mode='test')
 
                 trainer.test(data_loaders=test_loader, gen_images=True)
             except Exception as e:

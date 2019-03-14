@@ -1,9 +1,5 @@
-import torch
-
-import neuralnet.mapnet.main as mapnet
-import neuralnet.unet.main as unet
+import neuralnet.probenet.main as probenet
 
 if __name__ == "__main__":
     # torch.cuda.set_device(1)
-    unet.main()
-    # mapnet.main()
+    probenet.main()

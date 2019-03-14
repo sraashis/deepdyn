@@ -29,7 +29,7 @@ def plot(file=None, y=None, query=None, title='', save=False, x_tick_skip=None):
             plt.show()
         plt.close('all')
     except Exception as e:
-        print('### PLOTTER ###', e)
+        print('[NVIZ-WARN]', e)
 
 
 def plot_cmap(file=None, query=None, save=False, x=None, y=None, title=''):
@@ -45,7 +45,7 @@ def plot_cmap(file=None, query=None, save=False, x=None, y=None, title=''):
             plt.show()
         plt.close('all')
     except Exception as e:
-        print('### PLOTTER ###', e)
+        print('[NVIZ-WARN]', e)
 
 
 def y_scatter(file=None, query=None, y=None, save=False, title='', label=None):
@@ -71,7 +71,7 @@ def y_scatter(file=None, query=None, y=None, save=False, title='', label=None):
             plt.show()
         plt.close('all')
     except Exception as e:
-        print('### PLOTTER ###', e)
+        print('[NVIZ-WARN]', e)
 
 
 def xy_scatter(file=None, query=None, x=None, y=None, label=None, title='', save=False):
@@ -98,7 +98,7 @@ def xy_scatter(file=None, query=None, x=None, y=None, label=None, title='', save
             plt.show()
         plt.close('all')
     except Exception as e:
-        print('### PLOTTER ###', e)
+        print('[NVIZ-WARN]', e)
 
 
 if __name__ == "__main__":

@@ -11,7 +11,7 @@ import torch
 import torch.nn.functional as F
 from PIL import Image as IMG
 
-from nnbee.torchtrainer import NNBee
+from nnbee.torchbee import NNBee
 from nnbee.utils.measurements import ScoreAccumulator
 
 sep = os.sep
@@ -24,9 +24,16 @@ class ProbeNetBee(NNBee):
         self.patch_offset = self.conf.get('Params').get('patch_offset')
         self.dparm = self.conf.get("Funcs").get('dparm')
 
+    def log_header(self):
+        return {
+            'train': 'ID,EPOCH,BATCH,LOSS',
+            'validation': 'ID,LOSS',
+            'test': 'ID,LOSS'
+        }
+
     # This method should work invariant to input/output channels
     def _eval(self, data_loaders=None, logger=None, gen_images=False, score_acc=None):
-        assert isinstance(score_acc, ScoreAccumulator)
+        score_acc = 0.0
         with torch.no_grad():
             for loader in data_loaders:
                 img_obj = loader.dataset.image_objects[0]
@@ -45,7 +52,7 @@ class ProbeNetBee(NNBee):
                     clip_ix = data['clip_ix'].to(self.device).int()
 
                     outputs = self.model(inputs)
-                    loss = F.mse_loss(outputs, labels).item()
+                    loss = F.mse_loss(outputs, labels[None, ...]).item()
 
                     img_loss += loss
 
