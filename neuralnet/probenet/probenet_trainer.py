@@ -24,7 +24,7 @@ class ProbeNetBee(NNBee):
         self.patch_offset = self.conf.get('Params').get('patch_offset')
         self.dparm = self.conf.get("Funcs").get('dparm')
 
-    def log_header(self):
+    def get_log_headers(self):
         return {
             'train': 'ID,EPOCH,BATCH,LOSS',
             'validation': 'ID,LOSS',
