@@ -38,12 +38,12 @@ class NNBee:
         self.checkpoint_file = os.path.join(self.log_dir, self.conf.get('checkpoint_file'))
         _log_key = self.conf.get('checkpoint_file').split('.')[0]
         self.test_logger = NNBee.get_logger(log_file=os.path.join(self.log_dir, _log_key + '-TEST.csv'),
-                                            header=self.log_header().get('test', ''))
+                                            header=self.get_log_headers().get('test', ''))
         if self.mode == 'train':
             self.train_logger = NNBee.get_logger(log_file=os.path.join(self.log_dir, _log_key + '-TRAIN.csv'),
-                                                 header=self.log_header().get('train', ''))
+                                                 header=self.get_log_headers().get('train', ''))
             self.val_logger = NNBee.get_logger(log_file=os.path.join(self.log_dir, _log_key + '-VAL.csv'),
-                                               header=self.log_header().get('validation', ''))
+                                               header=self.get_log_headers().get('validation', ''))
 
         #  Function to initialize class weights, default is [1, 1]
         self.dparm = self.conf.get("Funcs").get('dparm')
@@ -64,22 +64,24 @@ class NNBee:
         self.checkpoint = {'total_epochs:': 0, 'epochs': 0, 'state': None, 'score': 0.0, 'model': 'EMPTY'}
         self.patience = self.conf.get('Params').get('patience', 35)
 
-    def active_headers(self, headers):
+    def get_active_headers(self, headers, key):
         """
         All the headers that are present in log file are filtered in order to generate graph
         :return: None
         """
-        train = [e for e in self._MAYBE_LOG_HEADERS if e in headers.get('train', [])]
-        val = [e for e in self._MAYBE_LOG_HEADERS if e in headers.get('validation', [])]
-        test = [e for e in self._MAYBE_LOG_HEADERS if e in headers.get('test', [])]
-        return train, val, test
+        if 'train' == key:
+            return [e for e in self._MAYBE_LOG_HEADERS if e in headers.get('train', [])]
+        if 'validation' == key:
+            return [e for e in self._MAYBE_LOG_HEADERS if e in headers.get('validation', [])]
+        if 'test' == key:
+            return [e for e in self._MAYBE_LOG_HEADERS if e in headers.get('test', [])]
 
     def test(self, data_loaders=None, gen_images=True):
         print('Running test')
         self.model.eval()
         score = ScoreAccumulator()
         self._eval(data_loaders=data_loaders, gen_images=gen_images, score_acc=score, logger=self.test_logger)
-        _, _, h_test = self.active_headers(self.log_header())
+        h_test = self.get_active_headers(self.get_log_headers(), 'test')
         for y in h_test:
             plt.y_scatter(file=self.test_logger.name, y=y, label='ID', save=True, title='Test')
         if 'PRECISION' in h_test and 'RECALL' in h_test:
@@ -96,7 +98,8 @@ class NNBee:
 
             # Run one epoch
             epoch_run(epoch=epoch, data_loader=data_loader)
-            self._gen_plots(data_loader=data_loader, validation_loader=validation_loader)
+            active_headers = self.get_active_headers(self.get_log_headers(), 'train')
+            self._gen_plots(data_loader=data_loader, log_file=self.train_logger.name, active_headers=active_headers)
 
             # Validation_frequency is the number of epoch until validation
             if epoch % self.validation_frequency == 0:
@@ -116,25 +119,20 @@ class NNBee:
         self.model.eval()
         val_score = ScoreAccumulator()
         self._eval(data_loaders=data_loaders, gen_images=gen_images, score_acc=val_score, logger=self.val_logger)
-        self._gen_plots(validation_loader=data_loaders)
+
+        active_headers = self.get_active_headers(self.get_log_headers(), 'validation')
+        self._gen_plots(data_loader=data_loaders, log_file=self.val_logger.name, active_headers=active_headers)
         self._save_if_better(score=val_score.get_prfa()[2])
 
     def _gen_plots(self, **kw):
-        h_train, h_val, h_test = self.active_headers(self.log_header())
 
         if kw.get('data_loader'):
-            self.plot_column_keys(file=self.train_logger.name, batches_per_epoch=kw['data_loader'].__len__(),
-                                  keys=h_train)
-            if 'PRECISION' in h_train and 'RECALL' in h_train:
-                plt.plot_cmap(file=self.train_logger.name, save=True, x='PRECISION', y='RECALL')
+            self.plot_column_keys(file=kw['log_file'], batches_per_epoch=kw['data_loader'].__len__(),
+                                  keys=kw['active_headers'])
+            if 'PRECISION' in kw['active_headers'] and 'RECALL' in kw['active_headers']:
+                plt.plot_cmap(file=kw['log_file'], save=True, x='PRECISION', y='RECALL')
 
-        if kw.get('validation_loader'):
-            self.plot_column_keys(file=self.val_logger.name, batches_per_epoch=kw['validation_loader'].__len__(),
-                                  keys=h_val)
-            if 'PRECISION' in h_val and 'RECALL' in h_val:
-                plt.plot_cmap(file=self.val_logger.name, save=True, x='PRECISION', y='RECALL')
-
-    def log_header(self):
+    def get_log_headers(self):
         # EXAMPLE:
         # return {
         #     'train': 'ID,EPOCH,BATCH,PRECISION,RECALL,F1,ACCURACY,LOSS',
