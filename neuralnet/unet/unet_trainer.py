@@ -7,90 +7,31 @@
 import os
 
 import numpy as np
-import math
 import torch
-import torch.nn.functional as F
 from PIL import Image as IMG
 
-from neuralnet.torchtrainer import NNTrainer
-from neuralnet.utils.measurements import ScoreAccumulator
+from nnbee.torchbee import NNBee
+from nnbee.utils.measurements import ScoreAccumulator
 
 sep = os.sep
 
 
-class UNetNNTrainer(NNTrainer):
+class UNetBee(NNBee):
     def __init__(self, **kwargs):
-        NNTrainer.__init__(self, **kwargs)
-        self.patch_shape = self.run_conf.get('Params').get('patch_shape')
-        self.patch_offset = self.run_conf.get('Params').get('patch_offset')
-        self.dparm = self.run_conf.get("Funcs").get('dparm')
+        NNBee.__init__(self, **kwargs)
+        self.patch_shape = self.conf.get('Params').get('patch_shape')
+        self.patch_offset = self.conf.get('Params').get('patch_offset')
 
-    def train(self, optimizer=None, data_loader=None, validation_loader=None):
+    def log_header(self):
+        return {
+            'train': 'ID,EPOCH,BATCH,PRECISION,RECALL,F1,ACCURACY,LOSS',
+            'validation': 'ID,PRECISION,RECALL,F1,ACCURACY',
+            'test': 'ID,PRECISION,RECALL,F1,ACCURACY'
+        }
 
-        if validation_loader is None:
-            raise ValueError('Please provide validation loader.')
-
-        logger = NNTrainer.get_logger(self.train_log_file,
-                                      header='ID,EPOCH,BATCH,PRECISION,RECALL,F1,ACCURACY,LOSS')
-
-        val_logger = NNTrainer.get_logger(self.validation_log_file,
-                                          header='ID,PRECISION,RECALL,F1,ACCURACY')
-
-        print('Training...')
-        for epoch in range(1, self.epochs + 1):
-
-            self.model.train()
-            score_acc = ScoreAccumulator()
-            running_loss = 0.0
-            self._adjust_learning_rate(optimizer=optimizer, epoch=epoch)
-            self.checkpoint['total_epochs'] = epoch
-
-            for i, data in enumerate(data_loader, 1):
-                inputs, labels = data['inputs'].to(self.device).float(), data['labels'].to(self.device).long()
-
-                optimizer.zero_grad()
-                outputs = self.model(inputs)
-                _, predicted = torch.max(outputs, 1)
-
-                loss = F.nll_loss(outputs, labels, weight=torch.FloatTensor(self.dparm(self.run_conf)).to(self.device))
-                loss.backward()
-                optimizer.step()
-
-                current_loss = loss.item()
-                running_loss += current_loss
-                p, r, f1, a = score_acc.reset().add_tensor(predicted, labels).get_prfa()
-
-                if i % self.log_frequency == 0:
-                    print('Epochs[%d/%d] Batch[%d/%d] loss:%.5f pre:%.3f rec:%.3f f1:%.3f acc:%.3f' %
-                          (
-                              epoch, self.epochs, i, data_loader.__len__(), running_loss / self.log_frequency, p, r, f1,
-                              a))
-                    running_loss = 0.0
-
-                self.flush(logger, ','.join(str(x) for x in [0, epoch, i, p, r, f1, a, current_loss]))
-
-            self.plot_train(file=self.train_log_file, batches_per_epochs=data_loader.__len__(), keys=['LOSS', 'F1'])
-            if epoch % self.validation_frequency == 0:
-                self.evaluate(data_loaders=validation_loader, logger=val_logger, gen_images=False)
-                if self.early_stop(patience=75):
-                    return
-
-            self.plot_val(self.validation_log_file, batches_per_epoch=len(validation_loader))
-
-        try:
-            logger.close()
-            val_logger.close()
-        except IOError:
-            pass
-
-    def evaluate(self, data_loaders=None, logger=None, gen_images=False):
-        assert (logger is not None), 'Please Provide a logger'
-        self.model.eval()
-        eval_score = ScoreAccumulator()
-
-        print('\nEvaluating...')
+    def _eval(self, data_loaders=None, logger=None, gen_images=False, score_acc=None):
+        assert isinstance(score_acc, ScoreAccumulator)
         with torch.no_grad():
-
             for loader in data_loaders:
                 img_obj = loader.dataset.image_objects[0]
                 x, y = img_obj.working_arr.shape[0], img_obj.working_arr.shape[1]
@@ -121,7 +62,7 @@ class UNetNNTrainer(NNTrainer):
                     map_img = map_img.cpu().numpy()
                     predicted_img = predicted_img.cpu().numpy()
                     img_score.add_array(predicted_img, img_obj.ground_truth)
-                    self.run_conf['acc'].accumulate(img_score)  # Global score
+                    self.conf['acc'].accumulate(img_score)  # Global score
 
                     IMG.fromarray(np.array(predicted_img, dtype=np.uint8)).save(
                         os.path.join(self.log_dir, 'pred_' + img_obj.file_name.split('.')[0] + '.png'))
@@ -129,10 +70,8 @@ class UNetNNTrainer(NNTrainer):
                         os.path.join(self.log_dir, img_obj.file_name.split('.')[0] + '.png'))
                 else:
                     img_score.add_tensor(predicted_img, gt)
-                    eval_score.accumulate(img_score)
+                    score_acc.accumulate(img_score)
 
                 prf1a = img_score.get_prfa()
                 print(img_obj.file_name, ' PRF1A', prf1a)
                 self.flush(logger, ','.join(str(x) for x in [img_obj.file_name] + prf1a))
-
-        self._save_if_better(score=eval_score.get_prfa()[2])

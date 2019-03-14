@@ -11,19 +11,19 @@ import torchvision.transforms as tfm
 from torch.utils.data.dataset import Dataset
 
 from imgcommons.containers import Image
-import neuralnet.utils.data_utils as dutils
+import nnbee.utils.data_utils as dutils
 
 
 class Generator(Dataset):
-    def __init__(self, run_conf=None, images=None,
+    def __init__(self, conf=None, images=None,
                  transforms=None, shuffle_indices=False, mode=None, **kwargs):
 
-        self.run_conf = run_conf
-        self.mask_getter = self.run_conf.get('Funcs').get('mask_getter')
-        self.truth_getter = self.run_conf.get('Funcs').get('truth_getter')
-        self.image_dir = self.run_conf.get('Dirs').get('image')
-        self.mask_dir = self.run_conf.get('Dirs').get('mask')
-        self.truth_dir = self.run_conf.get('Dirs').get('truth')
+        self.conf = conf
+        self.mask_getter = self.conf.get('Funcs').get('mask_getter')
+        self.truth_getter = self.conf.get('Funcs').get('truth_getter')
+        self.image_dir = self.conf.get('Dirs').get('image')
+        self.mask_dir = self.conf.get('Dirs').get('mask')
+        self.truth_dir = self.conf.get('Dirs').get('truth')
         self.shuffle_indices = shuffle_indices
         self.transforms = transforms
         self.mode = mode
@@ -62,28 +62,28 @@ class Generator(Dataset):
         if self.mode != 'train':
             return
 
-        self.run_conf['Params']['cls_weights'] = [0, 0]
+        self.conf['Params']['cls_weights'] = [0, 0]
         for _, obj in self.image_objects.items():
-            self.run_conf['Params']['cls_weights'][0] += dutils.get_class_weights(obj.ground_truth)[0]
-            self.run_conf['Params']['cls_weights'][1] += dutils.get_class_weights(obj.ground_truth)[255]
+            self.conf['Params']['cls_weights'][0] += dutils.get_class_weights(obj.ground_truth)[0]
+            self.conf['Params']['cls_weights'][1] += dutils.get_class_weights(obj.ground_truth)[255]
 
-        self.run_conf['Params']['cls_weights'][0] = self.run_conf['Params']['cls_weights'][0] / len(self.image_objects)
-        self.run_conf['Params']['cls_weights'][1] = self.run_conf['Params']['cls_weights'][1] / len(self.image_objects)
+        self.conf['Params']['cls_weights'][0] = self.conf['Params']['cls_weights'][0] / len(self.image_objects)
+        self.conf['Params']['cls_weights'][1] = self.conf['Params']['cls_weights'][1] / len(self.image_objects)
 
     @classmethod
-    def get_loader(cls, images, run_conf, transforms, mode, batch_sizes=[]):
+    def get_loader(cls, images, conf, transforms, mode, batch_sizes=[]):
         """
         ###### GET list dataloaders of different batch sizes as specified in batch_sizes
         :param images: List of images for which the torch dataloader will be generated
-        :param run_conf: JSON file. see runs.py
+        :param conf: JSON file. see runs.py
         :param transforms: torchvision composed transforms
         :param mode: 'train' or 'test'
         :param batch_sizes: Default will pick from runs.py. List of integers(batch_size)
                 will generate a loader for each batch size
         :return: loader if batch_size is default else list of loaders
         """
-        batch_sizes = [run_conf['Params']['batch_size']] if len(batch_sizes) == 0 else batch_sizes
-        gen = cls(run_conf=run_conf, images=images, transforms=transforms, shuffle_indices=True, mode=mode)
+        batch_sizes = [conf['Params']['batch_size']] if len(batch_sizes) == 0 else batch_sizes
+        gen = cls(conf=conf, images=images, transforms=transforms, shuffle_indices=True, mode=mode)
 
         dls = []
         for bz in batch_sizes:
@@ -91,17 +91,17 @@ class Generator(Dataset):
         return dls if len(dls) > 1 else dls[0]
 
     @classmethod
-    def get_loader_per_img(cls, images, run_conf, mode=None):
+    def get_loader_per_img(cls, images, conf, mode=None):
         loaders = []
         for file in images:
             gen = cls(
-                run_conf=run_conf,
+                conf=conf,
                 images=[file],
                 transforms=tfm.Compose([tfm.ToPILImage(), tfm.ToTensor()]),
                 shuffle_indices=False,
                 mode=mode
             )
-            loader = torch.utils.data.DataLoader(gen, batch_size=min(run_conf['Params']['batch_size'], gen.__len__()),
+            loader = torch.utils.data.DataLoader(gen, batch_size=min(conf['Params']['batch_size'], gen.__len__()),
                                                  shuffle=False, num_workers=3, sampler=None)
             loaders.append(loader)
         return loaders

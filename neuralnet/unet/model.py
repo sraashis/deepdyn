@@ -2,7 +2,7 @@ import torch
 import torch.nn.functional as F
 from torch import nn
 
-from neuralnet.utils.weights_utils import initialize_weights
+from nnbee.utils.weights_utils import initialize_weights
 
 
 class _DoubleConvolution(nn.Module):
