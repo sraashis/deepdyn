@@ -22,7 +22,7 @@ class MAPNetBee(NNBee):
         self.patch_shape = self.conf.get('Params').get('patch_shape')
         self.patch_offset = self.conf.get('Params').get('patch_offset')
 
-    def log_header(self):
+    def get_log_headers(self):
         return {
             'train': 'ID,EPOCH,BATCH,LOSS',
             'validation': 'ID,LOSS',
