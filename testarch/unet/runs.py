@@ -31,7 +31,7 @@ DRIVE = {
     'Funcs': {
         'truth_getter': lambda file_name: file_name.split('_')[0] + '_manual1.gif',
         'mask_getter': lambda file_name: file_name.split('_')[0] + '_mask.gif',
-        'dparm': lambda x: np.random.choice(np.arange(1, 101, 1), 2)
+        'dparm': lambda x: [1, 1]
     }
 }
 
