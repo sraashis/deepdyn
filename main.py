@@ -2,6 +2,7 @@ import testarch.unet as net
 import testarch.unet.runs as r
 import torchvision.transforms as tmf
 
+# Set GPU
 import torch
 torch.cuda.set_device(1)
 
