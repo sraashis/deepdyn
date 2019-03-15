@@ -3,7 +3,7 @@
 A pytorch based framework for medical image processing with COnvolutional Neural Network. 
 Along with example with unet for DRIVE dataset segmentation [1]. DRIVE dataset is composed of 40 retinal fundus images. 
 
-#### Required dependencies
+## Required dependencies
 
 We need python3, numpy, pytorch, torchvision, matplotlib and PILLOW packages
 
@@ -13,7 +13,7 @@ pip install -r ature/assets/requirements.txt
 
 
 
-#### Project Structure
+## Project Structure
 
 * [ature/nbee](https://github.com/sraashis/ature/tree/master/nbee) nbee framework core.
 * [ature/utils](https://github.com/sraashis/ature/tree/master/utils) Utilities for dealing with F1-score, image cropping, slicing, visual precision-recall, auto split train-validation-test set and many more.
@@ -22,15 +22,15 @@ pip install -r ature/assets/requirements.txt
 for retinal image segmentation.
 * [ature/data](https://github.com/sraashis/ature/tree/master/data) DRIVE dataset..
 
-#### Dataset check
+## Dataset check
 Original image and respective ground-truth image. Ground-truth is a binary image with each vessel pixel(white) 255
  and background(black) 0.
 ![Sample DRIVE image](assets/merged_drive.png)
 
-### [U-net architecture link](https://arxiv.org/abs/1505.04597)
+#### [U-net architecture link](https://arxiv.org/abs/1505.04597)
 ![Unet](assets/unet.png)
 
-#### Usage
+## Usage
 Example **main.py**
 ```python
 import testarch.unet as net
@@ -103,7 +103,7 @@ DRIVE = {
 'validation'. [this util] (https://github.com/sraashis/ature/blob/master/utils/auto_split.py) takes a folder with all images and does that automatically. This is handy when we want to to k-fold cross validation. We jsut have to generate such k json files and put in splits_json folder. 
 - **truth_getter, mask_getter**: A custom function that maps input_image to its ground_truth and mask respectively.
 
-#### Sample log
+## Sample log
 ```text
 workstation$ python main.py 
 Total Params: 31042434
@@ -143,7 +143,7 @@ Running validation..
 Score improved:  0.49741 to 0.63598 BEST CHECKPOINT SAVED
 ...
 ```
-#### Results
+## Results
 The network is trained for 40 epochs with 15 training images, 5 validation images and 20 test images.
 ![Training_Loss](assets/loss.png)
 ![Training_Scores](assets/training_f1_acc.png)
@@ -158,7 +158,7 @@ Right one the is the segmentation result on one of the test images.
 
 ### Thank you!'ve made it. ❤
 
-##### References
+#### References
 
 1. J. Staal, M. Abramoff, M. Niemeijer, M. Viergever, and B. van Ginneken, “Ridge based vessel segmentation in color
 images of the retina,” IEEE Transactions on Medical Imaging 23, 501–509 (2004)
