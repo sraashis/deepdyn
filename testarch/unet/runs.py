@@ -24,7 +24,7 @@ DRIVE = {
         'image': 'data' + sep + 'DRIVE' + sep + 'images',
         'mask': 'data' + sep + 'DRIVE' + sep + 'mask',
         'truth': 'data' + sep + 'DRIVE' + sep + 'manual',
-        'logs': 'logs' + sep + 'DRIVE' + sep + 'UNET_DEL_ASAP',
+        'logs': 'logs' + sep + 'DRIVE',
         'splits_json': 'data' + sep + 'DRIVE' + sep + 'splits'
     },
 

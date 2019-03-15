@@ -85,7 +85,11 @@ class NNBee:
 
             # Validation_frequency is the number of epoch until validation
             if epoch % self.validation_frequency == 0:
-                self._validation(data_loaders=validation_loader, gen_images=False)
+                print('Running validation..')
+                self.model.eval()
+                val_score = ScoreAccumulator()
+                self._eval(data_loaders=validation_loader, gen_images=False, score_acc=val_score,
+                           logger=self.val_logger)
                 self._on_validation_end(data_loader=validation_loader, log_file=self.val_logger.name)
                 if self.early_stop(patience=self.patience):
                     return
@@ -97,12 +101,6 @@ class NNBee:
 
     def _on_epoch_end(self, **kw):
         pass
-
-    def _validation(self, data_loaders=None, gen_images=False):
-        print('Running validation..')
-        self.model.eval()
-        val_score = ScoreAccumulator()
-        self._eval(data_loaders=data_loaders, gen_images=gen_images, score_acc=val_score, logger=self.val_logger)
 
     def _on_validation_end(self, **kw):
         pass
