@@ -12,8 +12,8 @@ import numpy as np
 import torch
 import torchvision.transforms as tfm
 
-import nnbee.utils.img_utils as imgutils
-from nnbee.datagen import Generator
+import utils.img_utils as imgutils
+from nbee.datagen import Generator
 
 sep = os.sep
 

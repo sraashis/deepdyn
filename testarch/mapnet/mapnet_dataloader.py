@@ -12,9 +12,9 @@ import torch
 import torchvision.transforms as tfm
 from skimage.morphology import skeletonize
 
-import nnbee.utils.img_utils as iu
-from nnbee.utils.img_utils import Image
-from nnbee.datagen import Generator
+import utils.img_utils as iu
+from utils.img_utils import Image
+from nbee.datagen import Generator
 import random
 
 sep = os.sep

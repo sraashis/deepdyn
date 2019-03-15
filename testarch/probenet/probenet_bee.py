@@ -4,15 +4,12 @@
 ### date: 9/10/2018
 """
 
-import os
-
 import numpy as np
+import os
 import torch
 import torch.nn.functional as F
 from PIL import Image as IMG
-
-from nnbee.torchbee import NNBee
-from nnbee.utils.measurements import ScoreAccumulator
+from nbee.torchbee import NNBee
 
 sep = os.sep
 
@@ -30,6 +27,18 @@ class ProbeNetBee(NNBee):
             'validation': 'ID,LOSS',
             'test': 'ID,LOSS'
         }
+
+    def _on_epoch_end(self, **kw):
+        self.plot_column_keys(file=kw['log_file'], batches_per_epoch=kw['data_loader'].__len__(),
+                              keys=['LOSS'])
+
+    def _on_validation_end(self, **kw):
+        self.plot_column_keys(file=kw['log_file'], batches_per_epoch=kw['data_loader'].__len__(),
+                              keys=['LOSS'])
+
+    def _on_test_end(self, **kw):
+        self.plot_column_keys(file=kw['log_file'], batches_per_epoch=1,
+                              keys=['F1', 'ACCURACY'])
 
     # This method should work invariant to input/output channels
     def _eval(self, data_loaders=None, logger=None, gen_images=False, score_acc=None):

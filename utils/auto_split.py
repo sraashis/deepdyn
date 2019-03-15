@@ -60,7 +60,7 @@ def create_splits(files, sep1=('', 0), sep2=('', 0), json_file=None):
 
 
 if __name__ == "__main__":
-    from neuralnet.unet.runs import VEVIO as r
+    from testarch.unet.runs import VEVIO as r
 
     files = os.listdir(r['Dirs']['image'])
     random.shuffle(files)

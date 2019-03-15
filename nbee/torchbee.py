@@ -7,22 +7,16 @@
 import os
 import random as rd
 import sys
-import threading
 
 import numpy as np
 import torch
 import torch.nn.functional as F
 
-import nnbee.utils.loss as l
-import nnbee.viz.nviz as plt
-from nnbee.utils.measurements import ScoreAccumulator
+from utils.loss import dice_loss as l
+from utils.measurements import ScoreAccumulator
 
 
 class NNBee:
-    """
-    Possible headers that may appear in log files. These are the ones which are plotted
-    """
-    _MAYBE_LOG_HEADERS = ['LOSS', 'F1', 'MSE', 'ACCURACY', 'DICE']
 
     def __init__(self, conf=None, model=None, optimizer=None):
 
@@ -36,14 +30,16 @@ class NNBee:
 
         # Initialize necessary logging conf
         self.checkpoint_file = os.path.join(self.log_dir, self.conf.get('checkpoint_file'))
+
+        self.log_headers = self.get_log_headers()
         _log_key = self.conf.get('checkpoint_file').split('.')[0]
         self.test_logger = NNBee.get_logger(log_file=os.path.join(self.log_dir, _log_key + '-TEST.csv'),
-                                            header=self.get_log_headers().get('test', ''))
+                                            header=self.log_headers.get('test', ''))
         if self.mode == 'train':
             self.train_logger = NNBee.get_logger(log_file=os.path.join(self.log_dir, _log_key + '-TRAIN.csv'),
-                                                 header=self.get_log_headers().get('train', ''))
+                                                 header=self.log_headers.get('train', ''))
             self.val_logger = NNBee.get_logger(log_file=os.path.join(self.log_dir, _log_key + '-VAL.csv'),
-                                               header=self.get_log_headers().get('validation', ''))
+                                               header=self.log_headers.get('validation', ''))
 
         #  Function to initialize class weights, default is [1, 1]
         self.dparm = self.conf.get("Funcs").get('dparm')
@@ -64,31 +60,17 @@ class NNBee:
         self.checkpoint = {'total_epochs:': 0, 'epochs': 0, 'state': None, 'score': 0.0, 'model': 'EMPTY'}
         self.patience = self.conf.get('Params').get('patience', 35)
 
-    def get_active_headers(self, headers, key):
-        """
-        All the headers that are present in log file are filtered in order to generate graph
-        :return: None
-        """
-        if 'train' == key:
-            return [e for e in self._MAYBE_LOG_HEADERS if e in headers.get('train', [])]
-        if 'validation' == key:
-            return [e for e in self._MAYBE_LOG_HEADERS if e in headers.get('validation', [])]
-        if 'test' == key:
-            return [e for e in self._MAYBE_LOG_HEADERS if e in headers.get('test', [])]
-
     def test(self, data_loaders=None, gen_images=True):
         print('Running test')
         self.model.eval()
         score = ScoreAccumulator()
         self._eval(data_loaders=data_loaders, gen_images=gen_images, score_acc=score, logger=self.test_logger)
-        h_test = self.get_active_headers(self.get_log_headers(), 'test')
-        for y in h_test:
-            plt.y_scatter(file=self.test_logger.name, y=y, label='ID', save=True, title='Test')
-        if 'PRECISION' in h_test and 'RECALL' in h_test:
-            plt.xy_scatter(file=self.test_logger.name, save=True, x='PRECISION', y='RECALL', label='ID', title='Test')
-
+        self._on_test_end(log_file=self.test_logger.name)
         if not self.test_logger and not self.test_logger.closed:
             self.test_logger.close()
+
+    def _on_test_end(self, **kw):
+        pass
 
     def train(self, data_loader=None, validation_loader=None, epoch_run=None):
         print('Training...')
@@ -98,12 +80,13 @@ class NNBee:
 
             # Run one epoch
             epoch_run(epoch=epoch, data_loader=data_loader)
-            active_headers = self.get_active_headers(self.get_log_headers(), 'train')
-            self._gen_plots(data_loader=data_loader, log_file=self.train_logger.name, active_headers=active_headers)
+
+            self._on_epoch_end(data_loader=data_loader, log_file=self.train_logger.name)
 
             # Validation_frequency is the number of epoch until validation
             if epoch % self.validation_frequency == 0:
                 self._validation(data_loaders=validation_loader, gen_images=False)
+                self._on_validation_end(data_loader=validation_loader, log_file=self.val_logger.name)
                 if self.early_stop(patience=self.patience):
                     return
 
@@ -111,8 +94,9 @@ class NNBee:
             self.train_logger.close()
         if not self.val_logger and not self.val_logger.closed:
             self.val_logger.close()
-        if not self.test_logger and not self.test_logger.closed:
-            self.test_logger.close()
+
+    def _on_epoch_end(self, **kw):
+        pass
 
     def _validation(self, data_loaders=None, gen_images=False):
         print('Running validation..')
@@ -120,17 +104,8 @@ class NNBee:
         val_score = ScoreAccumulator()
         self._eval(data_loaders=data_loaders, gen_images=gen_images, score_acc=val_score, logger=self.val_logger)
 
-        active_headers = self.get_active_headers(self.get_log_headers(), 'validation')
-        self._gen_plots(data_loader=data_loaders, log_file=self.val_logger.name, active_headers=active_headers)
-        self._save_if_better(score=val_score.get_prfa()[2])
-
-    def _gen_plots(self, **kw):
-
-        if kw.get('data_loader'):
-            self.plot_column_keys(file=kw['log_file'], batches_per_epoch=kw['data_loader'].__len__(),
-                                  keys=kw['active_headers'])
-            if 'PRECISION' in kw['active_headers'] and 'RECALL' in kw['active_headers']:
-                plt.plot_cmap(file=kw['log_file'], save=True, x='PRECISION', y='RECALL')
+    def _on_validation_end(self, **kw):
+        pass
 
     def get_log_headers(self):
         # EXAMPLE:
@@ -183,8 +158,10 @@ class NNBee:
     def get_logger(log_file=None, header=''):
 
         if os.path.isfile(log_file):
-            print('### CRITICAL!!! ' + log_file + '" already exists. PLEASE BACKUP. Exiting..')
-            sys.exit(1)
+            print('### CRITICAL!!! ' + log_file + '" already exists.')
+            ip = input('Override? [Y/N]: ')
+            if ip == 'N' or ip == 'n':
+                sys.exit(1)
 
         file = open(log_file, 'w')
         NNBee.flush(file, header)
@@ -195,21 +172,6 @@ class NNBee:
         if logger is not None:
             logger.write(msg + '\n')
             logger.flush()
-
-    @property
-    def train_log_file(self):
-        if self.train_logger:
-            return os.path.basename(self.train_logger.name)
-
-    @property
-    def val_log_file(self):
-        if self.val_logger:
-            return os.path.basename(self.val_logger.name)
-
-    @property
-    def test_log_file(self):
-        if self.test_logger:
-            return os.path.basename(self.test_logger.name)
 
     def _adjust_learning_rate(self, epoch):
         if epoch % 30 == 0:
@@ -227,18 +189,10 @@ class NNBee:
         :param keys:
         :return:
         """
-
-        def f(fl=file, b_per_ep=batches_per_epoch):
-            for k in keys:
-                plt.plot(file=fl, title=title, y=k, save=True,
-                         x_tick_skip=b_per_ep)
-
-        NNBee.send_to_back(f)
-
-    @staticmethod
-    def send_to_back(func, kwargs={}):
-        t = threading.Thread(target=func, kwargs=kwargs)
-        t.start()
+        from viz.nviz import plot
+        for k in keys:
+            plot(file=file, title=title, y=k, save=True,
+                 x_tick_skip=batches_per_epoch)
 
     '''
     ######################################################################################

@@ -11,12 +11,12 @@ import torch
 import torch.optim as optim
 import torchvision.transforms as transforms
 
-import neuralnet.probenet.runs as rs
-from neuralnet.probenet.model import UNet
-from neuralnet.probenet.probenet_dataloader import PatchesGenerator
-from neuralnet.probenet.probenet_trainer import ProbeNetBee
-from nnbee.utils import auto_split as asp
-from nnbee.utils.measurements import ScoreAccumulator
+import testarch.probenet.runs as rs
+from testarch.probenet.model import UNet
+from testarch.probenet.probenet_dataloader import PatchesGenerator
+from testarch.probenet.probenet_bee import ProbeNetBee
+from utils import auto_split as asp
+from utils.measurements import ScoreAccumulator
 
 RUNS = [rs.DEPTH_MAP]
 

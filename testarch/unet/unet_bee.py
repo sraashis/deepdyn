@@ -4,14 +4,13 @@
 ### date: 9/10/2018
 """
 
-import os
-
 import numpy as np
+import os
 import torch
+import nbee.viz.nviz as plt
 from PIL import Image as IMG
-
-from nnbee.torchbee import NNBee
-from nnbee.utils.measurements import ScoreAccumulator
+from nbee.torchbee import NNBee
+from utils.measurements import ScoreAccumulator
 
 sep = os.sep
 
@@ -22,6 +21,7 @@ class UNetBee(NNBee):
         self.patch_shape = self.conf.get('Params').get('patch_shape')
         self.patch_offset = self.conf.get('Params').get('patch_offset')
 
+    # Headers for log files
     def get_log_headers(self):
         return {
             'train': 'ID,EPOCH,BATCH,PRECISION,RECALL,F1,ACCURACY,LOSS',
@@ -29,6 +29,23 @@ class UNetBee(NNBee):
             'test': 'ID,PRECISION,RECALL,F1,ACCURACY'
         }
 
+    def _on_epoch_end(self, **kw):
+        self.plot_column_keys(file=kw['log_file'], batches_per_epoch=kw['data_loader'].__len__(),
+                              keys=['F1', 'LOSS', 'ACCURACY'])
+        plt.plot_cmap(file=kw['log_file'], save=True, x='PRECISION', y='RECALL')
+
+    def _on_validation_end(self, **kw):
+        self.plot_column_keys(file=kw['log_file'], batches_per_epoch=kw['data_loader'].__len__(),
+                              keys=['F1', 'ACCURACY'])
+        plt.plot_cmap(file=kw['log_file'], save=True, x='PRECISION', y='RECALL')
+
+    def _on_test_end(self, **kw):
+        plt.y_scatter(file=kw['log_file'], y='F1', label='ID', save=True, title='Test')
+        plt.y_scatter(file=kw['log_file'], y='ACCURACY', label='ID', save=True, title='Test')
+        plt.xy_scatter(file=kw['log_file'], save=True, x='PRECISION', y='RECALL', label='ID', title='Test')
+
+    # This method takes torch n dataloaders for n image with one image in each and evaluates after training.
+    # It is also the base method for both testing and validation
     def _eval(self, data_loaders=None, logger=None, gen_images=False, score_acc=None):
         assert isinstance(score_acc, ScoreAccumulator)
         with torch.no_grad():

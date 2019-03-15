@@ -7,13 +7,13 @@
 import os
 from random import shuffle
 
-import nnbee.utils.img_utils as imgutils
+import utils.img_utils as imgutils
 import numpy as np
 import torch
 import torchvision.transforms as tfm
-from nnbee.utils.img_utils import Image
+from utils.img_utils import Image
 
-from nnbee.datagen import Generator
+from nbee.datagen import Generator
 
 sep = os.sep
 
