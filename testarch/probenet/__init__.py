@@ -40,14 +40,14 @@ def run(runs, transforms):
                     train_loader = PatchesGenerator.get_loader(conf=R, images=splits['train'], transforms=transforms,
                                                                mode='train')
                     val_loader = PatchesGenerator.get_loader_per_img(conf=R, images=splits['validation'],
-                                                                     mode='validation')
+                                                                     mode='validation', transforms=transforms)
                     bee.train(data_loader=train_loader, validation_loader=val_loader, epoch_run=bee.epoch_mse_loss)
 
                 bee.resume_from_checkpoint(parallel_trained=R.get('Params').get('parallel_trained'))
 
                 images = splits['test']
                 test_loader = PatchesGenerator.get_loader_per_img(conf=R,
-                                                                  images=images, mode='test')
+                                                                  images=images, mode='test', transforms=transforms)
 
                 bee.test(data_loaders=test_loader, gen_images=True)
             except Exception as e:

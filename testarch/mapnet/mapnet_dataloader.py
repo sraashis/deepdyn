@@ -138,13 +138,13 @@ class PatchesGenerator(Generator):
                 'clip_ix': np.array([row_from, row_to, col_from, col_to]), }
 
     @classmethod
-    def get_loader_per_img(cls, images, conf, mode=None):
+    def get_loader_per_img(cls, images, conf, mode, transforms):
         loaders = []
         for file in images:
             gen = cls(
                 conf=conf,
                 images=[file],
-                transforms=tfm.Compose([tfm.ToPILImage(), tfm.ToTensor()]),
+                transforms=transforms,
                 shuffle_indices=False,
                 mode=mode
             )

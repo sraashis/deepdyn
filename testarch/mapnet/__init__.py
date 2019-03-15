@@ -4,11 +4,11 @@ import traceback
 import torch
 import torch.optim as optim
 
+from utils import auto_split as asp
+from utils.measurements import ScoreAccumulator
 from ..mapnet.mapnet_bee import MAPNetBee
 from ..mapnet.mapnet_dataloader import PatchesGenerator
 from ..mapnet.model import MapUNet
-from utils import auto_split as asp
-from utils.measurements import ScoreAccumulator
 
 
 def run(runs, transforms):
@@ -40,7 +40,8 @@ def run(runs, transforms):
                                   epoch_run=trainer.epoch_dice_loss)
 
                 trainer.resume_from_checkpoint(parallel_trained=R.get('Params').get('parallel_trained'))
-                test_loader = PatchesGenerator.get_loader_per_img(conf=R, images=splits['test'], mode='test')
+                test_loader = PatchesGenerator.get_loader_per_img(conf=R, images=splits['test'], mode='test',
+                                                                  transforms=transforms)
 
                 trainer.test(data_loaders=test_loader, gen_images=True)
             except Exception as e:

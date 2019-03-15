@@ -10,11 +10,11 @@ import traceback
 import torch
 import torch.optim as optim
 
+from utils import auto_split as asp
+from utils.measurements import ScoreAccumulator
 from ..unet.model import UNet
 from ..unet.unet_bee import UNetBee
 from ..unet.unet_dataloader import PatchesGenerator
-from utils import auto_split as asp
-from utils.measurements import ScoreAccumulator
 
 
 def run(runs, transforms):
@@ -46,7 +46,8 @@ def run(runs, transforms):
                 drive_trainer.resume_from_checkpoint(parallel_trained=R.get('Params').get('parallel_trained'))
 
                 test_loader = PatchesGenerator.get_loader_per_img(conf=R,
-                                                                  images=splits['test'], mode='test')
+                                                                  images=splits['test'], mode='test',
+                                                                  transforms=transforms)
                 drive_trainer.test(test_loader)
             except Exception as e:
                 traceback.print_exc()
