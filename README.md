@@ -147,7 +147,7 @@ Score improved:  0.49741 to 0.63598 BEST CHECKPOINT SAVED
 The network is trained for 40 epochs with 15 training images, 5 validation images and 20 test images.
 ![Training_Loss](assets/loss.png)
 ![Training_Scores](assets/training_f1_acc.png)
-Figure above is the training cross-entropy loss, F1, and accuracy loss.
+Figure above is the training cross-entropy loss, F1, and accuracy.
 ![Precision-Recall color-Map](assets/train_pr_map.png)
 Figure above is the training precision-recall map for training and validation respectively with color being the training iterations.
 ![Validation_scores](assets/val_f1_acc.png)
