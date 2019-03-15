@@ -49,4 +49,3 @@ tornado==5.1.1
 traitlets==4.3.2
 wcwidth==0.1.7
 webencodings==0.5.1
-imgcommons==0.34
