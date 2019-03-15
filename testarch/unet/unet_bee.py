@@ -7,7 +7,7 @@
 import numpy as np
 import os
 import torch
-import nbee.viz.nviz as plt
+import viz.nviz as plt
 from PIL import Image as IMG
 from nbee.torchbee import NNBee
 from utils.measurements import ScoreAccumulator

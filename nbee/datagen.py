@@ -10,7 +10,7 @@ import torch
 import torchvision.transforms as tfm
 from torch.utils.data.dataset import Dataset
 
-from imgcommons.containers import Image
+from utils.img_utils import Image
 import utils.data_utils as dutils
 
 
@@ -91,13 +91,13 @@ class Generator(Dataset):
         return dls if len(dls) > 1 else dls[0]
 
     @classmethod
-    def get_loader_per_img(cls, images, conf, mode=None):
+    def get_loader_per_img(cls, images, conf, mode, transforms):
         loaders = []
         for file in images:
             gen = cls(
                 conf=conf,
                 images=[file],
-                transforms=tfm.Compose([tfm.ToPILImage(), tfm.ToTensor()]),
+                transforms=transforms,
                 shuffle_indices=False,
                 mode=mode
             )

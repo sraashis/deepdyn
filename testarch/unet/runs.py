@@ -7,13 +7,13 @@ DRIVE = {
         'num_channels': 1,
         'num_classes': 2,
         'batch_size': 4,
-        'epochs': 5,
+        'epochs': 40,
         'learning_rate': 0.001,
         'patch_shape': (388, 388),
         'patch_offset': (150, 150),
         'expand_patch_by': (184, 184),
         'use_gpu': True,
-        'distribute': True,
+        'distribute': False,
         'shuffle': True,
         'log_frequency': 5,
         'validation_frequency': 1,
@@ -24,7 +24,7 @@ DRIVE = {
         'image': 'data' + sep + 'DRIVE' + sep + 'images',
         'mask': 'data' + sep + 'DRIVE' + sep + 'mask',
         'truth': 'data' + sep + 'DRIVE' + sep + 'manual',
-        'logs': 'LOGS_2019' + sep + 'DRIVE' + sep + 'UNET_DEL_ASAP',
+        'logs': 'logs' + sep + 'DRIVE' + sep + 'UNET_DEL_ASAP',
         'splits_json': 'data' + sep + 'DRIVE' + sep + 'splits'
     },
 
@@ -34,6 +34,14 @@ DRIVE = {
         'dparm': lambda x: np.random.choice(np.arange(1, 101, 1), 2)
     }
 }
+
+
+
+"""
+############################################################
+Extra experimental confs
+############################################################
+"""
 DRIVE1 = {
     'Params': {
         'num_channels': 1,
