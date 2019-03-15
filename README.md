@@ -5,7 +5,7 @@ Along with example with unet for DRIVE dataset segmentation [1]. DRIVE dataset i
 
 ## Required dependencies
 
-We need python3, numpy, pytorch, torchvision, matplotlib and PILLOW packages
+We need python3, numpy, pandas, pytorch, torchvision, matplotlib and PILLOW packages
 
 ```
 pip install -r ature/assets/requirements.txt
