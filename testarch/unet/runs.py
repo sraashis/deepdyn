@@ -1,7 +1,7 @@
-import os
 import numpy as np
-sep = os.sep
 
+import os
+sep = os.sep
 DRIVE = {
     'Params': {
         'num_channels': 1,
