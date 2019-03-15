@@ -152,10 +152,13 @@ Figure above is the training precision-recall map with color being the training 
 ![Validation_scores](assets/val_f1_acc.png)
 Figure above the validation F1 and Accuracy.
 ![Test scores and result](assets/test_pr.png)
-Figure above is the test result on test set after training and validation.
+Figure on left is the test result on test set after training and validation.
+ Right one is the segmentation result on one of the test images.
 
-### Thank you!'ve made it. 
+### Thank you!'ve made it. ❤
+
 ##### References
 
 1. J. Staal, M. Abramoff, M. Niemeijer, M. Viergever, and B. van Ginneken, “Ridge based vessel segmentation in color
 images of the retina,” IEEE Transactions on Medical Imaging 23, 501–509 (2004)
+2. O. Ronneberger, P. Fischer, and T. Brox, “U-net: Convolutional networks for biomedical image segmentation,” inMICCAI,(2015)
