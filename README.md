@@ -154,7 +154,7 @@ Figure above the validation F1 and Accuracy.
 ![Test scores and result](assets/test_pr.png)
 Figure above is the test result on test set after training and validation.
 
-### THANK YOU! You've made it. 
+### Thank you!'ve made it. 
 ##### References
 
 1. J. Staal, M. Abramoff, M. Niemeijer, M. Viergever, and B. van Ginneken, “Ridge based vessel segmentation in color
