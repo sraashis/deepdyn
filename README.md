@@ -163,3 +163,4 @@ Right one the is the segmentation result on one of the test images.
 1. J. Staal, M. Abramoff, M. Niemeijer, M. Viergever, and B. van Ginneken, “Ridge based vessel segmentation in color
 images of the retina,” IEEE Transactions on Medical Imaging 23, 501–509 (2004)
 2. O. Ronneberger, P. Fischer, and T. Brox, “U-net: Convolutional networks for biomedical image segmentation,” inMICCAI,(2015)
+3.Dynamic Deep Networks for Retinal Vessel Segmentation, https://arxiv.org/abs/1903.07803
