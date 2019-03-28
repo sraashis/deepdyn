@@ -189,9 +189,9 @@ class NNTrainer:
 
         if os.path.isfile(log_file):
             print('### CRITICAL!!! ' + log_file + '" already exists. OVERRIDE [Y/N]?')
-            ui = input()
-            if ui == 'N' or ui == 'n':
-                sys.exit(1)
+            # ui = input()
+            # if ui == 'N' or ui == 'n':
+            #     sys.exit(1)
 
         file = open(log_file, 'w')
         NNTrainer.flush(file, header)
@@ -214,7 +214,7 @@ class NNTrainer:
     def plot_train(file=None, keys=None, batches_per_epochs=None):
 
         def f(fl=file, ks=keys, bpep=batches_per_epochs):
-            plt.plot_cmap(file=fl, save=True, x='PRECISION', y='RECALL', title='Training')
+            # plt.plot_cmap(file=fl, save=True, x='PRECISION', y='RECALL', title='Training')
             for k in ks:
                 plt.plot(file=fl, y=k, title='Training', x_tick_skip=bpep, save=True)
 
@@ -224,11 +224,11 @@ class NNTrainer:
     def plot_val(file, batches_per_epoch):
 
         def f(fl=file, b_per_ep=batches_per_epoch):
-            plt.plot(file=fl, title='Validation', y='F1', save=True,
+            plt.plot(file=fl, title='Validation', y='LOSS', save=True,
                      x_tick_skip=b_per_ep)
-            plt.plot(file=file, title='Validation', y='ACCURACY', save=True,
-                     x_tick_skip=b_per_ep)
-            plt.plot_cmap(file=fl, save=True, x='PRECISION', y='RECALL', title='Validation')
+            # plt.plot(file=file, title='Validation', y='ACCURACY', save=True,
+            #          x_tick_skip=b_per_ep)
+            # plt.plot_cmap(file=fl, save=True, x='PRECISION', y='RECALL', title='Validation')
 
         NNTrainer.send_to_back(f)
 
