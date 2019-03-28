@@ -7,8 +7,11 @@ import torch.nn.functional as F
 
 from neuralnet.torchtrainer import NNTrainer
 import numpy as np
-from scipy import spatial
+import matplotlib.mlab as mlab
+import matplotlib.pyplot as plt
 
+plt.switch_backend('agg')
+from scipy import spatial
 
 sep = os.sep
 
@@ -34,16 +37,19 @@ class TracknetTrainer(NNTrainer):
         for epoch in range(1, self.epochs + 1):
             self.model.train()
             running_loss = 0.0
+
             self._adjust_learning_rate(optimizer=optimizer, epoch=epoch)
             for i, data in enumerate(data_loader, 1):
-                inputs, labels = data['inputs'].to(self.device).float(), data['labels'].to(self.device)
+                inputs, rho, labels = data['inputs'].to(self.device).float(), \
+                                      data['rho'].to(self.device).float().cuda().squeeze(), \
+                                      data['labels'].to(self.device)
 
                 optimizer.zero_grad()
                 thr_map = self.model(inputs).squeeze()
 
                 labels = labels.squeeze()
                 thr_map = thr_map.squeeze()
-                diff = thr_map-labels
+                diff = thr_map - labels
                 diff[diff > 180] -= 360
                 loss = torch.abs(diff).mean()
                 loss.backward()
@@ -60,6 +66,7 @@ class TracknetTrainer(NNTrainer):
                 self.flush(logger, ','.join(str(x) for x in [0, epoch, i, current_loss]))
             self.plot_train(file=self.train_log_file, batches_per_epochs=data_loader.__len__(), keys=['LOSS'])
             if epoch % self.validation_frequency == 0:
+                self.checkpoint['epochs'] = epoch
                 self.evaluate(data_loaders=validation_loader, logger=val_logger, gen_images=False)
             self.plot_val(self.validation_log_file, batches_per_epoch=len(validation_loader))
         # print('maxloss', maxloss)
@@ -74,6 +81,9 @@ class TracknetTrainer(NNTrainer):
         self.model.eval()
 
         print('\nEvaluating...')
+        keys = range(91)
+        angloss = {el: [] for el in keys}
+        labelcount = {el: 0 for el in keys}
         with torch.no_grad():
             eval_score = 0.000001
             for loader in data_loaders:
@@ -84,30 +94,44 @@ class TracknetTrainer(NNTrainer):
                 # segmented_img[:, :, 1] = torch.LongTensor(img_obj.working_arr).to(self.device)
                 img_loss = 0.000001
                 for i, data in enumerate(loader, 1):
-                    inputs, labels = data['inputs'].to(self.device).float(), data['labels'].to(self.device).squeeze()
+                    inputs, rho, labels = data['inputs'].to(self.device).float(), \
+                                          data['rho'].to(self.device).float().cuda().squeeze(), \
+                                          data['labels'].to(self.device).squeeze()
+                    IJs = data['POS'].to(self.device).long()
 
                     # positions = data['POS'].to(self.device)
                     # prev_positions = data['PREV'].to(self.device)
                     outputs = self.model(inputs).squeeze()
 
-                    if gen_images:
-                        print(torch.cat([labels[..., None], outputs[..., None]], 1))
-
                     diff = torch.abs(outputs - labels)
                     diff[diff > 180] -= 360
+                    diff = abs(diff)
+                    if True:
+                        for e, l in zip(diff.cpu().numpy(), labels.cpu().numpy()):
+                            angloss[int(l)].append(e)
+                            labelcount[int(l)] += 1
+                        # print(torch.cat([labels[..., None], outputs[..., None], labels[..., None] - outputs[..., None]], 1))
+
                     loss = diff.abs().mean()
                     current_loss = loss.item()
                     # print('current_loss', current_loss)
                     img_loss += current_loss
 
+                    # if len(outputs.shape) == 1:
+                    #     outputs = outputs[None, ...]
+                    for j in range(outputs.shape[0]):
+                        x, y = int(IJs[j][0]), int(IJs[j][1])
+                        segmented_img[:, :, 0][x, y] = 255
+                        x_pred, y_pred = int(np.asarray(rho[j]) * np.cos(outputs[j])), int(
+                            np.asarray(rho[j]) * np.sin(outputs[j]))
+                        segmented_img[:, :, 1][x + x_pred, y + y_pred] = 255
+
                     self.flush(logger,
                                ','.join(str(x) for x in [img_obj.file_name] + [current_loss]))
 
                 img_loss = img_loss / loader.__len__()
-                # print(img_obj.file_name + ' loss: ' + str(img_loss))
                 eval_score += img_loss
 
-                segmented_img[segmented_img > 0] = 255
                 if gen_images:
                     img = segmented_img.cpu().numpy()
                     IMG.fromarray(np.array(img, np.uint8)).save(
@@ -115,3 +139,25 @@ class TracknetTrainer(NNTrainer):
                     self.log_counter += 1
 
             self._save_if_better(score=len(data_loaders) / eval_score)
+
+            plt.rcParams["figure.figsize"] = (24, 16)
+
+            err = list(angloss.values())
+            # count = list(labelcount.values())
+            # res = np.zeros(len(keys))
+            # for k in keys:
+            #     if count[k] == 0:
+            #         continue
+            #     res[k] = err[k] / count[k]
+            res = []
+            temp = []
+            for i in range(len(err)):
+                if (i+1) % 5 == 0:
+                    if i > 0:
+                        res.append(temp)
+                    temp = []
+                else:
+                    temp += err[i]
+
+            plt.boxplot(res)
+            plt.savefig('error_distrib.png')

@@ -21,6 +21,16 @@ class PatchesGenerator(Generator):
         self._load_indices()
         print('Patches:', self.__len__())
 
+    def cart2pol(x, y):
+        rho = np.sqrt(x ** 2 + y ** 2)
+        phi = np.arctan2(y, x)
+        return (rho, phi)
+
+    def pol2cart(rho, phi):
+        x = rho * np.cos(phi)
+        y = rho * np.sin(phi)
+        return (x, y)
+
     def _load_indices(self):
 
         def _is_valid(i, j):
@@ -34,6 +44,9 @@ class PatchesGenerator(Generator):
                 return False
             return True
 
+        keys = range(361)
+        angcount = {el: 0 for el in keys}
+        hist_data = []
         for ID, img_file in enumerate(self.images):
             mat_file = Mat(mat_file=self.image_dir + sep + img_file)
 
@@ -61,7 +74,7 @@ class PatchesGenerator(Generator):
                 prev = np.append(u_pos_input[0:ix], u_pos_input[:-ix], 0)
                 positions.append(prev)
 
-            print('positions', np.shape(positions))
+            # print('positions', np.shape(positions))
             print('vessel_pathidx', vessel_pathidx)
             b = vessel_pathidx.copy()
             for ix, src in enumerate(vessel_pathidx):
@@ -71,10 +84,15 @@ class PatchesGenerator(Generator):
 
             relative_xy = b_pos_output - u_pos_input
 
-            # rho = np.sqrt(output[0] ** 2 + output[1] ** 2)
+            rho = np.sqrt(relative_xy[:, 0] ** 2 + relative_xy[:, 1] ** 2)
             phi = np.arctan2(relative_xy[:, 0], relative_xy[:, 1])
             phi = phi * 180 / math.pi
-            phi[phi < 0] += 360
+            # phi[phi < 0] += 360
+            phi = abs(phi)
+            # phi[phi < 90] += 180
+            phi[phi > 90] -= 180
+            phi = abs(phi)
+            # print('phi', phi)
             for ix in range(u_pos_input.shape[0]):
                 indices = []
                 for pos in positions:
@@ -82,10 +100,19 @@ class PatchesGenerator(Generator):
                     if _is_valid(xy[0], xy[1]):
                         indices.append(xy)
                 if len(indices) - 1 == self.previous_visit:
-                    self.indices.append([ID, indices, phi[ix], relative_xy[ix]])
+                    angcount[int(phi[ix])] += 1
+                    hist_data.append(phi[ix])
+                    self.indices.append([ID, indices, phi[ix], rho[ix], relative_xy[ix]])
+        if self.mode == 'train':
+            import matplotlib.pyplot as plt
+            plt.rcParams["figure.figsize"] = (12, 8)
+            # plt.plot(np.arange(361), list(angcount.values()))
+            plt.grid(True)
+            plt.hist(hist_data, bins=18)
+            plt.savefig('patch_distrib_fig1.png')
 
     def __getitem__(self, index):
-        ID, positions, phi, rel_out = self.indices[index]
+        ID, positions, phi, rho, rel_out = self.indices[index]
 
         input_tensor = []
         for ix, (a, b) in enumerate(positions):
@@ -100,6 +127,6 @@ class PatchesGenerator(Generator):
             input_tensor.append(_patch[1])
 
         input_tensor = np.array(input_tensor)
-        return {'IDs': ID, 'POS': np.array(positions[0]), 'inputs': input_tensor,
+        return {'IDs': ID, 'POS': np.array(positions[0]), 'inputs': input_tensor, 'rho': rho,
                 'labels': torch.FloatTensor([phi])}
 
