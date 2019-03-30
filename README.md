@@ -100,7 +100,7 @@ DRIVE = {
 - **parallel_trained**: If a resumed model was parallel trained or not.
 - **logs**: Dir for all logs
 - **splits_json**: A directory that consist of json files with list of files with keys 'train', 'test'
-'validation'. [this util] (https://github.com/sraashis/ature/blob/master/utils/auto_split.py) takes a folder with all images and does that automatically. This is handy when we want to to k-fold cross validation. We jsut have to generate such k json files and put in splits_json folder. 
+'validation'. (https://github.com/sraashis/ature/blob/master/utils/auto_split.py) takes a folder with all images and does that automatically. This is handy when we want to do k-fold cross validation. We jsut have to generate such k json files and put in splits_json folder. 
 - **truth_getter, mask_getter**: A custom function that maps input_image to its ground_truth and mask respectively.
 
 ## Sample log
