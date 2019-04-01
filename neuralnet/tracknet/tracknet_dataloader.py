@@ -74,7 +74,6 @@ class PatchesGenerator(Generator):
                 prev = np.append(u_pos_input[0:ix], u_pos_input[:-ix], 0)
                 positions.append(prev)
 
-            # print('positions', np.shape(positions))
             print('vessel_pathidx', vessel_pathidx)
             b = vessel_pathidx.copy()
             for ix, src in enumerate(vessel_pathidx):

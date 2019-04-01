@@ -69,7 +69,7 @@ class TracknetTrainer(NNTrainer):
                 self.checkpoint['epochs'] = epoch
                 self.evaluate(data_loaders=validation_loader, logger=val_logger, gen_images=False)
             self.plot_val(self.validation_log_file, batches_per_epoch=len(validation_loader))
-        # print('maxloss', maxloss)
+        # print('maxlosss', maxloss)
 
         try:
             logger.close()
