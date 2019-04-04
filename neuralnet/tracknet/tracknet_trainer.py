@@ -40,18 +40,16 @@ class TracknetTrainer(NNTrainer):
 
             self._adjust_learning_rate(optimizer=optimizer, epoch=epoch)
             for i, data in enumerate(data_loader, 1):
-                inputs, rho, labels = data['inputs'].to(self.device).float(), \
-                                      data['rho'].to(self.device).float().cuda().squeeze(), \
-                                      data['labels'].to(self.device)
+                inputs, labels = data['inputs'].to(self.device).float(), data['labels'].to(self.device)
 
                 optimizer.zero_grad()
                 thr_map = self.model(inputs).squeeze()
 
                 labels = labels.squeeze()
                 thr_map = thr_map.squeeze()
-                diff = thr_map - labels
-                diff[diff > 180] -= 360
-                loss = torch.abs(diff).mean()
+                # diff = thr_map - labels
+                # diff[diff > 180] -= 360
+                loss = F.mse_loss(thr_map, labels)
                 loss.backward()
                 optimizer.step()
                 current_loss = loss.item()
@@ -81,9 +79,9 @@ class TracknetTrainer(NNTrainer):
         self.model.eval()
 
         print('\nEvaluating...')
-        keys = range(91)
-        angloss = {el: [] for el in keys}
-        labelcount = {el: 0 for el in keys}
+        # keys = range(91)
+        # angloss = {el: [] for el in keys}
+        # labelcount = {el: 0 for el in keys}
         with torch.no_grad():
             eval_score = 0.000001
             for loader in data_loaders:
@@ -94,25 +92,20 @@ class TracknetTrainer(NNTrainer):
                 # segmented_img[:, :, 1] = torch.LongTensor(img_obj.working_arr).to(self.device)
                 img_loss = 0.000001
                 for i, data in enumerate(loader, 1):
-                    inputs, rho, labels = data['inputs'].to(self.device).float(), \
-                                          data['rho'].to(self.device).float().cuda().squeeze(), \
-                                          data['labels'].to(self.device).squeeze()
+                    inputs, labels = data['inputs'].to(self.device).float(), data['labels'].to(self.device).squeeze()
                     IJs = data['POS'].to(self.device).long()
 
                     # positions = data['POS'].to(self.device)
                     # prev_positions = data['PREV'].to(self.device)
                     outputs = self.model(inputs).squeeze()
 
-                    diff = torch.abs(outputs - labels)
-                    diff[diff > 180] -= 360
-                    diff = abs(diff)
-                    if True:
-                        for e, l in zip(diff.cpu().numpy(), labels.cpu().numpy()):
-                            angloss[int(l)].append(e)
-                            labelcount[int(l)] += 1
+                    # if True:
+                    #     for e, l in zip(diff.cpu().numpy(), labels.cpu().numpy()):
+                    #         angloss[int(l)].append(e)
+                    #         labelcount[int(l)] += 1
                         # print(torch.cat([labels[..., None], outputs[..., None], labels[..., None] - outputs[..., None]], 1))
 
-                    loss = diff.abs().mean()
+                    loss = F.mse_loss(outputs, labels)
                     current_loss = loss.item()
                     # print('current_loss', current_loss)
                     img_loss += current_loss
@@ -122,8 +115,7 @@ class TracknetTrainer(NNTrainer):
                     for j in range(outputs.shape[0]):
                         x, y = int(IJs[j][0]), int(IJs[j][1])
                         segmented_img[:, :, 0][x, y] = 255
-                        x_pred, y_pred = int(np.asarray(rho[j]) * np.cos(outputs[j])), int(
-                            np.asarray(rho[j]) * np.sin(outputs[j]))
+                        x_pred, y_pred = int(np.asarray(outputs[j][0])), int(np.asarray(outputs[j][1]))
                         segmented_img[:, :, 1][x + x_pred, y + y_pred] = 255
 
                     self.flush(logger,
@@ -142,22 +134,22 @@ class TracknetTrainer(NNTrainer):
 
             plt.rcParams["figure.figsize"] = (24, 16)
 
-            err = list(angloss.values())
+            # err = list(angloss.values())
             # count = list(labelcount.values())
             # res = np.zeros(len(keys))
             # for k in keys:
             #     if count[k] == 0:
             #         continue
             #     res[k] = err[k] / count[k]
-            res = []
-            temp = []
-            for i in range(len(err)):
-                if (i+1) % 5 == 0:
-                    if i > 0:
-                        res.append(temp)
-                    temp = []
-                else:
-                    temp += err[i]
+            # res = []
+            # temp = []
+            # for i in range(len(err)):
+            #     if (i+1) % 5 == 0:
+            #         if i > 0:
+            #             res.append(temp)
+            #         temp = []
+            #     else:
+            #         temp += err[i]
 
-            plt.boxplot(res)
-            plt.savefig('error_distrib.png')
+            # plt.boxplot(res)
+            # plt.savefig('error_distrib.png')

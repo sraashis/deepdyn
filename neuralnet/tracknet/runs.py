@@ -6,7 +6,7 @@ DRIVE = {
     'Params': {
         'previous_visit': 4,
         'num_channels': 10,
-        'num_classes': 1,
+        'num_classes': 2,
         'batch_size': 16,
         'epochs': 1,
         'learning_rate': 0.001,
