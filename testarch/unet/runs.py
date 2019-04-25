@@ -13,7 +13,7 @@ DRIVE = {
         'patch_offset': (150, 150),
         'expand_patch_by': (184, 184),
         'use_gpu': True,
-        'distribute': False,
+        'distribute': True,
         'shuffle': True,
         'log_frequency': 5,
         'validation_frequency': 1,
@@ -31,7 +31,7 @@ DRIVE = {
     'Funcs': {
         'truth_getter': lambda file_name: file_name.split('_')[0] + '_manual1.gif',
         'mask_getter': lambda file_name: file_name.split('_')[0] + '_mask.gif',
-        'dparm': lambda x: lambda x: np.random.choice(np.arange(1, 10, 1), 2)
+        'dparm': lambda x: np.random.choice(np.arange(1, 10, 1), 2)
     }
 }
 

@@ -45,8 +45,9 @@ def run(runs, transforms):
 
                 drive_trainer.resume_from_checkpoint(parallel_trained=R.get('Params').get('parallel_trained'))
 
+                all_images = splits['test'] + splits['train'] + splits['validation']
                 test_loader = PatchesGenerator.get_loader_per_img(conf=R,
-                                                                  images=splits['test'], mode='test',
+                                                                  images=all_images, mode='test',
                                                                   transforms=transforms)
                 drive_trainer.test(test_loader)
             except Exception as e:

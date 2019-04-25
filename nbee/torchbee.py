@@ -12,7 +12,7 @@ import numpy as np
 import torch
 import torch.nn.functional as F
 
-from utils.loss import dice_loss as l
+from utils.loss import dice_loss
 from utils.measurements import ScoreAccumulator
 
 
@@ -246,7 +246,7 @@ class NNBee:
             # w = torch.FloatTensor(2).random_(1, 100).to(self.device)
             # wd = torch.FloatTensor(*labels.shape).uniform_(0.1, 2).to(self.device)
 
-            loss = l.dice_loss(outputs[:, 1, :, :], labels, beta=rd.choice(np.arange(1, 2, 0.1).tolist()))
+            loss = dice_loss(outputs[:, 1, :, :], labels, beta=rd.choice(np.arange(1, 2, 0.1).tolist()))
             loss.backward()
             self.optimizer.step()
 

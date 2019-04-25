@@ -83,3 +83,4 @@ class MAPNetBee(NNBee):
                 prf1a = img_score.get_prfa()
                 print(img_obj.file_name, ' PRF1A', prf1a)
                 self.flush(logger, ','.join(str(x) for x in [img_obj.file_name] + prf1a))
+        self._save_if_better(score=score_acc.get_prfa()[2])
