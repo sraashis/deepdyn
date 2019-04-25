@@ -88,7 +88,7 @@ DRIVE = {
 }
 ```
 Similarly, ***testarch.miniunet.runs*** file consist a predefined configuration  ***DRIVE*** with all necessary parameters. 
-***NOTE: Make sure it pick up probability-maps from the logs of previous run.***
+***NOTE: Make sure it picks up probability-maps from the logs of previous run.***
 
 ```python
 import os
@@ -101,7 +101,7 @@ DRIVE = {
         'epochs': 100,
         'learning_rate': 0.001,
         'patch_shape': (100, 100),
-        'expand_patch_by': (40, 40),
+        'expand_patch_by': (40, 40)
         'use_gpu': True,
         'distribute': True,
         'shuffle': True,
