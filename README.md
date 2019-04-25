@@ -59,13 +59,13 @@ DRIVE = {
         'num_channels': 1,
         'num_classes': 2,
         'batch_size': 4,
-        'epochs': 40,
+        'epochs': 250,
         'learning_rate': 0.001,
         'patch_shape': (388, 388),
         'patch_offset': (150, 150),
         'expand_patch_by': (184, 184),
         'use_gpu': True,
-        'distribute': False,
+        'distribute': True,
         'shuffle': True,
         'log_frequency': 5,
         'validation_frequency': 1,
@@ -76,17 +76,56 @@ DRIVE = {
         'image': 'data' + sep + 'DRIVE' + sep + 'images',
         'mask': 'data' + sep + 'DRIVE' + sep + 'mask',
         'truth': 'data' + sep + 'DRIVE' + sep + 'manual',
-        'logs': 'logs' + sep + 'DRIVE',
+        'logs': 'logs' + sep + 'DRIVE' + sep + 'UNET',
         'splits_json': 'data' + sep + 'DRIVE' + sep + 'splits'
     },
 
     'Funcs': {
         'truth_getter': lambda file_name: file_name.split('_')[0] + '_manual1.gif',
         'mask_getter': lambda file_name: file_name.split('_')[0] + '_mask.gif',
-        'dparm': lambda x: [1, 1]
+        'dparm': lambda x: np.random.choice(np.arange(1, 10, 1), 2)
     }
 }
 ```
+Similarly, ***testarch.miniunet.runs*** file consist a predefined configuration  ***DRIVE*** with all necessary parameters. 
+*** NOTE: make sure it pick up probability-maps from the logs of previous run.***
+
+```python
+import os
+sep = os.sep
+DRIVE = {
+    'Params': {
+        'num_channels': 2,
+        'num_classes': 2,
+        'batch_size': 4,
+        'epochs': 100,
+        'learning_rate': 0.001,
+        'patch_shape': (100, 100),
+        'expand_patch_by': (40, 40),
+        'use_gpu': True,
+        'distribute': True,
+        'shuffle': True,
+        'log_frequency': 20,
+        'validation_frequency': 1,
+        'mode': 'train',
+        'parallel_trained': False
+    },
+    'Dirs': {
+        'image': 'data' + sep + 'DRIVE' + sep + 'images',
+        'image_unet': 'logs' + sep + 'DRIVE' + sep + 'UNET',
+        'mask': 'data' + sep + 'DRIVE' + sep + 'mask',
+        'truth': 'data' + sep + 'DRIVE' + sep + 'manual',
+        'logs': 'logs' + sep + 'DRIVE' + sep + 'MINI-UNET',
+        'splits_json': 'data' + sep + 'DRIVE' + sep + 'splits'
+    },
+
+    'Funcs': {
+        'truth_getter': lambda file_name: file_name.split('_')[0] + '_manual1.gif',
+        'mask_getter': lambda file_name: file_name.split('_')[0] + '_mask.gif'
+    }
+}
+```
+
 - **num_channels**: Input channels to the CNN. We are only feeding the green channel to unet.
 - **num_classes**: Output classes from CNN. We have vessel, background.
 - **patch_shape, expand_patch_by**: Unet takes 388 * 388 patch but also looks at 184 pixel on each dimension equally to make it 572 * 572. We mirror image if we run to image edges when expanding.
