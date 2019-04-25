@@ -1,7 +1,7 @@
 # nbee
 
-A pytorch based framework for medical image processing with COnvolutional Neural Network. 
-Along with example with unet for DRIVE dataset segmentation [1]. DRIVE dataset is composed of 40 retinal fundus images. 
+A pytorch based framework for medical image processing with Convolutional Neural Network. 
+Along with example of unet for DRIVE dataset segmentation [1]. DRIVE dataset is composed of 40 retinal fundus images. 
 
 ## Required dependencies
 
@@ -100,7 +100,7 @@ DRIVE = {
 - **parallel_trained**: If a resumed model was parallel trained or not.
 - **logs**: Dir for all logs
 - **splits_json**: A directory that consist of json files with list of files with keys 'train', 'test'
-'validation'. [this util] (https://github.com/sraashis/ature/blob/master/utils/auto_split.py) takes a folder with all images and does that automatically. This is handy when we want to to k-fold cross validation. We jsut have to generate such k json files and put in splits_json folder. 
+'validation'. (https://github.com/sraashis/ature/blob/master/utils/auto_split.py) takes a folder with all images and does that automatically. This is handy when we want to do k-fold cross validation. We jsut have to generate such k json files and put in splits_json folder. 
 - **truth_getter, mask_getter**: A custom function that maps input_image to its ground_truth and mask respectively.
 
 ## Sample log
@@ -149,7 +149,7 @@ The network is trained for 40 epochs with 15 training images, 5 validation image
 ![Training_Scores](assets/training_f1_acc.png)
 Figure above is the training cross-entropy loss, F1, and accuracy.
 ![Precision-Recall color-Map](assets/train_pr_map.png)
-Figure above is the training precision-recall map for training and validation respectively with color being the training iterations.
+Figure above is the precision-recall map for training and validation respectively with color being the training iterations.
 ![Validation_scores](assets/val_f1_acc.png)
 Figure above is the validation F1 and Accuracy.
 ![Test scores and result](assets/test.png)
@@ -163,3 +163,4 @@ Right one the is the segmentation result on one of the test images.
 1. J. Staal, M. Abramoff, M. Niemeijer, M. Viergever, and B. van Ginneken, “Ridge based vessel segmentation in color
 images of the retina,” IEEE Transactions on Medical Imaging 23, 501–509 (2004)
 2. O. Ronneberger, P. Fischer, and T. Brox, “U-net: Convolutional networks for biomedical image segmentation,” inMICCAI,(2015)
+3. Dynamic Deep Networks for Retinal Vessel Segmentation, https://arxiv.org/abs/1903.07803
