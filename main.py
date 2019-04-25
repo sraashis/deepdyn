@@ -1,17 +1,16 @@
-import testarch.unet as net
-import testarch.unet.runs as r
+import testarch.unet as unet
+import testarch.unet.runs as r_unet
+import testarch.miniunet as mini_unet
+import testarch.miniunet.runs as r_miniunet
 import torchvision.transforms as tmf
 
-# Set GPU
-import torch
-torch.cuda.set_device(1)
 
 transforms = tmf.Compose([
     tmf.ToPILImage(),
     tmf.ToTensor()
 ])
 
-runs = [r.DRIVE]
 if __name__ == "__main__":
-    net.run(runs, transforms)
+    unet.run([r_unet.DRIVE], transforms)
+    mini_unet.run([r_miniunet.DRIVE], transforms)
 

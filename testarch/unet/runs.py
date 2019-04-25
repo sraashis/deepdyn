@@ -7,7 +7,7 @@ DRIVE = {
         'num_channels': 1,
         'num_classes': 2,
         'batch_size': 4,
-        'epochs': 40,
+        'epochs': 250,
         'learning_rate': 0.001,
         'patch_shape': (388, 388),
         'patch_offset': (150, 150),
@@ -24,14 +24,14 @@ DRIVE = {
         'image': 'data' + sep + 'DRIVE' + sep + 'images',
         'mask': 'data' + sep + 'DRIVE' + sep + 'mask',
         'truth': 'data' + sep + 'DRIVE' + sep + 'manual',
-        'logs': 'logs' + sep + 'DRIVE',
+        'logs': 'logs' + sep + 'DRIVE' + sep + 'UNET',
         'splits_json': 'data' + sep + 'DRIVE' + sep + 'splits'
     },
 
     'Funcs': {
         'truth_getter': lambda file_name: file_name.split('_')[0] + '_manual1.gif',
         'mask_getter': lambda file_name: file_name.split('_')[0] + '_mask.gif',
-        'dparm': lambda x: [1, 1]
+        'dparm': lambda x: lambda x: np.random.choice(np.arange(1, 10, 1), 2)
     }
 }
 

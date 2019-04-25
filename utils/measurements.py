@@ -10,6 +10,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 import torch
 from sklearn.metrics import confusion_matrix
+from utils import img_utils as iu
 
 def plot_confusion_matrix(y_pred=None, y_true=None, classes=None, normalize=False, cmap=plt.cm.Greens):
     """
@@ -129,3 +130,22 @@ class AverageMeter(object):
         self.sum += val * n
         self.count += n
         self.avg = self.sum / self.count
+
+
+def get_best_thr(img, y, for_best='F1'):
+    best_score = {for_best: 0.0}
+    best_thr = 0.0
+
+    if np.sum(y) == 0:
+        best_score[for_best] = 1
+        return best_score, 255.0
+
+    for thr in np.linspace(1, 255, 255):
+        i_best = img.copy()
+        i_best[i_best > thr] = 255
+        i_best[i_best <= thr] = 0
+        current_score = iu.get_praf1(i_best, y)
+        if current_score[for_best] > best_score[for_best]:
+            best_score = current_score
+            best_thr = thr
+    return best_score, best_thr
