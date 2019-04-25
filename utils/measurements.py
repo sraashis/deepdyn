@@ -12,7 +12,6 @@ import torch
 from sklearn.metrics import confusion_matrix
 from utils import img_utils as iu
 
-
 def plot_confusion_matrix(y_pred=None, y_true=None, classes=None, normalize=False, cmap=plt.cm.Greens):
     """
     This function prints and plots the confusion matrix.
