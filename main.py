@@ -11,6 +11,6 @@ transforms = tmf.Compose([
 ])
 
 if __name__ == "__main__":
-    # unet.run([r_unet.DRIVE], transforms)
+    unet.run([r_unet.DRIVE], transforms)
     mini_unet.run([r_miniunet.DRIVE], transforms)
 
