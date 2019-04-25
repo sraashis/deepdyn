@@ -35,7 +35,7 @@ def run(runs, transforms):
                     train_loader = PatchesGenerator.get_loader(conf=R, images=splits['train'], transforms=transforms,
                                                                mode='train')
                     val_loader = PatchesGenerator.get_loader_per_img(conf=R, images=splits['validation'],
-                                                                     mode='validation')
+                                                                     mode='validation', transforms=transforms)
                     trainer.train(data_loader=train_loader, validation_loader=val_loader,
                                   epoch_run=trainer.epoch_dice_loss)
 

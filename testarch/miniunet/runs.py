@@ -7,12 +7,12 @@ DRIVE = {
         'num_channels': 2,
         'num_classes': 2,
         'batch_size': 4,
-        'epochs': 40,
+        'epochs': 100,
         'learning_rate': 0.001,
         'patch_shape': (100, 100),
         'expand_patch_by': (40, 40),
         'use_gpu': True,
-        'distribute': False,
+        'distribute': True,
         'shuffle': True,
         'log_frequency': 20,
         'validation_frequency': 1,
@@ -24,7 +24,7 @@ DRIVE = {
         'image_unet': 'logs' + sep + 'DRIVE' + sep + 'UNET',
         'mask': 'data' + sep + 'DRIVE' + sep + 'mask',
         'truth': 'data' + sep + 'DRIVE' + sep + 'manual',
-        'logs': 'data' + sep + 'DRIVE' + sep + 'MINI-UNET',
+        'logs': 'logs' + sep + 'DRIVE' + sep + 'MINI-UNET',
         'splits_json': 'data' + sep + 'DRIVE' + sep + 'splits'
     },
 

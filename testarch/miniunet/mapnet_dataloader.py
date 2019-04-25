@@ -81,7 +81,7 @@ class PatchesGenerator(Generator):
         raw_estimate[raw_estimate > sup] = 255
         raw_estimate[raw_estimate <= sup] = 0
 
-        # <PREP2> Clear up small components(components less that 20px)
+        # <PREP2> Clear up small components(components less that 10px)
         raw_estimate = iu.remove_connected_comp(raw_estimate.squeeze(), 10)
 
         # <PREP3> Skeletonize binary image
