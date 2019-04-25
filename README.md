@@ -88,7 +88,7 @@ DRIVE = {
 }
 ```
 Similarly, ***testarch.miniunet.runs*** file consist a predefined configuration  ***DRIVE*** with all necessary parameters. 
-*** NOTE: make sure it pick up probability-maps from the logs of previous run.***
+***NOTE: Make sure it pick up probability-maps from the logs of previous run.***
 
 ```python
 import os
@@ -195,7 +195,7 @@ Figure above is the validation F1 and Accuracy.
 Figure on left is the test result on the test set after training and validation.
 Right one the is the segmentation result on one of the test images.
 
-### Thank you!'ve made it. ❤
+### Thank you! ❤
 
 #### References
 
