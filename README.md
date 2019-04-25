@@ -12,6 +12,7 @@ We need python3, numpy, pandas, pytorch, torchvision, matplotlib and PILLOW pack
 pip install -r ature/assets/requirements.txt
 ```
 
+![Flow](assets/flow_ature.png)
 
 
 ## Project Structure
