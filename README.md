@@ -19,8 +19,8 @@ pip install -r ature/assets/requirements.txt
 * [ature/nbee](https://github.com/sraashis/ature/tree/master/nbee) nbee framework core.
 * [ature/utils](https://github.com/sraashis/ature/tree/master/utils) Utilities for dealing with F1-score, image cropping, slicing, visual precision-recall, auto split train-validation-test set and many more.
 * [ature/viz](https://github.com/sraashis/ature/tree/master/viz) Easy pytorch visualization.
-* [ature/testarch](https://github.com/sraashis/ature/tree/master/nbee) Full end to end working [u-net(Olaf Ronneberger et al.)](https://arxiv.org/abs/1505.04597) 
-for retinal image segmentation.
+* [ature/testarch](https://github.com/sraashis/ature/tree/master/nbee) Full end to end working [u-net(Olaf Ronneberger et al.)](https://arxiv.org/abs/1505.04597) and MINI-UNET as per Deep Dynamic(https://arxiv.org/abs/1903.07803) paper
+for more robust retinal image segmentation.
 * [ature/data](https://github.com/sraashis/ature/tree/master/data) DRIVE dataset..
 
 ## Dataset check
@@ -34,22 +34,21 @@ Original image and respective ground-truth image. Ground-truth is a binary image
 ## Usage
 Example **main.py**
 ```python
-import testarch.unet as net
-import testarch.unet.runs as r
+import testarch.unet as unet
+import testarch.unet.runs as r_unet
+import testarch.miniunet as mini_unet
+import testarch.miniunet.runs as r_miniunet
 import torchvision.transforms as tmf
 
-# Set GPU
-import torch
-torch.cuda.set_device(1)
 
 transforms = tmf.Compose([
     tmf.ToPILImage(),
     tmf.ToTensor()
 ])
 
-runs = [r.DRIVE]
 if __name__ == "__main__":
-    net.run(runs, transforms)
+    unet.run([r_unet.DRIVE], transforms)
+    mini_unet.run([r_miniunet.DRIVE], transforms)
 ```
 Where ***testarch.unet.runs*** file consist a predefined configuration  ***DRIVE*** with all necessary parameters.
 ```python
