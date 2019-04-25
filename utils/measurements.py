@@ -10,8 +10,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 import torch
 from sklearn.metrics import confusion_matrix
-
-import imgcommons.utils as imgutils
+from utils import img_utils as iu
 
 
 def plot_confusion_matrix(y_pred=None, y_true=None, classes=None, normalize=False, cmap=plt.cm.Greens):
@@ -146,7 +145,7 @@ def get_best_thr(img, y, for_best='F1'):
         i_best = img.copy()
         i_best[i_best > thr] = 255
         i_best[i_best <= thr] = 0
-        current_score = imgutils.get_praf1(i_best, y)
+        current_score = iu.get_praf1(i_best, y)
         if current_score[for_best] > best_score[for_best]:
             best_score = current_score
             best_thr = thr

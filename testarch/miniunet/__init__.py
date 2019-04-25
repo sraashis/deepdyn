@@ -6,9 +6,9 @@ import torch.optim as optim
 
 from utils import auto_split as asp
 from utils.measurements import ScoreAccumulator
-from ..mapnet.mapnet_bee import MAPNetBee
-from ..mapnet.mapnet_dataloader import PatchesGenerator
-from ..mapnet.model import MapUNet
+from ..miniunet.mapnet_bee import MAPNetBee
+from ..miniunet.mapnet_dataloader import PatchesGenerator
+from ..miniunet.model import MapUNet
 
 
 def run(runs, transforms):
