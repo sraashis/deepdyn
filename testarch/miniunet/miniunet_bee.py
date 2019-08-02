@@ -4,22 +4,23 @@
 ### date: 9/10/2018
 """
 
-import numpy as np
 import os
+
+import numpy as np
 import torch
-import torch.nn.functional as F
 from PIL import Image as IMG
+
 from nbee.torchbee import NNBee
+from utils.measurements import ScoreAccumulator
 
 sep = os.sep
 
 
-class ProbeNetBee(NNBee):
+class MiniUNetBee(NNBee):
     def __init__(self, **kwargs):
         NNBee.__init__(self, **kwargs)
         self.patch_shape = self.conf.get('Params').get('patch_shape')
         self.patch_offset = self.conf.get('Params').get('patch_offset')
-        self.dparm = self.conf.get("Funcs").get('dparm')
 
     def get_log_headers(self):
         return {
@@ -40,50 +41,46 @@ class ProbeNetBee(NNBee):
         self.plot_column_keys(file=kw['log_file'], batches_per_epoch=1,
                               keys=['F1', 'ACCURACY'])
 
-    # This method should work invariant to input/output channels
     def _eval(self, data_loaders=None, logger=None, gen_images=False, score_acc=None):
-        score_acc = 0.0
+        assert isinstance(score_acc, ScoreAccumulator)
         with torch.no_grad():
             for loader in data_loaders:
                 img_obj = loader.dataset.image_objects[0]
+                x, y = img_obj.working_arr.shape[0], img_obj.working_arr.shape[1]
+                predicted_img = torch.FloatTensor(x, y).fill_(0).to(self.device)
+                gt_mid = torch.tensor(img_obj.extra['gt_mid']).float().to(self.device)
 
-                if len(img_obj.working_arr.shape) == 3:
-                    x, y, c = img_obj.working_arr.shape
-
-                elif len(img_obj.working_arr.shape) == 2:
-                    (x, y), c = img_obj.working_arr.shape, 1
-
-                map_img = torch.FloatTensor(c, x, y).fill_(0).to(self.device)
-
-                img_loss = 0.0
                 for i, data in enumerate(loader, 1):
                     inputs, labels = data['inputs'].to(self.device).float(), data['labels'].to(self.device).float()
                     clip_ix = data['clip_ix'].to(self.device).int()
 
                     outputs = self.model(inputs)
-                    loss = F.mse_loss(outputs, labels[None, ...]).item()
+                    _, predicted = torch.max(outputs, 1)
+                    predicted_map = outputs[:, 1, :, :]
 
-                    img_loss += loss
-
-                    for j in range(outputs.shape[0]):
+                    for j in range(predicted_map.shape[0]):
                         p, q, r, s = clip_ix[j]
-                        map_img[:, p:q, r:s] = outputs[j, :, :, :]
-
+                        predicted_img[p:q, r:s] = predicted[j]
                     print('Batch: ', i, end='\r')
 
+                img_score = ScoreAccumulator()
+                predicted_img = predicted_img * 255
+
                 if gen_images:
-                    map_img = map_img.cpu().numpy().squeeze()
+                    predicted_img = predicted_img.cpu().numpy()
+                    predicted_img[img_obj.extra['fill_in'] == 1] = 255
+                    img_score.add_array(predicted_img, img_obj.ground_truth)
 
-                    #  Dimension of tensor and PIL image are reverted. We need to fix that before saving PIL image
-                    if len(map_img.shape) == 3:
-                        map_img = np.rollaxis(map_img, 0, 3)
+                    # Global score accumulator
+                    self.conf['acc'].accumulate(img_score)
 
-                    IMG.fromarray(np.array(map_img, dtype=np.uint8)).save(
+                    IMG.fromarray(np.array(predicted_img, dtype=np.uint8)).save(
                         os.path.join(self.log_dir, img_obj.file_name.split('.')[0] + '.png'))
                 else:
-                    score_acc += img_loss / loader.__len__()
-                print('\n' + img_obj.file_name, ' Image LOSS: ', img_loss / loader.__len__())
+                    img_score.add_tensor(predicted_img, gt_mid)
+                    score_acc.accumulate(img_score)
 
-                self.flush(logger, ','.join(str(x) for x in [img_obj.file_name, img_loss / loader.__len__()]))
-
-        self._save_if_better(score=len(data_loaders) / score_acc)
+                prf1a = img_score.get_prfa()
+                print(img_obj.file_name, ' PRF1A', prf1a)
+                self.flush(logger, ','.join(str(x) for x in [img_obj.file_name] + prf1a))
+        self._save_if_better(score=score_acc.get_prfa()[2])

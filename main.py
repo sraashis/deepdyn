@@ -1,9 +1,9 @@
-import testarch.unet as unet
-import testarch.unet.runs as r_unet
-import testarch.miniunet as mini_unet
-import testarch.miniunet.runs as r_miniunet
 import torchvision.transforms as tmf
 
+import testarch.miniunet as mini_unet
+import testarch.miniunet.runs as rm
+import testarch.unet as unet
+import testarch.unet.runs as ru
 
 transforms = tmf.Compose([
     tmf.ToPILImage(),
@@ -11,6 +11,18 @@ transforms = tmf.Compose([
 ])
 
 if __name__ == "__main__":
-    unet.run([r_unet.DRIVE], transforms)
-    mini_unet.run([r_miniunet.DRIVE], transforms)
+    runs_unet = [ru.DRIVE_1_100_1, ru.DRIVE_1_1, ru.DRIVE_WEIGHTED,
+                 ru.STARE_1_100_1, ru.STARE_1_1, ru.STARE_WEIGHTED,
+                 ru.WIDE_1_100_1, ru.WIDE_1_1, ru.WIDE_WEIGHTED,
+                 ru.CHASEDB_1_100_1, ru.CHASEDB_1_1, ru.CHASEDB_WEIGHTED,
+                 ru.VEVIO_MOSAICS_1_100_1, ru.VEVIO_MOSAICS_1_1, ru.VEVIO_MOSAICS_WEIGHTED,
+                 ru.VEVIO_FRAMES_1_100_1, ru.VEVIO_FRAMES_1_1, ru.VEVIO_FRAMES_WEIGHTED]
 
+    runs_miniunet = [rm.DRIVE_1_100_1, rm.DRIVE_1_1, rm.DRIVE_WEIGHTED,
+                     rm.STARE_1_100_1, rm.STARE_1_1, rm.STARE_WEIGHTED,
+                     rm.WIDE_1_100_1, rm.WIDE_1_1, rm.WIDE_WEIGHTED,
+                     rm.CHASEDB_1_100_1, rm.CHASEDB_1_1, rm.CHASEDB_WEIGHTED,
+                     rm.VEVIO_MOSAICS_1_100_1, rm.VEVIO_MOSAICS_1_1, rm.VEVIO_MOSAICS_WEIGHTED,
+                     rm.VEVIO_FRAMES_1_100_1, rm.VEVIO_FRAMES_1_1, rm.VEVIO_FRAMES_WEIGHTED]
+    unet.run(runs_unet, transforms)
+    mini_unet.run(runs_miniunet, transforms)

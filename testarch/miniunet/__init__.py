@@ -6,9 +6,9 @@ import torch.optim as optim
 
 from utils import auto_split as asp
 from utils.measurements import ScoreAccumulator
-from ..miniunet.mapnet_bee import MAPNetBee
-from ..miniunet.mapnet_dataloader import PatchesGenerator
-from ..miniunet.model import MapUNet
+from ..miniunet.miniunet_bee import MiniUNetBee
+from ..miniunet.miniunet_dataloader import PatchesGenerator
+from ..miniunet.model import MiniUNet
 
 
 def run(runs, transforms):
@@ -21,7 +21,7 @@ def run(runs, transforms):
             splits = asp.load_split_json(os.path.join(R['Dirs']['splits_json'], split))
             R['checkpoint_file'] = split + '.tar'
 
-            model = MapUNet(R['Params']['num_channels'], R['Params']['num_classes'])
+            model = MiniUNet(R['Params']['num_channels'], R['Params']['num_classes'])
             optimizer = optim.Adam(model.parameters(), lr=R['Params']['learning_rate'])
             if R['Params']['distribute']:
                 model = torch.nn.DataParallel(model)
@@ -29,7 +29,7 @@ def run(runs, transforms):
                 optimizer = optim.Adam(model.module.parameters(), lr=R['Params']['learning_rate'])
 
             try:
-                trainer = MAPNetBee(model=model, conf=R, optimizer=optimizer)
+                trainer = MiniUNetBee(model=model, conf=R, optimizer=optimizer)
 
                 if R.get('Params').get('mode') == 'train':
                     train_loader = PatchesGenerator.get_loader(conf=R, images=splits['train'], transforms=transforms,
