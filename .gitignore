@@ -8,7 +8,7 @@ preprocess/graph/__pycache__/
 preprocess/image/__pycache__/
 .idea
 out/
-data/
+# data/
 logs/
 net_logs
 notebook/.ipynb_checkpoints/
