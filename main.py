@@ -24,5 +24,7 @@ if __name__ == "__main__":
                      rm.CHASEDB_1_100_1, rm.CHASEDB_1_1, rm.CHASEDB_WEIGHTED,
                      rm.VEVIO_MOSAICS_1_100_1, rm.VEVIO_MOSAICS_1_1, rm.VEVIO_MOSAICS_WEIGHTED,
                      rm.VEVIO_FRAMES_1_100_1, rm.VEVIO_FRAMES_1_1, rm.VEVIO_FRAMES_WEIGHTED]
-    unet.run(runs_unet, transforms)
-    mini_unet.run(runs_miniunet, transforms)
+
+    for r1, r2 in zip(runs_unet, runs_miniunet):
+        unet.run([r1], transforms)
+        mini_unet.run([r2], transforms)
