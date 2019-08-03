@@ -28,3 +28,4 @@ if __name__ == "__main__":
     for r1, r2 in zip(runs_unet, runs_miniunet):
         unet.run([r1], transforms)
         mini_unet.run([r2], transforms)
+        # break
