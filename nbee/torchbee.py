@@ -58,7 +58,7 @@ class NNBee:
         self.optimizer = optimizer
         self.model_trace = []
         self.checkpoint = {'total_epochs:': 0, 'epochs': 0, 'state': None, 'score': 0.0, 'model': 'EMPTY'}
-        self.patience = self.conf.get('Params').get('patience', 45)
+        self.patience = self.conf.get('Params').get('patience', 150)
 
     def test(self, data_loaders=None, gen_images=True):
         print('Running test')

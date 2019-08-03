@@ -25,6 +25,10 @@ if __name__ == "__main__":
                      rm.VEVIO_MOSAICS_1_100_1, rm.VEVIO_MOSAICS_1_1, rm.VEVIO_MOSAICS_WEIGHTED,
                      rm.VEVIO_FRAMES_1_100_1, rm.VEVIO_FRAMES_1_1, rm.VEVIO_FRAMES_WEIGHTED]
 
+    import inspect
+    print(inspect.getsource(ru.DRIVE_1_100_1['Funcs']['dparm']))
+    print(inspect.getsource(ru.DRIVE_1_1['Funcs']['dparm']))
+    print(inspect.getsource(ru.DRIVE_WEIGHTED['Funcs']['dparm']))
     for r1, r2 in zip(runs_unet, runs_miniunet):
         unet.run([r1], transforms)
         mini_unet.run([r2], transforms)
