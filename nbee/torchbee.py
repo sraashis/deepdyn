@@ -118,6 +118,7 @@ class NNBee:
         return NotImplementedError('------Evaluation step can vary a lot.. Needs to be implemented.-------')
 
     def resume_from_checkpoint(self, parallel_trained=False):
+        self.checkpoint = torch.load(self.checkpoint_file)
         try:
             if parallel_trained:
                 from collections import OrderedDict

@@ -4,11 +4,13 @@
 ### date: 9/10/2018
 """
 
-import numpy as np
 import os
+
+import numpy as np
 import torch
-import viz.nviz as plt
 from PIL import Image as IMG
+
+import viz.nviz as plt
 from nbee.torchbee import NNBee
 from utils.measurements import ScoreAccumulator
 
@@ -72,24 +74,28 @@ class UNetBee(NNBee):
                     print('Batch: ', i, end='\r')
 
                 img_score = ScoreAccumulator()
-                map_img = torch.exp(map_img) * 255
-                predicted_img = predicted_img * 255
+                img_score.add_tensor(predicted_img, gt)
+                score_acc.accumulate(img_score)
 
-                if gen_images:
-                    map_img = map_img.cpu().numpy()
+                if gen_images:  #### Test mode
+                    predicted_img = predicted_img * 255
+                    map_img = (torch.exp(map_img) * 255).cpu().numpy()
                     predicted_img = predicted_img.cpu().numpy()
-                    img_score.add_array(predicted_img, img_obj.ground_truth)
-                    self.conf['acc'].accumulate(img_score)  # Global score
+
+                    ### Only save scores for test images############################
+                    if loader.dataset.image_objects[0].file_name in loader.dataset.conf['test_only']:
+                        self.conf['acc'].accumulate(img_score)  # Global score
+                        prf1a = img_score.get_prfa()
+                        print(img_obj.file_name, ' PRF1A', prf1a)
+                        self.flush(logger, ','.join(str(x) for x in [img_obj.file_name] + prf1a))
+                    #################################################################
 
                     IMG.fromarray(np.array(predicted_img, dtype=np.uint8)).save(
                         os.path.join(self.log_dir, 'pred_' + img_obj.file_name.split('.')[0] + '.png'))
                     IMG.fromarray(np.array(map_img, dtype=np.uint8)).save(
                         os.path.join(self.log_dir, img_obj.file_name.split('.')[0] + '.png'))
-                else:
-                    img_score.add_tensor(predicted_img, gt)
-                    score_acc.accumulate(img_score)
-
-                prf1a = img_score.get_prfa()
-                print(img_obj.file_name, ' PRF1A', prf1a)
-                self.flush(logger, ','.join(str(x) for x in [img_obj.file_name] + prf1a))
+                else:  #### Validation mode
+                    prf1a = img_score.get_prfa()
+                    print(img_obj.file_name, ' PRF1A', prf1a)
+                    self.flush(logger, ','.join(str(x) for x in [img_obj.file_name] + prf1a))
         self._save_if_better(score=score_acc.get_prfa()[2])

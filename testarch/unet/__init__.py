@@ -45,7 +45,10 @@ def run(runs, transforms):
 
                 drive_trainer.resume_from_checkpoint(parallel_trained=R.get('Params').get('parallel_trained'))
 
+                ### We need to generate unet-map for all images(test, training and validation) for miniunet
+                ### However, we accumulate only test set's score
                 all_images = splits['test'] + splits['train'] + splits['validation']
+                R['test_only'] = splits['test']
                 test_loader = PatchesGenerator.get_loader_per_img(conf=R,
                                                                   images=all_images, mode='test',
                                                                   transforms=transforms)
