@@ -43,8 +43,6 @@ class NNBee:
 
         #  Function to initialize class weights, default is [1, 1]
         self.dparm = self.conf.get("Funcs").get('dparm')
-        if not self.dparm:
-            self.dparm = lambda x: [1.0, 1.0]
 
         # Handle gpu/cpu
         if torch.cuda.is_available():
@@ -56,7 +54,6 @@ class NNBee:
         # Initialization to save model
         self.model = model.to(self.device)
         self.optimizer = optimizer
-        self.model_trace = []
         self.checkpoint = {'total_epochs:': 0, 'epochs': 0, 'state': None, 'score': 0.0, 'model': 'EMPTY'}
         self.patience = self.conf.get('Params').get('patience', 150)
 
@@ -118,7 +115,7 @@ class NNBee:
         return NotImplementedError('------Evaluation step can vary a lot.. Needs to be implemented.-------')
 
     def resume_from_checkpoint(self, parallel_trained=False):
-        self.checkpoint = torch.load(self.checkpoint_file)
+        # self.checkpoint = torch.load(self.checkpoint_file)
         try:
             if parallel_trained:
                 from collections import OrderedDict
