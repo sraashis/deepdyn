@@ -87,7 +87,6 @@ class NNBee:
             if epoch % self.validation_frequency == 0:
                 print('Running validation..')
                 self.model.eval()
-                val_score = ScoreAccumulator()
                 self.validation(epoch=epoch, validation_loader=validation_loader, epoch_run=epoch_run)
                 self._on_validation_end(data_loader=validation_loader, log_file=self.val_logger.name)
                 if self.early_stop(patience=self.patience):
@@ -149,7 +148,7 @@ class NNBee:
             self.checkpoint['model'] = str(self.model)
             torch.save(self.checkpoint, self.checkpoint_file)
         else:
-            print('Score did not improve:' + str(score) + ' BEST: ' + str(self.checkpoint['score']) + ' EP: ' + (
+            print('Score did not improve:' + str(score) + ' BEST: ' + str(self.checkpoint['score']) + ' Best EP: ' + (
                 str(self.checkpoint['epochs'])))
 
     def early_stop(self, patience=35):
@@ -217,8 +216,7 @@ class NNBee:
             self.optimizer.zero_grad()
             outputs = self.model(inputs)
             _, predicted = torch.max(outputs, 1)
-            w = np.random.choice(np.arange(1, 101, 1), 2)
-            loss = F.nll_loss(outputs, labels, weight=torch.FloatTensor(w).to(self.device))
+            loss = F.nll_loss(outputs, labels, weight=torch.FloatTensor(self.dparm(self.conf)).to(self.device))
             loss.backward()
             self.optimizer.step()
 

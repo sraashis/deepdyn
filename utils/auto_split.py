@@ -8,15 +8,15 @@ import json
 import os
 import random
 import sys
-
-try:
-    BASE_PROJECT_DIR = '/home/ak/PycharmProjects/ature'
-    sys.path.append(BASE_PROJECT_DIR)
-    os.chdir(BASE_PROJECT_DIR)
-except:
-    BASE_PROJECT_DIR = '/home/akhanal1/ature'
-    sys.path.append(BASE_PROJECT_DIR)
-    os.chdir(BASE_PROJECT_DIR)
+#
+# try:
+#     BASE_PROJECT_DIR = '/home/ak/PycharmProjects/ature'
+#     sys.path.append(BASE_PROJECT_DIR)
+#     os.chdir(BASE_PROJECT_DIR)
+# except:
+#     BASE_PROJECT_DIR = '/home/akhanal1/ature'
+#     sys.path.append(BASE_PROJECT_DIR)
+#     os.chdir(BASE_PROJECT_DIR)
 
 
 def load_split_json(json_file):
