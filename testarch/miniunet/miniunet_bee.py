@@ -41,7 +41,7 @@ class MiniUNetBee(NNBee):
         self.plot_column_keys(file=kw['log_file'], batches_per_epoch=1,
                               keys=['F1', 'ACCURACY'])
 
-    def _eval(self, data_loaders=None, logger=None, gen_images=False, score_acc=None):
+    def evaluate(self, data_loaders=None, logger=None, gen_images=False, score_acc=None):
         assert isinstance(score_acc, ScoreAccumulator)
         with torch.no_grad():
             for loader in data_loaders:

@@ -12,6 +12,7 @@ from torch.utils.data.dataset import Dataset
 
 from utils.img_utils import Image
 import utils.data_utils as dutils
+import math
 
 
 class Generator(Dataset):
@@ -87,7 +88,8 @@ class Generator(Dataset):
 
         dls = []
         for bz in batch_sizes:
-            dls.append(torch.utils.data.DataLoader(gen, batch_size=bz, shuffle=True, num_workers=5, sampler=None))
+            dls.append(torch.utils.data.DataLoader(gen, batch_size=bz, shuffle=True, num_workers=5, sampler=None,
+                                                   drop_last=True))
         return dls if len(dls) > 1 else dls[0]
 
     @classmethod
@@ -105,3 +107,42 @@ class Generator(Dataset):
                                                  shuffle=False, num_workers=3, sampler=None)
             loaders.append(loader)
         return loaders
+
+    @classmethod
+    def random_split(cls, images, conf, transforms, mode, size_ratio=[0.75, 0.25]):
+        FULL_SIZE = 3
+        gen = cls(
+            conf=conf,
+            images=images,
+            transforms=transforms,
+            shuffle_indices=False,
+            mode=mode
+        )
+        size_a = math.ceil(size_ratio[0] * len(gen))
+        size_b = math.floor(size_ratio[1] * len(gen))
+
+        if len(size_ratio) == FULL_SIZE:
+            size_c = len(gen) - (size_a + size_b)
+
+            dataset_a, dataset_b, dataset_c = torch.utils.data.dataset.random_split(gen, [size_a, size_b, size_c])
+
+            loader_a = torch.utils.data.DataLoader(dataset_a,
+                                                   batch_size=min(conf['Params']['batch_size'], dataset_a.__len__()),
+                                                   shuffle=True, num_workers=3, sampler=None, drop_last=True)
+            loader_b = torch.utils.data.DataLoader(dataset_b,
+                                                   batch_size=min(conf['Params']['batch_size'], dataset_b.__len__()),
+                                                   shuffle=True, num_workers=3, sampler=None, drop_last=True)
+            loader_c = torch.utils.data.DataLoader(dataset_c,
+                                                   batch_size=min(conf['Params']['batch_size'], dataset_c.__len__()),
+                                                   shuffle=True, num_workers=3, sampler=None, drop_last=True)
+            return loader_a, loader_b, loader_c
+
+        dataset_a, dataset_b = torch.utils.data.dataset.random_split(gen, [size_a, size_b])
+
+        loader_a = torch.utils.data.DataLoader(dataset_a,
+                                               batch_size=min(conf['Params']['batch_size'], dataset_a.__len__()),
+                                               shuffle=True, num_workers=3, sampler=None, drop_last=True)
+        loader_b = torch.utils.data.DataLoader(dataset_b,
+                                               batch_size=min(conf['Params']['batch_size'], dataset_b.__len__()),
+                                               shuffle=True, num_workers=3, sampler=None, drop_last=True)
+        return loader_a, loader_b

@@ -57,14 +57,17 @@ class NNBee:
         self.checkpoint = {'total_epochs:': 0, 'epochs': 0, 'state': None, 'score': 0.0, 'model': 'EMPTY'}
         self.patience = self.conf.get('Params').get('patience', 150)
 
-    def test(self, data_loaders=None, gen_images=True):
+    def test(self, data_loaders=None):
         print('Running test')
         self.model.eval()
         score = ScoreAccumulator()
-        self._eval(data_loaders=data_loaders, gen_images=gen_images, score_acc=score, logger=self.test_logger)
+        self.evaluate(data_loaders=data_loaders, gen_images=True, score_acc=score, logger=self.test_logger)
         self._on_test_end(log_file=self.test_logger.name)
         if not self.test_logger and not self.test_logger.closed:
             self.test_logger.close()
+
+    def evaluate(self, data_loaders=None, logger=None, gen_images=False, score_acc=None):
+        return NotImplementedError('------Evaluation step can vary a lot.. Needs to be implemented.-------')
 
     def _on_test_end(self, **kw):
         pass
@@ -76,7 +79,7 @@ class NNBee:
             self.checkpoint['total_epochs'] = epoch
 
             # Run one epoch
-            epoch_run(epoch=epoch, data_loader=data_loader)
+            epoch_run(epoch=epoch, data_loader=data_loader, logger=self.train_logger)
 
             self._on_epoch_end(data_loader=data_loader, log_file=self.train_logger.name)
 
@@ -85,8 +88,7 @@ class NNBee:
                 print('Running validation..')
                 self.model.eval()
                 val_score = ScoreAccumulator()
-                self._eval(data_loaders=validation_loader, gen_images=False, score_acc=val_score,
-                           logger=self.val_logger)
+                self.validation(epoch=epoch, validation_loader=validation_loader, epoch_run=epoch_run)
                 self._on_validation_end(data_loader=validation_loader, log_file=self.val_logger.name)
                 if self.early_stop(patience=self.patience):
                     return
@@ -111,11 +113,14 @@ class NNBee:
         # }
         raise NotImplementedError('Must be implemented to use.')
 
-    def _eval(self, data_loaders=None, logger=None, gen_images=False, score_acc=None):
-        return NotImplementedError('------Evaluation step can vary a lot.. Needs to be implemented.-------')
+    def validation(self, epoch=None, validation_loader=None, epoch_run=None):
+        score_acc = ScoreAccumulator()
+        epoch_run(epoch=epoch, data_loader=validation_loader, logger=self.val_logger, score_acc=score_acc)
+        self._save_if_better(score=score_acc.get_prfa()[2])
 
     def resume_from_checkpoint(self, parallel_trained=False):
-        # self.checkpoint = torch.load(self.checkpoint_file)
+        self.checkpoint = torch.load(self.checkpoint_file)
+        print(self.checkpoint_file, ' Loaded...')
         try:
             if parallel_trained:
                 from collections import OrderedDict
@@ -204,20 +209,25 @@ class NNBee:
         :return:
         """
         running_loss = 0.0
-        score_acc = ScoreAccumulator()
+        score_acc = ScoreAccumulator() if kw.get('score_acc') is None else kw.get('score_acc')
+        assert isinstance(score_acc, ScoreAccumulator)
+
         for i, data in enumerate(kw['data_loader'], 1):
             inputs, labels = data['inputs'].to(self.device).float(), data['labels'].to(self.device).long()
             self.optimizer.zero_grad()
             outputs = self.model(inputs)
             _, predicted = torch.max(outputs, 1)
-
-            loss = F.nll_loss(outputs, labels, weight=torch.FloatTensor(self.dparm(self.conf)).to(self.device))
+            w = np.random.choice(np.arange(1, 101, 1), 2)
+            loss = F.nll_loss(outputs, labels, weight=torch.FloatTensor(w).to(self.device))
             loss.backward()
             self.optimizer.step()
 
             current_loss = loss.item()
             running_loss += current_loss
-            p, r, f1, a = score_acc.reset().add_tensor(predicted, labels).get_prfa()
+
+            if kw.get('score_acc') is None:
+                score_acc.reset()
+            p, r, f1, a = score_acc.add_tensor(predicted, labels).get_prfa()
 
             if i % self.log_frequency == 0:
                 print('Epochs[%d/%d] Batch[%d/%d] loss:%.5f pre:%.3f rec:%.3f f1:%.3f acc:%.3f' %
@@ -226,11 +236,14 @@ class NNBee:
                           running_loss / self.log_frequency, p, r, f1,
                           a))
                 running_loss = 0.0
-            self.flush(self.train_logger,
+            self.flush(kw['logger'],
                        ','.join(str(x) for x in [0, kw['epoch'], i, p, r, f1, a, current_loss]))
 
     def epoch_dice_loss(self, **kw):
-        score_acc = ScoreAccumulator()
+
+        score_acc = ScoreAccumulator() if kw.get('score_acc') is None else kw.get('score_acc')
+        assert isinstance(score_acc, ScoreAccumulator)
+
         running_loss = 0.0
         for i, data in enumerate(kw['data_loader'], 1):
             inputs, labels = data['inputs'].to(self.device).float(), data['labels'].to(self.device).long()
@@ -250,7 +263,11 @@ class NNBee:
 
             current_loss = loss.item()
             running_loss += current_loss
-            p, r, f1, a = score_acc.reset().add_tensor(predicted, labels).get_prfa()
+
+            if kw.get('score_acc') is None:
+                score_acc.reset()
+            p, r, f1, a = score_acc.add_tensor(predicted, labels).get_prfa()
+
             if i % self.log_frequency == 0:
                 print('Epochs[%d/%d] Batch[%d/%d] loss:%.5f pre:%.3f rec:%.3f f1:%.3f acc:%.3f' %
                       (
@@ -259,9 +276,11 @@ class NNBee:
                           a))
                 running_loss = 0.0
 
-            self.flush(self.train_logger, ','.join(str(x) for x in [0, kw['epoch'], i, p, r, f1, a, current_loss]))
+            self.flush(kw['logger'], ','.join(str(x) for x in [0, kw['epoch'], i, p, r, f1, a, current_loss]))
 
     def epoch_mse_loss(self, **kw):
+
+        # Todo score accumulation to check if this model is better than the saved one
         running_loss = 0.0
         for i, data in enumerate(kw['data_loader'], 1):
             inputs, labels = data['inputs'].to(self.device).float(), data['labels'].to(self.device).float()
@@ -286,4 +305,4 @@ class NNBee:
                           kw['epoch'], self.epochs, i, kw['data_loader'].__len__(), running_loss / self.log_frequency))
                 running_loss = 0.0
 
-            self.flush(self.train_logger, ','.join(str(x) for x in [0, kw['epoch'], i, current_loss]))
+            self.flush(kw['logger'], ','.join(str(x) for x in [0, kw['epoch'], i, current_loss]))

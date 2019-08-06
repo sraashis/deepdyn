@@ -48,7 +48,7 @@ class UNetBee(NNBee):
 
     # This method takes torch n dataloaders for n image with one image in each and evaluates after training.
     # It is also the base method for both testing and validation
-    def _eval(self, data_loaders=None, logger=None, gen_images=False, score_acc=None):
+    def evaluate(self, data_loaders=None, logger=None, gen_images=False, score_acc=None):
         assert isinstance(score_acc, ScoreAccumulator)
         with torch.no_grad():
             for loader in data_loaders:
@@ -74,14 +74,12 @@ class UNetBee(NNBee):
                     print('Batch: ', i, end='\r')
 
                 img_score = ScoreAccumulator()
-                img_score.add_tensor(predicted_img, gt)
-                score_acc.accumulate(img_score)
-
                 if gen_images:  #### Test mode
                     predicted_img = predicted_img * 255
                     map_img = (torch.exp(map_img) * 255).cpu().numpy()
                     predicted_img = predicted_img.cpu().numpy()
 
+                    img_score.add_array(predicted_img, img_obj.ground_truth)
                     ### Only save scores for test images############################
                     if loader.dataset.image_objects[0].file_name in loader.dataset.conf['test_only']:
                         self.conf['acc'].accumulate(img_score)  # Global score
@@ -95,7 +93,8 @@ class UNetBee(NNBee):
                     IMG.fromarray(np.array(map_img, dtype=np.uint8)).save(
                         os.path.join(self.log_dir, img_obj.file_name.split('.')[0] + '.png'))
                 else:  #### Validation mode
+                    img_score.add_tensor(predicted_img, gt)
                     prf1a = img_score.get_prfa()
                     print(img_obj.file_name, ' PRF1A', prf1a)
                     self.flush(logger, ','.join(str(x) for x in [img_obj.file_name] + prf1a))
-        self._save_if_better(score=score_acc.get_prfa()[2])
+                score_acc.accumulate(img_score)

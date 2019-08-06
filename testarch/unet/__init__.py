@@ -17,6 +17,7 @@ from ..unet.unet_bee import UNetBee
 from ..unet.unet_dataloader import PatchesGenerator
 
 
+
 def run(runs, transforms):
     for R in runs:
         for k, folder in R['Dirs'].items():
@@ -36,12 +37,13 @@ def run(runs, transforms):
             try:
                 drive_trainer = UNetBee(model=model, conf=R, optimizer=optimizer)
                 if R.get('Params').get('mode') == 'train':
-                    train_loader = PatchesGenerator.get_loader(conf=R, images=splits['train'], transforms=transforms,
-                                                               mode='train')
-                    val_loader = PatchesGenerator.get_loader_per_img(conf=R, images=splits['validation'],
-                                                                     mode='validation', transforms=transforms)
-                    drive_trainer.train(data_loader=train_loader, validation_loader=val_loader,
-                                        epoch_run=drive_trainer.epoch_ce_loss)
+                    for x in range(5):
+                        train_loader, val_loader = PatchesGenerator.random_split(conf=R,
+                                                                                 images=splits['train'] + splits[
+                                                                                     'validation'],
+                                                                                 transforms=transforms, mode='train')
+                        drive_trainer.train(data_loader=train_loader, validation_loader=val_loader,
+                                            epoch_run=drive_trainer.epoch_ce_loss)
 
                 drive_trainer.resume_from_checkpoint(parallel_trained=R.get('Params').get('parallel_trained'))
 

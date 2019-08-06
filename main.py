@@ -31,5 +31,5 @@ if __name__ == "__main__":
     print(inspect.getsource(ru.DRIVE_WEIGHTED['Funcs']['dparm']))
     for r1, r2 in zip(runs_unet, runs_miniunet):
         unet.run([r1], transforms)
-        mini_unet.run([r2], transforms)
-        # break
+        # mini_unet.run([r2], transforms)
+        break
