@@ -11,13 +11,13 @@ import torch
 from PIL import Image as IMG
 
 import viz.nviz as plt
-from nbee.torchbee import NNBee
+from nbee.torchtrainer import NNBee
 from utils.measurements import ScoreAccumulator
 
 sep = os.sep
 
 
-class UNetBee(NNBee):
+class UNetTrainer(NNBee):
     def __init__(self, **kwargs):
         NNBee.__init__(self, **kwargs)
         self.patch_shape = self.conf.get('Params').get('patch_shape')

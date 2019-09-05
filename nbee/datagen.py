@@ -109,7 +109,7 @@ class Generator(Dataset):
         return loaders
 
     @classmethod
-    def random_split(cls, images, conf, transforms, mode, size_ratio=[0.75, 0.25]):
+    def random_split(cls, images, conf, transforms, mode, size_ratio=[0.8, 0.2]):
         FULL_SIZE = 3
         gen = cls(
             conf=conf,

@@ -13,8 +13,8 @@ import torch.optim as optim
 from utils import auto_split as asp
 from utils.measurements import ScoreAccumulator
 from ..unet.model import UNet
-from ..unet.unet_bee import UNetBee
 from ..unet.unet_dataloader import PatchesGenerator
+from ..unet.unet_trainer import UNetTrainer
 
 
 def run(runs, transforms):
@@ -22,10 +22,10 @@ def run(runs, transforms):
         for k, folder in R['Dirs'].items():
             os.makedirs(folder, exist_ok=True)
         R['acc'] = ScoreAccumulator()
-        for split in os.listdir(R['Dirs']['splits_json']):
-            splits = asp.load_split_json(os.path.join(R['Dirs']['splits_json'], split))
+        for split_file in os.listdir(R['Dirs']['splits_json']):
+            splits = asp.load_split_json(os.path.join(R['Dirs']['splits_json'], split_file))
 
-            R['checkpoint_file'] = split + '.tar'
+            R['checkpoint_file'] = split_file + '.tar'
             model = UNet(R['Params']['num_channels'], R['Params']['num_classes'])
             optimizer = optim.Adam(model.parameters(), lr=R['Params']['learning_rate'])
             if R['Params']['distribute']:
@@ -34,21 +34,28 @@ def run(runs, transforms):
                 optimizer = optim.Adam(model.module.parameters(), lr=R['Params']['learning_rate'])
 
             try:
-                drive_trainer = UNetBee(model=model, conf=R, optimizer=optimizer)
+                trainer = UNetTrainer(model=model, conf=R, optimizer=optimizer)
                 if R.get('Params').get('mode') == 'train':
-                    train_loader, val_loader = PatchesGenerator.random_split(conf=R,
-                                                                             images=splits['train'] + splits[
-                                                                                 'validation'],
-                                                                             transforms=transforms, mode='train')
-                    drive_trainer.train(data_loader=train_loader, validation_loader=val_loader,
-                                        epoch_run=drive_trainer.epoch_ce_loss)
+                    # train_loader, val_loader = PatchesGenerator.random_split(conf=R,
+                    #                                                          images=splits['train'] + splits[
+                    #                                                              'validation'],
+                    #                                                          transforms=transforms, mode='train')
 
-                drive_trainer.resume_from_checkpoint(parallel_trained=R.get('Params').get('parallel_trained'))
+                    train_loader = PatchesGenerator.get_loader(conf=R, images=splits['train'], transforms=transforms,
+                                                               mode='train')
+                    val_loader = PatchesGenerator.get_loader_per_img(conf=R, images=splits['validation'],
+                                                                     mode='validation', transforms=transforms)
+
+                    # print('### Train Val Batch size:', len(train_loader.dataset), len(val_loader.dataset))
+                    trainer.train(data_loader=train_loader, validation_loader=val_loader,
+                                  epoch_run=trainer.epoch_ce_loss)
 
                 test_loader = PatchesGenerator.get_loader_per_img(conf=R,
                                                                   images=splits['test'], mode='test',
                                                                   transforms=transforms)
-                drive_trainer.test(test_loader)
+
+                trainer.resume_from_checkpoint(parallel_trained=R.get('Params').get('parallel_trained'))
+                trainer.test(test_loader)
             except Exception as e:
                 traceback.print_exc()
 

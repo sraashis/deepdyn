@@ -75,7 +75,8 @@ class NNBee:
     def train(self, data_loader=None, validation_loader=None, epoch_run=None):
         print('Training...')
         for epoch in range(1, self.epochs + 1):
-            self._adjust_learning_rate(epoch=epoch)
+            self.model.train()
+            # self._adjust_learning_rate(epoch=epoch)
             self.checkpoint['total_epochs'] = epoch
 
             # Run one epoch
@@ -114,7 +115,8 @@ class NNBee:
 
     def validation(self, epoch=None, validation_loader=None, epoch_run=None):
         score_acc = ScoreAccumulator()
-        epoch_run(epoch=epoch, data_loader=validation_loader, logger=self.val_logger, score_acc=score_acc)
+        self.evaluate(data_loaders=validation_loader, logger=self.val_logger, gen_images=False, score_acc=score_acc)
+        # epoch_run(epoch=epoch, data_loader=validation_loader, logger=self.val_logger, score_acc=score_acc)
         self._save_if_better(score=score_acc.get_prfa()[2])
 
     def resume_from_checkpoint(self, parallel_trained=False):

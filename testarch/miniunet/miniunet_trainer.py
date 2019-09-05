@@ -10,13 +10,13 @@ import numpy as np
 import torch
 from PIL import Image as IMG
 
-from nbee.torchbee import NNBee
+from nbee.torchtrainer import NNBee
 from utils.measurements import ScoreAccumulator
 
 sep = os.sep
 
 
-class MiniUNetBee(NNBee):
+class MiniUNetTrainer(NNBee):
     def __init__(self, **kwargs):
         NNBee.__init__(self, **kwargs)
         self.patch_shape = self.conf.get('Params').get('patch_shape')
