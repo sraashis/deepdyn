@@ -4,15 +4,14 @@
 ### date: 9/10/2018
 """
 
+import math
 import os
 
 import torch
-import torchvision.transforms as tfm
 from torch.utils.data.dataset import Dataset
 
-from utils.img_utils import Image
 import utils.data_utils as dutils
-import math
+from utils.img_utils import Image
 
 
 class Generator(Dataset):
@@ -128,21 +127,21 @@ class Generator(Dataset):
 
             loader_a = torch.utils.data.DataLoader(dataset_a,
                                                    batch_size=min(conf['Params']['batch_size'], dataset_a.__len__()),
-                                                   shuffle=True, num_workers=3, sampler=None, drop_last=True)
+                                                   shuffle=True, num_workers=3, drop_last=False)
             loader_b = torch.utils.data.DataLoader(dataset_b,
                                                    batch_size=min(conf['Params']['batch_size'], dataset_b.__len__()),
-                                                   shuffle=True, num_workers=3, sampler=None, drop_last=True)
+                                                   shuffle=True, num_workers=3, drop_last=False)
             loader_c = torch.utils.data.DataLoader(dataset_c,
                                                    batch_size=min(conf['Params']['batch_size'], dataset_c.__len__()),
-                                                   shuffle=True, num_workers=3, sampler=None, drop_last=True)
+                                                   shuffle=True, num_workers=3, drop_last=False)
             return loader_a, loader_b, loader_c
 
         dataset_a, dataset_b = torch.utils.data.dataset.random_split(gen, [size_a, size_b])
 
         loader_a = torch.utils.data.DataLoader(dataset_a,
-                                               batch_size=min(conf['Params']['batch_size'], dataset_a.__len__()),
-                                               shuffle=True, num_workers=3, sampler=None, drop_last=True)
+                                               batch_size=min(conf['Params']['batch_size'], dataset_a.__len__(), 2),
+                                               shuffle=True, num_workers=3, drop_last=False)
         loader_b = torch.utils.data.DataLoader(dataset_b,
-                                               batch_size=min(conf['Params']['batch_size'], dataset_b.__len__()),
-                                               shuffle=True, num_workers=3, sampler=None, drop_last=True)
+                                               batch_size=min(conf['Params']['batch_size'], dataset_b.__len__(), 2),
+                                               shuffle=True, num_workers=3, drop_last=False)
         return loader_a, loader_b

@@ -1,6 +1,5 @@
 import copy
 import os
-
 import numpy as np
 
 sep = os.sep
@@ -25,7 +24,6 @@ Params = {
     'parallel_trained': False,
 }
 
-# dparm_1_100_1 = lambda x: (1 + np.random.beta(.5, .5, 2) * 100).astype(int)
 dparm_1_100_1 = lambda x: np.random.choice(np.arange(1, 101, 1), 2)
 # dparm_1_1 = lambda x: [1, 1]
 # d_parm_weighted = lambda x: [x['Params']['cls_weights'][0], x['Params']['cls_weights'][1]]

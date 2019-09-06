@@ -16,7 +16,7 @@ from utils.loss import dice_loss
 from utils.measurements import ScoreAccumulator
 
 
-class NNBee:
+class NNTrainer:
 
     def __init__(self, conf=None, model=None, optimizer=None):
 
@@ -33,13 +33,13 @@ class NNBee:
 
         self.log_headers = self.get_log_headers()
         _log_key = self.conf.get('checkpoint_file').split('.')[0]
-        self.test_logger = NNBee.get_logger(log_file=os.path.join(self.log_dir, _log_key + '-TEST.csv'),
-                                            header=self.log_headers.get('test', ''))
+        self.test_logger = NNTrainer.get_logger(log_file=os.path.join(self.log_dir, _log_key + '-TEST.csv'),
+                                                header=self.log_headers.get('test', ''))
         if self.mode == 'train':
-            self.train_logger = NNBee.get_logger(log_file=os.path.join(self.log_dir, _log_key + '-TRAIN.csv'),
-                                                 header=self.log_headers.get('train', ''))
-            self.val_logger = NNBee.get_logger(log_file=os.path.join(self.log_dir, _log_key + '-VAL.csv'),
-                                               header=self.log_headers.get('validation', ''))
+            self.train_logger = NNTrainer.get_logger(log_file=os.path.join(self.log_dir, _log_key + '-TRAIN.csv'),
+                                                     header=self.log_headers.get('train', ''))
+            self.val_logger = NNTrainer.get_logger(log_file=os.path.join(self.log_dir, _log_key + '-VAL.csv'),
+                                                   header=self.log_headers.get('validation', ''))
 
         #  Function to initialize class weights, default is [1, 1]
         self.dparm = self.conf.get("Funcs").get('dparm')
@@ -88,10 +88,11 @@ class NNBee:
             if epoch % self.validation_frequency == 0:
                 print('Running validation..')
                 self.model.eval()
-                self.validation(epoch=epoch, validation_loader=validation_loader, epoch_run=epoch_run)
-                self._on_validation_end(data_loader=validation_loader, log_file=self.val_logger.name)
-                if self.early_stop(patience=self.patience):
-                    return
+                with torch.no_grad():
+                    self.validation(epoch=epoch, validation_loader=validation_loader, epoch_run=epoch_run)
+                    self._on_validation_end(data_loader=validation_loader, log_file=self.val_logger.name)
+                    if self.early_stop(patience=self.patience):
+                        return
 
         if not self.train_logger and not self.train_logger.closed:
             self.train_logger.close()
@@ -115,9 +116,11 @@ class NNBee:
 
     def validation(self, epoch=None, validation_loader=None, epoch_run=None):
         score_acc = ScoreAccumulator()
-        self.evaluate(data_loaders=validation_loader, logger=self.val_logger, gen_images=False, score_acc=score_acc)
-        # epoch_run(epoch=epoch, data_loader=validation_loader, logger=self.val_logger, score_acc=score_acc)
-        self._save_if_better(score=score_acc.get_prfa()[2])
+        # self.evaluate(data_loaders=validation_loader, logger=self.val_logger, gen_images=False, score_acc=score_acc)
+        epoch_run(epoch=epoch, data_loader=validation_loader, logger=self.val_logger, score_acc=score_acc)
+        p, r, f1, a = score_acc.get_prfa()
+        print('### PRF1A: ', p, r, f1, a, self.dparm(self.conf))
+        self._save_if_better(score=f1)
 
     def resume_from_checkpoint(self, parallel_trained=False):
         self.checkpoint = torch.load(self.checkpoint_file)
@@ -166,7 +169,7 @@ class NNBee:
                 sys.exit(1)
 
         file = open(log_file, 'w')
-        NNBee.flush(file, header)
+        NNTrainer.flush(file, header)
         return file
 
     @staticmethod
@@ -210,23 +213,29 @@ class NNBee:
         :return:
         """
         running_loss = 0.0
-        score_acc = ScoreAccumulator() if kw.get('score_acc') is None else kw.get('score_acc')
+        score_acc = ScoreAccumulator() if self.model.training else kw.get('score_acc')
         assert isinstance(score_acc, ScoreAccumulator)
 
         for i, data in enumerate(kw['data_loader'], 1):
             inputs, labels = data['inputs'].to(self.device).float(), data['labels'].to(self.device).long()
-            self.optimizer.zero_grad()
+
+            if self.model.training:
+                self.optimizer.zero_grad()
+
             outputs = self.model(inputs)
             _, predicted = torch.max(outputs, 1)
             loss = F.nll_loss(outputs, labels, weight=torch.FloatTensor(self.dparm(self.conf)).to(self.device))
-            loss.backward()
-            self.optimizer.step()
+
+            if self.model.training:
+                loss.backward()
+                self.optimizer.step()
 
             current_loss = loss.item()
             running_loss += current_loss
 
-            if kw.get('score_acc') is None:
+            if self.model.training:
                 score_acc.reset()
+
             p, r, f1, a = score_acc.add_tensor(predicted, labels).get_prfa()
 
             if i % self.log_frequency == 0:
@@ -241,7 +250,7 @@ class NNBee:
 
     def epoch_dice_loss(self, **kw):
 
-        score_acc = ScoreAccumulator() if kw.get('score_acc') is None else kw.get('score_acc')
+        score_acc = ScoreAccumulator() if self.model.training else kw.get('score_acc')
         assert isinstance(score_acc, ScoreAccumulator)
 
         running_loss = 0.0
@@ -249,7 +258,9 @@ class NNBee:
             inputs, labels = data['inputs'].to(self.device).float(), data['labels'].to(self.device).long()
             # weights = data['weights'].to(self.device)
 
-            self.optimizer.zero_grad()
+            if self.model.training:
+                self.optimizer.zero_grad()
+
             outputs = self.model(inputs)
             _, predicted = torch.max(outputs, 1)
 
@@ -258,13 +269,15 @@ class NNBee:
             # wd = torch.FloatTensor(*labels.shape).uniform_(0.1, 2).to(self.device)
 
             loss = dice_loss(outputs[:, 1, :, :], labels, beta=rd.choice(np.arange(1, 2, 0.1).tolist()))
-            loss.backward()
-            self.optimizer.step()
+
+            if self.model.training:
+                loss.backward()
+                self.optimizer.step()
 
             current_loss = loss.item()
             running_loss += current_loss
 
-            if kw.get('score_acc') is None:
+            if self.model.training:
                 score_acc.reset()
             p, r, f1, a = score_acc.add_tensor(predicted, labels).get_prfa()
 
@@ -285,7 +298,9 @@ class NNBee:
         for i, data in enumerate(kw['data_loader'], 1):
             inputs, labels = data['inputs'].to(self.device).float(), data['labels'].to(self.device).float()
 
-            self.optimizer.zero_grad()
+            if self.model.training:
+                self.optimizer.zero_grad()
+
             outputs = self.model(inputs)
             _, predicted = torch.max(outputs, 1)
 
@@ -293,8 +308,10 @@ class NNBee:
                 labels = torch.unsqueeze(labels, 1)
 
             loss = F.mse_loss(outputs, labels)
-            loss.backward()
-            self.optimizer.step()
+
+            if self.model.training:
+                loss.backward()
+                self.optimizer.step()
 
             current_loss = loss.item()
             running_loss += current_loss

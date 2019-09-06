@@ -14,7 +14,7 @@ from skimage.morphology import skeletonize
 
 import utils.img_utils as iu
 from utils.img_utils import Image
-from nbee.datagen import Generator
+from torchtrainer.datagen import Generator
 import random
 
 sep = os.sep
