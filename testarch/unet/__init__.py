@@ -36,17 +36,17 @@ def run(runs, transforms):
             try:
                 trainer = UNetTrainer(model=model, conf=R, optimizer=optimizer)
                 if R.get('Params').get('mode') == 'train':
-                    train_loader, val_loader = PatchesGenerator.random_split(conf=R,
-                                                                             images=splits['train'] + splits[
-                                                                                 'validation'],
-                                                                             transforms=transforms, mode='train')
+                    # train_loader, val_loader = PatchesGenerator.random_split(conf=R,
+                    #                                                          images=splits['train'] + splits[
+                    #                                                              'validation'],
+                    #                                                          transforms=transforms, mode='train')
 
-                    # train_loader = PatchesGenerator.get_loader(conf=R, images=splits['train'], transforms=transforms,
-                    #                                            mode='train')
-                    # val_loader = PatchesGenerator.get_loader_per_img(conf=R, images=splits['validation'],
-                    #                                                  mode='validation', transforms=transforms)
+                    train_loader = PatchesGenerator.get_loader(conf=R, images=splits['train'], transforms=transforms,
+                                                               mode='train')
+                    val_loader = PatchesGenerator.get_loader_per_img(conf=R, images=splits['validation'],
+                                                                     mode='validation', transforms=transforms)
 
-                    print('### Train Val Batch size:', len(train_loader.dataset), len(val_loader.dataset))
+                    # print('### Train Val Batch size:', len(train_loader.dataset), len(val_loader.dataset))
                     # trainer.resume_from_checkpoint(parallel_trained=R.get('Params').get('parallel_trained'))
                     trainer.train(data_loader=train_loader, validation_loader=val_loader,
                                   epoch_run=trainer.epoch_ce_loss)

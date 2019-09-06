@@ -1,6 +1,5 @@
 import torchvision.transforms as tmf
 
-import testarch.miniunet as mini_unet
 import testarch.miniunet.runs as rm
 import testarch.unet as unet
 import testarch.unet.runs as ru

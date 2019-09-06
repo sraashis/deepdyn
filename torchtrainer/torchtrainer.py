@@ -86,13 +86,14 @@ class NNTrainer:
 
             # Validation_frequency is the number of epoch until validation
             if epoch % self.validation_frequency == 0:
-                print('Running validation..')
+                print('############# Running validation... ####################')
                 self.model.eval()
                 with torch.no_grad():
                     self.validation(epoch=epoch, validation_loader=validation_loader, epoch_run=epoch_run)
                     self._on_validation_end(data_loader=validation_loader, log_file=self.val_logger.name)
                     if self.early_stop(patience=self.patience):
                         return
+                print('########################################################')
 
         if not self.train_logger and not self.train_logger.closed:
             self.train_logger.close()
@@ -116,10 +117,10 @@ class NNTrainer:
 
     def validation(self, epoch=None, validation_loader=None, epoch_run=None):
         score_acc = ScoreAccumulator()
-        # self.evaluate(data_loaders=validation_loader, logger=self.val_logger, gen_images=False, score_acc=score_acc)
-        epoch_run(epoch=epoch, data_loader=validation_loader, logger=self.val_logger, score_acc=score_acc)
+        self.evaluate(data_loaders=validation_loader, logger=self.val_logger, gen_images=False, score_acc=score_acc)
+        # epoch_run(epoch=epoch, data_loader=validation_loader, logger=self.val_logger, score_acc=score_acc)
         p, r, f1, a = score_acc.get_prfa()
-        print('### PRF1A: ', p, r, f1, a, self.dparm(self.conf))
+        print('>>> PRF1: ', [p, r, f1], self.dparm(self.conf))
         self._save_if_better(score=f1)
 
     def resume_from_checkpoint(self, parallel_trained=False):
