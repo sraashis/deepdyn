@@ -1,0 +1,48 @@
+{
+  "train": [
+    "27_training.tif",
+    "33_training.tif",
+    "24_training.tif",
+    "25_training.tif",
+    "32_training.tif",
+    "36_training.tif",
+    "29_training.tif",
+    "30_training.tif",
+    "34_training.tif",
+    "28_training.tif",
+    "40_training.tif",
+    "39_training.tif",
+    "37_training.tif",
+    "35_training.tif",
+    "23_training.tif"
+  ],
+  "validation": [
+    "21_training.tif",
+    "22_training.tif",
+    "38_training.tif",
+    "26_training.tif",
+    "31_training.tif"
+  ],
+  "test": [
+    "11_test.tif",
+    "02_test.tif",
+    "15_test.tif",
+    "04_test.tif",
+    "20_test.tif",
+    "01_test.tif",
+    "19_test.tif",
+    "08_test.tif",
+    "06_test.tif",
+    "18_test.tif",
+    "14_test.tif",
+    "03_test.tif",
+    "07_test.tif",
+    "09_test.tif",
+    "12_test.tif",
+    "16_test.tif",
+    "05_test.tif",
+    "10_test.tif",
+    "17_test.tif",
+    "13_test.tif"
+  ]
+}
