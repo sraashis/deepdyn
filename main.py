@@ -26,5 +26,3 @@ if __name__ == "__main__":
 
     for r1 in runs_unet:
         unet.run([r1], transforms)
-    #     mini_unet.run([r2], transforms)
-    # unet.run([ru.DRIVE_1_100_1], transforms)
