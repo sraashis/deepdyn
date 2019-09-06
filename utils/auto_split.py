@@ -8,15 +8,15 @@ import json
 import os
 import random
 import sys
-
-try:
-    BASE_PROJECT_DIR = '/home/ak/PycharmProjects/ature'
-    sys.path.append(BASE_PROJECT_DIR)
-    os.chdir(BASE_PROJECT_DIR)
-except:
-    BASE_PROJECT_DIR = '/home/akhanal1/ature'
-    sys.path.append(BASE_PROJECT_DIR)
-    os.chdir(BASE_PROJECT_DIR)
+#
+# try:
+#     BASE_PROJECT_DIR = '/home/ak/PycharmProjects/ature'
+#     sys.path.append(BASE_PROJECT_DIR)
+#     os.chdir(BASE_PROJECT_DIR)
+# except:
+#     BASE_PROJECT_DIR = '/home/akhanal1/ature'
+#     sys.path.append(BASE_PROJECT_DIR)
+#     os.chdir(BASE_PROJECT_DIR)
 
 
 def load_split_json(json_file):
@@ -60,8 +60,28 @@ def create_splits(files, sep1=('', 0), sep2=('', 0), json_file=None):
 
 
 if __name__ == "__main__":
-    from testarch.unet.runs import VEVIO as r
 
-    files = os.listdir(r['Dirs']['image'])
+    files = [
+    "27_training.tif",
+    "33_training.tif",
+    "22_training.tif",
+    "24_training.tif",
+    "25_training.tif",
+    "32_training.tif",
+    "26_training.tif",
+    "36_training.tif",
+    "23_training.tif",
+    "29_training.tif",
+    "30_training.tif",
+    "34_training.tif",
+    "28_training.tif",
+    "31_training.tif",
+    "40_training.tif",
+    "21_training.tif",
+    "39_training.tif",
+    "37_training.tif",
+    "35_training.tif",
+    "38_training.tif"
+  ]
     random.shuffle(files)
-    create_splits(files, ('validation', 4), ('test', 4), json_file='UNET-VEVIO.json')
+    create_splits(files, ('validation', 4), ('test', 0), json_file='UNET-DRIVE.json')

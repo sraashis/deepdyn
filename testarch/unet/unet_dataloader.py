@@ -12,7 +12,7 @@ import numpy as np
 import torch
 
 import utils.img_utils as imgutils
-from nbee.datagen import Generator
+from torchtrainer.datagen import Generator
 
 sep = os.sep
 

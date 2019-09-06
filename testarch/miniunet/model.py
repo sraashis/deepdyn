@@ -22,9 +22,9 @@ class _DoubleConvolution(nn.Module):
         return self.encode(x)
 
 
-class MapUNet(nn.Module):
+class MiniUNet(nn.Module):
     def __init__(self, num_channels, num_classes):
-        super(MapUNet, self).__init__()
+        super(MiniUNet, self).__init__()
 
         reduce_by = 4
 
@@ -52,10 +52,10 @@ class MapUNet(nn.Module):
         a_mid = self.A_mid(a4_dwn)
 
         a4_up = self.A4_up(a_mid)
-        _a4 = self._A4(MapUNet.match_and_concat(a4_, a4_up))
+        _a4 = self._A4(MiniUNet.match_and_concat(a4_, a4_up))
 
         a3_up = self.A3_up(_a4)
-        _a3 = self._A3(MapUNet.match_and_concat(a3_, a3_up))
+        _a3 = self._A3(MiniUNet.match_and_concat(a3_, a3_up))
 
         final = self.final(_a3)
         return F.softmax(final, 1)
@@ -68,6 +68,6 @@ class MapUNet(nn.Module):
         return torch.cat((upsampled, bypass), 1)
 
 
-m = MapUNet(1, 2)
+m = MiniUNet(1, 2)
 torch_total_params = sum(p.numel() for p in m.parameters() if p.requires_grad)
 print('Total Params:', torch_total_params)
