@@ -59,9 +59,10 @@ class NNTrainer:
 
     def test(self, data_loaders=None):
         print('Running test')
-        self.model.eval()
         score = ScoreAccumulator()
-        self.evaluate(data_loaders=data_loaders, gen_images=True, score_acc=score, logger=self.test_logger)
+        self.model.eval()
+        with torch.no_grad():
+            self.evaluate(data_loaders=data_loaders, gen_images=True, score_acc=score, logger=self.test_logger)
         self._on_test_end(log_file=self.test_logger.name)
         if not self.test_logger and not self.test_logger.closed:
             self.test_logger.close()
@@ -90,9 +91,9 @@ class NNTrainer:
                 self.model.eval()
                 with torch.no_grad():
                     self.validation(epoch=epoch, validation_loader=validation_loader, epoch_run=epoch_run)
-                    self._on_validation_end(data_loader=validation_loader, log_file=self.val_logger.name)
-                    if self.early_stop(patience=self.patience):
-                        return
+                self._on_validation_end(data_loader=validation_loader, log_file=self.val_logger.name)
+                if self.early_stop(patience=self.patience):
+                    return
                 print('########################################################')
 
         if not self.train_logger and not self.train_logger.closed:
