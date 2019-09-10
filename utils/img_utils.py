@@ -36,14 +36,14 @@ class Image:
         try:
             self.data_dir = data_dir
             self.file_name = file_name
-            self.image_arr = np.array(IMG.open(os.path.join(self.data_dir, self.file_name)))
+            self.image_arr = np.array(IMG.open(os.path.join(self.data_dir, self.file_name)), dtype=np.uint8)
         except Exception as e:
             print('### Error Loading file: ' + self.file_name + ': ' + str(e))
 
     def load_mask(self, mask_dir=None, fget_mask=None):
         try:
             mask_file = fget_mask(self.file_name)
-            self.mask = np.array(IMG.open(os.path.join(mask_dir, mask_file)))
+            self.mask = np.array(IMG.open(os.path.join(mask_dir, mask_file)), dtype=np.uint8)
         except Exception as e:
             print('### Fail to load mask: ' + str(e))
 
@@ -56,7 +56,7 @@ class Image:
     def load_ground_truth(self, gt_dir=None, fget_ground_truth=None):
         try:
             gt_file = fget_ground_truth(self.file_name)
-            self.ground_truth = np.array(IMG.open(os.path.join(gt_dir, gt_file)))
+            self.ground_truth = np.array(IMG.open(os.path.join(gt_dir, gt_file)), dtype=np.uint8)
         except Exception as e:
             print('### Fail to load ground truth: ' + str(e))
 

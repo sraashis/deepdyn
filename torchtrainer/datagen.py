@@ -45,6 +45,7 @@ class Generator(Dataset):
             img_obj.load_mask(mask_dir=self.mask_dir, fget_mask=self.mask_getter)
         if self.truth_getter is not None:
             img_obj.load_ground_truth(gt_dir=self.truth_dir, fget_ground_truth=self.truth_getter)
+            img_obj.ground_truth[img_obj.ground_truth == 1] = 255
 
         img_obj.working_arr = img_obj.image_arr
         img_obj.apply_clahe()
@@ -64,8 +65,9 @@ class Generator(Dataset):
 
         self.conf['Params']['cls_weights'] = [0, 0]
         for _, obj in self.image_objects.items():
-            self.conf['Params']['cls_weights'][0] += dutils.get_class_weights(obj.ground_truth)[0]
-            self.conf['Params']['cls_weights'][1] += dutils.get_class_weights(obj.ground_truth)[255]
+            cls_weights = dutils.get_class_weights(obj.ground_truth)
+            self.conf['Params']['cls_weights'][0] += cls_weights[0]
+            self.conf['Params']['cls_weights'][1] += cls_weights[255]
 
         self.conf['Params']['cls_weights'][0] = self.conf['Params']['cls_weights'][0] / len(self.image_objects)
         self.conf['Params']['cls_weights'][1] = self.conf['Params']['cls_weights'][1] / len(self.image_objects)
