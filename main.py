@@ -17,14 +17,12 @@ if __name__ == "__main__":
                  ru.VEVIO_MOSAICS_1_100_1, ru.VEVIO_MOSAICS_1_1, ru.VEVIO_MOSAICS_WEIGHTED,
                  ru.VEVIO_FRAMES_1_100_1, ru.VEVIO_FRAMES_1_1, ru.VEVIO_FRAMES_WEIGHTED]
 
-    # runs_miniunet = [rm.DRIVE_1_100_1, rm.DRIVE_1_1, rm.DRIVE_WEIGHTED,
-    #                  rm.STARE_1_100_1, rm.STARE_1_1, rm.STARE_WEIGHTED,
-    #                  rm.WIDE_1_100_1, rm.WIDE_1_1, rm.WIDE_WEIGHTED,
-    #                  rm.CHASEDB_1_100_1, rm.CHASEDB_1_1, rm.CHASEDB_WEIGHTED,
-    #                  rm.VEVIO_MOSAICS_1_100_1, rm.VEVIO_MOSAICS_1_1, rm.VEVIO_MOSAICS_WEIGHTED,
-    #                  rm.VEVIO_FRAMES_1_100_1, rm.VEVIO_FRAMES_1_1, rm.VEVIO_FRAMES_WEIGHTED]
+    runs_miniunet = [rm.DRIVE_1_100_1, rm.DRIVE_1_1, rm.DRIVE_WEIGHTED,
+                     rm.STARE_1_100_1, rm.STARE_1_1, rm.STARE_WEIGHTED,
+                     rm.WIDE_1_100_1, rm.WIDE_1_1, rm.WIDE_WEIGHTED,
+                     rm.CHASEDB_1_100_1, rm.CHASEDB_1_1, rm.CHASEDB_WEIGHTED,
+                     rm.VEVIO_MOSAICS_1_100_1, rm.VEVIO_MOSAICS_1_1, rm.VEVIO_MOSAICS_WEIGHTED,
+                     rm.VEVIO_FRAMES_1_100_1, rm.VEVIO_FRAMES_1_1, rm.VEVIO_FRAMES_WEIGHTED]
 
-    for r1 in runs_unet:
-        unet.run([r1], transforms)
-    #     mini_unet.run([r2], transforms)
-    # unet.run([ru.DRIVE_1_100_1], transforms)
+    for ru, rmu in zip(runs_unet, runs_miniunet):
+        unet.run([ru, rmu], transforms)
