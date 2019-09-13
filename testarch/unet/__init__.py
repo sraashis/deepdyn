@@ -52,7 +52,9 @@ def run(runs, transforms):
                                   epoch_run=trainer.epoch_ce_loss)
 
                 test_loader = PatchesGenerator.get_loader_per_img(conf=R,
-                                                                  images=splits['test'], mode='test',
+                                                                  images=splits['test'] + splits['train'] + splits[
+                                                                      'validation'],
+                                                                  mode='test',
                                                                   transforms=transforms)
 
                 trainer.resume_from_checkpoint(parallel_trained=R.get('Params').get('parallel_trained'))
