@@ -2,6 +2,7 @@ import torchvision.transforms as tmf
 
 import testarch.miniunet.runs as rm
 import testarch.unet as unet
+import testarch.miniunet as miniunet
 import testarch.unet.runs as ru
 
 transforms = tmf.Compose([
@@ -24,5 +25,6 @@ if __name__ == "__main__":
                      rm.VEVIO_MOSAICS_1_100_1, rm.VEVIO_MOSAICS_1_1, rm.VEVIO_MOSAICS_WEIGHTED,
                      rm.VEVIO_FRAMES_1_100_1, rm.VEVIO_FRAMES_1_1, rm.VEVIO_FRAMES_WEIGHTED]
 
-    for ru, rmu in zip(runs_unet, runs_miniunet):
-        unet.run([ru, rmu], transforms)
+    for runet, rminiunet in zip(runs_unet, runs_miniunet):
+        unet.run([runet], transforms)
+        miniunet.run([rminiunet], transforms)
