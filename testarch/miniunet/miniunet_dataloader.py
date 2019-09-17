@@ -9,14 +9,12 @@ from random import shuffle
 
 import numpy as np
 import torch
-import torchvision.transforms as tfm
 from skimage.morphology import skeletonize
 
 import utils.img_utils as iu
 from utils.img_utils import Image
 from torchtrainer.datagen import Generator
 import random
-
 sep = os.sep
 
 
@@ -38,8 +36,7 @@ class PatchesGenerator(Generator):
             all_pix_pos = list(zip(*np.where(img_obj.extra['seed'] == 255)))
             all_patch_indices = list(
                 iu.get_chunk_indices_by_index(img_obj.working_arr.shape, self.patch_shape, all_pix_pos))
-            # all_patch_indices = list(
-            #     iu.get_chunk_indexes(img_obj.working_arr.shape, self.patch_shape, self.patch_shape))
+
             for chunk_ix in all_patch_indices:
                 self.indices.append([ID] + chunk_ix)
             self.image_objects[ID] = img_obj
@@ -59,7 +56,9 @@ class PatchesGenerator(Generator):
         img_obj.apply_mask()
 
         sup, res = 20, 235
-
+        # rngea = np.arange(5, 50, 5)
+        # rngeb = np.arange(200, 250, 5)
+        # sup, res = random.choice(rngea), random.choice(rngeb)
         img_obj.extra['unet'] = iu.get_image_as_array(
             self.unet_dir + sep + img_obj.file_name.split('.')[0] + self.input_image_ext, 1)
 
@@ -102,7 +101,6 @@ class PatchesGenerator(Generator):
     def __getitem__(self, index):
         ID, row_from, row_to, col_from, col_to = self.indices[index]
 
-        orig = self.image_objects[ID].working_arr
         unet_map = 255 - self.image_objects[ID].extra['unet']
         mid_pix = 255 - self.image_objects[ID].extra['mid_pix']
 
@@ -110,18 +108,15 @@ class PatchesGenerator(Generator):
         p, q, r, s, pad = iu.expand_and_mirror_patch(full_img_shape=self.image_objects[ID].working_arr.shape,
                                                      orig_patch_indices=[row_from, row_to, col_from, col_to],
                                                      expand_by=self.expand_by)
-        orig_patch = np.pad(orig[p:q, r:s], pad, 'reflect')
         mid_patch = np.pad(mid_pix[p:q, r:s], pad, 'reflect')
         unet_patch = np.pad(unet_map[p:q, r:s], pad, 'reflect')
 
         if self.mode == 'train' and random.uniform(0, 1) <= 0.5:
-            orig_patch = np.flip(orig_patch, 0)
             unet_patch = np.flip(unet_patch, 0)
             mid_patch = np.flip(mid_patch, 0)
             y_mid = np.flip(y_mid, 0)
 
         if self.mode == 'train' and random.uniform(0, 1) <= 0.5:
-            orig_patch = np.flip(orig_patch, 1)
             unet_patch = np.flip(unet_patch, 1)
             mid_patch = np.flip(mid_patch, 1)
             y_mid = np.flip(y_mid, 1)
@@ -135,7 +130,7 @@ class PatchesGenerator(Generator):
         return {'id': ID,
                 'inputs': img_tensor,
                 'labels': y_mid.copy(),
-                'clip_ix': np.array([row_from, row_to, col_from, col_to]), }
+                'clip_ix': np.array([row_from, row_to, col_from, col_to])}
 
     @classmethod
     def get_loader_per_img(cls, images, conf, mode, transforms):

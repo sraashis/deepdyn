@@ -52,8 +52,7 @@ def run(runs, transforms):
                                   epoch_run=trainer.epoch_ce_loss)
 
                 test_loader = PatchesGenerator.get_loader_per_img(conf=R,
-                                                                  images=splits['test'] + splits['train'] + splits[
-                                                                      'validation'],
+                                                                  images=splits['test'],
                                                                   mode='test',
                                                                   transforms=transforms)
 
