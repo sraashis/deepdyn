@@ -55,7 +55,7 @@ class NNTrainer:
         self.model = model.to(self.device)
         self.optimizer = optimizer
         self.checkpoint = {'total_epochs:': 0, 'epochs': 0, 'state': None, 'score': 0.0, 'model': 'EMPTY'}
-        self.patience = self.conf.get('Params').get('patience', 150)
+        self.patience = self.conf.get('Params').get('patience', 35)
 
     def test(self, data_loaders=None):
         print('Running test')
@@ -77,7 +77,7 @@ class NNTrainer:
         print('Training...')
         for epoch in range(1, self.epochs + 1):
             self.model.train()
-            # self._adjust_learning_rate(epoch=epoch)
+            self._adjust_learning_rate(epoch=epoch)
             self.checkpoint['total_epochs'] = epoch
 
             # Run one epoch
@@ -121,7 +121,7 @@ class NNTrainer:
         self.evaluate(data_loaders=validation_loader, logger=self.val_logger, gen_images=False, score_acc=score_acc)
         # epoch_run(epoch=epoch, data_loader=validation_loader, logger=self.val_logger, score_acc=score_acc)
         p, r, f1, a = score_acc.get_prfa()
-        print('>>> PRF1: ', [p, r, f1], self.dparm(self.conf))
+        print('>>> PRF1: ', [p, r, f1, a])
         self._save_if_better(score=f1)
 
     def resume_from_checkpoint(self, parallel_trained=False):
@@ -258,18 +258,12 @@ class NNTrainer:
         running_loss = 0.0
         for i, data in enumerate(kw['data_loader'], 1):
             inputs, labels = data['inputs'].to(self.device).float(), data['labels'].to(self.device).long()
-            # weights = data['weights'].to(self.device)
 
             if self.model.training:
                 self.optimizer.zero_grad()
 
             outputs = self.model(inputs)
             _, predicted = torch.max(outputs, 1)
-
-            # Balancing imbalanced class as per computed weights from the dataset
-            # w = torch.FloatTensor(2).random_(1, 100).to(self.device)
-            # wd = torch.FloatTensor(*labels.shape).uniform_(0.1, 2).to(self.device)
-
             loss = dice_loss(outputs[:, 1, :, :], labels, beta=rd.choice(np.arange(1, 2, 0.1).tolist()))
 
             if self.model.training:
