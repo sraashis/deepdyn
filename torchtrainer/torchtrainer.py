@@ -166,9 +166,9 @@ class NNTrainer:
 
         if os.path.isfile(log_file):
             print('### CRITICAL!!! ' + log_file + '" already exists.')
-            # ip = input('Override? [Y/N]: ')
-            # if ip == 'N' or ip == 'n':
-            #     sys.exit(1)
+            ip = input('Override? [Y/N]: ')
+            if ip == 'N' or ip == 'n':
+                sys.exit(1)
 
         file = open(log_file, 'w')
         NNTrainer.flush(file, header)
