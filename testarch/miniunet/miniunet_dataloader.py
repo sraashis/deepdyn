@@ -56,9 +56,6 @@ class PatchesGenerator(Generator):
         img_obj.apply_mask()
 
         sup, res = 20, 235
-        # rngea = np.arange(5, 50, 5)
-        # rngeb = np.arange(200, 250, 5)
-        # sup, res = random.choice(rngea), random.choice(rngeb)
         img_obj.extra['unet'] = iu.get_image_as_array(
             self.unet_dir + sep + img_obj.file_name.split('.')[0] + self.input_image_ext, 1)
 

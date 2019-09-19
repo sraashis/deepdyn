@@ -8,7 +8,7 @@ Params = {
     'num_channels': 2,
     'num_classes': 2,
     'batch_size': 4,
-    'epochs': 61,
+    'epochs': 101,
     'learning_rate': 0.001,
     'patch_shape': (100, 100),
     'expand_patch_by': (40, 40),

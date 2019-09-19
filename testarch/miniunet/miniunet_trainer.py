@@ -51,8 +51,6 @@ class MiniUNetTrainer(NNTrainer):
             x, y = img_obj.working_arr.shape[0], img_obj.working_arr.shape[1]
             predicted_img = torch.FloatTensor(x, y).fill_(0).to(self.device)
 
-            gt = torch.FloatTensor(img_obj.ground_truth).to(self.device)
-
             for i, data in enumerate(loader, 1):
                 inputs, labels = data['inputs'].to(self.device).float(), data['labels'].to(self.device).float()
                 clip_ix = data['clip_ix'].to(self.device).int()
@@ -84,7 +82,7 @@ class MiniUNetTrainer(NNTrainer):
                 IMG.fromarray(np.array(predicted_img, dtype=np.uint8)).save(
                     os.path.join(self.log_dir, 'pred_' + img_obj.file_name.split('.')[0] + '.png'))
             else:  #### Validation mode
-                img_score.add_tensor(predicted_img, gt)
+                img_score.add_tensor(predicted_img, torch.FloatTensor(img_obj.extra['gt_mid']).to(self.device))
                 score_acc.accumulate(img_score)
                 prf1a = img_score.get_prfa()
                 print(img_obj.file_name, ' PRF1A', prf1a)
