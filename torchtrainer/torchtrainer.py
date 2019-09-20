@@ -227,8 +227,7 @@ class NNTrainer:
             outputs = self.model(inputs)
             _, predicted = torch.max(outputs, 1)
 
-            loss = F.cross_entropy(outputs, labels,
-                                   weight=torch.FloatTensor(self.dparm(self.conf)).to(self.device))
+            loss = F.cross_entropy(outputs, labels, weight=torch.FloatTensor(self.dparm(self.conf)).to(self.device))
 
             if self.model.training:
                 loss.backward()
