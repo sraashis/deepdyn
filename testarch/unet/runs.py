@@ -29,7 +29,7 @@ Params = {
 
 def dparm_1_100_1(x=None):
     w_ = np.random.choice(np.arange(0.01, 0.3, 0.01))
-    wt = np.array([w_, 1 - w_]) * 255
+    wt = np.array([w_, 1 - w_]) * 100
     random.shuffle(wt)
     return wt
 
