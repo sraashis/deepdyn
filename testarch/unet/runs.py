@@ -1,5 +1,7 @@
 import copy
 import os
+import random
+
 import numpy as np
 
 sep = os.sep
@@ -10,7 +12,7 @@ Params = {
     'num_channels': 1,
     'num_classes': 2,
     'batch_size': 4,
-    'epochs': 351,
+    'epochs': 251,
     'learning_rate': 0.001,
     'patch_shape': (388, 388),
     'patch_offset': (150, 150),
@@ -24,7 +26,14 @@ Params = {
     'parallel_trained': False,
 }
 
-dparm_1_100_1 = lambda x: np.random.choice(np.arange(1, 101, 1), 2)
+
+def dparm_1_100_1(x=None):
+    w_ = np.random.choice(np.arange(0.01, 0.3, 0.01))
+    wt = np.array([w_, 1 - w_]) * 255
+    random.shuffle(wt)
+    return wt
+
+
 dparm_1_1 = lambda x: [1, 1]
 d_parm_weighted = lambda x: [x['Params']['cls_weights'][0], x['Params']['cls_weights'][1]]
 ##############################################################################################
@@ -47,7 +56,6 @@ DRIVE = {
 DRIVE_1_100_1 = copy.deepcopy(DRIVE)
 DRIVE_1_100_1['Dirs']['logs'] = 'logs' + sep + 'DRIVE' + sep + 'UNET_1_100_1'
 DRIVE_1_100_1['Funcs']['dparm'] = dparm_1_100_1
-
 
 DRIVE_1_1 = copy.deepcopy(DRIVE)
 DRIVE_1_1['Dirs']['logs'] = 'logs' + sep + 'DRIVE' + sep + 'UNET_1_1'

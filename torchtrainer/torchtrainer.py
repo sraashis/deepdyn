@@ -55,7 +55,7 @@ class NNTrainer:
         self.model = model.to(self.device)
         self.optimizer = optimizer
         self.checkpoint = {'total_epochs:': 0, 'epochs': 0, 'state': None, 'score': 0.0, 'model': 'EMPTY'}
-        self.patience = self.conf.get('Params').get('patience', 35)
+        self.patience = self.conf.get('Params').get('patience', 40)
 
     def test(self, data_loaders=None):
         print('Running test')
@@ -226,7 +226,9 @@ class NNTrainer:
 
             outputs = self.model(inputs)
             _, predicted = torch.max(outputs, 1)
-            loss = F.nll_loss(outputs, labels, weight=torch.FloatTensor(self.dparm(self.conf)).to(self.device))
+
+            loss = F.cross_entropy(outputs, labels,
+                                   weight=torch.FloatTensor(self.dparm(self.conf)).to(self.device))
 
             if self.model.training:
                 loss.backward()
@@ -264,8 +266,12 @@ class NNTrainer:
 
             outputs = self.model(inputs)
             _, predicted = torch.max(outputs, 1)
-            loss = dice_loss(outputs[:, 1, :, :], labels, beta=rd.choice(np.arange(1, 2, 0.1).tolist()))
 
+            outputs_softmax = F.softmax(outputs, 1)
+            loss1 = dice_loss(outputs_softmax[:, 1, :, :], labels, beta=rd.choice(np.arange(1, 2, 0.1).tolist()))
+            loss2 = dice_loss(outputs_softmax[:, 0, :, :], 1 - labels,
+                              beta=rd.choice(np.arange(1, 2, 0.1).tolist()))
+            loss = loss1 + loss2
             if self.model.training:
                 loss.backward()
                 self.optimizer.step()

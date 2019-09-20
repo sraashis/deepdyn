@@ -12,6 +12,7 @@ from PIL import Image as IMG
 
 from torchtrainer.torchtrainer import NNTrainer
 from utils.measurements import ScoreAccumulator
+import torch.nn.functional as F
 
 sep = os.sep
 
@@ -55,7 +56,7 @@ class MiniUNetTrainer(NNTrainer):
                 inputs, labels = data['inputs'].to(self.device).float(), data['labels'].to(self.device).float()
                 clip_ix = data['clip_ix'].to(self.device).int()
 
-                outputs = self.model(inputs)
+                outputs = F.softmax(self.model(inputs), 1)
                 _, predicted = torch.max(outputs, 1)
                 predicted_map = outputs[:, 1, :, :]
 

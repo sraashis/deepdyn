@@ -100,6 +100,7 @@ class PatchesGenerator(Generator):
 
         unet_map = 255 - self.image_objects[ID].extra['unet']
         mid_pix = 255 - self.image_objects[ID].extra['mid_pix']
+        # working_arr = 255 - self.image_objects[ID].working_arr
 
         y_mid = self.image_objects[ID].extra['gt_mid'][row_from:row_to, col_from:col_to]
         p, q, r, s, pad = iu.expand_and_mirror_patch(full_img_shape=self.image_objects[ID].working_arr.shape,
@@ -107,16 +108,19 @@ class PatchesGenerator(Generator):
                                                      expand_by=self.expand_by)
         mid_patch = np.pad(mid_pix[p:q, r:s], pad, 'reflect')
         unet_patch = np.pad(unet_map[p:q, r:s], pad, 'reflect')
+        # green_ch = np.pad(working_arr[p:q, r:s], pad, 'reflect')
 
         if self.mode == 'train' and random.uniform(0, 1) <= 0.5:
             unet_patch = np.flip(unet_patch, 0)
             mid_patch = np.flip(mid_patch, 0)
             y_mid = np.flip(y_mid, 0)
+            # green_ch = np.flip(green_ch, 0)
 
         if self.mode == 'train' and random.uniform(0, 1) <= 0.5:
             unet_patch = np.flip(unet_patch, 1)
             mid_patch = np.flip(mid_patch, 1)
             y_mid = np.flip(y_mid, 1)
+            # green_ch = np.flip(green_ch, 1)
 
         y_mid[y_mid == 255] = 1
         if self.conf['Params']['num_channels'] == 1:
