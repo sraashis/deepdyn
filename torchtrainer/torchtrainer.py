@@ -266,11 +266,7 @@ class NNTrainer:
             outputs = self.model(inputs)
             _, predicted = torch.max(outputs, 1)
 
-            outputs_softmax = F.softmax(outputs, 1)
-            loss1 = dice_loss(outputs_softmax[:, 1, :, :], labels, beta=rd.choice(np.arange(1, 2, 0.1).tolist()))
-            loss2 = dice_loss(outputs_softmax[:, 0, :, :], 1 - labels,
-                              beta=rd.choice(np.arange(1, 2, 0.1).tolist()))
-            loss = loss1 + loss2
+            loss = dice_loss(F.softmax(outputs, 1)[:, 1, :, :], labels, beta=rd.choice(np.arange(1, 2, 0.1).tolist()))
             if self.model.training:
                 loss.backward()
                 self.optimizer.step()
