@@ -22,6 +22,7 @@ class MiniUNetTrainer(NNTrainer):
         NNTrainer.__init__(self, **kwargs)
         self.patch_shape = self.conf.get('Params').get('patch_shape')
         self.patch_offset = self.conf.get('Params').get('patch_offset')
+        self.patience = self.conf.get('Params').get('patience', 21)
 
     def get_log_headers(self):
         return {
@@ -71,7 +72,7 @@ class MiniUNetTrainer(NNTrainer):
                 predicted_img = predicted_img.cpu().numpy() * 255
                 predicted_img[img_obj.extra['fill_in'] == 1] = 255
 
-                img_score.add_array(predicted_img, img_obj.ground_truth)
+                img_score.reset().add_array(predicted_img, img_obj.ground_truth)
                 ### Only save scores for test images############################
 
                 self.conf['acc'].accumulate(img_score)  # Global score
@@ -81,9 +82,9 @@ class MiniUNetTrainer(NNTrainer):
                 #################################################################
 
                 IMG.fromarray(np.array(predicted_img, dtype=np.uint8)).save(
-                    os.path.join(self.log_dir, 'pred_' + img_obj.file_name.split('.')[0] + '.png'))
+                    os.path.join(self.log_dir, img_obj.file_name.split('.')[0] + '.png'))
             else:  #### Validation mode
-                img_score.add_tensor(predicted_img, torch.FloatTensor(img_obj.extra['gt_mid']).to(self.device))
+                img_score.reset().add_tensor(predicted_img, torch.FloatTensor(img_obj.extra['gt_mid']).to(self.device))
                 score_acc.accumulate(img_score)
                 prf1a = img_score.get_prfa()
                 print(img_obj.file_name, ' PRF1A', prf1a)
