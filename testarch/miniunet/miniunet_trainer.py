@@ -22,7 +22,7 @@ class MiniUNetTrainer(NNTrainer):
         NNTrainer.__init__(self, **kwargs)
         self.patch_shape = self.conf.get('Params').get('patch_shape')
         self.patch_offset = self.conf.get('Params').get('patch_offset')
-        self.patience = self.conf.get('Params').get('patience', 21)
+        self.patience = self.conf.get('Params').get('patience', 31)
 
     def get_log_headers(self):
         return {
