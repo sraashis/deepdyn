@@ -26,14 +26,7 @@ Params = {
     'parallel_trained': False,
 }
 
-
-def dparm_1_100_1(x=None):
-    w_ = np.random.choice(np.arange(0.01, 0.3, 0.01))
-    wt = np.array([w_, 1 - w_]) * 100
-    random.shuffle(wt)
-    return wt
-
-
+dparm_1_100_1 = lambda x: np.random.choice(np.arange(1, 101, 1), 2)
 dparm_1_1 = lambda x: [1, 1]
 d_parm_weighted = lambda x: [x['Params']['cls_weights'][0], x['Params']['cls_weights'][1]]
 ##############################################################################################
