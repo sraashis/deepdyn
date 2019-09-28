@@ -263,7 +263,7 @@ class NNTrainer:
             if self.model.training:
                 self.optimizer.zero_grad()
 
-            outputs = F.sigmoid(self.model(inputs))
+            outputs = F.softmax(self.model(inputs), 1)
             _, predicted = torch.max(outputs, 1)
 
             loss = dice_loss(outputs[:, 1, :, :], labels, beta=rd.choice(np.arange(1, 2, 0.1).tolist()))
