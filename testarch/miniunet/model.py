@@ -58,7 +58,7 @@ class MiniUNet(nn.Module):
         _a3 = self._A3(MiniUNet.match_and_concat(a3_, a3_up))
 
         final = self.final(_a3)
-        return F.softmax(final, 1)
+        return final
 
     @staticmethod
     def match_and_concat(bypass, upsampled, crop=True):

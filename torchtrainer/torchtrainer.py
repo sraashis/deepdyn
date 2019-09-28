@@ -55,7 +55,7 @@ class NNTrainer:
         self.model = model.to(self.device)
         self.optimizer = optimizer
         self.checkpoint = {'total_epochs:': 0, 'epochs': 0, 'state': None, 'score': 0.0, 'model': 'EMPTY'}
-        self.patience = self.conf.get('Params').get('patience', 35)
+        self.patience = self.conf.get('Params').get('patience', 51)
 
     def test(self, data_loaders=None):
         print('Running test')
@@ -224,8 +224,9 @@ class NNTrainer:
             if self.model.training:
                 self.optimizer.zero_grad()
 
-            outputs = self.model(inputs)
+            outputs = F.log_softmax(self.model(inputs), 1)
             _, predicted = torch.max(outputs, 1)
+
             loss = F.nll_loss(outputs, labels, weight=torch.FloatTensor(self.dparm(self.conf)).to(self.device))
 
             if self.model.training:
@@ -262,10 +263,10 @@ class NNTrainer:
             if self.model.training:
                 self.optimizer.zero_grad()
 
-            outputs = self.model(inputs)
+            outputs = F.sigmoid(self.model(inputs))
             _, predicted = torch.max(outputs, 1)
-            loss = dice_loss(outputs[:, 1, :, :], labels, beta=rd.choice(np.arange(1, 2, 0.1).tolist()))
 
+            loss = dice_loss(outputs[:, 1, :, :], labels, beta=rd.choice(np.arange(1, 2, 0.1).tolist()))
             if self.model.training:
                 loss.backward()
                 self.optimizer.step()

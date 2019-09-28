@@ -9,6 +9,7 @@ import os
 import numpy as np
 import torch
 from PIL import Image as IMG
+import torch.nn.functional as F
 
 import viz.nviz as plt
 from torchtrainer.torchtrainer import NNTrainer
@@ -62,7 +63,7 @@ class UNetTrainer(NNTrainer):
                 inputs, labels = data['inputs'].to(self.device).float(), data['labels'].to(self.device).float()
                 clip_ix = data['clip_ix'].to(self.device).int()
 
-                outputs = self.model(inputs)
+                outputs = F.softmax(self.model(inputs), 1)
                 _, predicted = torch.max(outputs, 1)
                 predicted_map = outputs[:, 1, :, :]
 
@@ -74,7 +75,7 @@ class UNetTrainer(NNTrainer):
 
             img_score = ScoreAccumulator()
             if gen_images:  #### Test mode
-                map_img = (torch.exp(map_img) * 255).cpu().numpy()
+                map_img = map_img.cpu().numpy() * 255
                 predicted_img = predicted_img.cpu().numpy() * 255
 
                 img_score.add_array(predicted_img, img_obj.ground_truth)
