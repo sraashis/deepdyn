@@ -224,7 +224,7 @@ class NNTrainer:
             if self.model.training:
                 self.optimizer.zero_grad()
 
-            outputs = F.log_softmax(self.model(inputs))
+            outputs = F.log_softmax(self.model(inputs), 1)
             _, predicted = torch.max(outputs, 1)
 
             loss = F.nll_loss(outputs, labels, weight=torch.FloatTensor(self.dparm(self.conf)).to(self.device))
