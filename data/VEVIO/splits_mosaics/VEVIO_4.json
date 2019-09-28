@@ -1,0 +1,1 @@
+{"train": ["neo22od1_m.png", "neo08od1_m.png", "neo17od1_m.png", "neo15od1_m.png", "neo07od1_m.png", "neo02od1_m.png", "neo13od1_m.png", "neo04od1_m.png", "neo12od1_m.png"], "validation": ["neo10od1_m.png", "neo23od1_m.png", "neo03od1_m.png", "neo06od1_m.png"], "test": ["neo11od1_m.png", "neo14od1_m.png", "neo20od1_m.png"]}

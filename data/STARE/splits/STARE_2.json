@@ -1,0 +1,28 @@
+{
+  "train": [
+    "im0324.ppm",
+    "im0239.ppm",
+    "im0240.ppm",
+    "im0004.ppm",
+    "im0002.ppm",
+    "im0162.ppm",
+    "im0291.ppm",
+    "im0082.ppm",
+    "im0319.ppm",
+    "im0001.ppm",
+    "im0163.ppm",
+    "im0044.ppm"
+  ],
+  "validation": [
+    "im0005.ppm",
+    "im0003.ppm",
+    "im0235.ppm",
+    "im0139.ppm"
+  ],
+  "test": [
+    "im0077.ppm",
+    "im0081.ppm",
+    "im0236.ppm",
+    "im0255.ppm"
+  ]
+}
