@@ -55,7 +55,7 @@ class NNTrainer:
         self.model = model.to(self.device)
         self.optimizer = optimizer
         self.checkpoint = {'total_epochs:': 0, 'epochs': 0, 'state': None, 'score': 0.0, 'model': 'EMPTY'}
-        self.patience = self.conf.get('Params').get('patience', 51)
+        self.patience = self.conf.get('Params').get('patience', 71)
 
     def test(self, data_loaders=None):
         print('Running test')
