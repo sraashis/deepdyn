@@ -78,7 +78,7 @@ class UNetTrainer(NNTrainer):
                 map_img = map_img.cpu().numpy() * 255
                 predicted_img = predicted_img.cpu().numpy() * 255
 
-                img_score.add_array(predicted_img, img_obj.ground_truth)
+                img_score.reset().add_array(predicted_img, img_obj.ground_truth)
                 ### Only save scores for test images############################
 
                 self.conf['acc'].accumulate(img_score)  # Global score
@@ -92,7 +92,7 @@ class UNetTrainer(NNTrainer):
                 IMG.fromarray(np.array(map_img, dtype=np.uint8)).save(
                     os.path.join(self.log_dir, img_obj.file_name.split('.')[0] + '.png'))
             else:  #### Validation mode
-                img_score.add_tensor(predicted_img, gt)
+                img_score.reset().add_tensor(predicted_img, gt)
                 score_acc.accumulate(img_score)
                 prf1a = img_score.get_prfa()
                 print(img_obj.file_name, ' PRF1A', prf1a)
