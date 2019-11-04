@@ -77,7 +77,7 @@ class NNTrainer:
         print('Training...')
         for epoch in range(1, self.epochs + 1):
             self.model.train()
-            self._adjust_learning_rate(epoch=epoch)
+            # self._adjust_learning_rate(epoch=epoch)
             self.checkpoint['total_epochs'] = epoch
 
             # Run one epoch
@@ -263,7 +263,7 @@ class NNTrainer:
             if self.model.training:
                 self.optimizer.zero_grad()
 
-            outputs = F.sigmoid(self.model(inputs))
+            outputs = F.softmax(self.model(inputs), 1)
             _, predicted = torch.max(outputs, 1)
 
             loss = dice_loss(outputs[:, 1, :, :], labels, beta=rd.choice(np.arange(1, 2, 0.1).tolist()))
