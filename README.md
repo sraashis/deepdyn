@@ -8,7 +8,7 @@ Along with example of unet for DRIVE dataset segmentation [1]. DRIVE dataset is 
 We need python3, numpy, pandas, pytorch, torchvision, matplotlib and PILLOW packages
 
 ```
-pip install -r ature/assets/requirements.txt
+pip install -r deepdyn/assets/requirements.txt
 ```
 
 ![Flow](assets/flow_ature.png)
@@ -16,12 +16,12 @@ pip install -r ature/assets/requirements.txt
 
 ## Project Structure
 
-* [ature/torchtrainer](https://github.com/sraashis/ature/tree/master/nbee) framework core.
-* [ature/utils](https://github.com/sraashis/ature/tree/master/utils) Utilities for dealing with F1-score, image cropping, slicing, visual precision-recall, auto split train-validation-test set and many more.
-* [ature/viz](https://github.com/sraashis/ature/tree/master/viz) Easy pytorch visualization.
-* [ature/testarch](https://github.com/sraashis/ature/tree/master/nbee) Full end to end working [u-net(Olaf Ronneberger et al.)](https://arxiv.org/abs/1505.04597) and MINI-UNET as per Deep Dynamic(https://arxiv.org/abs/1903.07803) paper
+* [deepdyn/torchtrainer](https://github.com/sraashis/deepdyn/tree/master/nbee) framework core.
+* [deepdyn/utils](https://github.com/sraashis/deepdyn/tree/master/utils) Utilities for dealing with F1-score, image cropping, slicing, visual precision-recall, auto split train-validation-test set and many more.
+* [deepdyn/viz](https://github.com/sraashis/deepdyn/tree/master/viz) Easy pytorch visualization.
+* [deepdyn/testarch](https://github.com/sraashis/deepdyn/tree/master/nbee) Full end to end working [u-net(Olaf Ronneberger et al.)](https://arxiv.org/abs/1505.04597) and MINI-UNET as per Deep Dynamic(https://arxiv.org/abs/1903.07803) paper
 for more robust retinal image segmentation.
-* [ature/data](https://github.com/sraashis/ature/tree/master/data) DRIVE dataset..
+* [deepdyn/data](https://github.com/sraashis/deepdyn/tree/master/data) DRIVE dataset..
 
 ## Dataset check
 Original image and respective ground-truth image. Ground-truth is a binary image with each vessel pixel(white) 255
@@ -139,7 +139,7 @@ DRIVE = {
 - **parallel_trained**: If a resumed model was parallel trained or not.
 - **logs**: Dir for all logs
 - **splits_json**: A directory that consist of json files with list of files with keys 'train', 'test'
-'validation'. (https://github.com/sraashis/ature/blob/master/utils/auto_split.py) takes a folder with all images and does that automatically. This is handy when we want to do k-fold cross validation. We jsut have to generate such k json files and put in splits_json folder. 
+'validation'. (https://github.com/sraashis/deepdyn/blob/master/utils/auto_split.py) takes a folder with all images and does that automatically. This is handy when we want to do k-fold cross validation. We jsut have to generate such k json files and put in splits_json folder. 
 - **truth_getter, mask_getter**: A custom function that maps input_image to its ground_truth and mask respectively.
 
 ## Sample log
