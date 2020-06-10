@@ -89,7 +89,7 @@ class Generator(Dataset):
 
         dls = []
         for bz in batch_sizes:
-            dls.append(torch.utils.data.DataLoader(gen, batch_size=bz, shuffle=True, num_workers=5, sampler=None,
+            dls.append(torch.utils.data.DataLoader(gen, batch_size=bz, shuffle=True, num_workers=0, sampler=None,
                                                    drop_last=True))
         return dls if len(dls) > 1 else dls[0]
 
