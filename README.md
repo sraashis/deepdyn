@@ -3,7 +3,7 @@ Implementation of Deep Dynamic Networks for Retinal Vessel Segmentation (https:/
 # A pytorch based framework for medical image processing with Convolutional Neural Network. 
 Along with example of unet for DRIVE dataset segmentation [1]. DRIVE dataset is composed of 40 retinal fundus images.
 
-##(Please check a better and pip installable version of the framework with an example over [Here](https://github.com/sraashis/easytorch).)
+## Please check a better and pip installable version of the framework with an example over [Here](https://github.com/sraashis/easytorch).)
 
 ## Required dependencies
 
